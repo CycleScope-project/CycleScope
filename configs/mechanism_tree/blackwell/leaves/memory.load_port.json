@@ -1,0 +1,25 @@
+{
+ "memory.load_port.root": {
+  "fields": {
+   "line_granular": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "blackwell.load_port_lines.b300.r1"
+    ]
+   },
+   "lane_order": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "gather_hit.b300.r2"
+    ]
+   }
+  },
+  "scope": "device"
+ }
+}

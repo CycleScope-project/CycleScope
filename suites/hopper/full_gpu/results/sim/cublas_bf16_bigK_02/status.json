@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "cublas_bf16_bigK_02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 36405,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4420173,
+ "completed": 4420173,
+ "cycles": 77094,
+ "hard": 0,
+ "walls": {
+  "convert": 10.3,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 12.0,
+  "total": 23.1
+ },
+ "rss_kb": {
+  "convert": 385960,
+  "segments": 385960,
+  "build": 385960,
+  "sim": 801636
+ },
+ "hw_cycles": 77116.0,
+ "reference_cache_control": "all",
+ "placement_digest": "937cc6867de7ae46",
+ "shards": 5
+}

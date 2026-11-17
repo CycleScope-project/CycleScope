@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "triton_grouped_gemm_tma_03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2913648,
+ "completed": 2913648,
+ "cycles": 55892,
+ "hard": 0,
+ "walls": {
+  "convert": 7.8,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 5.7,
+  "total": 14.1
+ },
+ "rss_kb": {
+  "convert": 246984,
+  "segments": 246984,
+  "build": 246984,
+  "sim": 477928
+ },
+ "hw_cycles": 59354.0,
+ "reference_cache_control": "all",
+ "placement_digest": "acbc4a2bb20db43e",
+ "shards": 4
+}

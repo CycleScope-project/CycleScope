@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C72B-NVF4-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 168901,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 5284517,
+ "completed": 5284517,
+ "cycles": 36334,
+ "hard": 0,
+ "walls": {
+  "convert": 6.8,
+  "segments": 0.0,
+  "build": 0.7,
+  "sim": 8.9,
+  "total": 16.4
+ },
+ "rss_kb": {
+  "convert": 289324,
+  "segments": 289324,
+  "build": 289324,
+  "sim": 631980
+ },
+ "hw_cycles": 35153.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 7
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-SOFTMAX-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 18405504,
+ "completed": 18405504,
+ "cycles": 44002,
+ "hard": 0,
+ "walls": {
+  "convert": 18.8,
+  "segments": 0.1,
+  "build": 1.7,
+  "sim": 42.1,
+  "total": 62.7
+ },
+ "rss_kb": {
+  "convert": 302312,
+  "segments": 302312,
+  "build": 302312,
+  "sim": 1818128
+ },
+ "hw_cycles": 44797.0,
+ "reference_cache_control": "all",
+ "placement_digest": "e3b3aa08156af80a",
+ "shards": 16
+}

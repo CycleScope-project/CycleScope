@@ -1,0 +1,17 @@
+{
+ "memory.l1.capacity.root": {
+  "fields": {
+   "l1.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 256
+    },
+    "sources": [
+     "memory_request.b300.r2.l1.outstanding_requests",
+     "mechtree.w4.mem_outstanding"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

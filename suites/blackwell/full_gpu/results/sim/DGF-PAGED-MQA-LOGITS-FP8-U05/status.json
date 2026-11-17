@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-PAGED-MQA-LOGITS-FP8-U05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 37159,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1337666,
+ "completed": 1337666,
+ "cycles": 16934,
+ "hard": 0,
+ "walls": {
+  "convert": 6.8,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 3.2,
+  "total": 10.3
+ },
+ "rss_kb": {
+  "convert": 402368,
+  "segments": 402368,
+  "build": 402368,
+  "sim": 402368
+ },
+ "hw_cycles": 17986.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

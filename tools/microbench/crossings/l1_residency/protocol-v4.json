@@ -1,0 +1,27 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "l1_residency",
+  "version": 4,
+  "supersedes": "protocol-v3.json (version 3, runs h100-r1 / b300-r1: the pinned-carveout install rule failed -- cudaFuncAttributePreferredSharedMemoryCarveout does not pin the configuration: requested 0 / 8 / 16 / >= 32 KiB gave effective L1 240 / 148 / 84 / 20 KiB (configurations 8 / 100 / 164 / 228) and the same 44 % hint gave 228 KiB at S = 0 but 100 KiB at S = 64 KiB; K(C) spread 196 KiB -> unrealised per v3. The v3 default-hint diagnostic cells, however, agreed 10 / 10 on both devices with the occupancy rule config = smallest supported configuration >= n_res x (S + static + 1 KiB), and E + config was 248 KiB for every one of them.)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanism": "memory.l1.residency l1.data_array_bytes, l1.reserved_bytes (engine l1_cap_lines: (data_array - reserved - launch static shared - launch dynamic shared) / line_bytes)",
+  "probe": "tools/microbench/crossings/l1_residency/probe/l1cap.cu version 3 unchanged (same binary, same cells, same SASS gate); the install uses the default-hint cells, the pinned cells are reported",
+  "derivation": {
+    "per_load, hit_reference, effective_capacity": "as version 3 (E(cell) = largest F with every lat(F' <= F) <= 1.10 x hit(cell), hit = lat(4 KiB), cells valid within 5 % of the run's smallest hit)",
+    "configuration": "for a default-hint cell (S dynamic shared bytes, block threads, static shared bytes from the probe's params): n_res = min(32, 64 / (block / 32), floor(228 KiB / (S + static + 1 KiB))); config(cell) = the smallest supported configuration (0, 8, 16, 32, 64, 100, 132, 164, 196, 228 KiB; CUDA programming guide cc 9.0 / 10.x) >= n_res x (S + static + 1 KiB) -- the driver's documented occupancy-maximising default; the probe's cudaOccupancyMaxActiveBlocksPerMultiprocessor value is reported next to n_res",
+    "K": "K(cell) = E(cell) + config(cell) over the 10 default-hint cells (S in {0, 32, 64, 128, 192} KiB x block in {32, 1024})",
+    "install": "data_array_bytes = round(mean K) to 1 KiB, reserved_bytes = 0 (the engine reads only the difference); 256 KiB - mean K reported as the unusable part",
+    "pinned_cells": "E of the carveout-hint cells reported with the configuration implied by E (config = 248 KiB - E rounded to the supported list) -- the hint -> configuration mapping observed, not used"
+  },
+  "acceptance": {
+    "measured": "all 10 default-hint cells valid on both runs; max K - min K <= 4 KiB (one F step); both runs give the same E at every cell",
+    "experimental": "spread <= 8 KiB or one cell differing by one step between runs",
+    "unrealised": "otherwise; leaf unchanged"
+  },
+  "engine_finding": "the L1 data budget is 248 KiB minus the shared-memory configuration the driver selects for the launch, not minus the launch's own shared bytes; the configuration follows the occupancy rule above (n_res x per-CTA need, rounded up to the supported list). The engine formula (data_array - reserved - static - dynamic) undercounts the carveout whenever several CTAs are resident per SM and overcounts it when the configuration rounds down relative to one CTA's need. Handed to the engine line with the per-cell table; no cpp change here.",
+  "devices": {"h100": "sm_90a", "b300": "sm_103a"},
+  "runs": "two runs per device in one job (the v3 r1 data are not reused: this protocol is frozen before its own runs)",
+  "install": "memory.l1.residency root fields l1.data_array_bytes / l1.reserved_bytes on both devices; source keys l1_residency.<device>.<run> with protocol tools/microbench/crossings/l1_residency/protocol-v4.json; one two-architecture 450 A/B round",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no cpp change"
+}

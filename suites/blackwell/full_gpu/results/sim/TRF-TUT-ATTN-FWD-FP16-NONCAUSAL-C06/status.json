@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-ATTN-FWD-FP16-NONCAUSAL-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 13450560,
+ "completed": 13450560,
+ "cycles": 42804,
+ "hard": 0,
+ "walls": {
+  "convert": 13.6,
+  "segments": 0.0,
+  "build": 1.2,
+  "sim": 21.5,
+  "total": 36.4
+ },
+ "rss_kb": {
+  "convert": 257348,
+  "segments": 257348,
+  "build": 257348,
+  "sim": 1301436
+ },
+ "hw_cycles": 47457.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 16
+}

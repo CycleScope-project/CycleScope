@@ -1,0 +1,17 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "register_operands",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": ["instruction.service (issue_interval_cycles of register-source ALU / FMA classes)"],
+ "devices": {"b300": "sm_103a (target)", "h100": "sm_90a (same cells, report + install if the same rule holds)"},
+ "question": "ffma2_operands (b300-r2b1) showed that the issue interval of one class changes with its source-operand form: FFMA2 2.01 / 2.26 / 3.03, scalar FFMA 1.49 with three distinct registers vs the installed 1.007 measured with reuse-friendly operands. Which static per-instruction fact predicts the interval, so that it can become a capture axis?",
+ "candidate_keys": "computed per target instruction from the SASS text and control word (static facts, the same the converter has): reads = number of distinct general-purpose source registers read from the register file (a 64-bit pair counts as 2; RZ, immediates, constant-bank and uniform operands and operands carrying .reuse do not count); bank_max = the largest number of those reads that fall in one register bank (register index mod 4).",
+ "cells": "the ffma2_operands k_thrx2 harness unchanged (16 warps, 8 independent chains, K in {16, 32, 64}, one target op per chain per K, interval = slope / 32). Classes FFMA (fma.rn.f32), FFMA2 (fma.rn.f32x2), FADD2 (add.rn.f32x2), IMAD (mad.lo.u32), FADD (add.rn.f32). Source forms per class: all sources the chain register (x, x, x); one changing + loop-invariant others (x, k1, k2); two changing (x, y, k); all distinct changing (x, y, z) — two-source classes use the applicable subset. Every (class, form) is built twice: as written, and with the chain registers' allocation perturbed (an extra live register declared before the chains) to move bank assignment. --launches 8 --reps 33, two runs.",
+ "derivation": "per kernel: interval (v3 acceptance), reads and bank_max of the target instructions in the window (a kernel whose target instructions do not share one (reads, bank_max) value is reported with its distribution and excluded from the fit).",
+ "decision": "per class: key K in {reads, bank_max, (reads, bank_max)} is accepted if every pair of kernels with the same key value agree within 5 % and the controls hold (FFMA (x, k1, k2) within 10 % of the installed 1.007 on b300; FADD2 (x, y) within 5 % of 2.01). The simplest accepted key wins (reads before bank_max before the pair). With an accepted key: interval(class, key value) is installed as a partition of the class leaf on a new capture axis named after the key (python and cpp converters identical, the partition in the common definition as for MATCH), values measured; key values not covered by a kernel take the nearest measured value and are recorded. No accepted key -> nothing installed, the table is reported.",
+ "install": "sources register_operands.<device>.r<n>; converter axis + tree partition + values in one semantic change; A/B 500 x 2 against the current main baseline with single-class fallback arms for cases > 3 %",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or key change after data",
+ "addenda": []
+}

@@ -1,0 +1,4971 @@
+--- python/examples/gluon/01-attention-forward.py
++++ tutorial_01_attention_forward.py
+@@ -1,16 +1,25 @@
+ import copy
++
+ import math
++
+ import torch
++
+ import triton
++
+ import pytest
++
+ import itertools
+ 
+ from triton.language.core import _aggregate as aggregate
+ 
+ from triton.experimental import gluon
++
+ from triton.experimental.gluon import language as gl
++
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.hopper import fence_async_shared
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (
+     TensorMemoryLayout,
+     allocate_tensor_memory,
+@@ -22,12 +31,8 @@
+     tcgen05_commit,
+     float2,
+ )
++
+ from triton.experimental.gluon.language.nvidia.blackwell.float2 import Float2Tensor
+-
+-# ===-----------------------------------------------------------------------===#
+-# Layout Utilities
+-# ===-----------------------------------------------------------------------===#
+-
+ 
+ @gluon.constexpr_function
+ def get_mma_instr_shape(shape, element_ty):
+@@ -35,12 +40,6 @@
+     n = 256 if shape[1] >= 256 else shape[1]
+     k = 256 // element_ty.primitive_bitwidth
+     return (m, n, k)
+-
+-
+-# ===-----------------------------------------------------------------------===#
+-# Data Abstractions
+-# ===-----------------------------------------------------------------------===#
+-
+ 
+ @aggregate
+ class BarrierCounter:
+@@ -64,7 +63,6 @@
+         index = gl.where(rollover, 0, next_index)
+         phase = gl.where(rollover, self.phase ^ 1, self.phase)
+         return BarrierCounter(index, phase, self.num_barriers)
+-
+ 
+ def Channel(T, alloc_fn):
+ 
+@@ -170,12 +168,11 @@
+ 
+     return ChannelType, Producer, Consumer
+ 
+-
+ SharedMemoryChannel, SharedMemoryProducer, SharedMemoryConsumer = Channel(gl.shared_memory_descriptor,
+                                                                           gl.allocate_shared_memory)
++
+ TensorMemoryChannel, TensorMemoryProducer, TensorMemoryConsumer = Channel(tensor_memory_descriptor,
+                                                                           allocate_tensor_memory)
+-
+ 
+ @gluon.jit
+ def get_desc_channel(desc, num_buffers: gl.constexpr, num_consumers: gl.constexpr = 1):
+@@ -183,17 +180,10 @@
+     layout: gl.constexpr = desc.layout
+     return SharedMemoryChannel.alloc(shape, desc.dtype, layout, num_buffers, num_consumers)
+ 
+-
+ @gluon.jit
+ def issue_async_tma_load(smem, bar, desc, offset):
+     mbarrier.expect(bar, desc.block_type.nbytes)
+     tma.async_copy_global_to_shared(desc, [offset, 0], bar, smem)
+-
+-
+-# ===-----------------------------------------------------------------------===#
+-# Gluon Attention
+-# ===-----------------------------------------------------------------------===#
+-
+ 
+ @aggregate
+ class AttentionConfig:
+@@ -296,7 +286,6 @@
+         qo_offset_y = offset_y + start_m * self.BLOCK_M
+ 
+         return AttentionProgram(self, start_m, off_hz, offset_y, qo_offset_y)
+-
+ 
+ @aggregate
+ class ProgramScheduler:
+@@ -331,7 +320,6 @@
+         pid_n = first_pid_n + (tile_id % group_size_n)
+         pid_m = (tile_id % self.num_pid_in_group) // group_size_n
+         return self.config.get_program(pid_m, pid_n)
+-
+ 
+ @aggregate
+ class AttentionProgram:
+@@ -372,24 +360,16 @@
+             lo, hi = 0, self.config.N_CTX
+         return lo, hi
+ 
+-
+-# ===-----------------------------------------------------------------------===#
+-# _gluon_attn
+-# ===-----------------------------------------------------------------------===#
+-
+-
+ @gluon.jit
+ def _borrow_s_as_p(config, s_tmem):
+     p_tmem = s_tmem.slice(0, config.BLOCK_N // 2)
+     return p_tmem._reinterpret(config.dtype, config.qk_shape, config.p_tmem_layout)
+-
+ 
+ @gluon.jit
+ def _borrow_s_as_alpha(config, s_tmem):
+     alpha_tmem = s_tmem.slice(config.BLOCK_N // 2, 1)
+     alpha_layout: gl.constexpr = TensorMemoryLayout([config.SPLIT_M, 1], col_stride=1)
+     return alpha_tmem._reinterpret(gl.float32, [config.SPLIT_M, 1], alpha_layout)
+-
+ 
+ @gluon.jit
+ def _borrow_s_for_epilogue(config, s_tmem):
+@@ -399,7 +379,6 @@
+     m_i_tmem = m_i_tmem._reinterpret(gl.float32, [config.SPLIT_M, 1], layout)
+     l_i_tmem = l_i_tmem._reinterpret(gl.float32, [config.SPLIT_M, 1], layout)
+     return m_i_tmem, l_i_tmem
+-
+ 
+ @gluon.constexpr_function
+ def _get_split_n_layout(layout: gl.constexpr, SPLIT_FACTOR: gl.constexpr = 2):
+@@ -425,7 +404,6 @@
+                     return ret
+         assert False, f"split_n requires having a basis {target}. Got\n{layout}"
+ 
+-
+ @gluon.jit
+ def _split_n(x, SPLIT_FACTOR: gl.constexpr = 2):
+     if SPLIT_FACTOR == 1:
+@@ -436,7 +414,6 @@
+         x0 = gl.convert_layout(x0, layout, assert_trivial=True)
+         x1 = gl.convert_layout(x1, layout, assert_trivial=True)
+         return _split_n(x0, SPLIT_FACTOR // 2) + _split_n(x1, SPLIT_FACTOR // 2)
+-
+ 
+ @gluon.constexpr_function
+ def _get_join_n_layout(layout, SPLIT_FACTOR: gl.constexpr = 2):
+@@ -452,7 +429,6 @@
+         shape,
+     )
+ 
+-
+ @gluon.jit
+ def _join_n(xs):
+     if len(xs) == 1:
+@@ -464,7 +440,6 @@
+         x = gl.join(x0, x1).permute(0, 2, 1).reshape([x0.shape[0], x0.shape[1] * 2])
+         return gl.convert_layout(x, layout, assert_trivial=True)
+ 
+-
+ @gluon.jit
+ def _attn_fwd_load(config, chnls, descs, M, STAGE: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+@@ -500,7 +475,6 @@
+             v_smem, v_bar, kv_producer = kv_producer.acquire()
+             issue_async_tma_load(v_smem, v_bar, desc_v, offsetkv_y)
+ 
+-
+ @gluon.jit
+ def _attn_fwd_mma(config, chnls, descs, M, STAGE: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+@@ -561,7 +535,6 @@
+         p1_tmem = _borrow_s_as_p(config, s1_tmem)
+         tcgen05_mma(p1_tmem, v_smem, o1_tmem, use_acc=o1_init, mbarriers=[o1_bar, v_bar, s0_bar, s1_bar])
+ 
+-
+ @gluon.jit
+ def _mask_scalar(qk, col_limit_right, s, i):
+     col_lim_right_s = col_limit_right - s
+@@ -569,7 +542,6 @@
+     mask = -1 << col_lim_right_cur
+     mask_i_bit = (mask & (1 << i)) == 0
+     return gl.where(mask_i_bit, qk, -float("inf"))
+-
+ 
+ @gluon.jit
+ def _apply_causal_mask(qk, col_limit_right):
+@@ -585,7 +557,6 @@
+     i = offs_n & 0xf
+     return gl.map_elementwise(_mask_scalar, qk, col_limit_right, s, i)
+ 
+-
+ @gluon.jit
+ def _compute_and_store_exp2(config, qk, p_tmem):
+     SIZE: gl.constexpr = p_tmem.shape[1] // config.SPLIT_EXP_FACTOR
+@@ -596,7 +567,6 @@
+         p_tmem.slice(i * SIZE, SIZE).store(p.to(config.dtype))
+         ps = ps + (p, )
+     return _join_n(ps)
+-
+ 
+ @gluon.jit
+ def _subtiled_qk_load(config, s_tmem, use_tmem_red: gl.constexpr):
+@@ -616,7 +586,6 @@
+             qks = qks + (s_tmem.slice(i * SIZE, SIZE).load(layout), )
+         return _join_n(qks), None
+ 
+-
+ @gluon.jit
+ def _softmax_inner_loop(tile_id: gl.constexpr, config, prog,  #
+                         s_consumer, corr_producer, exp_turnstile, corr_bar,  #
+@@ -671,7 +640,6 @@
+         m_i = m_ij
+ 
+     return m_i, l_i, corr_bar, s_consumer, corr_producer, exp_turnstile
+-
+ 
+ @gluon.jit
+ def _softmax_tile(tile_id: gl.constexpr, config, M, desc_o, STAGE: gl.constexpr,  #
+@@ -716,21 +684,18 @@
+ 
+         mbarrier.arrive(s_bar, count=1)
+ 
+-
+ @gluon.jit
+ def _attn_fwd_softmax0(config, chnls, descs, M, STAGE: gl.constexpr, use_tmem_red: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+     desc_q, desc_k, desc_v, desc_o = descs
+     _softmax_tile(0, config, M, desc_o, STAGE, s0_chnl, c0_chnl, exp_turnstile.create_producer(), use_tmem_red)
+ 
+-
+ @gluon.jit
+ def _attn_fwd_softmax1(config, chnls, descs, M, STAGE: gl.constexpr, use_tmem_red: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+     desc_q, desc_k, desc_v, desc_o = descs
+     _softmax_tile(1, config, M, desc_o, STAGE, s1_chnl, c1_chnl, exp_turnstile.create_consumer(), use_tmem_red)
+ 
+-
+ @gluon.jit
+ def _attn_fwd_epilogue(config, chnls, descs, M, STAGE: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+@@ -751,7 +716,6 @@
+         mbarrier.arrive(o0_bar, count=1)
+         tma.store_wait(0)
+         mbarrier.arrive(o1_bar, count=1)
+-
+ 
+ @gluon.jit
+ def _attn_fwd_correction_rescale(config, s_tmem, corr_consumer, o_consumer):
+@@ -772,7 +736,6 @@
+         o_ref.store(float2.unpack(o, axis=1))
+     mbarrier.arrive(o_bar, count=1)
+     return corr_consumer, o_consumer
+-
+ 
+ @gluon.jit
+ def _attn_fwd_correction_epilogue(config, prog, s_tmem, M, corr_consumer, epi_producer, o_consumer):
+@@ -819,7 +782,6 @@
+ 
+     return corr_consumer, epi_producer, o_consumer
+ 
+-
+ @gluon.jit
+ def _attn_fwd_correction(config, chnls, descs, M, STAGE: gl.constexpr):
+     q_chnl, kv_chnl, o_chnl, epi_chnl, s0_chnl, s1_chnl, c0_chnl, c1_chnl, exp_turnstile = chnls
+@@ -851,7 +813,6 @@
+             config, prog, s0_tmem, M, corr0_consumer, epi_producer, o_consumer)
+         corr1_consumer, epi_producer, o_consumer = _attn_fwd_correction_epilogue(  #
+             config, prog, s1_tmem, M, corr1_consumer, epi_producer, o_consumer)
+-
+ 
+ def attention_repr(specialization):
+     name = "gluon_attention"
+@@ -859,7 +820,6 @@
+     if specialization.constants["dtype"] == gl.float8e5:
+         name = "cutlass_" + name
+     return name
+-
+ 
+ @gluon.jit(do_not_specialize=["Z"], repr=attention_repr)
+ def attention_kernel(  #
+@@ -902,22 +862,14 @@
+     c1_chnl.release()
+     exp_turnstile.release()
+ 
+-
+-# ===-----------------------------------------------------------------------===#
+-# Entry Point
+-# ===-----------------------------------------------------------------------===#
+-
+-
+ def torch_dtype_to_triton(dtype):
+     if dtype == torch.float8_e5m2:
+         return gl.float8e5
+     return getattr(gl, str(dtype).split('.')[1])
+ 
+-
+ def make_tensor_desc(x, shape, strides, block_shape):
+     layout = gl.NVMMASharedLayout.get_default_for(block_shape, torch_dtype_to_triton(x.dtype))
+     return TensorDescriptor(x, shape=shape, strides=strides, block_shape=block_shape, layout=layout)
+-
+ 
+ def attention_forward(q, k, v, causal, sm_scale, use_tmem_red):
+     HEAD_DIM_Q, HEAD_DIM_K = q.shape[-1], k.shape[-1]
+@@ -957,83 +909,26 @@
+ 
+     return o, M
+ 
+-
+-# ===-----------------------------------------------------------------------===#
+-# Unit Tests
+-# ===-----------------------------------------------------------------------===#
+-
+-
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def is_blackwell():
+     return is_cuda() and torch.cuda.get_device_capability()[0] == 10
+ 
+-
+ def is_blackwell_ultra():
+     return is_cuda() and torch.cuda.get_device_capability()[0:2] == (10, 3)
+ 
+-
+-@pytest.mark.parametrize("Z", [1, 4])
+-@pytest.mark.parametrize("H", [2, 48])
+-@pytest.mark.parametrize("N_CTX", [256, 1024, 4 * 1024])
+-@pytest.mark.parametrize("HEAD_DIM", [64, 128])
+-@pytest.mark.parametrize("causal", [False, True])
+-@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16])
+-@pytest.mark.parametrize("use_tmem_red", [False, True])
+-@pytest.mark.skipif(not is_blackwell(), reason="Gluon attention is only supported on Blackwell GPUs")
+-def test_op(Z, H, N_CTX, HEAD_DIM, causal, dtype, use_tmem_red, profile=False):
+-    device = "cuda"
+-
+-    if use_tmem_red and not is_blackwell_ultra():
+-        pytest.skip("TMEM reduction is only supported on Blackwell Ultra GPUs")
+-
+-    torch.manual_seed(42)
+-    q = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=device).normal_(mean=0.0, std=0.5).requires_grad_())
+-    k = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=device).normal_(mean=0.0, std=0.5).requires_grad_())
+-    v = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=device).normal_(mean=0.0, std=0.5).requires_grad_())
+-    sm_scale = 0.5
+-
+-    ref_out = torch.nn.functional.scaled_dot_product_attention(q, k, v, scale=sm_scale, is_causal=causal)
+-
+-    tri_out, _ = attention_forward(q, k, v, causal, sm_scale, use_tmem_red)
+-    torch.testing.assert_close(ref_out, tri_out, atol=1e-2, rtol=0)
+-
+-
+-# ===-----------------------------------------------------------------------===#
+-# Benchmarking
+-# ===-----------------------------------------------------------------------===#
+-
+ BATCH = [4]
++
+ N_HEADS = [32]
++
+ HEAD_DIM = [64, 128]
++
+ causal = [False, True]
++
+ providers = ["triton-fp16", "triton-fp8"]
+-N_CTX = [2**i for i in range(10, 17)]
+-use_tmem_reds = [False, True] if is_blackwell_ultra() else [False]
+ 
+ bench_configs = []
+-for Z, H, D, is_causal, use_tmem_red in itertools.product(BATCH, N_HEADS, HEAD_DIM, causal, use_tmem_reds):
+-    config = triton.testing.Benchmark(
+-        x_names=["N_CTX"],
+-        x_vals=N_CTX,
+-        line_arg="provider",
+-        line_vals=providers,
+-        line_names=providers,
+-        styles=[("red", "-"), ("blue", "-"), ("green", "-"), ("yellow", "-")],
+-        ylabel="TFLOPS",
+-        plot_name=f"Attention Z={Z} H={H} D={D} causal={is_causal} use_tmem_red={use_tmem_red}",
+-        args={
+-            "Z": Z,
+-            "H": H,
+-            "HEAD_DIM": D,
+-            "causal": is_causal,
+-            "use_tmem_red": use_tmem_red,
+-        },
+-    )
+-    bench_configs.append(config)
+-
+ 
+ @triton.testing.perf_report(bench_configs)
+ def bench(Z, H, N_CTX, HEAD_DIM, causal, use_tmem_red, provider):
+@@ -1068,7 +963,3 @@
+         if causal:
+             total_flops *= 0.5
+         return total_flops * 1e-12 / (ms * 1e-3)
+-
+-
+-if __name__ == "__main__":
+-    bench.run(save_path=".", print_data=True)
+--- python/tutorials/01-vector-add.py
++++ tutorial_01_vector_add.py
+@@ -14,17 +14,11 @@
+ 
+ """
+ 
+-# %%
+-# Compute Kernel
+-# --------------
+-
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ @triton.jit
+ def add_kernel(x_ptr,  # *Pointer* to first input vector.
+@@ -53,12 +47,6 @@
+     # Write x + y back to DRAM.
+     tl.store(output_ptr + offsets, output, mask=mask)
+ 
+-
+-# %%
+-# Let's also declare a helper function to (1) allocate the `z` tensor
+-# and (2) enqueue the above kernel with appropriate grid/block sizes:
+-
+-
+ def add(x: torch.Tensor, y: torch.Tensor):
+     # We need to preallocate the output.
+     output = torch.empty_like(x)
+@@ -77,59 +65,4 @@
+     # running asynchronously at this point.
+     return output
+ 
+-
+-# %%
+-# We can now use the above function to compute the element-wise sum of two `torch.tensor` objects and test its correctness:
+-
+-torch.manual_seed(0)
+ size = 98432
+-x = torch.rand(size, device=DEVICE)
+-y = torch.rand(size, device=DEVICE)
+-output_torch = x + y
+-output_triton = add(x, y)
+-print(output_torch)
+-print(output_triton)
+-print(f'The maximum difference between torch and triton is '
+-      f'{torch.max(torch.abs(output_torch - output_triton))}')
+-
+-# %%
+-# Seems like we're good to go!
+-
+-# %%
+-# Benchmark
+-# ---------
+-#
+-# We can now benchmark our custom op on vectors of increasing sizes to get a sense of how it does relative to PyTorch.
+-# To make things easier, Triton has a set of built-in utilities that allow us to concisely plot the performance of our custom ops.
+-# for different problem sizes.
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        x_names=['size'],  # Argument names to use as an x-axis for the plot.
+-        x_vals=[2**i for i in range(12, 28, 1)],  # Different possible values for `x_name`.
+-        x_log=True,  # x axis is logarithmic.
+-        line_arg='provider',  # Argument name whose value corresponds to a different line in the plot.
+-        line_vals=['triton', 'torch'],  # Possible values for `line_arg`.
+-        line_names=['Triton', 'Torch'],  # Label name for the lines.
+-        styles=[('blue', '-'), ('green', '-')],  # Line styles.
+-        ylabel='GB/s',  # Label name for the y-axis.
+-        plot_name='vector-add-performance',  # Name for the plot. Used also as a file name for saving the plot.
+-        args={},  # Values for function arguments not in `x_names` and `y_name`.
+-    ))
+-def benchmark(size, provider):
+-    x = torch.rand(size, device=DEVICE, dtype=torch.float32)
+-    y = torch.rand(size, device=DEVICE, dtype=torch.float32)
+-    quantiles = [0.5, 0.2, 0.8]
+-    if provider == 'torch':
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: x + y, quantiles=quantiles)
+-    if provider == 'triton':
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: add(x, y), quantiles=quantiles)
+-    gbps = lambda ms: 3 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
+-    return gbps(ms), gbps(max_ms), gbps(min_ms)
+-
+-
+-# %%
+-# We can now run the decorated function above. Pass `print_data=True` to see the performance number, `show_plots=True` to plot them, and/or
+-# `save_path='/path/to/results/' to save them to disk along with raw CSV data:
+-benchmark.run(print_data=True, show_plots=True)
+--- python/tutorials/02-fused-softmax.py
++++ tutorial_02_fused_softmax.py
+@@ -14,30 +14,20 @@
+ 
+ """
+ 
+-# %%
+-# Motivations
+-# -----------
+-#
+-# Custom GPU kernels for elementwise additions are educationally valuable but won't get you very far in practice.
+-# Let us consider instead the case of a simple (numerically stabilized) softmax operation:
+-
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
++
+ from triton.runtime import driver
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ def is_hip():
+     return triton.runtime.driver.active.get_current_target().backend == "hip"
+ 
+-
+ def is_cdna():
+     return is_hip() and triton.runtime.driver.active.get_current_target().arch in ('gfx940', 'gfx941', 'gfx942',
+                                                                                    'gfx90a', 'gfx908')
+-
+ 
+ def naive_softmax(x):
+     """Compute row-wise softmax of X using native pytorch
+@@ -57,29 +47,6 @@
+     ret = numerator / denominator[:, None]
+     # in total: read 5MN + 2M elements ; wrote 3MN + 2M elements
+     return ret
+-
+-
+-# %%
+-# When implemented naively in PyTorch, computing :code:`y = naive_softmax(x)` for :math:`x \in R^{M \times N}`
+-# requires reading :math:`5MN + 2M` elements from DRAM and writing back :math:`3MN + 2M` elements.
+-# This is obviously wasteful; we'd prefer to have a custom "fused" kernel that only reads
+-# X once and does all the necessary computations on-chip.
+-# Doing so would require reading and writing back only :math:`MN` bytes, so we could
+-# expect a theoretical speed-up of ~4x (i.e., :math:`(8MN + 4M) / 2MN`).
+-# The `torch.jit.script` flags aims to perform this kind of "kernel fusion" automatically
+-# but, as we will see later, it is still far from ideal.
+-
+-# %%
+-# Compute Kernel
+-# --------------
+-#
+-# Our softmax kernel works as follows: each program loads a set of rows of the input matrix X strided by number of programs,
+-# normalizes it and writes back the result to the output Y.
+-#
+-# Note that one important limitation of Triton is that each block must have a
+-# power-of-two number of elements, so we need to internally "pad" each row and guard the
+-# memory operations properly if we want to handle any possible input shapes:
+-
+ 
+ @triton.jit
+ def softmax_kernel(output_ptr, input_ptr, input_row_stride, output_row_stride, n_rows, n_cols, BLOCK_SIZE: tl.constexpr,
+@@ -108,18 +75,7 @@
+         output_ptrs = output_row_start_ptr + col_offsets
+         tl.store(output_ptrs, softmax_output, mask=mask)
+ 
+-
+-# %%
+-# We can create a helper function that enqueues the kernel and its (meta-)arguments for any given input tensor.
+-
+-properties = driver.active.utils.get_device_properties(DEVICE.index)
+-NUM_SM = properties["multiprocessor_count"]
+-NUM_REGS = properties["max_num_regs"]
+-SIZE_SMEM = properties["max_shared_mem"]
+-WARP_SIZE = properties["warpSize"]
+-target = triton.runtime.driver.active.get_current_target()
+ kernels = {}
+-
+ 
+ def softmax(x):
+     n_rows, n_cols = x.shape
+@@ -173,63 +129,3 @@
+     # Create a number of persistent programs.
+     kernel[(num_programs, 1, 1)](y, x, x.stride(0), y.stride(0), n_rows, n_cols, BLOCK_SIZE, num_stages)
+     return y
+-
+-
+-# %%
+-# Unit Test
+-# ---------
+-
+-# %%
+-# We make sure that we test our kernel on a matrix with an irregular number of rows and columns.
+-# This will allow us to verify that our padding mechanism works.
+-
+-torch.manual_seed(0)
+-x = torch.randn(1823, 781, device=DEVICE)
+-y_triton = softmax(x)
+-y_torch = torch.softmax(x, axis=1)
+-assert torch.allclose(y_triton, y_torch), (y_triton, y_torch)
+-
+-# %%
+-# As expected, the results are identical.
+-
+-# %%
+-# Benchmark
+-# ---------
+-#
+-# Here we will benchmark our operation as a function of the number of columns in the input matrix -- assuming 4096 rows.
+-# We will then compare its performance against (1) :code:`torch.softmax` and (2) the :code:`naive_softmax` defined above.
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        x_names=['N'],  # argument names to use as an x-axis for the plot
+-        x_vals=[128 * i for i in range(2, 100)],  # different possible values for `x_name`
+-        line_arg='provider',  # argument name whose value corresponds to a different line in the plot
+-        line_vals=['triton', 'torch', 'naive_softmax'],  # possible values for `line_arg``
+-        line_names=["Triton", "Torch", "Naive Softmax"],  # label name for the lines
+-        styles=[('blue', '-'), ('green', '-'), ('red', '-')],  # line styles
+-        ylabel="GB/s",  # label name for the y-axis
+-        plot_name="softmax-performance",  # name for the plot. Used also as a file name for saving the plot.
+-        args={'M': 4096},  # values for function arguments not in `x_names` and `y_name`
+-    ))
+-def benchmark(M, N, provider):
+-    x = torch.randn(M, N, device=DEVICE, dtype=torch.float32)
+-    stream = getattr(torch, DEVICE.type).Stream()
+-    getattr(torch, DEVICE.type).set_stream(stream)
+-    if provider == 'torch':
+-        ms = triton.testing.do_bench(lambda: torch.softmax(x, axis=-1))
+-    if provider == 'triton':
+-        ms = triton.testing.do_bench(lambda: softmax(x))
+-    if provider == 'naive_softmax':
+-        ms = triton.testing.do_bench(lambda: naive_softmax(x))
+-    gbps = lambda ms: 2 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
+-    return gbps(ms)
+-
+-
+-benchmark.run(show_plots=True, print_data=True)
+-
+-# %%
+-# In the above plot, we can see that:
+-#  - Triton is 4x faster than the Torch JIT. This confirms our suspicions that the Torch JIT does not do any fusion here.
+-#  - Triton is noticeably faster than :code:`torch.softmax` -- in addition to being **easier to read, understand and maintain**.
+-#    Note however that the PyTorch `softmax` operation is more general and will work on tensors of any shape.
+--- python/tutorials/03-matrix-multiplication.py
++++ tutorial_03_matrix_multiplication.py
+@@ -16,150 +16,14 @@
+ 
+ """
+ 
+-# %%
+-# Motivations
+-# -----------
+-#
+-# Matrix multiplications are a key building block of most modern high-performance computing systems.
+-# They are notoriously hard to optimize, hence their implementation is generally done by
+-# hardware vendors themselves as part of so-called "kernel libraries" (e.g., cuBLAS).
+-# Unfortunately, these libraries are often proprietary and cannot be easily customized
+-# to accommodate the needs of modern deep learning workloads (e.g., fused activation functions).
+-# In this tutorial, you will learn how to implement efficient matrix multiplications by
+-# yourself with Triton, in a way that is easy to customize and extend.
+-#
+-# Roughly speaking, the kernel that we will write will implement the following blocked
+-# algorithm to multiply a (M, K) by a (K, N) matrix:
+-#
+-#  .. code-block:: python
+-#
+-#    # Do in parallel
+-#    for m in range(0, M, BLOCK_SIZE_M):
+-#      # Do in parallel
+-#      for n in range(0, N, BLOCK_SIZE_N):
+-#        acc = zeros((BLOCK_SIZE_M, BLOCK_SIZE_N), dtype=float32)
+-#        for k in range(0, K, BLOCK_SIZE_K):
+-#          a = A[m : m+BLOCK_SIZE_M, k : k+BLOCK_SIZE_K]
+-#          b = B[k : k+BLOCK_SIZE_K, n : n+BLOCK_SIZE_N]
+-#          acc += dot(a, b)
+-#        C[m : m+BLOCK_SIZE_M, n : n+BLOCK_SIZE_N] = acc
+-#
+-# where each iteration of the doubly-nested for-loop is performed by a dedicated Triton program instance.
+-
+-# %%
+-# Compute Kernel
+-# --------------
+-#
+-# The above algorithm is, actually, fairly straightforward to implement in Triton.
+-# The main difficulty comes from the computation of the memory locations at which blocks
+-# of :code:`A` and :code:`B` must be read in the inner loop. For that, we need
+-# multi-dimensional pointer arithmetic.
+-#
+-# Pointer Arithmetic
+-# ~~~~~~~~~~~~~~~~~~~
+-#
+-# For a row-major 2D tensor :code:`X`, the memory location of :code:`X[i, j]` is given
+-# by :code:`&X[i, j] = X + i*stride_xi + j*stride_xj`.
+-# Therefore, blocks of pointers for :code:`A[m : m+BLOCK_SIZE_M, k:k+BLOCK_SIZE_K]` and
+-# :code:`B[k : k+BLOCK_SIZE_K, n : n+BLOCK_SIZE_N]` can be defined in pseudo-code as:
+-#
+-#  .. code-block:: python
+-#
+-#    &A[m : m+BLOCK_SIZE_M, k:k+BLOCK_SIZE_K] =  a_ptr + (m : m+BLOCK_SIZE_M)[:, None]*A.stride(0) + (k : k+BLOCK_SIZE_K)[None, :]*A.stride(1);
+-#    &B[k : k+BLOCK_SIZE_K, n:n+BLOCK_SIZE_N] =  b_ptr + (k : k+BLOCK_SIZE_K)[:, None]*B.stride(0) + (n : n+BLOCK_SIZE_N)[None, :]*B.stride(1);
+-#
+-# Which means that pointers for blocks of A and B can be initialized (i.e., :code:`k=0`) in Triton as the following
+-# code. Also note that we need an extra modulo to handle the case where :code:`M` is not a multiple of
+-# :code:`BLOCK_SIZE_M` or :code:`N` is not a multiple of :code:`BLOCK_SIZE_N`, in which case we can pad the data with
+-# some useless values, which will not contribute to the results. For the :code:`K` dimension, we will handle that later
+-# using masking load semantics.
+-#
+-#  .. code-block:: python
+-#
+-#    offs_am = (pid_m * BLOCK_SIZE_M + tl.arange(0, BLOCK_SIZE_M)) % M
+-#    offs_bn = (pid_n * BLOCK_SIZE_N + tl.arange(0, BLOCK_SIZE_N)) % N
+-#    offs_k = tl.arange(0, BLOCK_SIZE_K)
+-#    a_ptrs = a_ptr + (offs_am[:, None]*stride_am + offs_k [None, :]*stride_ak)
+-#    b_ptrs = b_ptr + (offs_k [:, None]*stride_bk + offs_bn[None, :]*stride_bn)
+-#
+-# And then updated in the inner loop as follows:
+-#
+-#  .. code-block:: python
+-#
+-#    a_ptrs += BLOCK_SIZE_K * stride_ak;
+-#    b_ptrs += BLOCK_SIZE_K * stride_bk;
+-#
+-#
+-# L2 Cache Optimizations
+-# ~~~~~~~~~~~~~~~~~~~~~~
+-#
+-# As mentioned above, each program instance computes a :code:`[BLOCK_SIZE_M, BLOCK_SIZE_N]`
+-# block of :code:`C`.
+-# It is important to remember that the order in which these blocks are computed does
+-# matter, since it affects the L2 cache hit rate of our program, and unfortunately, a
+-# simple row-major ordering
+-#
+-#  .. code-block:: Python
+-#
+-#    pid = tl.program_id(axis=0)
+-#    grid_n = tl.cdiv(N, BLOCK_SIZE_N)
+-#    pid_m = pid // grid_n
+-#    pid_n = pid % grid_n
+-#
+-# is just not going to cut it.
+-#
+-# One possible solution is to launch blocks in an order that promotes data reuse.
+-# This can be done by 'super-grouping' blocks in groups of :code:`GROUP_M` rows before
+-# switching to the next column:
+-#
+-#  .. code-block:: python
+-#
+-#    # Program ID
+-#    pid = tl.program_id(axis=0)
+-#    # Number of program ids along the M axis
+-#    num_pid_m = tl.cdiv(M, BLOCK_SIZE_M)
+-#    # Number of programs ids along the N axis
+-#    num_pid_n = tl.cdiv(N, BLOCK_SIZE_N)
+-#    # Number of programs in group
+-#    num_pid_in_group = GROUP_SIZE_M * num_pid_n
+-#    # Id of the group this program is in
+-#    group_id = pid // num_pid_in_group
+-#    # Row-id of the first program in the group
+-#    first_pid_m = group_id * GROUP_SIZE_M
+-#    # If `num_pid_m` isn't divisible by `GROUP_SIZE_M`, the last group is smaller
+-#    group_size_m = min(num_pid_m - first_pid_m, GROUP_SIZE_M)
+-#    # *Within groups*, programs are ordered in a column-major order
+-#    # Row-id of the program in the *launch grid*
+-#    pid_m = first_pid_m + ((pid % num_pid_in_group) % group_size_m)
+-#    # Col-id of the program in the *launch grid*
+-#    pid_n = (pid % num_pid_in_group) // group_size_m
+-#
+-# For example, in the following matmul where each matrix is 9 blocks by 9 blocks,
+-# we can see that if we compute the output in row-major ordering, we need to load 90
+-# blocks into SRAM to compute the first 9 output blocks, but if we do it in grouped
+-# ordering, we only need to load 54 blocks.
+-#
+-#   .. image:: grouped_vs_row_major_ordering.png
+-#
+-# In practice, this can improve the performance of our matrix multiplication kernel by
+-# more than 10\% on some hardware architecture (e.g., 220 to 245 TFLOPS on A100).
+-#
+-
+-# %%
+-# Final Result
+-# ------------
+-
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+-
+ 
+ def get_cuda_autotune_config():
+     return [
+@@ -197,7 +61,6 @@
+         triton.Config({'BLOCK_SIZE_M': 128, 'BLOCK_SIZE_N': 32, 'BLOCK_SIZE_K': 64, 'GROUP_SIZE_M': 8}, num_stages=4,
+                       num_warps=4)
+     ]
+-
+ 
+ def get_hip_autotune_config():
+     sizes = [
+@@ -212,19 +75,12 @@
+     ]
+     return [triton.Config(s | {'matrix_instr_nonkdim': 16}, num_warps=8, num_stages=2) for s in sizes]
+ 
+-
+ def get_autotune_config():
+     if is_cuda():
+         return get_cuda_autotune_config()
+     else:
+         return get_hip_autotune_config()
+ 
+-
+-# `triton.jit`'ed functions can be auto-tuned by using the `triton.autotune` decorator, which consumes:
+-#   - A list of `triton.Config` objects that define different configurations of
+-#       meta-parameters (e.g., `BLOCK_SIZE_M`) and compilation options (e.g., `num_warps`) to try
+-#   - An auto-tuning *key* whose change in values will trigger evaluation of all the
+-#       provided configs
+ @triton.autotune(
+     configs=get_autotune_config(),
+     key=['M', 'N', 'K'],
+@@ -319,17 +175,9 @@
+     c_mask = (offs_cm[:, None] < M) & (offs_cn[None, :] < N)
+     tl.store(c_ptrs, c, mask=c_mask)
+ 
+-
+-# We can fuse `leaky_relu` by providing it as an `ACTIVATION` meta-parameter in `matmul_kernel`.
+ @triton.jit
+ def leaky_relu(x):
+     return tl.where(x >= 0, x, 0.01 * x)
+-
+-
+-# %%
+-# We can now create a convenience wrapper function that only takes two input tensors,
+-# and (1) checks any shape constraint; (2) allocates the output; (3) launches the above kernel.
+-
+ 
+ def matmul(a, b, activation=""):
+     # Check constraints.
+@@ -351,92 +199,4 @@
+     )
+     return c
+ 
+-
+-# %%
+-# Unit Test
+-# ---------
+-#
+-# We can test our custom matrix multiplication operation against a native torch implementation (i.e., cuBLAS).
+-
+-torch.manual_seed(0)
+-a = torch.rand((512, 512), device=DEVICE, dtype=torch.float16) - 0.5
+-b = torch.rand((512, 512), device=DEVICE, dtype=torch.float16) - 0.5
+-triton_output = matmul(a, b)
+-torch_output = torch.matmul(a, b)
+-print(f"triton_output_with_fp16_inputs={triton_output}")
+-print(f"torch_output_with_fp16_inputs={torch_output}")
+-
+-if torch.allclose(triton_output, torch_output, atol=1e-2, rtol=0):
+-    print("✅ Triton and Torch match")
+-else:
+-    print("❌ Triton and Torch differ")
+-
+-TORCH_HAS_FP8 = hasattr(torch, "float8_e5m2")
+-if TORCH_HAS_FP8 and is_cuda():
+-    torch.manual_seed(0)
+-    a = torch.randn((512, 512), device=DEVICE, dtype=torch.float16)
+-    b = torch.randn((512, 512), device=DEVICE, dtype=torch.float16)
+-    a = a.to(torch.float8_e5m2)
+-    # pre-transpose b for efficiency.
+-    b = b.T
+-    b = b.to(torch.float8_e5m2)
+-    triton_output = matmul(a, b)
+-    torch_output = torch.matmul(a.to(torch.float16), b.to(torch.float16))
+-    print(f"triton_output_with_fp8_inputs={triton_output}")
+-    print(f"torch_output_with_fp8_inputs={torch_output}")
+-    if torch.allclose(triton_output, torch_output, atol=0.125, rtol=0):
+-        print("✅ Triton and Torch match")
+-    else:
+-        print("❌ Triton and Torch differ")
+-
+-# %%
+-# Benchmark
+-# ---------
+-#
+-# Square Matrix Performance
+-# ~~~~~~~~~~~~~~~~~~~~~~~~~~
+-#
+-# We can now compare the performance of our kernel against that of cuBLAS or rocBLAS. Here we focus on square matrices,
+-# but feel free to arrange this script as you wish to benchmark any other matrix shape.
+-
+-ref_lib = 'cuBLAS' if is_cuda() else 'rocBLAS'
+-
+ configs = []
+-for fp8_inputs in [False, True]:
+-    if fp8_inputs and (not TORCH_HAS_FP8 or not is_cuda()):
+-        continue
+-    configs.append(
+-        triton.testing.Benchmark(
+-            x_names=["M", "N", "K"],  # Argument names to use as an x-axis for the plot
+-            x_vals=[128 * i for i in range(2, 33)],  # Different possible values for `x_name`
+-            line_arg="provider",  # Argument name whose value corresponds to a different line in the plot
+-            # Possible values for `line_arg`
+-            # Don't compare to cublas for fp8 cases as torch.matmul doesn't support fp8 at the moment.
+-            line_vals=["triton"] if fp8_inputs else [ref_lib.lower(), "triton"],  # Label name for the lines
+-            line_names=["Triton"] if fp8_inputs else [ref_lib, "Triton"],  # Line styles
+-            styles=[("green", "-"), ("blue", "-")],
+-            ylabel="TFLOPS",  # Label name for the y-axis
+-            plot_name="matmul-performance-" +
+-            ("fp16" if not fp8_inputs else "fp8"),  # Name for the plot, used also as a file name for saving the plot.
+-            args={"fp8_inputs": fp8_inputs},
+-        ))
+-
+-
+-@triton.testing.perf_report(configs)
+-def benchmark(M, N, K, provider, fp8_inputs):
+-    a = torch.randn((M, K), device=DEVICE, dtype=torch.float16)
+-    b = torch.randn((K, N), device=DEVICE, dtype=torch.float16)
+-    if TORCH_HAS_FP8 and fp8_inputs:
+-        a = a.to(torch.float8_e5m2)
+-        b = b.T
+-        b = b.to(torch.float8_e5m2)
+-    quantiles = [0.5, 0.2, 0.8]
+-    if provider == ref_lib.lower():
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch.matmul(a, b), quantiles=quantiles)
+-    if provider == 'triton':
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: matmul(a, b), quantiles=quantiles)
+-    perf = lambda ms: 2 * M * N * K * 1e-12 / (ms * 1e-3)
+-    return perf(ms), perf(max_ms), perf(min_ms)
+-
+-
+-benchmark.run(show_plots=True, print_data=True)
+--- python/tutorials/04-low-memory-dropout.py
++++ tutorial_04_low_memory_dropout.py
+@@ -14,32 +14,13 @@
+ 
+ """
+ 
+-# %%
+-# Baseline
+-# --------
+-#
+-# The *dropout* operator was first introduced in [SRIVASTAVA2014]_ as a way to improve the performance
+-# of deep neural networks in low-data regime (i.e. regularization).
+-#
+-# It takes a vector as input and produces a vector of the same shape as output. Each scalar in the
+-# output has a probability :math:`p` of being changed to zero and otherwise it is copied from the input.
+-# This forces the network to perform well even when only :math:`1 - p` scalars from the input are available.
+-#
+-# At evaluation time we want to use the full power of the network so we set :math:`p=0`. Naively this would
+-# increase the norm of the output (which can be a bad thing, e.g. it can lead to artificial decrease
+-# in the output softmax temperature). To prevent this we multiply the output by :math:`\frac{1}{1 - p}`, which
+-# keeps the norm consistent regardless of the dropout probability.
+-#
+-# Let's first take a look at the baseline implementation.
++import tabulate
+ 
+-import tabulate
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ @triton.jit
+ def _dropout(
+@@ -62,7 +43,6 @@
+     # Write-back output
+     tl.store(output_ptr + offsets, output, mask=mask)
+ 
+-
+ def dropout(x, x_keep, p):
+     output = torch.empty_like(x)
+     assert x.is_contiguous()
+@@ -71,41 +51,7 @@
+     _dropout[grid](x, x_keep, output, n_elements, p, BLOCK_SIZE=1024)
+     return output
+ 
+-
+-# Input tensor
+-x = torch.randn(size=(10, ), device=DEVICE)
+-# Dropout mask
+ p = 0.5
+-x_keep = (torch.rand(size=(10, ), device=DEVICE) > p).to(torch.int32)
+-#
+-output = dropout(x, x_keep=x_keep, p=p)
+-print(tabulate.tabulate([
+-    ["input"] + x.tolist(),
+-    ["keep mask"] + x_keep.tolist(),
+-    ["output"] + output.tolist(),
+-]))
+-
+-# %%
+-# Seeded dropout
+-# --------------
+-#
+-# The above implementation of dropout works fine, but it can be a bit awkward to deal with. Firstly
+-# we need to store the dropout mask for backpropagation. Secondly, dropout state management can get
+-# very tricky when using recompute/checkpointing (e.g. see all the notes about `preserve_rng_state` in
+-# https://pytorch.org/docs/stable/checkpoint.html). In this tutorial we'll describe an alternative implementation
+-# that (1) has a smaller memory footprint; (2) requires less data movement; and (3) simplifies the management
+-# of persisting randomness across multiple invocations of the kernel.
+-#
+-# Pseudo-random number generation in Triton is simple! In this tutorial we will use the
+-# :code:`triton.language.rand` function which generates a block of uniformly distributed :code:`float32`
+-# values in [0, 1), given a seed and a block of :code:`int32` offsets. But if you need it, Triton also provides
+-# other :ref:`random number generation strategies<Random Number Generation>`.
+-#
+-# .. note::
+-#    Triton's implementation of PRNG is based on the Philox algorithm (described on [SALMON2011]_).
+-#
+-# Let's put it all together.
+-
+ 
+ @triton.jit
+ def _seeded_dropout(
+@@ -130,7 +76,6 @@
+     output = tl.where(x_keep, x / (1 - p), 0.0)
+     tl.store(output_ptr + offsets, output, mask=mask)
+ 
+-
+ def seeded_dropout(x, p, seed):
+     output = torch.empty_like(x)
+     assert x.is_contiguous()
+@@ -138,38 +83,3 @@
+     grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']), )
+     _seeded_dropout[grid](x, output, n_elements, p, seed, BLOCK_SIZE=1024)
+     return output
+-
+-
+-x = torch.randn(size=(10, ), device=DEVICE)
+-# Compare this to the baseline - dropout mask is never instantiated!
+-output = seeded_dropout(x, p=0.5, seed=123)
+-output2 = seeded_dropout(x, p=0.5, seed=123)
+-output3 = seeded_dropout(x, p=0.5, seed=512)
+-
+-print(
+-    tabulate.tabulate([
+-        ["input"] + x.tolist(),
+-        ["output (seed = 123)"] + output.tolist(),
+-        ["output (seed = 123)"] + output2.tolist(),
+-        ["output (seed = 512)"] + output3.tolist(),
+-    ]))
+-
+-# %%
+-# Et Voilà! We have a triton kernel that applies the same dropout mask provided the seed is the same!
+-# If you'd like explore further applications of pseudorandomness in GPU programming, we encourage you
+-# to explore the `python/triton/language/random.py`!
+-
+-# %%
+-# Exercises
+-# ---------
+-#
+-# 1. Extend the kernel to operate over a matrix and use a vector of seeds - one per row.
+-# 2. Add support for striding.
+-# 3. (challenge) Implement a kernel for sparse Johnson-Lindenstrauss transform which generates the projection matrix on the fly each time using a seed.
+-
+-# %%
+-# References
+-# ----------
+-#
+-# .. [SALMON2011] John K. Salmon, Mark A. Moraes, Ron O. Dror, and David E. Shaw, "Parallel Random Numbers: As Easy as 1, 2, 3", 2011
+-# .. [SRIVASTAVA2014] Nitish Srivastava and Geoffrey Hinton and Alex Krizhevsky and Ilya Sutskever and Ruslan Salakhutdinov, "Dropout: A Simple Way to Prevent Neural Networks from Overfitting", JMLR 2014
+--- python/tutorials/05-layer-norm.py
++++ tutorial_05_layer_norm.py
+@@ -12,38 +12,11 @@
+ 
+ """
+ 
+-# %%
+-# Motivations
+-# -----------
+-#
+-# The *LayerNorm* operator was first introduced in [BA2016]_ as a way to improve the performance
+-# of sequential models (e.g., Transformers) or neural networks with small batch size.
+-# It takes a vector :math:`x` as input and produces a vector :math:`y` of the same shape as output.
+-# The normalization is performed by subtracting the mean and dividing by the standard deviation of :math:`x`.
+-# After the normalization, a learnable linear transformation with weights :math:`w` and biases :math:`b` is applied.
+-# The forward pass can be expressed as follows:
+-#
+-# .. math::
+-#    y = \frac{ x - \text{E}[x] }{ \sqrt{\text{Var}(x) + \epsilon} } * w + b
+-#
+-# where :math:`\epsilon` is a small constant added to the denominator for numerical stability.
+-# Let’s first take a look at the forward pass implementation.
+-
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
+-
+-try:
+-    # This is https://github.com/NVIDIA/apex, NOT the apex on PyPi, so it
+-    # should not be added to extras_require in setup.py.
+-    import apex
+-    HAS_APEX = True
+-except ModuleNotFoundError:
+-    HAS_APEX = False
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ @triton.jit
+ def _layer_norm_fwd_fused(
+@@ -93,41 +66,6 @@
+         y = x_hat * w + b
+         # Write output
+         tl.store(Y + cols, y, mask=mask)
+-
+-
+-# %%
+-# Backward pass
+-# -------------
+-#
+-# The backward pass for the layer normalization operator is a bit more involved than the forward pass.
+-# Let :math:`\hat{x}` be the normalized inputs :math:`\frac{ x - \text{E}[x] }{ \sqrt{\text{Var}(x) + \epsilon} }` before the linear transformation,
+-# the Vector-Jacobian Products (VJP) :math:`\nabla_{x}` of :math:`x` are given by:
+-#
+-# .. math::
+-#    \nabla_{x} = \frac{1}{\sigma}\Big( \nabla_{y} \odot w - \underbrace{ \big( \frac{1}{N} \hat{x} \cdot (\nabla_{y} \odot w) \big) }_{c_1} \odot \hat{x} - \underbrace{ \frac{1}{N} \nabla_{y} \cdot w }_{c_2} \Big)
+-#
+-# where :math:`\odot` denotes the element-wise multiplication, :math:`\cdot` denotes the dot product, and :math:`\sigma` is the standard deviation.
+-# :math:`c_1` and :math:`c_2` are intermediate constants that improve the readability of the following implementation.
+-#
+-# For the weights :math:`w` and biases :math:`b`, the VJPs :math:`\nabla_{w}` and :math:`\nabla_{b}` are more straightforward:
+-#
+-# .. math::
+-#    \nabla_{w} = \nabla_{y} \odot \hat{x} \quad \text{and} \quad \nabla_{b} = \nabla_{y}
+-#
+-# Since the same weights :math:`w` and biases :math:`b` are used for all rows in the same batch, their gradients need to sum up.
+-# To perform this step efficiently, we use a parallel reduction strategy: each kernel instance accumulates
+-# partial :math:`\nabla_{w}` and :math:`\nabla_{b}` across certain rows into one of :math:`\text{GROUP_SIZE_M}` independent buffers.
+-# These buffers stay in the L2 cache and then are further reduced by another function to compute the actual :math:`\nabla_{w}` and :math:`\nabla_{b}`.
+-#
+-# Let the number of input rows :math:`M = 4` and :math:`\text{GROUP_SIZE_M} = 2`,
+-# here's a diagram of the parallel reduction strategy for :math:`\nabla_{w}` (:math:`\nabla_{b}` is omitted for brevity):
+-#
+-#   .. image:: parallel_reduction.png
+-#
+-# In Stage 1, the rows of X that have the same color share the same buffer and thus a lock is used to ensure that only one kernel instance writes to the buffer at a time.
+-# In Stage 2, the buffers are further reduced to compute the final :math:`\nabla_{w}` and :math:`\nabla_{b}`.
+-# In the following implementation, Stage 1 is implemented by the function :code:`_layer_norm_bwd_dx_fused` and Stage 2 is implemented by the function :code:`_layer_norm_bwd_dwdb`.
+-
+ 
+ @triton.jit
+ def _layer_norm_bwd_dx_fused(DX,  # pointer to the input gradient
+@@ -193,7 +131,6 @@
+     # Release the lock
+     tl.atomic_xchg(Lock, 0)
+ 
+-
+ @triton.jit
+ def _layer_norm_bwd_dwdb(DW,  # pointer to the partial sum of weights gradient
+                          DB,  # pointer to the partial sum of biases gradient
+@@ -219,16 +156,6 @@
+     sum_db = tl.sum(db, axis=0)
+     tl.store(FINAL_DW + cols, sum_dw, mask=cols < N)
+     tl.store(FINAL_DB + cols, sum_db, mask=cols < N)
+-
+-
+-# %%
+-# Benchmark
+-# ---------
+-#
+-# We can now compare the performance of our kernel against that of PyTorch.
+-# Here we focus on inputs that have Less than 64KB per feature.
+-# Specifically, one can set :code:`'mode': 'backward'` to benchmark the backward pass.
+-
+ 
+ class LayerNorm(torch.autograd.Function):
+ 
+@@ -292,90 +219,3 @@
+             BLOCK_SIZE_M=32,  #
+             BLOCK_SIZE_N=128, num_ctas=1)
+         return dx, None, dw, db, None
+-
+-
+-layer_norm = LayerNorm.apply
+-
+-
+-def test_layer_norm(M, N, dtype, eps=1e-5, device=DEVICE):
+-    # create data
+-    x_shape = (M, N)
+-    w_shape = (x_shape[-1], )
+-    weight = torch.rand(w_shape, dtype=dtype, device=device, requires_grad=True)
+-    bias = torch.rand(w_shape, dtype=dtype, device=device, requires_grad=True)
+-    x = -2.3 + 0.5 * torch.randn(x_shape, dtype=dtype, device=device)
+-    dy = .1 * torch.randn_like(x)
+-    x.requires_grad_(True)
+-    # forward pass
+-    y_tri = layer_norm(x, w_shape, weight, bias, eps)
+-    y_ref = torch.nn.functional.layer_norm(x, w_shape, weight, bias, eps).to(dtype)
+-    # backward pass (triton)
+-    y_tri.backward(dy, retain_graph=True)
+-    dx_tri, dw_tri, db_tri = [_.grad.clone() for _ in [x, weight, bias]]
+-    x.grad, weight.grad, bias.grad = None, None, None
+-    # backward pass (torch)
+-    y_ref.backward(dy, retain_graph=True)
+-    dx_ref, dw_ref, db_ref = [_.grad.clone() for _ in [x, weight, bias]]
+-    # compare
+-    assert torch.allclose(y_tri, y_ref, atol=1e-2, rtol=0)
+-    assert torch.allclose(dx_tri, dx_ref, atol=1e-2, rtol=0)
+-    assert torch.allclose(db_tri, db_ref, atol=1e-2, rtol=0)
+-    assert torch.allclose(dw_tri, dw_ref, atol=1e-2, rtol=0)
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        x_names=['N'],
+-        x_vals=[512 * i for i in range(2, 32)],
+-        line_arg='provider',
+-        line_vals=['triton', 'torch'] + (['apex'] if HAS_APEX else []),
+-        line_names=['Triton', 'Torch'] + (['Apex'] if HAS_APEX else []),
+-        styles=[('blue', '-'), ('green', '-'), ('orange', '-')],
+-        ylabel='GB/s',
+-        plot_name='layer-norm-backward',
+-        args={'M': 4096, 'dtype': torch.float16, 'mode': 'backward'},
+-    ))
+-def bench_layer_norm(M, N, dtype, provider, mode='backward', eps=1e-5, device=DEVICE):
+-    # create data
+-    x_shape = (M, N)
+-    w_shape = (x_shape[-1], )
+-    weight = torch.rand(w_shape, dtype=dtype, device=device, requires_grad=True)
+-    bias = torch.rand(w_shape, dtype=dtype, device=device, requires_grad=True)
+-    x = -2.3 + 0.5 * torch.randn(x_shape, dtype=dtype, device=device)
+-    dy = .1 * torch.randn_like(x)
+-    x.requires_grad_(True)
+-    quantiles = [0.5, 0.2, 0.8]
+-
+-    def y_fwd():
+-
+-        if provider == "triton":
+-            return layer_norm(x, w_shape, weight, bias, eps)  # noqa: F811, E704
+-
+-        if provider == "torch":
+-            return torch.nn.functional.layer_norm(x, w_shape, weight, bias, eps)  # noqa: F811, E704
+-
+-        if provider == "apex":
+-            apex_layer_norm = (apex.normalization.FusedLayerNorm(w_shape).to(x.device).to(x.dtype))
+-            return apex_layer_norm(x)  # noqa: F811, E704
+-
+-    # forward pass
+-    if mode == 'forward':
+-        gbps = lambda ms: 2 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
+-        ms, min_ms, max_ms = triton.testing.do_bench(y_fwd, quantiles=quantiles, rep=500)
+-    # backward pass
+-    if mode == 'backward':
+-        y = y_fwd()
+-        gbps = lambda ms: 3 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)  # noqa: F811, E704
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: y.backward(dy, retain_graph=True), quantiles=quantiles,
+-                                                     grad_to_none=[x], rep=500)
+-    return gbps(ms), gbps(max_ms), gbps(min_ms)
+-
+-
+-test_layer_norm(1151, 8192, torch.float16)
+-bench_layer_norm.run(save_path='.', print_data=True)
+-
+-# %%
+-# References
+-# ----------
+-#
+-# .. [BA2016] Jimmy Lei Ba and Jamie Ryan Kiros and Geoffrey E. Hinton, "Layer Normalization", Arxiv 2016
+--- python/tutorials/06-fused-attention.py
++++ tutorial_06_fused_attention.py
+@@ -14,35 +14,31 @@
+ """
+ 
+ import pytest
++
+ import torch
++
+ import os
+ 
+ import triton
++
+ import triton.language as tl
++
+ from triton.tools.tensor_descriptor import TensorDescriptor
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ def is_hip():
+     return triton.runtime.driver.active.get_current_target().backend == "hip"
+ 
+-
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def supports_host_descriptor():
+     return is_cuda() and torch.cuda.get_device_capability()[0] >= 9
+ 
+-
+ def is_blackwell():
+     return is_cuda() and torch.cuda.get_device_capability()[0] == 10
+ 
+-
+ def is_hopper():
+     return is_cuda() and torch.cuda.get_device_capability()[0] == 9
+-
+ 
+ @triton.jit
+ def _attn_fwd_inner(acc, l_i, m_i, q,  #
+@@ -109,7 +105,6 @@
+         offsetv_y += BLOCK_N
+     return acc, l_i, m_i
+ 
+-
+ def _host_descriptor_pre_hook(nargs):
+     BLOCK_M = nargs["BLOCK_M"]
+     BLOCK_N = nargs["BLOCK_N"]
+@@ -124,7 +119,6 @@
+     nargs["desc_k"].block_shape = [BLOCK_N, HEAD_DIM]
+     nargs["desc_o"].block_shape = [BLOCK_M, HEAD_DIM]
+ 
+-
+ if is_hip():
+     NUM_STAGES_OPTIONS = [1]
+ elif supports_host_descriptor():
+@@ -139,19 +133,18 @@
+     for s in NUM_STAGES_OPTIONS \
+     for w in [4, 8]\
+ ]
++
+ if "PYTEST_VERSION" in os.environ:
+     # Use a single config in testing for reproducibility
+     configs = [
+         triton.Config(dict(BLOCK_M=128, BLOCK_N=64), num_stages=2, num_warps=4, pre_hook=_host_descriptor_pre_hook),
+     ]
+ 
+-
+ def keep(conf):
+     BLOCK_M = conf.kwargs["BLOCK_M"]
+     BLOCK_N = conf.kwargs["BLOCK_N"]
+     return not (is_cuda() and torch.cuda.get_device_capability()[0] == 9 and BLOCK_M * BLOCK_N < 128 * 128
+                 and conf.num_warps == 8)
+-
+ 
+ def prune_invalid_configs(configs, named_args, **kwargs):
+     N_CTX = kwargs["N_CTX"]
+@@ -164,14 +157,12 @@
+             conf.kwargs.get("BLOCK_M", 0) >= conf.kwargs.get("BLOCK_N", 0) or STAGE == 1)
+     ]
+ 
+-
+ @triton.jit
+ def _maybe_make_tensor_desc(desc_or_ptr, shape, strides, block_shape):
+     if isinstance(desc_or_ptr, tl.tensor_descriptor):
+         return desc_or_ptr
+     else:
+         return tl.make_tensor_descriptor(desc_or_ptr, shape, strides, block_shape)
+-
+ 
+ @triton.autotune(configs=list(filter(keep, configs)), key=["N_CTX", "HEAD_DIM", "FP8_OUTPUT", "warp_specialize"],
+                  prune_configs_by={'early_config_prune': prune_invalid_configs})
+@@ -246,7 +237,6 @@
+     tl.store(m_ptrs, m_i)
+     desc_o.store([qo_offset_y, 0], acc.to(dtype))
+ 
+-
+ @triton.jit
+ def _attn_bwd_preprocess(O, DO,  #
+                          Delta,  #
+@@ -263,8 +253,6 @@
+     # write-back
+     tl.store(Delta + off_hz * N_CTX + off_m, delta)
+ 
+-
+-# The main inner-loop logic for computing dK and dV.
+ @triton.jit
+ def _attn_bwd_dkdv(dk, dv,  #
+                    Q, k, v, sm_scale,  #
+@@ -316,8 +304,6 @@
+         do_ptrs += step_m * stride_tok
+     return dk, dv
+ 
+-
+-# the main inner-loop logic for computing dQ
+ @triton.jit
+ def _attn_bwd_dq(dq, q, K, V,  #
+                  do, m, D,
+@@ -364,7 +350,6 @@
+         vT_ptrs += step_n * stride_tok
+     return dq
+ 
+-
+ @triton.jit
+ def _attn_bwd(Q, K, V, sm_scale,  #
+               DO,  #
+@@ -500,7 +485,6 @@
+     dq_ptrs = DQ + offs_m[:, None] * stride_tok + offs_k[None, :] * stride_d
+     dq *= LN2
+     tl.store(dq_ptrs, dq)
+-
+ 
+ class _attention(torch.autograd.Function):
+ 
+@@ -617,159 +601,6 @@
+ 
+         return dq, dk, dv, None, None, None, None
+ 
+-
+-attention = _attention.apply
+-
+-TORCH_HAS_FP8 = hasattr(torch, 'float8_e5m2')
+-
+-
+-@pytest.mark.parametrize("Z", [1, 4])
+-@pytest.mark.parametrize("H", [2, 48])
+-@pytest.mark.parametrize("N_CTX", [128, 1024, (2 if is_hip() else 4) * 1024])
+-@pytest.mark.parametrize("HEAD_DIM", [64, 128])
+-@pytest.mark.parametrize("causal", [False, True])
+-@pytest.mark.parametrize("warp_specialize", [False, True] if is_blackwell() else [False])
+-@pytest.mark.parametrize("mode", ["fwd", "bwd"])
+-@pytest.mark.parametrize("provider", ["triton-fp16"] + (["triton-fp8"] if TORCH_HAS_FP8 else []))
+-def test_op(Z, H, N_CTX, HEAD_DIM, causal, warp_specialize, mode, provider, dtype=torch.float16):
+-    if mode == "fwd" and "fp16" in provider:
+-        pytest.skip("Avoid running the forward computation twice.")
+-    if mode == "bwd" and "fp8" in provider:
+-        pytest.skip("Backward pass with FP8 is not supported.")
+-    torch.manual_seed(20)
+-    q = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=DEVICE).normal_(mean=0.0, std=0.5).requires_grad_())
+-    k = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=DEVICE).normal_(mean=0.0, std=0.5).requires_grad_())
+-    v = (torch.empty((Z, H, N_CTX, HEAD_DIM), dtype=dtype, device=DEVICE).normal_(mean=0.0, std=0.5).requires_grad_())
+-    sm_scale = 0.5
+-    # reference implementation
+-    ref_dtype = dtype
+-    if mode == "fwd" and "fp8" in provider:
+-        ref_dtype = torch.float32
+-    q = q.to(ref_dtype)
+-    k = k.to(ref_dtype)
+-    v = v.to(ref_dtype)
+-    M = torch.tril(torch.ones((N_CTX, N_CTX), device=DEVICE))
+-    p = torch.matmul(q, k.transpose(2, 3)) * sm_scale
+-    if causal:
+-        p[:, :, M == 0] = float("-inf")
+-    p = torch.softmax(p.float(), dim=-1)
+-    p = p.to(ref_dtype)
+-    # p = torch.exp(p)
+-    ref_out = torch.matmul(p, v).half()
+-    if mode == "bwd":
+-        dout = torch.randn_like(q)
+-        ref_out.backward(dout)
+-        ref_dv, v.grad = v.grad.clone(), None
+-        ref_dk, k.grad = k.grad.clone(), None
+-        ref_dq, q.grad = q.grad.clone(), None
+-    # triton implementation
+-    if mode == "fwd" and "fp8" in provider:
+-        q = q.to(torch.float8_e5m2)
+-        k = k.to(torch.float8_e5m2)
+-        v = v.permute(0, 1, 3, 2).contiguous()
+-        v = v.permute(0, 1, 3, 2)
+-        v = v.to(torch.float8_e5m2)
+-    tri_out = attention(q, k, v, causal, sm_scale, warp_specialize).half()
+-    if mode == "fwd":
+-        atol = 3 if "fp8" in provider else 1e-2
+-        torch.testing.assert_close(tri_out, ref_out, atol=atol, rtol=0)
+-        return
+-    tri_out.backward(dout)
+-    tri_dv, v.grad = v.grad.clone(), None
+-    tri_dk, k.grad = k.grad.clone(), None
+-    tri_dq, q.grad = q.grad.clone(), None
+-    # compare
+-    torch.testing.assert_close(tri_out, ref_out, atol=1e-2, rtol=0)
+-    rtol = 0.0
+-    # Relative tolerance workaround for known hardware limitation of CDNA2 GPU.
+-    # For details see https://pytorch.org/docs/stable/notes/numerical_accuracy.html#reduced-precision-fp16-and-bf16-gemms-and-convolutions-on-amd-instinct-mi200-devices
+-    if torch.version.hip is not None and triton.runtime.driver.active.get_current_target().arch == "gfx90a":
+-        rtol = 1e-2
+-    torch.testing.assert_close(tri_dv, ref_dv, atol=1e-2, rtol=rtol)
+-    torch.testing.assert_close(tri_dk, ref_dk, atol=1e-2, rtol=rtol)
+-    torch.testing.assert_close(tri_dq, ref_dq, atol=1e-2, rtol=rtol)
+-
+-
+-try:
+-    from flash_attn.flash_attn_interface import \
+-        flash_attn_qkvpacked_func as flash_attn_func
+-    HAS_FLASH = True
+-except BaseException:
+-    HAS_FLASH = False
+-
+-TORCH_HAS_FP8 = hasattr(torch, 'float8_e5m2')
+ BATCH, N_HEADS = 4, 32
+-# vary seq length for fixed head and batch=4
++
+ configs = []
+-for HEAD_DIM in [64, 128]:
+-    for mode in ["fwd", "bwd"]:
+-        for causal in [True, False]:
+-            # Enable warpspec for causal fwd on Hopper
+-            enable_ws = mode == "fwd" and (is_blackwell() or (is_hopper() and not causal))
+-            for warp_specialize in [False, True] if enable_ws else [False]:
+-                configs.append(
+-                    triton.testing.Benchmark(
+-                        x_names=["N_CTX"],
+-                        x_vals=[2**i for i in range(10, 15)],
+-                        line_arg="provider",
+-                        line_vals=["triton-fp16"] + (["triton-fp8"] if TORCH_HAS_FP8 else []) +
+-                        (["flash"] if HAS_FLASH else []),
+-                        line_names=["Triton [FP16]"] + (["Triton [FP8]"] if TORCH_HAS_FP8 else []) +
+-                        (["Flash-2"] if HAS_FLASH else []),
+-                        styles=[("red", "-"), ("blue", "-"), ("green", "-")],
+-                        ylabel="TFLOPS",
+-                        plot_name=
+-                        f"fused-attention-batch{BATCH}-head{N_HEADS}-d{HEAD_DIM}-{mode}-causal={causal}-warp_specialize={warp_specialize}",
+-                        args={
+-                            "H": N_HEADS,
+-                            "BATCH": BATCH,
+-                            "HEAD_DIM": HEAD_DIM,
+-                            "mode": mode,
+-                            "causal": causal,
+-                            "warp_specialize": warp_specialize,
+-                        },
+-                    ))
+-
+-
+-@triton.testing.perf_report(configs)
+-def bench_flash_attention(BATCH, H, N_CTX, HEAD_DIM, causal, warp_specialize, mode, provider, device=DEVICE):
+-    assert mode in ["fwd", "bwd"]
+-    dtype = torch.float16
+-    if "triton" in provider:
+-        q = torch.randn((BATCH, H, N_CTX, HEAD_DIM), dtype=dtype, device=device, requires_grad=True)
+-        k = torch.randn((BATCH, H, N_CTX, HEAD_DIM), dtype=dtype, device=device, requires_grad=True)
+-        v = torch.randn((BATCH, H, N_CTX, HEAD_DIM), dtype=dtype, device=device, requires_grad=True)
+-        if mode == "fwd" and "fp8" in provider:
+-            q = q.to(torch.float8_e5m2)
+-            k = k.to(torch.float8_e5m2)
+-            v = v.permute(0, 1, 3, 2).contiguous()
+-            v = v.permute(0, 1, 3, 2)
+-            v = v.to(torch.float8_e5m2)
+-        sm_scale = 1.3
+-        fn = lambda: attention(q, k, v, causal, sm_scale, warp_specialize)
+-        if mode == "bwd":
+-            o = fn()
+-            do = torch.randn_like(o)
+-            fn = lambda: o.backward(do, retain_graph=True)
+-        ms = triton.testing.do_bench(fn)
+-
+-    if provider == "flash":
+-        qkv = torch.randn((BATCH, N_CTX, 3, H, HEAD_DIM), dtype=dtype, device=device, requires_grad=True)
+-        fn = lambda: flash_attn_func(qkv, causal=causal)
+-        if mode == "bwd":
+-            o = fn()
+-            do = torch.randn_like(o)
+-            fn = lambda: o.backward(do, retain_graph=True)
+-        ms = triton.testing.do_bench(fn)
+-    flops_per_matmul = 2.0 * BATCH * H * N_CTX * N_CTX * HEAD_DIM
+-    total_flops = 2 * flops_per_matmul
+-    if causal:
+-        total_flops *= 0.5
+-    if mode == "bwd":
+-        total_flops *= 2.5  # 2.0(bwd) + 0.5(recompute)
+-    return total_flops * 1e-12 / (ms * 1e-3)
+-
+-
+-if __name__ == "__main__":
+-    # only works on post-Ampere GPUs right now
+-    bench_flash_attention.run(save_path=".", print_data=True)
+--- python/tutorials/07-extern-functions.py
++++ tutorial_07_extern_functions.py
+@@ -11,22 +11,19 @@
+ Triton automatically selects the correct underlying device function to invoke based on input and output types.
+ """
+ 
+-# %%
+-#  asin Kernel
+-# ------------
+-
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
++
+ import inspect
++
+ import os
++
+ from triton.language.extra import libdevice
+ 
+ from pathlib import Path
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ @triton.jit
+ def asin_kernel(
+@@ -43,57 +40,10 @@
+     x = libdevice.asin(x)
+     tl.store(y_ptr + offsets, x, mask=mask)
+ 
++size = 98432
+ 
+-# %%
+-#  Using the default libdevice library path
+-# -----------------------------------------
+-# We can use the default libdevice library path encoded in `triton/language/math.py`
+-
+-torch.manual_seed(0)
+-size = 98432
+-x = torch.rand(size, device=DEVICE)
+-output_triton = torch.zeros(size, device=DEVICE)
+-output_torch = torch.asin(x)
+-assert x.is_cuda and output_triton.is_cuda
+-n_elements = output_torch.numel()
+-grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']), )
+-asin_kernel[grid](x, output_triton, n_elements, BLOCK_SIZE=1024)
+-print(output_torch)
+-print(output_triton)
+-print(f'The maximum difference between torch and triton is '
+-      f'{torch.max(torch.abs(output_torch - output_triton))}')
+-
+-
+-# %%
+-#  Customize the libdevice library path
+-# -------------------------------------
+-# We can also customize the libdevice library path by passing the path to the `libdevice` library to the `asin` kernel.
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def is_hip():
+     return triton.runtime.driver.active.get_current_target().backend == "hip"
+-
+-
+-current_file = inspect.getfile(inspect.currentframe())
+-current_dir = Path(os.path.dirname(os.path.abspath(current_file)))
+-
+-if is_cuda():
+-    libdir = current_dir.parent.parent / 'third_party/nvidia/backend/lib'
+-    extern_libs = {'libdevice': str(libdir / 'libdevice.10.bc')}
+-elif is_hip():
+-    libdir = current_dir.parent.parent / 'third_party/amd/backend/lib'
+-    extern_libs = {}
+-    libs = ["ocml", "ockl"]
+-    for lib in libs:
+-        extern_libs[lib] = str(libdir / f'{lib}.bc')
+-else:
+-    raise RuntimeError('unknown backend')
+-
+-output_triton = torch.empty_like(x)
+-asin_kernel[grid](x, output_triton, n_elements, BLOCK_SIZE=1024, extern_libs=extern_libs)
+-print(output_torch)
+-print(output_triton)
+-print(f'The maximum difference between torch and triton is '
+-      f'{torch.max(torch.abs(output_torch - output_triton))}')
+--- python/tutorials/08-grouped-gemm.py
++++ tutorial_08_grouped_gemm.py
+@@ -5,49 +5,24 @@
+ of gemms. The scheduling is static and we do it on device.
+ """
+ 
+-# Copyright (c) 2023 - 2025 NVIDIA Corporation & Affiliates. All rights reserved.
+-#
+-# Permission is hereby granted, free of charge, to any person obtaining
+-# a copy of this software and associated documentation files
+-# (the "Software"), to deal in the Software without restriction,
+-# including without limitation the rights to use, copy, modify, merge,
+-# publish, distribute, sublicense, and/or sell copies of the Software,
+-# and to permit persons to whom the Software is furnished to do so,
+-# subject to the following conditions:
+-#
+-# The above copyright notice and this permission notice shall be
+-# included in all copies or substantial portions of the Software.
+-#
+-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+-# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+-# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+-# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+-# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+-# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+-# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-
+ from typing import Optional
++
+ import torch
+ 
+ import triton
++
+ import triton.language as tl
+-
+-DEVICE = triton.runtime.driver.active.get_active_torch_device()
+-
+ 
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def supports_tma():
+     return is_cuda() and torch.cuda.get_device_capability()[0] >= 9
+-
+ 
+ def num_sms():
+     if is_cuda():
+         return torch.cuda.get_device_properties("cuda").multi_processor_count
+     return 148
+-
+ 
+ @triton.autotune(
+     configs=[
+@@ -168,7 +143,6 @@
+         # get ready to go to the next gemm problem
+         last_problem_end = last_problem_end + num_tiles
+ 
+-
+ def group_gemm_fn(group_A, group_B):
+     assert len(group_A) == len(group_B)
+     group_size = len(group_A)
+@@ -212,7 +186,6 @@
+ 
+     return group_C
+ 
+-
+ tma_configs = [
+     triton.Config({'BLOCK_SIZE_M': BM, 'BLOCK_SIZE_N': BN, 'BLOCK_SIZE_K' : BK}, num_stages=s, num_warps=w) \
+     for BM in [128]\
+@@ -221,7 +194,6 @@
+     for s in ([3, 4])\
+     for w in [4, 8]\
+ ]
+-
+ 
+ @triton.autotune(
+     tma_configs,
+@@ -321,7 +293,6 @@
+         # get ready to go to the next gemm problem
+         last_problem_end = last_problem_end + num_tiles
+ 
+-
+ def group_gemm_tma_fn(group_A, group_B):
+ 
+     assert supports_tma()
+@@ -368,39 +339,18 @@
+                                     FP8=torch.float8_e4m3fn == group_A[0].dtype, NUM_SM=num_sms())
+     return group_C
+ 
+-
+ group_m = [1024, 512, 256, 128]
++
+ group_n = [1024, 512, 256, 128]
++
+ group_k = [1024, 512, 256, 128]
++
+ group_A = []
++
+ group_B = []
++
+ group_B_T = []
+-assert len(group_m) == len(group_n)
+-assert len(group_n) == len(group_k)
+-group_size = len(group_m)
+-for i in range(group_size):
+-    M = group_m[i]
+-    N = group_n[i]
+-    K = group_k[i]
+-    A = torch.rand((M, K), device=DEVICE, dtype=torch.float16)
+-    B = torch.rand((K, N), device=DEVICE, dtype=torch.float16)
+-    B_T = B.T.contiguous()
+-    group_A.append(A)
+-    group_B.append(B)
+-    group_B_T.append(B_T)
+-
+-tri_out = group_gemm_fn(group_A, group_B)
+-ref_out = [torch.matmul(a, b) for a, b in zip(group_A, group_B)]
+-for i in range(group_size):
+-    assert torch.allclose(ref_out[i], tri_out[i], atol=1e-2, rtol=1e-2)
+-
+-if supports_tma():
+-    tri_tma_out = group_gemm_tma_fn(group_A, group_B_T)
+-    for i in range(group_size):
+-        assert torch.allclose(ref_out[i], tri_tma_out[i], atol=1e-2, rtol=1e-2)
+-
+-
+-# only launch the kernel, no tensor preparation here to remove all overhead
++
+ def triton_perf_fn(a_ptrs, b_ptrs, c_ptrs, sizes, lds, group_size):
+     grid = lambda META: (META['NUM_SM'], )
+     grouped_matmul_kernel[grid](
+@@ -412,154 +362,11 @@
+         group_size,
+     )
+ 
+-
+ def triton_tma_perf_fn(a_ptrs, b_ptrs, c_ptrs, sizes, lds, group_size, dtype):
+     grid = lambda META: (META['NUM_SM'], )
+     grouped_matmul_tma_kernel[grid](a_ptrs, b_ptrs, c_ptrs, sizes, lds, group_size, FP8=torch.float8_e4m3fn == dtype,
+                                     NUM_SM=num_sms())
+ 
+-
+ def torch_perf_fn(group_A, group_B):
+     for a, b in zip(group_A, group_B):
+         torch.matmul(a, b)
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        # argument names to use as an x-axis for the plot
+-        x_names=['N'],
+-        x_vals=[2**i for i in range(7, 11)],  # different possible values for `x_name`
+-        line_arg='provider',
+-        # argument name whose value corresponds to a different line in the plot
+-        # possible values for `line_arg``
+-        line_vals=['cublas', 'triton'] + (['triton-tma'] if supports_tma() else []),
+-        # label name for the lines
+-        line_names=["cuBLAS", "Triton"] + (['Triton + TMA'] if supports_tma() else []),
+-        # line styles
+-        styles=[('green', '-'), ('blue', '-')] + ([('red', '-')] if supports_tma() else []),
+-        ylabel="runtime(ms)",  # label name for the y-axis
+-        plot_name="group-gemm-performance",
+-        # name for the plot. Used also as a file name for saving the plot.
+-        args={},
+-    ))
+-def benchmark_square_matrices(N, provider):
+-    group_size = 4
+-    group_A = []
+-    group_B = []
+-    group_B_T = []
+-    A_addrs = []
+-    B_addrs = []
+-    B_T_addrs = []
+-    C_addrs = []
+-    g_sizes = []
+-    g_lds = []
+-    group_C = []
+-    for i in range(group_size):
+-        A = torch.rand((N, N), device=DEVICE, dtype=torch.float16)
+-        B = torch.rand((N, N), device=DEVICE, dtype=torch.float16)
+-        C = torch.empty((N, N), device=DEVICE, dtype=torch.float16)
+-        B_T = B.T.contiguous()
+-        group_A.append(A)
+-        group_B.append(B)
+-        group_B_T.append(B_T)
+-        group_C.append(C)
+-        A_addrs.append(A.data_ptr())
+-        B_addrs.append(B.data_ptr())
+-        B_T_addrs.append(B_T.data_ptr())
+-        C_addrs.append(C.data_ptr())
+-        g_sizes += [N, N, N]
+-        g_lds += [N, N, N]
+-
+-    d_a_ptrs = torch.tensor(A_addrs, device=DEVICE)
+-    d_b_ptrs = torch.tensor(B_addrs, device=DEVICE)
+-    d_b_t_ptrs = torch.tensor(B_T_addrs, device=DEVICE)
+-    d_c_ptrs = torch.tensor(C_addrs, device=DEVICE)
+-    d_g_sizes = torch.tensor(g_sizes, dtype=torch.int32, device=DEVICE)
+-    d_g_lds = torch.tensor(g_lds, dtype=torch.int32, device=DEVICE)
+-
+-    quantiles = [0.5, 0.2, 0.8]
+-    if provider == 'cublas':
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch_perf_fn(group_A, group_B), quantiles=quantiles)
+-    if provider == 'triton':
+-        ms, min_ms, max_ms = triton.testing.do_bench(
+-            lambda: triton_perf_fn(d_a_ptrs, d_b_ptrs, d_c_ptrs, d_g_sizes, d_g_lds, group_size), quantiles=quantiles)
+-    if provider == 'triton-tma':
+-        ms, min_ms, max_ms = triton.testing.do_bench(
+-            lambda: triton_tma_perf_fn(d_a_ptrs, d_b_t_ptrs, d_c_ptrs, d_g_sizes, d_g_lds, group_size, dtype=torch.
+-                                       float16), quantiles=quantiles)
+-    return ms, max_ms, min_ms
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        # argument names to use as an x-axis for the plot
+-        x_names=['M'],
+-        x_vals=[2**i for i in range(7, 11)],  # different possible values for `x_name`
+-        line_arg='provider',
+-        # argument name whose value corresponds to a different line in the plot
+-        # possible values for `line_arg``
+-        line_vals=['cublas', 'triton'] + (['triton-tma'] if supports_tma() else []),
+-        # label name for the lines
+-        line_names=["cuBLAS", "Triton"] + (['Triton + TMA'] if supports_tma() else []),
+-        # line styles
+-        styles=[('green', '-'), ('blue', '-')] + ([('red', '-')] if supports_tma() else []),
+-        ylabel="runtime(ms)",  # label name for the y-axis
+-        plot_name="group-gemm-performance-m-8192-k-8192",
+-        # name for the plot. Used also as a file name for saving the plot.
+-        args={},
+-    ))
+-def benchmark_batches(M, provider):
+-    N = 8192
+-    K = 8192
+-    group_size = 4
+-    group_A = []
+-    group_B = []
+-    group_B_T = []
+-    A_addrs = []
+-    B_addrs = []
+-    B_T_addrs = []
+-    C_addrs = []
+-    g_sizes = []
+-    g_lds = []
+-    g_T_lds = []
+-    group_C = []
+-    for i in range(group_size):
+-        A = torch.rand((M, K), device=DEVICE, dtype=torch.float16)
+-        B = torch.rand((K, N), device=DEVICE, dtype=torch.float16)
+-        C = torch.empty((M, N), device=DEVICE, dtype=torch.float16)
+-        B_T = B.T.contiguous()
+-        group_A.append(A)
+-        group_B.append(B)
+-        group_B_T.append(B_T)
+-        group_C.append(C)
+-        A_addrs.append(A.data_ptr())
+-        B_addrs.append(B.data_ptr())
+-        B_T_addrs.append(B_T.data_ptr())
+-        C_addrs.append(C.data_ptr())
+-        g_sizes += [M, N, K]
+-        g_lds += [A.stride(0), B.stride(0), C.stride(0)]
+-        g_T_lds += [A.stride(0), B_T.stride(0), C.stride(0)]
+-
+-    d_a_ptrs = torch.tensor(A_addrs, device=DEVICE)
+-    d_b_ptrs = torch.tensor(B_addrs, device=DEVICE)
+-    d_b_t_ptrs = torch.tensor(B_T_addrs, device=DEVICE)
+-    d_c_ptrs = torch.tensor(C_addrs, device=DEVICE)
+-    d_g_sizes = torch.tensor(g_sizes, dtype=torch.int32, device=DEVICE)
+-    d_g_lds = torch.tensor(g_lds, dtype=torch.int32, device=DEVICE)
+-    d_g_t_lds = torch.tensor(g_T_lds, dtype=torch.int32, device=DEVICE)
+-
+-    quantiles = [0.5, 0.2, 0.8]
+-    if provider == 'cublas':
+-        ms, min_ms, max_ms = triton.testing.do_bench(lambda: torch_perf_fn(group_A, group_B), quantiles=quantiles)
+-    if provider == 'triton':
+-        ms, min_ms, max_ms = triton.testing.do_bench(
+-            lambda: triton_perf_fn(d_a_ptrs, d_b_ptrs, d_c_ptrs, d_g_sizes, d_g_lds, group_size), quantiles=quantiles)
+-    if provider == 'triton-tma':
+-        ms, min_ms, max_ms = triton.testing.do_bench(
+-            lambda: triton_tma_perf_fn(d_a_ptrs, d_b_t_ptrs, d_c_ptrs, d_g_sizes, d_g_t_lds, group_size, dtype=torch.
+-                                       float16), quantiles=quantiles)
+-    return ms, max_ms, min_ms
+-
+-
+-benchmark_square_matrices.run(show_plots=True, print_data=True)
+-benchmark_batches.run(show_plots=True, print_data=True)
+--- python/tutorials/09-persistent-matmul.py
++++ tutorial_09_persistent_matmul.py
+@@ -20,53 +20,40 @@
+ """
+ 
+ import argparse
++
+ import itertools
+ 
+ import torch
++
+ import triton
++
+ import triton.language as tl
++
+ import triton.profiler as proton
++
+ from triton.tools.tensor_descriptor import TensorDescriptor
++
+ from contextlib import contextmanager
+ 
+ from typing import Optional
+-
+ 
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def is_hip():
+     return triton.runtime.driver.active.get_current_target().backend == "hip"
+ 
+-
+-if is_cuda():
+-    from triton._C.libtriton import nvidia
+-    device_workspace = torch.empty(32 * 1024 * 1024, device="cuda", dtype=torch.uint8)
+-    device_blas = nvidia.cublas.CublasLt(device_workspace)
+-elif is_hip():
+-    from triton._C.libtriton import amd
+-    device_workspace = torch.empty(32 * 1024 * 1024, device="cuda", dtype=torch.uint8)
+-    device_blas = amd.hipblas.HipblasLt(device_workspace)
+-else:
+-    device_blas = None
+-
+-
+ def device_blas_name():
+     return 'cuBLAS' if is_cuda() else 'hipBLAS'
+ 
+-
+ def supports_tma():
+     return is_cuda() and torch.cuda.get_device_capability()[0] >= 9
+ 
+-
+ def is_hopper():
+     return torch.cuda.get_device_capability()[0] == 9
+ 
+-
+ def supports_ws():
+     return is_cuda() and torch.cuda.get_device_capability()[0] >= 9
+-
+ 
+ def _matmul_launch_metadata(grid, kernel, args):
+     ret = {}
+@@ -81,12 +68,6 @@
+     ret["bytes"] = bytes_per_elem * (M * K + N * K + M * N)
+     return ret
+ 
+-
+-HAS_TENSOR_DESC = supports_tma() and hasattr(tl, "make_tensor_descriptor")
+-HAS_HOST_TENSOR_DESC = supports_tma() and hasattr(triton.tools.tensor_descriptor, "TensorDescriptor")
+-HAS_WARP_SPECIALIZE = supports_ws() and HAS_TENSOR_DESC
+-
+-
+ def matmul_get_configs(pre_hook=None):
+     return [
+         triton.Config({'BLOCK_SIZE_M': BM, 'BLOCK_SIZE_N': BN, "BLOCK_SIZE_K": BK, "GROUP_SIZE_M": 8}, num_stages=s,
+@@ -97,7 +78,6 @@
+         for s in ([2, 3, 4])
+         for w in [4, 8]
+     ]
+-
+ 
+ @triton.autotune(
+     configs=matmul_get_configs(),
+@@ -158,7 +138,6 @@
+     c_mask = (offs_cm[:, None] < M) & (offs_cn[None, :] < N)
+     tl.store(c_ptrs, c, mask=c_mask)
+ 
+-
+ def matmul(a, b):
+     # Check constraints.
+     assert a.shape[1] == b.shape[0], "Incompatible dimensions"
+@@ -178,7 +157,6 @@
+         c.stride(0), c.stride(1),  #
+     )
+     return c
+-
+ 
+ def matmul_tma_set_block_size_hook(nargs):
+     EPILOGUE_SUBTILE = nargs.get("EPILOGUE_SUBTILE", False)
+@@ -191,7 +169,6 @@
+         nargs["c_desc"].block_shape = [BLOCK_M, BLOCK_N // 2]
+     else:
+         nargs["c_desc"].block_shape = [BLOCK_M, BLOCK_N]
+-
+ 
+ @triton.autotune(
+     configs=matmul_get_configs(pre_hook=matmul_tma_set_block_size_hook),
+@@ -238,7 +215,6 @@
+     offs_cn = pid_n * BLOCK_SIZE_N
+     c_desc.store([offs_cm, offs_cn], c)
+ 
+-
+ def matmul_tma(a, b, warp_specialize: bool):
+     # Check constraints.
+     assert a.shape[1] == b.shape[1], "Incompatible dimensions"  # b is transposed
+@@ -268,7 +244,6 @@
+         WARP_SPECIALIZE=warp_specialize,  #
+     )
+     return c
+-
+ 
+ @triton.jit
+ def _compute_pid(tile_id, num_pid_in_group, num_pid_m, GROUP_SIZE_M, NUM_SMS):
+@@ -278,7 +253,6 @@
+     pid_m = first_pid_m + (tile_id % group_size_m)
+     pid_n = (tile_id % num_pid_in_group) // group_size_m
+     return pid_m, pid_n
+-
+ 
+ @triton.autotune(
+     configs=matmul_get_configs(),
+@@ -342,7 +316,6 @@
+             c = accumulator.to(tl.float16)
+         tl.store(c_ptrs, c, mask=c_mask)
+ 
+-
+ def matmul_persistent(a, b):
+     # Check constraints.
+     assert a.shape[1] == b.shape[0], "Incompatible dimensions"
+@@ -365,7 +338,6 @@
+     )
+     return c
+ 
+-
+ def matmul_tma_persistent_get_configs(pre_hook=None):
+     return [
+         triton.Config(
+@@ -380,7 +352,6 @@
+         for w in [4, 8]  #
+         for SUBTILE in [True, False]  #
+     ]
+-
+ 
+ @triton.autotune(
+     configs=matmul_tma_persistent_get_configs(pre_hook=matmul_tma_set_block_size_hook),
+@@ -444,7 +415,6 @@
+             accumulator = accumulator.to(dtype)
+             c_desc.store([offs_am_c, offs_bn_c], accumulator)
+ 
+-
+ def matmul_tma_persistent(a, b, warp_specialize: bool):
+     # Check constraints.
+     assert a.shape[1] == b.shape[1], "Incompatible dimensions"  # b is transposed
+@@ -482,12 +452,10 @@
+     )
+     return c
+ 
+-
+ def prune_invalid_configs(configs, named_args, **kwargs):
+     FLATTEN = kwargs["FLATTEN"]
+     # Filter out configs where EPILOGUE_SUBTILE is true and HOPPER is true
+     return [conf for conf in configs if not (conf.kwargs.get("EPILOGUE_SUBTILE", True) and FLATTEN is False)]
+-
+ 
+ @triton.autotune(configs=matmul_tma_persistent_get_configs(), key=["M", "N", "K", "WARP_SPECIALIZE", "FLATTEN"],
+                  prune_configs_by={'early_config_prune': prune_invalid_configs})
+@@ -569,7 +537,6 @@
+             c = accumulator.to(dtype)
+             c_desc.store([offs_cm, offs_cn], c)
+ 
+-
+ def matmul_descriptor_persistent(a, b, warp_specialize: bool):
+     # Check constraints.
+     assert a.shape[1] == b.shape[1], "Incompatible dimensions"  # b is transposed
+@@ -603,7 +570,6 @@
+         FLATTEN=flatten,
+     )
+     return c
+-
+ 
+ def device_blas_matmul(a, b):
+     # Check constraints.
+@@ -620,7 +586,6 @@
+         device_blas.matmul(a, b, c)
+     return c
+ 
+-
+ def torch_matmul(a, b):
+     M, K = a.shape
+     N, K = b.shape
+@@ -631,7 +596,6 @@
+         c = torch.matmul(a, b.T)
+     return c
+ 
+-
+ @contextmanager
+ def proton_context():
+     proton.activate(0)
+@@ -639,17 +603,6 @@
+         yield
+     finally:
+         proton.deactivate(0)
+-
+-
+-def bench_fn(label, reps, warmup_reps, fn, *args):
+-    print(f"Benchmarking {label}: ...", end="")
+-    for _ in range(warmup_reps):
+-        fn(*args)
+-    with proton_context():
+-        for _ in range(reps):
+-            fn(*args)
+-    print(f"\rBenchmarking {label}: done")
+-
+ 
+ def bench(K, dtype, reps=10000, warmup_reps=10000):
+     M = 8192
+@@ -677,7 +630,6 @@
+             bench_fn(f"descriptor_persistent{ws_str}", reps, warmup_reps,
+                      lambda a, b: matmul_descriptor_persistent(a, b, ws), a, b)
+ 
+-
+ def run_test(expect, fn, a, b, label, enabled=True):
+     print(f"  {label}: ...", end="")
+     if enabled:
+@@ -688,7 +640,6 @@
+         icon = "⭕"
+     print(f"\r  {label}: {icon}  ")
+ 
+-
+ def validate(M, N, K, dtype):
+     print(f"{M=}, {N=}, {K=}, verification naive vs: ")
+     a = torch.randn((M, K), device="cuda", dtype=torch.float16).to(dtype)
+@@ -714,7 +665,6 @@
+         enabled = enabled and (not warp_specialize or HAS_TENSOR_DESC) and (not skipped)
+         run_test(naive_result, lambda a, b: kernel(a, b, warp_specialize), a, b, label, enabled)
+     print()
+-
+ 
+ def show_profile(precision, profile_name):
+     import triton.profiler.viewer as proton_viewer
+@@ -726,33 +676,3 @@
+     file_name = f"{profile_name}.hatchet"
+     tree, metrics = proton_viewer.parse(metric_names, file_name)
+     proton_viewer.print_tree(tree, metrics)
+-
+-
+-if __name__ == "__main__":
+-    parser = argparse.ArgumentParser()
+-    parser.add_argument("-K", type=int, required=False, default=512)
+-    parser.add_argument("--K_range", type=int, nargs=2)
+-    parser.add_argument("--K_step", type=int, default=512)
+-    parser.add_argument("--prec", type=str, choices=["fp8", "fp16"], default="fp16")
+-    args = parser.parse_args()
+-
+-    if args.prec == 'fp8' and (not hasattr(torch, "float8_e4m3fn") or not is_cuda()):
+-        print("This example requires CUDA/HIP with fp8 support.")
+-    else:
+-        dtype = torch.float8_e4m3fn if args.prec == 'fp8' else torch.float16
+-
+-        if args.K and args.K_range is None:
+-            args.K_range = [args.K, args.K]
+-            args.K_step = 1  # doesn't matter as long as it's not 0
+-
+-        torch.manual_seed(0)
+-
+-        validate(32, 32, 32, dtype)
+-        validate(8192, 8192, args.K_range[0], dtype)
+-
+-        proton.start("matmul", hook="triton")
+-        proton.deactivate()
+-        for K in range(args.K_range[0], args.K_range[1] + 1, args.K_step):
+-            bench(K, dtype)
+-        proton.finalize()
+-        show_profile(args.prec, "matmul")
+--- python/tutorials/10-block-scaled-matmul.py
++++ tutorial_10_block_scaled_matmul.py
+@@ -23,130 +23,29 @@
+ Future updates to this tutorial which support mixed precision block scaled matmul are planned.
+ """
+ 
+-# %%
+-# Background
+-# ----------
+-# Scale preshuffling on NVIDIA GPUs
+-#
+-# CUDA devices that support PTX 8.7 and later can utlize block scaled matrix multiply
+-# instructions. In order for low latency access to these scale factors in the fast
+-# inner loop over tensor core MMAs, it is important to ensure that the blocked
+-# scale factors are stored in a contiguous memory layout according to their access
+-# pattern.
+-#
+-# The block scaled matmul tensor core instructions compute the following product:
+-#
+-#     C = (A * scale_a) @ (B * scale_b)
+-#
+-# where scale_a and scale_b are the blocked scale factors for the A and B matrices.
+-# Under block scaled matmul, each scale factor is broadcast and multiplied across a
+-# vector of elements from the A and B matrices, usually along their respective K axes.
+-# The number of elements of A and B over which each scale factor is broadcast is herein
+-# refered to as the vector size (VEC_SIZE).
+-#
+-# In a linear row-major layout, the scale factors would take the shape
+-#
+-#     (M, K // VEC_SIZE) and (N, K // VEC_SIZE)   [1]
+-#
+-# in global memory. However, to avoid non-contiguous memory access, it is beneficial to
+-# instead store the scale factors in a packed block layout. For the LHS matrix this layout
+-# is given by
+-#
+-#     (M // 32 // 4, K // VEC_SIZE // 4, 32, 4, 4)   [2].
+-#
+-# In this way, each tensor core MMA in the fast inner loop over K blocks can achieve contiguous
+-# access of a block of 128 rows of scale factors along the M axis, for each BLOCK_M x BLOCK_K
+-# subtile of the matrix A.
+-#
+-# In order to conform with Triton's language semantics for dot_scaled, the scale factors
+-# are prepared in the above 5D layout [2], but are then logically transposed and reshaped into
+-# the 2D layout [1] expected by tl.dot_scaled.
+-#
+-# For more detailed information on the scale factor layout, see
+-#  1. https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-scale-factor-a-layout-1x
+-#  2. https://docs.nvidia.com/cuda/cublas/#d-block-scaling-factors-layout
+-#
+-
+-# Scale preshuffling on AMD GPUs
+-#
+-# Similar to NVIDIA GPUs, on AMD GPUs with CDNA4 architecture, scaled MFMA instructions natively
+-# support scaled matrix multiplication. Since it only supports OCP microscaling formats each
+-# scale is an 8-bit value that scales 32 elements from A or B operand tensors.
+-# Scales are stored as 8-bit tensors. Since MFMA instructions are warp-level instructions, that
+-# means that each thread provides a fixed set of operand values to MFMA instructions.
+-#
+-# For example, in an MFMA instruction with shape 16x16x128:
+-# - 4 threads contribute elements along the K dimension.
+-# - 16 threads contribute elements along the M or N dimension.
+-#
+-# From the perspective of the scales tensor, even if the K dimension is stored contiguously in
+-# shared memory, each thread sees its elements along K dim as strided due to interleaving with
+-# other threads. This striding limits the ability to load scale values using vectorized memory
+-# access.
+-#
+-# Our goal is to reorganize the scale tensor so that:
+-# 1. Each thread stores the 4 scale values it needs for 4 MFMA ops in contiguous memory.
+-# 2. Continuous threads access contiguous memory locations improving global memory coalescing when
+-# bypassing LDS, which is especially beneficial for "skinny" matmuls.
+-#
+-# We consider two MFMA cases: one with non-K dimension 16, and one with 32.
+-# In both, the minimum tile size for preshuffling is 32x32x256.
+-# For example, for a 32x256 operand tile, the corresponding scale tensor has shape 32x8,
+-# where each scale covers 32 elements along the K dimension.
+-#
+-# Each thread holds one scale per MFMA operation. We pack the 4 scale values
+-# (for 4 different MFMA ops) next to each other in memory.
+-#
+-# Case 1: mfma_scaled_16x16x128
+-#
+-# Packing order: mfma_op_0, mfma_op_2, mfma_op_1, mfma_op_3
+-#
+-#            K = 128       K = 128
+-#        +------------+ +------------+
+-#    M=16|  MFMA op 0 | |  MFMA op 1 |
+-#        +------------+ +------------+
+-#    M=16|  MFMA op 2 | |  MFMA op 3 |
+-#        +------------+ +------------+
+-#
+-# Case 2: mfma_scaled_32x32x64
+-#
+-# Packing order: mfma_op_0, mfma_op_1, mfma_op_2, mfma_op_3
+-#
+-#            K=64     K=64     K=64     K=64
+-#        +--------+ +--------+ +--------+ +--------+
+-#    M=32| op 0   | | op 1   | | op 2   | | op 3   |
+-#        +--------+ +--------+ +--------+ +--------+
+-
+ import argparse
+ 
+ import torch
++
+ import triton
++
+ import triton.language as tl
++
+ import triton.profiler as proton
++
+ from triton.tools.tensor_descriptor import TensorDescriptor
++
+ from triton.tools.mxfp import MXFP4Tensor, MXScaleTensor
+-
+ 
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+-
+ 
+ def is_hip_cdna4():
+     target = triton.runtime.driver.active.get_current_target()
+     return target is not None and target.backend == 'hip' and target.arch == 'gfx950'
+ 
+-
+ def supports_block_scaling():
+     return (is_cuda() and torch.cuda.get_device_capability()[0] in [10, 11]) or is_hip_cdna4()
+-
+-
+-if is_cuda() and torch.cuda.get_device_capability()[0] in [10, 11]:
+-    from triton._C.libtriton import nvidia
+-    cublas_workspace = torch.empty(32 * 1024 * 1024, device="cuda", dtype=torch.uint8)
+-    cublas = nvidia.cublas.CublasLt(cublas_workspace)
+-else:
+-    cublas = None
+-
+ 
+ def _matmul_launch_metadata(grid, kernel, args):
+     ret = {}
+@@ -165,7 +64,6 @@
+     ret["name"] = f"{kernel_name} [M={M}, N={N}, K={K}]"
+     ret["flops"] = 2.0 * M * N * K
+     return ret
+-
+ 
+ @triton.jit(launch_metadata=_matmul_launch_metadata)
+ def block_scaled_matmul_kernel(  #
+@@ -233,7 +131,6 @@
+ 
+     c_desc.store([offs_am, offs_bn], accumulator.to(output_dtype))
+ 
+-
+ def block_scaled_matmul(a_desc, a_scale_desc, b_desc, b_scale_desc, dtype_dst, M, N, K, rep_m, rep_n, rep_k, configs):
+     output = torch.empty((M, N), dtype=dtype_dst, device="cuda")
+     if dtype_dst == torch.float32:
+@@ -273,7 +170,6 @@
+     )
+     return output
+ 
+-
+ def cublas_block_scaled_matmul(a, a_scale, b, b_scale, block_scale_type="mxfp8"):
+     """
+     cuBLAS block-scaled matmul baseline.
+@@ -318,7 +214,6 @@
+         raise ValueError(f"Unsupported block_scale_type: {block_scale_type}")
+ 
+     return output
+-
+ 
+ def initialize_block_scaled(M, N, K, block_scale_type="nvfp4", compute_reference=False):
+     BLOCK_M = 128
+@@ -421,6 +316,8 @@
+     }
+ 
+     # Flatten scales for cuBLAS
++    a_scale_cublas = None
++    b_scale_cublas = None
+     if block_scale_type == "mxfp8":
+         a_scale_cublas = a_scale.contiguous().flatten()
+         b_scale_cublas = b_scale.contiguous().flatten()
+@@ -432,7 +329,6 @@
+ 
+     return a_desc, a_scale_desc, b_desc, b_scale_desc, rep_m, rep_n, rep_k, configs, reference, a, b, a_scale_cublas, b_scale_cublas
+ 
+-
+ def validate_block_scaled(M, N, K, block_scale_type="nvfp4"):
+     results = initialize_block_scaled(M, N, K, block_scale_type, compute_reference=True)
+     a_desc, a_scale_desc, b_desc, b_scale_desc, rep_m, rep_n, rep_k, configs, reference = results[:9]
+@@ -452,40 +348,6 @@
+     else:
+         print(f"✅ (pass {block_scale_type} - Triton only)")
+ 
+-
+-def bench_block_scaled(K, block_scale_type="nvfp4", reps=10, warmup_reps=10):
+-    assert K % 128 == 0
+-    M = 8192
+-    N = 8192
+-    print(f"Problem Shape = {M}x{N}x{K}")
+-
+-    results = initialize_block_scaled(M, N, K, block_scale_type, compute_reference=False)
+-    a_desc, a_scale_desc, b_desc, b_scale_desc, rep_m, rep_n, rep_k, configs, _ = results[:9]
+-    a, b, a_scale_cublas, b_scale_cublas = results[9:]
+-
+-    # Warmup
+-    for _ in range(warmup_reps):
+-        _ = block_scaled_matmul(a_desc, a_scale_desc, b_desc, b_scale_desc, torch.float16, M, N, K, rep_m, rep_n, rep_k,
+-                                configs)
+-        if cublas is not None and supports_block_scaling() and block_scale_type in ["mxfp8", "nvfp4"]:
+-            _ = cublas_block_scaled_matmul(a, a_scale_cublas, b, b_scale_cublas, block_scale_type=block_scale_type)
+-
+-    # Benchmark
+-    proton.activate(0)
+-    for _ in range(reps):
+-        _ = block_scaled_matmul(a_desc, a_scale_desc, b_desc, b_scale_desc, torch.float16, M, N, K, rep_m, rep_n, rep_k,
+-                                configs)
+-        if cublas is not None and supports_block_scaling() and block_scale_type in ["mxfp8", "nvfp4"]:
+-            bytes_per_elem = a.element_size()
+-            # For nvfp4, K is in elements but a.shape[1] is in bytes, so use K/2 for byte calculation
+-            K_bytes = K if block_scale_type == "mxfp8" else K // 2
+-            with proton.scope(f"cublas [M={M}, N={N}, K={K}]",
+-                              {"bytes": bytes_per_elem * (M * K_bytes + N * K_bytes + M * N), "flops": 2. * M * N * K}):
+-                _ = cublas_block_scaled_matmul(a, a_scale_cublas, b, b_scale_cublas, block_scale_type=block_scale_type)
+-    proton.deactivate(0)
+-    print("Done benchmarking")
+-
+-
+ def show_profile(profile_name):
+     import triton.profiler.viewer as proton_viewer
+ 
+@@ -494,7 +356,6 @@
+     file_name = f"{profile_name}.hatchet"
+     tree, metrics = proton_viewer.parse(metric_names, file_name)
+     proton_viewer.print_tree(tree, metrics)
+-
+ 
+ @triton.jit
+ def block_scaled_matmul_kernel_cdna4(a_ptr, b_ptr, c_ptr, a_scales_ptr, b_scales_ptr, M, N, K, stride_am, stride_ak,
+@@ -576,7 +437,6 @@
+ 
+     tl.store(c_ptrs, c, mask=c_mask, cache_modifier=".wt")
+ 
+-
+ def shuffle_scales_cdna4(scales: torch.Tensor, mfma_nonkdim: int):
+     scales_shuffled = scales.clone()
+     sm, sn = scales_shuffled.shape
+@@ -590,7 +450,6 @@
+ 
+     scales_shuffled = scales_shuffled.view(sm // 32, sn * 32)
+     return scales_shuffled
+-
+ 
+ def initialize_block_scaled_amd(M, N, K, mfma_nonkdim):
+ 
+@@ -627,7 +486,6 @@
+         w_scales_shuffled,
+         configs,
+     )
+-
+ 
+ def validate_block_scaled_amd(M, N, K, block_scale_type="mxfp4", mfma_nonkdim=16):
+ 
+@@ -663,7 +521,6 @@
+     torch.testing.assert_close(torch_out, triton_out)
+     print(f"✅ (pass {block_scale_type}, mfma_nonk_dim {mfma_nonkdim})")
+ 
+-
+ def block_scaled_matmul_amd(x, w, x_scales_triton, w_scales_triton, configs):
+     M, K = x.shape
+     N, K = w.shape
+@@ -690,60 +547,3 @@
+     triton_out = triton_out.to(torch.float32)
+ 
+     return triton_out
+-
+-
+-def bench_block_scaled_amd(K, block_scale_type="mxfp4", reps=10, mfma_nonkdim=16):
+-    assert K % 128 == 0
+-    M = 8192
+-    N = 8192
+-    print(f"Problem Shape = {M}x{N}x{K}")
+-
+-    x_mxfp4, w_mxfp4, x_scales, w_scales, x_scales_triton, w_scales_triton, configs = \
+-    initialize_block_scaled_amd(M, N, K, mfma_nonkdim)
+-
+-    x = x_mxfp4.to_packed_tensor(dim=1)
+-    w = w_mxfp4.to_packed_tensor(dim=1)
+-
+-    proton.activate(0)
+-    for _ in range(reps):
+-        _ = block_scaled_matmul_amd(x, w, x_scales_triton, w_scales_triton, configs)
+-    proton.deactivate(0)
+-    print("Done benchmarking")
+-
+-
+-if __name__ == "__main__":
+-    parser = argparse.ArgumentParser()
+-    parser.add_argument("-K", type=int, required=False, default=512)
+-    parser.add_argument("--K_range", type=int, nargs=2)
+-    parser.add_argument("--K_step", type=int, default=512)
+-    parser.add_argument("--bench", action="store_true", default=True)
+-    parser.add_argument("--format", type=str, choices=["mxfp4", "nvfp4", "mxfp8", "mixed"], default="nvfp4")
+-    args = parser.parse_args()
+-
+-    if not supports_block_scaling():
+-        print("⛔ This example requires GPU support for block scaled matmul")
+-    else:
+-        if args.K and args.K_range is None:
+-            args.K_range = [args.K, args.K]
+-            args.K_step = 1  # doesn't matter as long as it's not 0
+-
+-        torch.manual_seed(42)
+-
+-        if is_cuda():
+-            validate_block_scaled(8192, 8192, 8192, block_scale_type=args.format)
+-        elif is_hip_cdna4():
+-            assert args.format == "mxfp4", "AMD tutorial only supports mxpf4 format currently"
+-            validate_block_scaled_amd(8192, 8192, 8192, block_scale_type=args.format, mfma_nonkdim=16)
+-            validate_block_scaled_amd(8192, 8192, 8192, block_scale_type=args.format, mfma_nonkdim=32)
+-
+-        if args.bench:
+-            proton.start("block_scaled_matmul", hook="triton")
+-            proton.deactivate(0)  # Skip argument creation
+-            for K in range(args.K_range[0], args.K_range[1] + 1, args.K_step):
+-                if is_cuda():
+-                    bench_block_scaled(K, reps=10000, block_scale_type=args.format)
+-                elif is_hip_cdna4():
+-                    bench_block_scaled_amd(K, reps=10000, block_scale_type=args.format, mfma_nonkdim=16)
+-                    bench_block_scaled_amd(K, reps=10000, block_scale_type=args.format, mfma_nonkdim=32)
+-            proton.finalize()
+-            show_profile("block_scaled_matmul")
+--- python/tutorials/11-programmatic-dependent-launch.py
++++ tutorial_11_programmatic_dependent_launch.py
+@@ -11,19 +11,17 @@
+ """
+ 
+ import torch
++
+ import triton
++
+ import triton.language as tl
+-
+ 
+ def is_cuda():
+     return triton.runtime.driver.active.get_current_target().backend == "cuda"
+ 
+-
+ def supports_pdl():
+     return is_cuda() and torch.cuda.get_device_capability()[0] >= 9
+ 
+-
+-# In this example
+ @triton.jit
+ def add_kernel(x_ptr,  #
+                y_ptr,  #
+@@ -54,7 +52,6 @@
+     output = x + y
+     tl.store(output_ptr + offsets, output, mask=mask)
+ 
+-
+ def add(x: torch.Tensor, y: torch.Tensor, launch_pdl: bool = True):
+     output = torch.empty_like(x)
+     assert x.device == y.device and output.device == x.device
+@@ -67,7 +64,6 @@
+     )
+     return output
+ 
+-
+ def validate(n_elements):
+     x = torch.rand(n_elements, device="cuda", dtype=torch.float32)
+     y = torch.rand(n_elements, device="cuda", dtype=torch.float32)
+@@ -78,39 +74,3 @@
+     torch_vs_add = "✅" if torch.allclose(torch_result, add_result, atol=1.0) else "❌"
+     print(f"Number of Elements={n_elements} verification naive vs: ", end="")
+     print(f"add: {torch_vs_add}")
+-
+-
+-@triton.testing.perf_report(
+-    triton.testing.Benchmark(
+-        x_names=["size"],
+-        x_vals=[2**i for i in range(23, 28, 1)],
+-        x_log=False,
+-        line_arg="provider",
+-        line_vals=["pdl-fp32", "fp32"],
+-        line_names=["PDL", "No PDL"],
+-        styles=[("red", "-"), ("blue", "-")],
+-        ylabel='GB/s',
+-        plot_name="pdl-performance",
+-        args={},
+-    ))
+-def benchmark(size, provider):
+-    x = torch.rand(size, device="cuda", dtype=torch.float32)
+-    y = torch.rand(size, device="cuda", dtype=torch.float32)
+-
+-    quantiles = [0.5, 0.2, 0.8]
+-
+-    fn = lambda: add(x, y, "pdl" in provider)
+-
+-    ms, min_ms, max_ms = triton.testing.do_bench_cudagraph(fn, quantiles=quantiles, rep=100)
+-
+-    gbps = lambda ms: 3 * x.numel() * x.element_size() * 1e-9 / (ms * 1e-3)
+-    return gbps(ms), gbps(max_ms), gbps(min_ms)
+-
+-
+-if __name__ == "__main__":
+-
+-    if supports_pdl():
+-        validate(1024)
+-        benchmark.run(print_data=True, show_plots=True, save_path=".")
+-    else:
+-        print("PDL is not supported on this device")
+--- python/tutorials/gluon/07-persistence.py
++++ tutorial_07_persistence.py
+@@ -24,18 +24,29 @@
+ """
+ 
+ import itertools
++
+ import pytest
++
+ import torch
++
+ import triton
++
+ import importlib
++
+ import sys
++
+ from functools import partial
++
+ from typing import Union
++
+ from triton.experimental import gluon
++
+ from triton.experimental.gluon import language as gl
++
+ from triton.language.core import _aggregate as aggregate
+ 
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.hopper import (
+     tma,
+     mbarrier,
+@@ -44,6 +55,7 @@
+     warpgroup_mma_wait,
+     warpgroup_mma_accumulator,
+ )
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (
+     TensorMemoryLayout,
+     tensor_memory_descriptor,
+@@ -53,45 +65,14 @@
+     tcgen05_commit,
+ )
+ 
+-if torch.cuda.is_available():
+-    from triton._C.libtriton import nvidia
+-    cublas_workspace = torch.empty(32 * 1024 * 1024, device="cuda", dtype=torch.uint8)
+-    cublas = nvidia.cublas.CublasLt(cublas_workspace)
+-else:
+-    cublas = None
+-
+-t5 = importlib.import_module("05-wgmma")
+-
+-
+ def is_hopper_or_newer():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] >= 9
+ 
+-
+-if __name__ == "__main__" and not is_hopper_or_newer():
+-    raise RuntimeError("This tutorial requires Hopper or newer NVIDIA GPU")
+-
+-profiling_with_ncu = len(sys.argv) > 1 and sys.argv[1] == "profile"
+-
+-
+ def get_flops(ms, M, N, K):
+     flops = 2 * M * N * K
+     return flops * 1e-12 / (ms * 1e-3)
+ 
+-
+-# %%
+-# In the previous two tutorials, we introduced tensor core operations for Hopper
+-# and Blackwell NVIDIA GPUs. To make this tutorial more accessible, and to
+-# demonstrate some Gluon features, we will build an abstraction around both sets
+-# of tensor core operations so that our persistent matmul can be used on both
+-# Hopper and Blackwell.
+-#
+-# We can use @aggregate to define a class that contains the state of the
+-# matmul. We will define the API of our MMA wrapper to be like WGMMA's, because
+-# is the more restrictive of the two.
+-
+-
+-# MMA wrapper for WGMMA, which maps directly to the WGMMA functions.
+ @aggregate
+ class WGMMA:
+     acc: Union[warpgroup_mma_accumulator, gl.tensor]
+@@ -125,10 +106,6 @@
+     def take_result(self):
+         return self.acc, WGMMA(self.acc, gl.to_tensor(False))
+ 
+-
+-# MMA wrapper for tcgen05. In order to implement `wait_num_outstanding`, we
+-# need to allocate barriers and keep track of how many MMAs have been issued.
+-# State will be tracked with an accumulator.
+ @aggregate
+ class MMAv5:
+     use_acc: gl.tensor
+@@ -170,7 +147,6 @@
+         next = MMAv5(gl.to_tensor(False), self.acc_tmem, self.bar, self.counter, self.reg_layout)
+         return self.acc_tmem.load(self.reg_layout), next
+ 
+-
+ def select_mma_impl():
+     if torch.cuda.get_device_capability()[0] == 9:
+         return WGMMA
+@@ -178,17 +154,6 @@
+         return MMAv5
+     else:
+         return None
+-
+-
+-# %%
+-# Let's validate our abstraction by implementing a matmul where we pipeline both
+-# the MMA and the loads. This achieves async overlap of both the TMA loads and
+-# the MMAs by requiring at least two operand buffers. This will make the
+-# persistent kernel more interesting by allowing us to overlap more things.
+-#
+-# We will factor our kernel into components we can re-use between
+-# implementations.
+-
+ 
+ @gluon.jit
+ def issue_loads(producer, a_desc, b_desc, off_m, off_n, k, bars, a_bufs, b_bufs, num_buffers: gl.constexpr, pred=True):
+@@ -200,7 +165,6 @@
+     tma.async_copy_global_to_shared(b_desc, [k, off_n], bar, b_bufs.index(index), pred)
+     return producer
+ 
+-
+ @gluon.jit
+ def issue_mma(consumer, mma, bars, a_bufs, b_bufs, num_buffers: gl.constexpr):
+     index = consumer % num_buffers
+@@ -210,7 +174,6 @@
+     mma = mma.wait_num_outstanding(0)
+     mma = mma.issue_async_mma(a_bufs.index(index), b_bufs.index(index))
+     return consumer, mma
+-
+ 
+ @gluon.jit
+ def matmul_pipelined_kernel(a_desc, b_desc, c_desc, MMAImpl: gl.constexpr, num_buffers: gl.constexpr,
+@@ -258,7 +221,6 @@
+     tma.async_copy_shared_to_global(c_desc, [off_m, off_n], c_smem)
+     tma.store_wait(pendings=0)
+ 
+-
+ def matmul_pipelined(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps):
+     MMAImpl = select_mma_impl()
+     M, N = C.shape
+@@ -272,71 +234,6 @@
+ 
+     grid = (triton.cdiv(M, BLOCK_M), triton.cdiv(N, BLOCK_N))
+     matmul_pipelined_kernel[grid](a_desc, b_desc, c_desc, MMAImpl, num_buffers, num_warps=num_warps)
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(2000, 1000, 2000)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N, BLOCK_K", [(128, 256, 64)])
+-@pytest.mark.parametrize("num_buffers", [2, 3, 4])
+-@pytest.mark.parametrize("num_warps", [4, 8])
+-@pytest.mark.skipif(not is_hopper_or_newer(), reason="Requires Hopper or newer")
+-def test_pipelined_matmul(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps):
+-    torch.manual_seed(0)
+-    A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-    B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    matmul_pipelined(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps)
+-    torch.testing.assert_close(A @ B, C, rtol=1e-3, atol=1e-1)
+-
+-
+-# %%
+-# The optimal block shapes for our kernel are BLOCK_M=128 and BLOCK_N=256, which
+-# gives the maximum instruction shape on both Blackwell and Hopper. However, on
+-# Hopper we need 8 warps to fit the accumulator in registers.
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 16 * 1024
+-    A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-    B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-
+-if __name__ == "__main__" and not profiling_with_ncu:
+-    BLOCK_M = 128
+-    BLOCK_N = 256
+-    is_hopper = torch.cuda.get_device_capability()[0] == 9
+-    warps = [8] if is_hopper else [4, 8]
+-    print("Benchmarking pipelined matmul")
+-    print("=============================")
+-    print(f"BLOCK_M={BLOCK_M}, BLOCK_N={BLOCK_N}")
+-    print("BLOCK_K num_buffers num_warps tflops/s")
+-    for (BLOCK_K, num_buffers), num_warps in itertools.product([(128, 2), (64, 3), (64, 4)], warps):
+-        print(f"{BLOCK_K:>7} {num_buffers:>11} {num_warps:>9}", end=" ")
+-        fn = lambda: matmul_pipelined(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps)
+-        ms = triton.testing.do_bench_cudagraph(fn)
+-        print(f"{get_flops(ms, M, N, K):8.2f}")
+-    print()
+-
+-# %%
+-# BLOCK_K num_buffers num_warps Blackwell  Hopper
+-#     128           2         4    735.96
+-#     128           2         8    697.97  489.26
+-#      64           3         4   1054.00
+-#      64           3         8    973.94  673.67
+-#      64           4         4   1175.70
+-#      64           4         8   1072.83  669.16
+-#
+-# Blackwell performance lines up with what we have seen in previous tutorials,
+-# but on Hopper we see some wins. On Hopper, performance plateaus at 3 buffers,
+-# but on Blackwell we see benefits of 4 buffers. This suggests the throughput
+-# ratio has increased in favour of MMAs from Hopper to Blackwell. Noteworthy is
+-# our kernels are occupancy 1.
+-
+-# %%
+-# To make the kernel persistent, all we have to do is put an outer loop around
+-# the kernel and iterate over the output tiles assigned to that kernel.
+-#
+-# Let's define a tile scheduler abstraction that will allow us to change the
+-# scheduling strategy, starting with a basic row-major tile scheduler.
+-
+ 
+ @aggregate
+ class PersistentTileScheduler:
+@@ -374,14 +271,6 @@
+         pid_n = pid // self.num_pid_m
+         return pid_m, pid_n
+ 
+-
+-# %%
+-# We can make the kernel persistent by literally placing the outer loop around
+-# the whole kernel, but let's re-use the TMA barrier and MMA state.
+-# We must scope the operand buffers to the inner loop so the shared memory
+-# allocator knows their liveranges do not intersect with the TMA store buffer.
+-
+-
+ @gluon.jit
+ def persistent_matmul_kernel(a_desc, b_desc, c_desc, MMAImpl: gl.constexpr, SchedulerImpl: gl.constexpr,
+                              num_buffers: gl.constexpr, num_warps: gl.constexpr):
+@@ -425,7 +314,6 @@
+         tma.async_copy_shared_to_global(c_desc, [off_m, off_n], c_smem)
+         tma.store_wait(pendings=0)
+ 
+-
+ def persistent_matmul(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl):
+     M, N = C.shape
+     MMAImpl = select_mma_impl()
+@@ -441,78 +329,6 @@
+     num_pid = triton.cdiv(M, BLOCK_M) * triton.cdiv(N, BLOCK_N)
+     grid = (min(num_sms, num_pid), )
+     persistent_matmul_kernel[grid](a_desc, b_desc, c_desc, MMAImpl, SchedulerImpl, num_buffers, num_warps=num_warps)
+-
+-
+-schedulers = [PersistentTileScheduler]
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(2000, 1000, 2000)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N, BLOCK_K", [(128, 256, 64)])
+-@pytest.mark.parametrize("num_buffers", [2, 3, 4])
+-@pytest.mark.parametrize("num_warps", [4, 8])
+-@pytest.mark.parametrize("SchedulerImpl", schedulers)
+-@pytest.mark.skipif(not is_hopper_or_newer(), reason="Requires Hopper or newer")
+-def test_persistent_matmul(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl):
+-    torch.manual_seed(0)
+-    A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-    B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    persistent_matmul(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl)
+-    torch.testing.assert_close(A @ B, C, rtol=1e-3, atol=1e-1)
+-
+-
+-if __name__ == "__main__" and not profiling_with_ncu:
+-    print("Benchmarking persistent matmul")
+-    print("==============================")
+-    print(f"BLOCK_M={BLOCK_M} BLOCK_N={BLOCK_N}")
+-    print("BLOCK_K num_buffers num_warps tflops/s")
+-    for (BLOCK_K, num_buffers), num_warps in itertools.product([(128, 2), (64, 3), (64, 4)], warps):
+-        print(f"{BLOCK_K:>7} {num_buffers:>11} {num_warps:>9}", end=" ")
+-        fn = lambda: persistent_matmul(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps,
+-                                       PersistentTileScheduler)
+-        ms = triton.testing.do_bench_cudagraph(fn)
+-        print(f"{get_flops(ms, M, N, K):8.2f}")
+-    print()
+-
+-# %%
+-# BLOCK_K num_buffers num_warps  Blackwell  Hopper
+-#     128           2         4     712.25
+-#     128           2         8     686.64  502.84
+-#      64           3         4    1032.16
+-#      64           3         8     938.81  661.11
+-#      64           4         4    1142.26
+-#      64           4         8    1071.46  658.84
+-#
+-# The Hopper kernel sees a modest improvement, but the Blackwell kernel
+-# performance is slightly lower. Let's capture a profile of the kernels on
+-# Blackwell using ncu. Pass `profile` to this script's arguments to run the two
+-# kernels once.
+-
+-if __name__ == "__main__" and profiling_with_ncu:
+-    matmul_pipelined(A, B, C, 128, 256, 64, 4, 4)
+-    persistent_matmul(A, B, C, 128, 256, 64, 4, 4, PersistentTileScheduler)
+-
+-# %%
+-# There are many reasons the persistent kernel can be slower. Load imbalance can
+-# arise due to inefficient scheduling (work is not evenly distributed). But it
+-# can also arise from drift at runtime, such as some TMA accesses taking longer
+-# than others, which a static tile scheduler cannot compensate for.
+-#
+-# Another reason we suspect is the global memory access pattern:
+-#
+-# ```
+-# ncu --set full -o pipelined  --kernel-name matmul_pipelined_kernel  python 07-persistence.py profile
+-# ncu --set full -o persistent --kernel-name persistent_matmul_kernel python 07-persistence.py profile
+-# ncu --import  pipelined.ncu-rep | grep "L2 Hit Rate"
+-#     L2 Hit Rate                            %        61.11
+-# ncu --import persistent.ncu-rep | grep "L2 Hit Rate"
+-#     L2 Hit Rate                            %        52.93
+-# ```
+-#
+-# The persistent kernel's L2 hit rate is 10% lower. We can improve L2 efficiency
+-# by "super-grouping" the tiles along columns. See 03-matrix-multiplication.py
+-# for more details. Let's encode this strategy in a new tile scheduler.
+-
+ 
+ def GroupedPersistentTileScheduler(GROUP_SIZE_M):
+     # Bind this as a constexpr so it can be captured.
+@@ -559,65 +375,6 @@
+     GroupedPersistentTileSchedulerImpl.__name__ = f"GroupedPersistentTileScheduler({GROUP_SIZE_M.value})"
+     return GroupedPersistentTileSchedulerImpl
+ 
+-
+-# Add this to the testsuite.
+-schedulers += [GroupedPersistentTileScheduler(1), GroupedPersistentTileScheduler(8)]
+-
+-if __name__ == "__main__" and not profiling_with_ncu:
+-    num_warps = 8 if is_hopper else 4
+-    num_buffers = 3 if is_hopper else 4
+-    print("Benchmarking grouped scheduler")
+-    print("=============================")
+-    print(f"BLOCK_M={BLOCK_M} BLOCK_N={BLOCK_N} BLOCK_K={BLOCK_K}")
+-    print(f"num_buffers={num_buffers} num_warps={num_warps}")
+-    print("GROUP_SIZE_M tflops/s")
+-    for GROUP_SIZE_M in [1, 2, 4, 6, 8]:
+-        print(f"{GROUP_SIZE_M:>12}", end=" ")
+-        fn = lambda: persistent_matmul(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps,
+-                                       GroupedPersistentTileScheduler(GROUP_SIZE_M))
+-        ms = triton.testing.do_bench_cudagraph(fn)
+-        print(f"{get_flops(ms, M, N, K):8.2f}")
+-    print()
+-
+-# %%
+-# GROUP_SIZE_M Blackwell  Hopper
+-#            1   1025.11  649.09
+-#            2   1050.43  651.32
+-#            4   1032.71  655.51
+-#            6   1057.27  652.39
+-#            8   1179.94  648.42
+-#
+-# At GROUP_SIZE_M=8, we recover performance on Blackwell. In fact, under ncu we
+-# see the L2 hit rate increases to 70%, which suggests there are other ways to
+-# improve the scheduling.
+-#
+-# Performance decreases on Hopper with this scheduler. The L2 hit rate of the
+-# persistent kernel is 86% and 89% for the non-persistent kernel. The grouped
+-# scheduler does not affect the L2 hit rate but it does increase load imbalance.
+-
+-# %%
+-# Pipelining across the outer loop benefits smaller K shapes more because a
+-# larger proportion of time is spent in the epilogue. We can try overlapping the
+-# TMA store with the next tile by rotating the TMA store wait.
+-#
+-# However, this causes the liverange of the TMA store buffer to overlap with the
+-# operand buffers, decreasing our max num_buffers to 3. While Hopper is fine
+-# with 3 buffers, on Blackwell performance can suffer. There are 3 remedies:
+-#
+-# 1. Use gl.store which does not require shared memory but it cannot be
+-#    pipelined. However, the layout conversion requires shared memory.
+-# 2. Break up the TMA store to multiple steps, allowing us to use smaller
+-#    buffers, we will only be able to pipeline the last step.
+-#    reduces the amount of overlap.
+-# 3. Borrow one of the b_bufs.
+-#
+-# For BLOCK_{M,N,K} = (128, 256, 64), one B buffer is half the size of the
+-# accumulator, but we have enough memory to use 5 buffers for B just so that we
+-# can steal two buffers for the epilogue, even though the inner loop only uses
+-# 4 at a time.
+-
+-
+-# Forked versions of issue_loads and issue_mma that support `stealb`.
+ @gluon.jit
+ def issue_loads_stealb(producer, a_desc, b_desc, off_m, off_n, k, bars, a_bufs, b_bufs, stealb: gl.constexpr,
+                        num_buffers: gl.constexpr, pred=True):
+@@ -630,7 +387,6 @@
+     tma.async_copy_global_to_shared(b_desc, [k, off_n], bar, b_bufs.index(b_index), pred)
+     return producer
+ 
+-
+ @gluon.jit
+ def issue_mma_stealb(consumer, mma, bars, a_bufs, b_bufs, stealb: gl.constexpr, num_buffers: gl.constexpr):
+     index = consumer % num_buffers
+@@ -641,7 +397,6 @@
+     mma = mma.wait_num_outstanding(0)
+     mma = mma.issue_async_mma(a_bufs.index(index), b_bufs.index(b_index))
+     return consumer, mma
+-
+ 
+ @gluon.jit
+ def persistent_matmul_pipelined_kernel(a_desc, b_desc, c_desc, MMAImpl: gl.constexpr, SchedulerImpl: gl.constexpr,
+@@ -725,7 +480,6 @@
+         tma.async_copy_shared_to_global(c_desc, [epilogue_off_m, epilogue_off_n], c_buf)
+     tma.store_wait(pendings=0)
+ 
+-
+ def persistent_matmul_pipelined(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl):
+     M, N = C.shape
+     MMAImpl = select_mma_impl()
+@@ -743,103 +497,3 @@
+     grid = (min(num_sms, num_pid), )
+     persistent_matmul_pipelined_kernel[grid](a_desc, b_desc, c_desc, MMAImpl, SchedulerImpl, num_buffers,
+                                              STEALB=num_buffers == 4, num_warps=num_warps)
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(208, 416, 304), (2000, 1000, 2000)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N, BLOCK_K", [(64, 64, 64), (128, 256, 64)])
+-@pytest.mark.parametrize("num_buffers", [3, 4])
+-@pytest.mark.parametrize("num_warps", [4, 8])
+-@pytest.mark.parametrize("SchedulerImpl", schedulers)
+-@pytest.mark.skipif(not is_hopper_or_newer(), reason="Requires Hopper or newer")
+-def test_persistent_matmul_pipelined(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl):
+-    torch.manual_seed(0)
+-    A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-    B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    persistent_matmul_pipelined(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl)
+-    torch.testing.assert_close(A @ B, C, rtol=1e-3, atol=1e-1)
+-
+-
+-if __name__ == "__main__":
+-    args = {
+-        "BLOCK_M": 128,
+-        "BLOCK_N": 256,
+-        "BLOCK_K": 64,
+-        "num_buffers": 3 if is_hopper else 4,
+-        "num_warps": 8 if is_hopper else 4,
+-    }
+-    scheduler = PersistentTileScheduler if is_hopper else GroupedPersistentTileScheduler(8)
+-    nonpersistent = partial(matmul_pipelined, **args)
+-    persistent = partial(persistent_matmul, **args, SchedulerImpl=scheduler)
+-    persistent_pipelined = partial(persistent_matmul_pipelined, **args, SchedulerImpl=scheduler)
+-
+-    M, N = 8192, 8192
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    print("Benchmarking pipelined persistent")
+-    print("=================================")
+-    print("    K     nonpersistent    persistent   pipelined    cublas")
+-    for K in [2**i for i in range(9, 15)]:
+-        as_flops = partial(get_flops, M=M, N=N, K=K)
+-        A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-        B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-        BT = B.T.contiguous()
+-        r0 = as_flops(triton.testing.do_bench_cudagraph(lambda: nonpersistent(A, B, C)))
+-        r1 = as_flops(triton.testing.do_bench_cudagraph(lambda: persistent(A, B, C)))
+-        r2 = as_flops(triton.testing.do_bench_cudagraph(lambda: persistent_pipelined(A, B, C)))
+-        r3 = as_flops(triton.testing.do_bench(lambda: cublas.matmul(A, BT, C)))
+-        print(f"{K:>5} {r0:>17.2f} {r1:>13.2f} {r2:>11.2f} {r3:>9.2f}")
+-
+-# %%
+-# Blackwell results:
+-#
+-#     K     nonpersistent    persistent   pipelined    cublas
+-#   512            615.86        828.70      993.50   1108.11
+-#  1024            997.16       1077.28     1173.31   1347.44
+-#  2048           1152.74       1190.55     1133.37   1435.01
+-#  4096           1164.05       1120.92     1143.47   1563.98
+-#  8192           1160.93       1074.97     1185.40   1491.84
+-# 16384           1185.62       1096.34     1296.93   1548.42
+-#
+-# Hopper results:
+-#
+-#     K     nonpersistent    persistent   pipelined    cublas
+-#   512            491.74        485.01      539.88    588.15
+-#  1024            554.24        575.02      602.52    588.32
+-#  2048            573.87        594.72      625.91    615.58
+-#  4096            609.36        630.10      640.48    646.30
+-#  8192            629.44        646.22      661.57    661.11
+-# 16384            653.79        660.29      670.00    665.49
+-#
+-# Persistent matmul, when pipelined, gains more performance relative to
+-# nonpersistent at lower K, as we would expect. Load balancing can be
+-# particularly difficult when the number of SMs do not evenly divide the number
+-# of blocks, and with 8192x8192, we are smack in the middle with ~13.5 and
+-# ~15.5 blocks per SM for Hopper and Blackwell, respectively.
+-#
+-# On Hopper, our pipelined kernel is competitive with cublas, even pulling ahead
+-# for medium-sized K. However, cublas has a definitive advantage at low K. On
+-# Blackwell, it's not even close: cublas is significantly faster.
+-#
+-# Some matmul performance takes:
+-#
+-# - On Hopper, software pipelining is sufficient to reach peak performance for
+-#   medium and large K.
+-# - cublas uses 2-CTA matmul, which uses distributed shared memory to allow
+-#   256x256 instruction shape. 2-CTA support in Gluon is very spotty,
+-#   but this enables cublas to more efficiently feed the MMA, which matters more
+-#   on Blackwell due to the relative increase in MMA throughput vs TMA.
+-# - cublas matmul is warp-specialized which is necessary on Hopper to fully
+-#   overlap the epilogue at small K.
+-# - Our Blackwell implementation is limited by the shared API we designed for
+-#   Hopper and Blackwell: we are not double-buffering the accumulator and
+-#   leaving 256 columns of TMEM unused.
+-# - On Blackwell, we can use `clusterlaunchcontrol` to dynamically schedule
+-#   work in conjunction with the GPU, getting the best of both worlds.
+-#
+-# Main takeaways:
+-#
+-# - Persistent kernels replace GPU block scheduling with a (typically) static
+-#   schedule. This allows more resource and compute coordination/overlap between
+-#   blocks at the cost of losing dynamic scheduling.
+-# - Persistent kernels tend to benefit smaller problem sizes, but still deliver
+-#   benefits for large problem sizes.
+--- python/tutorials/gluon/08-warp-specialization.py
++++ tutorial_08_warp_specialization.py
+@@ -21,16 +21,25 @@
+ """
+ 
+ import pytest
++
+ import torch
++
+ import triton
++
+ import importlib
++
+ from functools import partial
++
+ from triton.experimental import gluon
++
+ from triton.experimental.gluon import language as gl
+ 
+ from triton.language.core import _aggregate as aggregate
++
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.hopper import tma, mbarrier, fence_async_shared
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (
+     TensorMemoryLayout,
+     tensor_memory_descriptor,
+@@ -40,87 +49,13 @@
+     tcgen05_commit,
+ )
+ 
+-if torch.cuda.is_available():
+-    from triton._C.libtriton import nvidia
+-    cublas_workspace = torch.empty(32 * 1024 * 1024, device="cuda", dtype=torch.uint8)
+-    cublas = nvidia.cublas.CublasLt(cublas_workspace)
+-else:
+-    cublas = None
+-
+-# Re-use utilities from the previous tutorial.
+-t3 = importlib.import_module("03-async-copy")
+-t4 = importlib.import_module("04-tma")
+-t7 = importlib.import_module("07-persistence")
+-
+-
+ def is_hopper_or_newer():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] >= 9
+ 
+-
+ def is_blackwell():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] == 10
+-
+-
+-if __name__ == "__main__" and not is_hopper_or_newer():
+-    raise RuntimeError("This tutorial requires Hopper or newer NVIDIA GPU")
+-
+-# %%
+-# Let's revisit our elementwise add kernel and implement a warp-specialized
+-# version. In a warp-specialized kernel, groups of warps that perform a specific
+-# task are called "partitions", and each can have a different number of warps
+-# and registers.
+-#
+-# First, we need to decide what the partitions will be and how many registers
+-# they will get. One of the benefits of warp specialization is that partitions
+-# that only use scalar values require only 1 warp and often very few registers.
+-# For example, we can have one partition that just issues async TMA loads and
+-# one partition that just issues TMA stores, each with 1 warp and 24 registers,
+-# the minimum number of registers we can assign to a warp.
+-#
+-# Then we have one compute partition, with either 4 or 8 warps, which performs
+-# the vector addition. Estimating the right register allocation is difficult,
+-# and often involves trial and error, profiling, and autotuning. We will need to
+-# use mbarriers to signal between the partitions using producer-consumer pairs.
+-#
+-# To write a warp-specialized kernel, we need to write a separate function for
+-# each partition. One of the partitions must be chosen as the "default"
+-# partition and it always has the same number of warps as `num_warps` passed to
+-# the kernel. The other partitions, i.e. the "worker" partitions, can have
+-# different numbers of warps. The signature of the worker partition functions
+-# must all be the same. Only the default partition can accept tensor arguments.
+-#
+-# To quickly sketch out the partitions: load partition will fetch inputs to smem
+-# and signal the compute partition. The compute partition will consume the
+-# operands and send them to the store partition over smem.
+-#
+-# Recall that we need fence_async_shared to synchronize the async and generic
+-# proxies. This also applies if the buffer accesses are initiated in different
+-# partitions, even when they are sequenced by mbarrier.arrive:
+-#
+-# ```python
+-# smem.store(value)  # in partition A
+-# fence_async_shared()
+-# mbarrier.arrive(bar, count=1)
+-#
+-# mbarrier.wait(bar, phase=0)  # in partition B
+-# tma.async_copy_shared_to_global(desc, [0, 0], smem)
+-# ```
+-#
+-# A fence is needed somewhere between the shared memory store and the TMA store.
+-#
+-# ```python
+-# value = smem.load()
+-# mbarrier.arrive(bar, count=1)
+-#
+-# mbarrier.wait(bar, phase=0)
+-# fence_async_shared()
+-# tma.async_copy_global_to_shared(desc, [0, 0], bar, smem)
+-# ```
+-#
+-# A fence is needed somewhere between the shared memory load and the TMA load.
+-
+ 
+ @gluon.jit
+ def load_partition(descs, barriers, buffers, xoff, numel, YBLOCK: gl.constexpr):
+@@ -153,7 +88,6 @@
+         tma.async_copy_global_to_shared(a_desc, [xoff, yoff], load_ready_bar, a_buf)
+         tma.async_copy_global_to_shared(b_desc, [xoff, yoff], load_ready_bar, b_buf)
+ 
+-
+ @gluon.jit
+ def store_partition(descs, barriers, buffers, xoff, numel, YBLOCK: gl.constexpr):
+     a_desc, b_desc, c_desc = descs
+@@ -189,9 +123,6 @@
+     # exited by now. We just need to wait the stores to complete.
+     tma.store_wait(0)
+ 
+-
+-# The default partition can have a different signature than the worker partition
+-# functions.
+ @gluon.jit
+ def compute_partition(barriers, buffers, ynumel, YBLOCK: gl.constexpr, layout: gl.constexpr):
+     load_empty_bars, load_ready_bars, c_empty_bars, c_ready_bars = barriers
+@@ -230,7 +161,6 @@
+         # Fence to order with TMA store.
+         fence_async_shared()
+         mbarrier.arrive(c_ready_bar, count=1)
+-
+ 
+ @gluon.jit
+ def elementwise_add_warp_specialized_kernel(  #
+@@ -283,7 +213,6 @@
+         (store_partition, (descs, barriers, buffers, xoff, numel, YBLOCK)),
+     ], [1, 1], [24, 24])
+ 
+-
+ def elementwise_add_warp_specialized(a, b, c, XBLOCK=32, YBLOCK=64,  #
+                                      num_load_buffers=2, num_store_buffers=2, num_warps=4):
+     xnumel, ynumel = a.shape
+@@ -308,84 +237,6 @@
+         XBLOCK, YBLOCK, num_load_buffers, num_store_buffers,  #
+         num_warps=num_warps, maxnreg=128)
+ 
+-
+-@pytest.mark.parametrize("xnumel, ynumel", [(1000, 2000), (4000, 120)])
+-@pytest.mark.parametrize("XBLOCK, YBLOCK", [(32, 64)])
+-@pytest.mark.parametrize("num_load_buffers, num_store_buffers", [(1, 1), (2, 2)])
+-@pytest.mark.parametrize("num_warps", [4, 8])
+-@pytest.mark.skipif(not is_hopper_or_newer(), reason="Requires Hopper or newer")
+-def test_elementwise_add_warp_specialized(xnumel, ynumel, XBLOCK, YBLOCK, num_load_buffers, num_store_buffers,
+-                                          num_warps):
+-    a = torch.randn(xnumel, ynumel, device="cuda")
+-    b = torch.randn(xnumel, ynumel, device="cuda")
+-    c = torch.empty_like(a, device="cuda")
+-    elementwise_add_warp_specialized(a, b, c, XBLOCK, YBLOCK, num_load_buffers, num_store_buffers, num_warps)
+-    torch.testing.assert_close(a + b, c, atol=0, rtol=0)
+-
+-
+-if __name__ == "__main__":
+-    print("Benchmarking elementwise_add")
+-    print("============================")
+-    xnumel, ynumel = 32 * 1024, 32 * 1024
+-    A = torch.randn(xnumel, ynumel, device="cuda")
+-    B = torch.randn(xnumel, ynumel, device="cuda")
+-    C = torch.empty_like(A, device="cuda")
+-
+-    XBLOCK = 64
+-    YBLOCK = 128
+-    num_load_buffers = 3
+-    num_store_buffers = 1
+-    num_warps = 4
+-
+-    ms = triton.testing.do_bench(lambda: t4.elementwise_add_tma(  #
+-        A, B, C, XBLOCK, YBLOCK, num_load_buffers))
+-    print(f"elementwise_add_tma: {t3.get_throughput(ms, C):.2f} TB/s")
+-
+-    ms = triton.testing.do_bench(lambda: elementwise_add_warp_specialized(  #
+-        A, B, C, XBLOCK, YBLOCK, num_load_buffers, num_store_buffers, num_warps))
+-    print(f"elementwise_add_warp_specialized: {t3.get_throughput(ms, C):.2f} TB/s")
+-    print()
+-
+-# %%
+-# Results on GB200:
+-#
+-# ```
+-# elementwise_add_tma: 5.89 TB/s
+-# elementwise_add_warp_specialized: 5.98 TB/s
+-# ```
+-#
+-# The warp specialized implementation ekes out another performance gain over
+-# the software pipelined kernel from 04-tma.py by relying on the warp scheduler
+-# to hide latencies. The gains are modest because the kernel is very bandwidth
+-# bound, but this shows how warp specialization can more efficiently issue
+-# loads.
+-
+-# %%
+-# Recall in previous tutorials we sometimes designed kernels to run with
+-# occupancy greater than 1. This is typical of kernels that we expect to stall
+-# or otherwise cannot exhaustively use the SM's resources. In doing so, we
+-# relied on the warp scheduler to overlap kernel instances and hide latencies.
+-#
+-# However, because programs cannot see what other programs on the SM are doing,
+-# they cannot coordinate usage of SM compute units or share resources. Warp
+-# specialization is especially powerful when used to build intricate schedules
+-# that minimize the critical path and maximize hardware utilization. In other
+-# words, warp specialization allows us to fuse multiple programs into
+-# one kernel.
+-
+-# %%
+-# Since we have unfinished business with Blackwell matmul from the last
+-# tutorial, let's demonstrate a warp-specialized persistent matmul with tcgen05.
+-#
+-# - Use the same block sizes BLOCK_{M,N,K} = (128, 256, 64)
+-# - Aim for 4 buffers using techniques to reduce epilogue smem.
+-# - Double-buffer the accumulator to fully overlap the epilogue.
+-#
+-# Because the epilogue is overlapped, we can subtile by a factor of 4 to allow
+-# 4 buffers. However, for tiny K, it might still be better to steal B.
+-
+-
+-# Helper class for passing arguments around partitions.
+ @aggregate
+ class PartitionArgs:
+     a_desc: tma.tensor_descriptor
+@@ -417,8 +268,6 @@
+         self.SUBTILE_FACTOR = gl.constexpr(SUBTILE_FACTOR)
+         self.num_warps = gl.constexpr(num_warps)
+ 
+-
+-# Counter abstraction for tracking barrier index and phase.
+ @aggregate
+ class Counter:
+     index: gl.tensor
+@@ -443,7 +292,6 @@
+         index = gl.where(rollover, 0, incr)
+         phase = gl.where(rollover, self.phase ^ 1, self.phase)
+         return Counter(index, phase, self.num_barriers)
+-
+ 
+ @gluon.jit
+ def matmul_load_partition(p, SchedulerImpl: gl.constexpr):
+@@ -470,7 +318,6 @@
+             tma.async_copy_global_to_shared(p.a_desc, [off_m, k], bar, p.a_bufs.index(state.index))
+             tma.async_copy_global_to_shared(p.b_desc, [k, off_n], bar, p.b_bufs.index(state.index))
+             state = state.next()
+-
+ 
+ @gluon.jit
+ def matmul_mma_partition(p, SchedulerImpl: gl.constexpr):
+@@ -504,10 +351,6 @@
+         tcgen05_commit(acc_ready_bars.index(acc_state.index))
+         acc_state = acc_state.next()
+ 
+-
+-# Helper for splitting a tensor along N. For our kernel, this only works for
+-# BLOCK_M=128 and num_warps=4, where all BLOCK_N elements are contiguously
+-# mapped to the same thread.
+ @gluon.jit
+ def _split_n(x, SUBTILE_FACTOR: gl.constexpr):
+     split_count: gl.constexpr = SUBTILE_FACTOR.bit_length() - 1  # log2
+@@ -522,7 +365,6 @@
+         xs = next_xs
+     return xs
+ 
+-
+ @gluon.jit
+ def matmul_epilogue_partition(p, SchedulerImpl: gl.constexpr):
+     BLOCK_M: gl.constexpr = p.a_desc.block_type.shape[0]
+@@ -567,7 +409,6 @@
+     # Overlap the last store with the wait, then wait for the last store here.
+     tma.store_wait(pendings=0)
+ 
+-
+ @gluon.jit
+ def matmul_warp_specialized_kernel(a_desc, b_desc, c_desc, SchedulerImpl: gl.constexpr, num_buffers: gl.constexpr,
+                                    SUBTILE_FACTOR: gl.constexpr, num_warps: gl.constexpr):
+@@ -599,7 +440,6 @@
+         (matmul_mma_partition, (p, SchedulerImpl)),
+     ], [1, 1], [24, 24])
+ 
+-
+ def matmul_warp_specialized(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, SUBTILE_FACTOR, num_warps, SchedulerImpl):
+     M, N = C.shape
+ 
+@@ -617,59 +457,3 @@
+     grid = (min(num_sms, num_pid), )
+     matmul_warp_specialized_kernel[grid](a_desc, b_desc, c_desc, SchedulerImpl, num_buffers, SUBTILE_FACTOR,
+                                          num_warps=num_warps)
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(208, 416, 304), (2000, 1000, 2000)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N, BLOCK_K", [(128, 256, 64)])
+-@pytest.mark.parametrize("num_buffers", [2, 3, 4])
+-@pytest.mark.parametrize("SUBTILE_FACTOR", [4])
+-@pytest.mark.parametrize("num_warps", [4])
+-@pytest.mark.parametrize("SchedulerImpl", t7.schedulers)
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_matmul_warp_specialized(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, SUBTILE_FACTOR, num_warps,
+-                                 SchedulerImpl):
+-    torch.manual_seed(0)
+-    A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-    B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    matmul_warp_specialized(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, SUBTILE_FACTOR, num_warps, SchedulerImpl)
+-    torch.testing.assert_close(A @ B, C, rtol=1e-3, atol=1e-1)
+-
+-
+-if __name__ == "__main__" and is_blackwell():
+-    print("Benchmarking matmul_warp_specialized")
+-    print("====================================")
+-    args = {
+-        "BLOCK_M": 128,
+-        "BLOCK_N": 256,
+-        "BLOCK_K": 64,
+-        "num_buffers": 4,
+-        "SUBTILE_FACTOR": 4,
+-        "num_warps": 4,
+-        "SchedulerImpl": t7.GroupedPersistentTileScheduler(8),
+-    }
+-
+-    M, N = 8192, 8192
+-    C = torch.empty(M, N, device="cuda", dtype=torch.float16)
+-    print("    K  warp-specialized    cublas")
+-    for K in [2**i for i in range(9, 15)]:
+-        as_flops = partial(t7.get_flops, M=M, N=N, K=K)
+-        A = torch.randn(M, K, device="cuda", dtype=torch.float16)
+-        B = torch.randn(K, N, device="cuda", dtype=torch.float16)
+-        BT = B.T.contiguous()
+-        r0 = as_flops(triton.testing.do_bench_cudagraph(lambda: matmul_warp_specialized(A, B, C, **args)))
+-        r1 = as_flops(triton.testing.do_bench(lambda: cublas.matmul(A, BT, C)))
+-        print(f"{K:>5} {r0:>17.2f} {r1:>9.2f}")
+-
+-# %%
+-#     K  warp-specialized    cublas
+-#   512           1160.28   1130.67
+-#  1024           1249.69   1148.52
+-#  2048           1347.18   1261.59
+-#  4096           1390.95   1299.38
+-#  8192           1350.01   1401.10
+-# 16384           1448.14   1508.76
+-#
+-# Much better! We are beating cublas on small K, even though there is still lots
+-# of tuning we can do to improve performance. On Blackwell, warp specialization
+-# is critical for achieving peak performance.
+--- python/tutorials/gluon/09-tma-gather-scatter.py
++++ tutorial_09_tma_gather_scatter.py
+@@ -39,108 +39,28 @@
+ """
+ 
+ import sys
++
+ import pytest
++
+ import torch
++
+ import triton
++
+ import importlib
++
+ import triton.experimental.gluon as gluon
++
+ import triton.experimental.gluon.language as gl
++
+ from triton._C.libtriton import ir, gluon_ir
+ 
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (tma, mbarrier, fence_async_shared)
+-
+ 
+ def is_blackwell():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] == 10
+-
+-
+-if __name__ == "__main__" and not is_blackwell():
+-    raise RuntimeError("This tutorial requires a Blackwell NVIDIA GPU")
+-
+-# Re-use utilities from the previous tutorials.
+-t7 = importlib.import_module("07-persistence")
+-
+-# %%
+-# `async_gather` and `async_scatter` impose constraints on the layout of the 1D
+-# row offsets tensor.
+-#
+-# Specifically, suppose the row offset tensor is divided into chunks of 4
+-# consecutive elements, then the layout must map each chunk to consecutive
+-# registers in the same thread. In addition, the chunks must be broadcasted
+-# across all threads in the same warp, i.e. all threads in the same warp must
+-# contain the same data.
+-#
+-# These constraints arise from the underlying `gather4` and `scatter4` PTX
+-# instructions used by `async_gather` and `async_scatter`. Each is a warp-level
+-# instruction that loads to or stores from 4 consecutive rows in shared memory.
+-#
+-# For example, the following layout is always valid for any row offsets tensor:
+-#
+-# ```python
+-# gl.SliceLayout(
+-#     dim=0,
+-#     parent=gl.BlockedLayout(
+-#         size_per_thread=[1, 4],
+-#         threads_per_warp=[num_threads_per_warp, 1],
+-#         warps_per_cta=[1, num_warps],
+-#         order=[1, 0],
+-#     ),
+-# )
+-# ```
+-#
+-# Recall from `02-layouts` that the parent `BlockedLayout` specified above will
+-# tile the dim=1 into chunks of 4 consecutive elements mapped to 4 consecutive
+-# registers in the same thread, and then tile dim=1 along all the warps. dim=0
+-# is only tiled across the threads in a warp, but when we take the `SliceLayout`
+-# along dim=0, all threads in a warp will map to the same 4 consecutive
+-# elements.
+-#
+-# Note that transposing the blocked layout and slicing along dim=1 yields an
+-# identical layout:
+-#
+-# ```python
+-# gl.SliceLayout(
+-#     dim=1,
+-#     parent=gl.BlockedLayout(
+-#         size_per_thread=[4, 1],
+-#         threads_per_warp=[1, num_threads_per_warp],
+-#         warps_per_cta=[num_warps, 1],
+-#         order=[0, 1],
+-#     ),
+-# )
+-# ```
+-#
+-# These are not the only valid layouts for the row offsets tensor. For example,
+-# given a row offset tensor with the shape `(BLOCK_X)`, a valid layout could be:
+-#
+-# ```python
+-# gl.BlockedLayout(
+-#     size_per_thread=[BLOCK_X]
+-#     threads_per_warp=[num_threads_per_warp],
+-#     warps_per_cta=[num_warps],
+-#     order=[0],
+-# )
+-# ```
+-#
+-# This layout is valid because all elements are mapped consecutively to the
+-# registers in all of the threads, but it is less efficient; because all warps
+-# have the same data, the compiler will pick only warp 0 to emit all the
+-# instructions. For example, if `BLOCK_X=256`, warp 0 will execute
+-# `256 // 4 = 64` gather4 instructions while the rest of the warps do nothing,
+-# whereas the sliced layouts above will spread the work across all warps,
+-# resulting in `256 // 4 // 4 = 16` gather4 instructions per warp, assuming
+-# there are 4 warps.
+-#
+-# In general, a layout is valid if its linear layout representation satisfies:
+-# - The first 2 register bases must be [1] and [2]
+-# - The lane bases must all be [0]
+-
+-# %%
+-# Let's write a tool to convert any layout to a linear layout to help illustrate
+-# this concept.
+-
+ 
+ def to_linear_layout(layout, shape):
+     context = ir.context()
+@@ -148,98 +68,6 @@
+     builder = gluon_ir.GluonOpBuilder(context)
+     return builder.to_linear_layout(layout._to_ir(builder), shape)
+ 
+-
+-if __name__ == "__main__":
+-    num_threads_per_warp = 32
+-    num_warps = 4
+-    BLOCK_X = 256
+-
+-    layout = gl.SliceLayout(
+-        dim=0,
+-        parent=gl.BlockedLayout(
+-            size_per_thread=[1, 4],
+-            threads_per_warp=[num_threads_per_warp, 1],
+-            warps_per_cta=[1, num_warps],
+-            order=[1, 0],
+-        ),
+-    )
+-    # DistributedLinearLayout(
+-    #     reg_bases=[[1], [2], [16], [32], [64], [128]],
+-    #     lane_bases=[[0], [0], [0], [0], [0]],
+-    #     warp_bases=[[4], [8]],
+-    #     block_bases=[],
+-    #     shape=[256]
+-    # )
+-    print(to_linear_layout(layout, [256]))
+-
+-    layout = gl.BlockedLayout(
+-        size_per_thread=[BLOCK_X],
+-        threads_per_warp=[num_threads_per_warp],
+-        warps_per_cta=[num_warps],
+-        order=[0],
+-    )
+-    # DistributedLinearLayout(
+-    #     reg_bases=[[1], [2], [4], [8], [16], [32], [64], [128]],
+-    #     lane_bases=[[0], [0], [0], [0], [0]],
+-    #     warp_bases=[[0], [0]],
+-    #     block_bases=[],
+-    #     shape=[256]
+-    # )
+-    print(to_linear_layout(layout, [256]))
+-
+-    # Notice how in the two layouts above, the first two register bases are
+-    # indeed [1] and [2], and all lane bases are [0]. The different is the
+-    # second layout's warp bases are all [0], which leads to inefficient code
+-    # generation for `async_gather` and `async_scatter`.
+-
+-    # Here is an example of an invalid layout:
+-    layout = gl.BlockedLayout(
+-        size_per_thread=[4],
+-        threads_per_warp=[num_threads_per_warp],
+-        warps_per_cta=[num_warps],
+-        order=[0],
+-    )
+-    # DistributedLinearLayout(
+-    #     reg_bases=[[1], [2]],
+-    #     lane_bases=[[4], [8], [16], [32], [64]],
+-    #     warp_bases=[[128], [0]],
+-    #     block_bases=[],
+-    #     shape=[256]
+-    # )
+-    print(to_linear_layout(layout, [256]))
+-
+-    # This layout is invalid because the lane bases are not all [0].
+-
+-# %%
+-# Let's demonstrate how to use `async_gather` and `async_scatter` by writing
+-# simple kernels. Note that both `async_gather` and `async_scatter` have several
+-# additional constraints. As we already mentioned, the tensor descriptor must be
+-# 2D with a block shape in the form of `[1, BLOCK_Y]`. Additionally:
+-#
+-# - The row offset tensor must have at least 8 elements. I.e. at least 8 rows
+-#   must be loaded by async gather or stored by async scatter.
+-#
+-# - There is a minimum number of columns based on the dtype. Specifically,
+-#   `BLOCK_Y >= (32 // tensor_desc.dtype.primitive_bitwidth) * 8`. For example,
+-#   a `float16` tensor descriptor must have `BLOCK_Y >= 16`.
+-#
+-# - The `y_offset` must be aligned to 16 bytes. I.e.
+-#   `y_offset % (16 // (tensor_desc.dtype.primitive_bitwidth // 8)) == 0`.
+-#   For example, for `float16`, `y_offset` must be a multiple of 8. This is checked
+-#   at runtime by the hardware, and if `y_offset` is not aligned to 16 bytes, the
+-#   CUDA driver will emit an illegal instruction error.
+-#
+-# - Elements of `x_offsets` may be out-of-bounds, in which case the loaded rows of
+-#   `async_gather` will be all zeros, and stored rows in `async_scatter` will be ignored.
+-#
+-# - `y_offset` can be out-of-bounds. Row elements in `y_offset:y_offset + BLOCK_Y` that
+-#   are out-of-bounds will be loaded as zeros by `async_gather` and ignored when stored by `async_scatter`.
+-#
+-# - `x_offsets` elements and `y_offset` may only be negative for `async_gather`. If `async_scatter`
+-#   receives negative row of column offsets, the CUDA driver will emit an illegal instruction error.
+-
+-
+-# The kernel computes `out = tensor_desc[x_offsets, y_offset:y_offset + BLOCK_Y]`.
+ @gluon.jit
+ def async_gather_kernel(out_ptr, out_stride_x, out_stride_y, tensor_desc, x_offsets_ptr, y_offset,
+                         BLOCK_X: gl.constexpr):
+@@ -275,7 +103,6 @@
+     indices_x = gl.arange(0, BLOCK_X, gl.SliceLayout(1, coalesced_2d_layout))[:, None] * out_stride_x
+     indices_y = gl.arange(0, BLOCK_Y, gl.SliceLayout(0, coalesced_2d_layout))[None, :] * out_stride_y
+     gl.store(out_ptr + indices_x + indices_y, out)
+-
+ 
+ def async_gather(input, x_offsets, y_offset, BLOCK_X, BLOCK_Y):
+     gl_dtype = getattr(gl, str(input.dtype).split('.')[1])
+@@ -288,83 +115,6 @@
+     async_gather_kernel[(1, )](out, *out.stride(), tensor_desc, x_offsets, y_offset, BLOCK_X)
+     return out
+ 
+-
+-@pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
+-@pytest.mark.parametrize("BLOCK_X", [8, 128])
+-@pytest.mark.parametrize("BLOCK_Y", [16, 128])
+-@pytest.mark.parametrize("y_offset", [-16, 0, 48, 1000])
+-@pytest.mark.parametrize("X_MAX, Y_MAX", [(1024, 1024)])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_async_gather(BLOCK_X, BLOCK_Y, y_offset, dtype, X_MAX, Y_MAX, fresh_knobs):
+-    triton.knobs.compilation.instrumentation_mode = "iisan"
+-    torch.manual_seed(0)
+-
+-    input = torch.randn((X_MAX, Y_MAX), dtype=dtype, device="cuda")
+-    # Span row offsets from negative to out-of-bounds to test the masked load behavior.
+-    x_offsets = torch.linspace(-X_MAX, 2 * X_MAX, BLOCK_X, dtype=torch.int32, device="cuda")
+-    # Randomly shuffle the row offsets.
+-    x_offsets = x_offsets[torch.randperm(BLOCK_X, device="cuda")]
+-
+-    out = async_gather(input, x_offsets, y_offset, BLOCK_X, BLOCK_Y)
+-
+-    # Mask out-of-bounds and negative row offsets.
+-    x_offsets = torch.where(x_offsets >= X_MAX, -1, x_offsets)
+-    mask = (x_offsets >= 0).unsqueeze(1)
+-
+-    # Mask out-of-bounds and negative column offsets by padding with zeros.
+-    y_lo, y_hi = max(0, y_offset), min(y_offset + BLOCK_Y, Y_MAX)
+-    ref = input[x_offsets, y_lo:y_hi] * mask
+-    lo_zeros = torch.zeros(BLOCK_X, y_lo - y_offset, dtype=dtype, device="cuda")
+-    hi_zeros = torch.zeros(BLOCK_X, y_offset + BLOCK_Y - y_hi, dtype=dtype, device="cuda")
+-    ref = torch.cat((lo_zeros, ref, hi_zeros), dim=1)
+-
+-    torch.testing.assert_close(out, ref, atol=0, rtol=0)
+-
+-
+-# %%
+-# The CUDA driver will emit an illegal instruction error if `y_offset` is not
+-# aligned to 16 bytes for both `async_gather` and `async_scatter`, or if negative
+-# row or column offsets are used for `async_scatter`.
+-
+-if __name__ == "__main__":
+-    # Note that any illegal instruction errors will corrupt the CUDA context in current Python
+-    # process, which prevents executing any other code. Guard each of these examples with a
+-    # flag so that only 1 is executed at a time.
+-    if len(sys.argv) > 1 and sys.argv[1] == "test_illegal_gather":
+-        try:
+-            # y_offset=2 is not 16-byte aligned for bfloat16
+-            test_async_gather(BLOCK_X=128, BLOCK_Y=128, y_offset=2, dtype=torch.bfloat16)
+-        except RuntimeError as e:
+-            assert "an illegal instruction was encountered" in str(e)
+-            raise
+-
+-# %%
+-# Illegal instruction errors can be frustrating to debug. They typically occur
+-# because an executed instruction does not match some runtime invariants. To
+-# figure out which instruction is causing the error, you can run the program
+-# inside the debugger `cuda-gdb`. For example, if we run
+-#
+-# ```bash
+-# cuda-gdb --args python python/tutorials/gluon/09-tma-gather-scatter.py test_illegal_gather
+-# ```
+-#
+-# Send `r` to run the program, and the debugger will break on the instruction
+-# that triggered the illegal instruction error:
+-#
+-# ```
+-# CUDA Exception: Warp Illegal Instruction
+-# The exception was triggered at PC 0x628fbe590  async_gather_kernel  (09-tma-gather-scatter.py:245)
+-#
+-# Thread 1 "python" received signal CUDA_EXCEPTION_4, Warp Illegal Instruction.
+-# [Switching focus to CUDA kernel 0, grid 9, block (0,0,0), thread (96,0,0), device 0, sm 148, warp 0, lane 0]
+-# 0x0000000628fbe700 in async_gather_kernel<<<(1,1,1),(128,1,1)>>> () at /root/code/triton/python/tutorials/gluon/09-tma-gather-scatter.py:245
+-# 245         tma.async_gather(tensor_desc, x_offsets, y_offset, barrier=bar, result=smem_dest)
+-# ```
+-
+-# %%
+-# This kernel computes `tensor_desc[x_offsets, y_offset:y_offset + BLOCK_Y] = src`.
+-
+-
+ @gluon.jit
+ def async_scatter_kernel(tensor_desc, x_offsets_ptr, y_offset, src_ptr, src_stride_x, src_stride_y,
+                          BLOCK_X: gl.constexpr):
+@@ -395,7 +145,6 @@
+     # Wait for the completion of the async scatter using `store_wait`.
+     tma.store_wait(0)
+ 
+-
+ def async_scatter(input, x_offsets, y_offset, src, BLOCK_X, BLOCK_Y):
+     gl_dtype = getattr(gl, str(input.dtype).split('.')[1])
+     # When picking the shared memory layout, we use the dimensions of the shared
+@@ -405,56 +154,6 @@
+     tensor_desc = TensorDescriptor.from_tensor(input, [1, BLOCK_Y], layout)
+     async_scatter_kernel[(1, )](tensor_desc, x_offsets, y_offset, src, *src.stride(), BLOCK_X)
+ 
+-
+-@pytest.mark.parametrize("dtype", [torch.bfloat16, torch.float32])
+-@pytest.mark.parametrize("BLOCK_X", [8, 128])
+-@pytest.mark.parametrize("BLOCK_Y", [16, 128])
+-@pytest.mark.parametrize("y_offset", [0, 48, 1000])
+-@pytest.mark.parametrize("X_MAX, Y_MAX", [(1024, 1024)])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_async_scatter(BLOCK_X, BLOCK_Y, y_offset, dtype, X_MAX, Y_MAX, fresh_knobs):
+-    triton.knobs.compilation.instrumentation_mode = "iisan"
+-    torch.manual_seed(0)
+-
+-    input = torch.randn((X_MAX, Y_MAX), dtype=dtype, device="cuda")
+-    input_ref = input.clone()
+-
+-    # Span row offsets from 0 to out-of-bounds to test the masked store behavior.
+-    x_offsets = torch.linspace(0, 2 * X_MAX, BLOCK_X, dtype=torch.int32, device="cuda")
+-    # Randomly shuffle the row offsets.
+-    x_offsets = x_offsets[torch.randperm(BLOCK_X, device="cuda")]
+-
+-    src = torch.randn((BLOCK_X, BLOCK_Y), dtype=dtype, device="cuda")
+-    async_scatter(input, x_offsets, y_offset, src, BLOCK_X, BLOCK_Y)
+-
+-    # Mask out-of-bounds row offsets.
+-    mask = x_offsets < X_MAX
+-    x_offsets = x_offsets[mask]
+-    src = src[mask]
+-
+-    # Mask out-of-bounds column offsets.
+-    y_hi = min(y_offset + BLOCK_Y, Y_MAX)
+-
+-    input_ref[x_offsets, y_offset:y_hi] = src[:, :y_hi - y_offset]
+-    torch.testing.assert_close(input, input_ref, atol=0, rtol=0)
+-
+-
+-# %%
+-# `async_gather` and `async_scatter` can be pipelined just like `async_copy_global_to_shared`
+-# and `async_copy_shared_to_global`. To demonstrate this, we will write a matmul kernel
+-# that has a fused gather and fused scatter along the M dimension:
+-# `out[out_scatter_indx, :] = X[X_gather_indx, :] @ W`.
+-#
+-# Recall in `06-tcgen05-mma` that we demonstrated how to write matmul kernels
+-# with `tcgen05_mma`. This example performs pipelining of the TMA loads, including `async_gather`,
+-# with `tcgen05_mma` and pipelining of the `async_scatter` with the persistent outer loop.
+-#
+-# In our blocked matmul kernrel with fused gather and scatter, for each tile of the output,
+-# we will load the M dimension offsets for the X tensor tile and the N dimension offsets for the W
+-# tensor tile via `gl.load` and schedule them sufficiently ahead of their use to account for the
+-# latency of the global loads.
+-
+-
+ @gluon.jit
+ def issue_loads(producer, X_desc, W_desc, X_gather_indx_ptr, off_m, off_n, k, bars, x_bufs, w_bufs,
+                 BLOCK_M: gl.constexpr, num_buffers: gl.constexpr, pred=True):
+@@ -473,7 +172,6 @@
+     tma.async_gather(X_desc, offs_x_m, k, bar, x_bufs.index(index), pred)
+     tma.async_copy_global_to_shared(W_desc, [k, off_n], bar, w_bufs.index(index), pred)
+     return producer
+-
+ 
+ @gluon.jit
+ def issue_mma(consumer, mma, bars, x_bufs, w_bufs, num_buffers: gl.constexpr):
+@@ -485,7 +183,6 @@
+     mma = mma.wait_num_outstanding(0)
+     mma = mma.issue_async_mma(x_bufs.index(index), w_bufs.index(b_index))
+     return consumer, mma
+-
+ 
+ @gluon.jit
+ def matmul_fused_gather_scatter_kernel(X_desc, W_desc, out_desc, X_gather_indx_ptr, out_scatter_indx_ptr,
+@@ -571,24 +268,6 @@
+     # Wait for the last async scatter to complete.
+     tma.store_wait(pendings=0)
+ 
+-
+-# %%
+-# We will pick reasonable defaults for the block sizes and number of load buffers.
+-# Tuning and optimizing the performance of this kernel is left as an exercise for the reader,
+-# as the primary objective of this tutorial is to demonstrate the use of async gather and scatter.
+-#
+-# The only alternative way to implement a matmul kernel with fused gather and
+-# scatter is to use async_copy (recall `03-async-copy`) or `gl.load` to load
+-# from global memory and `gl.store` to write to the output tensor in the
+-# epilogue. While these instructions provide more flexible indexing, they are
+-# much slower than TMA and async gather and scatter.
+-#
+-# One extra note: it is of course possible to use async gather and async scatter with
+-# warp-specialized kernels. Just keep in mind that because the row offsets is a tensor, you may want
+-# to give the load and epilogue partitions more than 1 warp to increase instruction issue throughput,
+-# particularly for the loads as they are on the critical path.
+-
+-
+ def matmul_fused_gather_scatter(X, X_gather_indx, W, out_scatter_indx, BLOCK_M=128, BLOCK_N=128, BLOCK_K=64,
+                                 GROUP_SIZE_M=8, num_buffers=3):
+     M = X.shape[0]
+@@ -614,49 +293,3 @@
+     matmul_fused_gather_scatter_kernel[grid](X_desc, W_desc, out_desc, X_gather_indx, out_scatter_indx, BLOCK_M,
+                                              SchedulerImpl, num_buffers)
+     return out
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(1024, 1024, 2048), (4096, 4096, 4096)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N", [(128, 128), (128, 64)])
+-@pytest.mark.parametrize("BLOCK_K, num_buffers", [(128, 2), (64, 3)])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_matmul_fused_gather_scatter(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers):
+-    torch.manual_seed(0)
+-
+-    # Randomize the gather indices.
+-    X_gather_indx = torch.arange(0, M, dtype=torch.int32, device="cuda")
+-    shfl = torch.randperm(M, device="cuda")
+-    X_gather_indx = X_gather_indx[shfl]
+-
+-    # Randomize the scatter indices.
+-    out_scatter_indx = torch.arange(0, M, dtype=torch.int32, device="cuda")
+-    shfl = torch.randperm(M, device="cuda")
+-    out_scatter_indx = out_scatter_indx[shfl]
+-
+-    X = torch.randn(M, K, dtype=torch.bfloat16, device="cuda")
+-    W = torch.randn(K, N, dtype=torch.bfloat16, device="cuda")
+-    out = matmul_fused_gather_scatter(X, X_gather_indx, W, out_scatter_indx, BLOCK_M, BLOCK_N, BLOCK_K,
+-                                      num_buffers=num_buffers)
+-
+-    out_ref = torch.empty_like(out)
+-    out_ref[out_scatter_indx, :] = X[X_gather_indx, :] @ W
+-    torch.testing.assert_close(out, out_ref, atol=1e-3, rtol=1e-3)
+-
+-
+-# %%
+-# The main takeaway from this tutorial is understanding how to use `async_gather`
+-# and `async_scatter`. These instructions provide a middle-ground between
+-# block DMAs like `async_copy_global_to_shared` and `async_copy_shared_to_global`
+-# and regular global loads and stores (`gl.load` and `gl.store`) by allowing
+-# separately-indexed columns while maintaining the performance of TMAs.
+-#
+-# Keep in mind the following:
+-# - `async_gather` and `async_scatter` are typically faster than `gl.load` and
+-#   `gl.store` when they can be used, but this is not always the case. Plus, TMA
+-#   instructions use shared memory.
+-# - Sometimes using `async_gather` or `async_scatter` instead of block DMA
+-#   instructions like `async_copy_global_to_shared` and `async_copy_shared_to_global`
+-#   is actually faster, but these situations are rare.
+-#
+-# In general, you should consider these instructions when writing kernels and
+-# experiment to see what is the best way to write a kernel.
+--- python/tutorials/gluon/10-tcgen05-copy.py
++++ tutorial_10_tcgen05_copy.py
+@@ -76,14 +76,23 @@
+ """
+ 
+ import itertools
++
+ import importlib
++
+ import pytest
++
+ import triton
++
+ import torch
++
+ import triton.experimental.gluon as gluon
++
+ import triton.experimental.gluon.language as gl
++
+ from triton.language.core import _aggregate as aggregate
++
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (
+     TensorMemoryLayout,
+     tensor_memory_descriptor,
+@@ -97,23 +106,9 @@
+     tma,
+ )
+ 
+-
+ def is_blackwell():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] == 10
+-
+-
+-if __name__ == "__main__" and not is_blackwell():
+-    raise RuntimeError("This tutorial requires a Blackwell NVIDIA GPU")
+-
+-# Re-use utilities from the previous tutorials.
+-t7 = importlib.import_module("07-persistence")
+-t8 = importlib.import_module("08-warp-specialization")
+-
+-# %%
+-# Let's write an example kernel that uses `tcgen05_copy` and and show what the
+-# requirements are for the shared and tensor memory layouts.
+-
+ 
+ @gluon.jit
+ def tcgen05_copy_kernel(in_ptr, in_stride0, in_stride1, out_ptr, out_stride0, out_stride1, M: gl.constexpr,
+@@ -151,7 +146,6 @@
+     output = gl.convert_layout(output, coalesced_2d_layout)
+     gl.store(out_ptr + offs_m[:, None] * out_stride0 + offs_n[None, :] * out_stride1, output)
+ 
+-
+ def tcgen05_copy_example(M, N, smem_layout, tmem_layout, dtype):
+     input = torch.randn(M, N, dtype=dtype, device="cuda")
+     output = torch.empty_like(input)
+@@ -159,65 +153,9 @@
+     # Just check that the input and output are equal.
+     torch.testing.assert_close(input, output, atol=0, rtol=0)
+ 
+-
+-# %%
+-# Let's first explore the valid shared memory layouts for the source of
+-# `tcgen05_copy` when the destination tensor memory layout is a
+-# `TensorMemoryLayout`, which is common when using TMAs and tensor core
+-# instructions.
+-#
+-# Recall that `TensorMemoryLayout` only supports 2D memory descriptors. When the
+-# destination tensor memory layout is a `TensorMemoryLayout`, the source shared
+-# memory layout is typically an `NVMMASharedLayout`. Other exotic layouts are
+-# supported, such as some `SharedLinearLayout`, but we won't cover them in this
+-# tutorial.
+-#
+-# Additional, the current restrictions apply to the `NVMMASharedLayout`:
+-# - The layout must be swizzled (swizzle_byte_width > 0).
+-# - The dtype must be 32-bit (e.g. gl.float32).
+-# - `TensorMemoryLayout` blockM must be 128.
+-# - The layout cannot be transposed.
+-
+ configs = []
++
+ TMEM_BLOCK_M = 128
+-for TMEM_BLOCK_N in [1, 2, 4, 8, 16, 32, 64, 128, 256]:
+-    for M, N in itertools.product([128, 256], [16, 32, 64, 128, 256]):
+-        if M < TMEM_BLOCK_M or N < TMEM_BLOCK_N or M * N * 4 > 228 * 1024:
+-            continue
+-        configs.append((M, N, TMEM_BLOCK_N))
+-
+-
+-@pytest.mark.parametrize("M, N, TMEM_BLOCK_N", configs)
+-@pytest.mark.parametrize("dtype", [torch.float32])
+-@pytest.mark.parametrize("swizzle", [32, 64, 128])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_tcgen05_copy_nvmma_shared(M, N, TMEM_BLOCK_N, dtype, swizzle):
+-    bitwidth = dtype.itemsize * 8
+-    # There are still some shared memory layouts for which an implementation does not exist.
+-    if M == 256 and swizzle // TMEM_BLOCK_N >= 8:
+-        pytest.skip("no tcgen05.copy atom exists for codegen")
+-    # NVMMASharedLayout swizzle block shape has a minimum size.
+-    if N < swizzle // dtype.itemsize:
+-        pytest.skip("block shape along contiguous dimension is too small for the swizzle byte width")
+-
+-    bitwidth = dtype.itemsize * 8
+-    smem_layout = gl.NVMMASharedLayout(swizzle_byte_width=swizzle, element_bitwidth=bitwidth, rank=2)
+-    tmem_layout = TensorMemoryLayout(block=(TMEM_BLOCK_M, TMEM_BLOCK_N), col_stride=32 // bitwidth)
+-    tcgen05_copy_example(M, N, smem_layout, tmem_layout, dtype)
+-
+-
+-# %%
+-# Although tcgen05_copy into TensorMemoryLayout only supports 32-bit dtypes,
+-# this is useful for writing matmul accumulate kernels: `D = A @ B + C`.
+-# Specifically, we can use TMA to load `C`, asynchronously copy it into tensor
+-# memory with `tcgen05_copy`, and then issue `tcgen05_mma` to perform the matmul
+-# while accumulating into tensor memory.
+-#
+-# We will use `gl.store` to write the output tiles to save shared memory, since
+-# C will require a large float32 buffer. We will use warp specialization to
+-# efficiently overlap the epilogue store with the rest of the kernel. Avoiding
+-# TMA for the epilogue store also reduces contention for the TMA pipe.
+-
+ 
+ @aggregate
+ class PartitionArgs:
+@@ -261,7 +199,6 @@
+         self.acc_ready_bars = acc_ready_bars
+         self.SchedulerImpl = gl.constexpr(SchedulerImpl)
+ 
+-
+ @gluon.jit
+ def matmul_accumulate_load_partition(p):
+     BLOCK_M: gl.constexpr = p.c_desc.block_type.shape[0]
+@@ -289,7 +226,6 @@
+             tma.async_copy_global_to_shared(p.a_desc, [off_m, k], bar, p.a_bufs.index(state.index))
+             tma.async_copy_global_to_shared(p.b_desc, [k, off_n], bar, p.b_bufs.index(state.index))
+             state = state.next()
+-
+ 
+ @gluon.jit
+ def matmul_accmulate_mma_partition(p):
+@@ -324,7 +260,6 @@
+         tcgen05_commit(p.acc_ready_bars.index(acc_state.index))
+         acc_state = acc_state.next()
+ 
+-
+ @gluon.jit
+ def matmul_accumulate_epilogue_partition(p):
+     BLOCK_M: gl.constexpr = p.c_desc.block_type.shape[0]
+@@ -357,7 +292,6 @@
+         acc = gl.convert_layout(acc, coalesced_2d_layout)
+         gl.store(p.d_ptr + offs_m[:, None] * p.d_stride_m + offs_n[None, :] * p.d_stride_n, acc)
+ 
+-
+ @gluon.jit(do_not_specialize=["d_stride_m", "d_stride_n"])
+ def matmul_accumulate_kernel(a_desc, b_desc, c_desc, d_ptr, d_stride_m, d_stride_n, SchedulerImpl: gl.constexpr,
+                              num_buffers: gl.constexpr):
+@@ -396,7 +330,6 @@
+         (matmul_accumulate_load_partition, (p, )),
+     ], [1, 1], [24, 24])
+ 
+-
+ def matmul_accumulate(A, B, C, BLOCK_M=128, BLOCK_N=128, BLOCK_K=64, GROUP_SIZE_M=8, num_buffers=3):
+     SchedulerImpl = t7.GroupedPersistentTileScheduler(GROUP_SIZE_M)
+     M, N = C.shape
+@@ -417,47 +350,3 @@
+     grid = (min(num_sms, num_pid), )
+     matmul_accumulate_kernel[grid](a_desc, b_desc, c_desc, D, *D.stride(), SchedulerImpl, num_buffers)
+     return D
+-
+-
+-@pytest.mark.parametrize("M, N, K", [(1024, 1024, 2048), (4096, 4096, 4096)])
+-@pytest.mark.parametrize("BLOCK_M, BLOCK_N", [(128, 128), (128, 64)])
+-@pytest.mark.parametrize("BLOCK_K, num_buffers", [(64, 3)])
+-@pytest.mark.parametrize("dtype", [torch.float16])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_matmul_accumulate(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, dtype):
+-    torch.manual_seed(0)
+-    A = torch.randn(M, K, dtype=dtype, device="cuda")
+-    B = torch.randn(K, N, dtype=dtype, device="cuda")
+-    C = torch.randn(M, N, dtype=torch.float32, device="cuda")
+-    D = matmul_accumulate(A, B, C, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers=num_buffers)
+-    torch.testing.assert_close(A @ B + C, D, atol=5e-3, rtol=1e-2)
+-
+-
+-# %%
+-# Another important use case for `tcgen05_copy` is to asynchronously copy tensor
+-# scales from shared memory to tensor memory for use by `tcgen05_mma_scaled`.
+-# In the next tutorial, we will cover `tcgen05_mma_scaled` in more detail, but
+-# for now just know that the tensor scales must be supplied to `tcgen05_mma_scaled`
+-# via tensor memory, and the layout of the scales tensor memory must be
+-# `TensorMemoryScalesLayout`. If we load the scales via TMAs into shared memory,
+-# we can efficiently copy the scales into tensor memory with `tcgen05_copy`
+-# which can be implicitly pipelined with the `tcgen05_mma_scaled` instruction:
+-#
+-# ```python
+-# tma.async_copy_global_to_shared(a_scale_desc, ..., bar, a_scale_buf)
+-# tma.async_copy_global_to_shared(b_scale_desc, ..., bar, b_scale_buf)
+-# mbarrier.wait(bar, phase)
+-#
+-# tcgen05_copy(a_scale_buf, a_scale_tmem)
+-# tcgen05_copy(b_scale_buf, b_scale_tmem)
+-# tcgen05_mma_scaled(a_buf, b_buf, acc_tmem, a_scale_tmem, b_scale_tmem, ...)
+-# tcgen05_commit(mma_bar)
+-# ```
+-#
+-# The main takeaway from this tutorial is understanding how to use `tcgen05_copy`
+-# to asynchronously copy data from shared memory to tensor memory. `tcgen05_copy`
+-# doesn't support all layouts, but should support typical NVMMASharedLayouts.
+-# The instruction is useful in specific cases to copy data from shared to tensor
+-# memory without round-tripping the data through registers, which increases
+-# register pressure and is slow. It is also asynchronous and can be implicitly
+-# pipelined with other `tcgen05` instructions.
+--- python/tutorials/gluon/11-tcgen05-mma-scaled.py
++++ tutorial_11_tcgen05_mma_scaled.py
+@@ -60,16 +60,27 @@
+ """
+ 
+ import itertools
++
+ import importlib
++
+ import pytest
++
+ import triton
++
+ import torch
++
+ import triton.experimental.gluon as gluon
++
+ import triton.experimental.gluon.language as gl
++
+ from dataclasses import replace
++
+ from triton.tools.mxfp import MXFP4Tensor, MXScaleTensor
++
+ from triton.language.core import _aggregate as aggregate
++
+ from triton.experimental.gluon.nvidia.hopper import TensorDescriptor
++
+ from triton.experimental.gluon.language.nvidia.blackwell import (
+     TensorMemoryLayout,
+     TensorMemoryScalesLayout,
+@@ -84,43 +95,9 @@
+     tma,
+ )
+ 
+-
+ def is_blackwell():
+     target = triton.runtime.driver.active.get_current_target()
+     return target.backend == "cuda" and torch.cuda.get_device_capability()[0] == 10
+-
+-
+-if __name__ == "__main__" and not is_blackwell():
+-    raise RuntimeError("This tutorial requires a Blackwell NVIDIA GPU")
+-
+-# Re-use utilities from the previous tutorials.
+-t7 = importlib.import_module("07-persistence")
+-t8 = importlib.import_module("08-warp-specialization")
+-
+-# %%
+-# Let's write a simple blocked-scaled matmul kernel. First, we will assume that
+-# the scale factors take the same layout as their corresponding blocks.
+-# Specifically, our A, B, A_scale, and B_scale tensors will have the following shapes:
+-#
+-# ```
+-# A.shape = (M, K)
+-# B.shape = (N, K)
+-# A_scale.shape = (M, K // VEC_SIZE)
+-# B_scale.shape = (N, K // VEC_SIZE)
+-# ```
+-#
+-# Note that Gluon represents fp4 dtypes by packing 2 fp4 elements into a uint8
+-# element. Typically, we pack the fp4 elements along the reduction dimension,
+-# i.e. the K dimension. For example, if A and B were fp4e2m1 tensors packed
+-# along K into uint8 elements, they would have the shapes:
+-#
+-# ```
+-# A.shape = (M, K // 2)
+-# B.shape = (N, K // 2)
+-# A_scale.shape = (M, K // VEC_SIZE)
+-# B_scale.shape = (N, K // VEC_SIZE)
+-# ```
+-
+ 
+ @gluon.jit
+ def simple_mma_scaled_kernel(a_desc, b_desc, c_desc, a_scale_ptr, a_scale_stride_m, a_scale_stride_k, b_scale_ptr,
+@@ -243,7 +220,6 @@
+     tma.async_copy_shared_to_global(c_desc, [off_m, off_n], acc_smem)
+     tma.store_wait(0)
+ 
+-
+ def make_operand_descriptor(value: torch.Tensor, BLOCK_MN: int, BLOCK_K: int, MIXED_PREC: bool):
+     # If the operand dtype is fp4, they will be packed into uint8.
+     IS_FP4 = value.dtype == torch.uint8
+@@ -259,13 +235,11 @@
+     )
+     return TensorDescriptor.from_tensor(value, [BLOCK_MN, BLOCK_K // ELEM_PER_BYTE], layout)
+ 
+-
+ def make_output_descriptor(M: int, N: int, dtype: torch.dtype, BLOCK_M: int, BLOCK_N: int):
+     C = torch.empty(M, N, device="cuda", dtype=dtype)
+     C_dtype = getattr(gl, str(dtype).split('.')[1])
+     C_desc_layout = gl.NVMMASharedLayout.get_default_for([BLOCK_M, BLOCK_N], C_dtype)
+     return TensorDescriptor.from_tensor(C, [BLOCK_M, BLOCK_N], C_desc_layout)
+-
+ 
+ def simple_mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, out_dtype=torch.float16, BLOCK_M=128, BLOCK_N=128, BLOCK_K=128):
+     M, N = A.shape[0], B.shape[0]
+@@ -298,13 +272,6 @@
+     simple_mma_scaled_kernel[grid](A_desc, B_desc, C_desc, A_scale, *A_scale.stride(), B_scale, *B_scale.stride(),
+                                    VEC_SIZE)
+     return C_desc.base
+-
+-
+-# %%
+-# We can use the generic utilities in `triton.tools.mxfp` to manage quantized
+-# tensors. MXFP4Tensor wraps a tensor of sub-byte fp4 elements, and MXScaleTensor
+-# wraps a uint8 tensor of e8m0 MX scale factors.
+-
+ 
+ def random_quantized_tensor(MN, K, format):
+     assert format in ["mxfp4", "mxfp8", "nvfp4"]
+@@ -331,122 +298,12 @@
+         # scale factors to float8_e4m3fn.
+         return base.to_packed_tensor(dim=1), scale_ref.to(torch.float8_e4m3fn), value
+ 
+-
+-@pytest.mark.parametrize("M, N, K", [(2048, 2048, 4096)])
+-@pytest.mark.parametrize("BLOCK_N", [32, 64, 128, 256])
+-@pytest.mark.parametrize("BLOCK_K", [32, 64, 128, 256, 512])
+-@pytest.mark.parametrize("a_format, b_format",
+-                         list(itertools.product(["mxfp8", "mxfp4"], repeat=2)) + [("nvfp4", "nvfp4")])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_simple_mma_scaled(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+-    if a_format in ["mxfp4", "nvfp4"] and b_format in ["mxfp4", "nvfp4"] and BLOCK_K <= 32:
+-        pytest.skip("BLOCK_K must be greater than 32 for fp4 formats")
+-    if a_format != b_format and BLOCK_K < 128:
+-        pytest.skip("BLOCK_K must be at least 128 for mixed precision operands")
+-    torch.manual_seed(0)
+-    A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-    B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-    C_ref = A_ref @ B_ref.T
+-    C = simple_mma_scaled(A, B, A_scale, B_scale, VEC_SIZE=16 if a_format == "nvfp4" else 32, BLOCK_N=BLOCK_N,
+-                          BLOCK_K=BLOCK_K)
+-    torch.testing.assert_close(C_ref, C.to(torch.float32), atol=1e-3, rtol=1e-3)
+-
+-
+-# %%
+-# We know we can improve the performance of our simple blocked-scaled matmul
+-# kernel with software pipelining and/or warp-specialization. However, before we
+-# do that, there are a few other ways we can optimize the block-scaled matmul.
+-# Specifically, we want to optimize the way we handle the MMA scales.
+-#
+-# The scales are contiguous along the inner dimension, which is the K dimension.
+-# However, because we load the scales with block shape [BLOCK_M, BLOCK_K // VEC_SIZE],
+-# even for large BLOCK_K, the size of the load along the contiguous dimension will
+-# be less than the cache line size (128 bytes). For example, for BLOCK_K=256 and
+-# MX scaling (VEC_SIZE=32), the size of the load along the contiguous dimension will
+-# be 8 bytes. This creates inefficient global load coalescing, vectorizing, and L2
+-# cache utilization.
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 8192
+-    BLOCK_N = 256
+-    formats = [("mxfp8", "mxfp8"), ("mxfp4", "mxfp4"), ("mxfp8", "mxfp4"), ("nvfp4", "nvfp4")]
+-    print(f"Benchmarking simple_mma_scaled ({M=}, {N=}, {K=})")
+-    print("===============================================================")
+-    print("|    format     |   tflops/s   |")
+-    print("|---------------|--------------|")
+-    for a_format, b_format in formats:
+-        A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-        B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-        # Use BLOCK_K=256 when both operands are fp4, otherwise use BLOCK_K=128.
+-        BLOCK_K = 256 if "fp4" in a_format and "fp4" in b_format else 128
+-        VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: simple_mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_N=BLOCK_N, BLOCK_K=BLOCK_K))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"| {a_format} x {b_format} | {tflops_per_sec:>8.2f}     |")
+-    print()
+-
+-# %%
+-# |    format     |   tflops/s   |
+-# |---------------|--------------|
+-# | mxfp8 x mxfp8 |    33.41     |
+-# | mxfp4 x mxfp4 |    67.02     |
+-# | mxfp8 x mxfp4 |    34.60     |
+-# | nvfp4 x nvfp4 |    70.84     |
+-#
+-# Performance is abysmal. However, it is unclear how much of the performance issues
+-# are due to the scales. If you microbenchmark the mxfp8 x mxfp8c case with
+-# `ncu --set full --kernel-name simple_mma_scaled_kernel`, you will see in the output:
+-#
+-# ```
+-# Section: Memory Workload Analysis Tables
+-# OPT   Est. Speedup: 15.72%
+-#       The memory access pattern for global loads from L1TEX might not be optimal. On average, only 4.0 of the 32
+-#       bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between
+-#       threads. Check the Source Counters section for uncoalesced global loads.
+-# ----- --------------------------------------------------------------------------------------------------------------
+-# OPT   Est. Speedup: 17.41%
+-#       The memory access pattern for local loads from L1TEX might not be optimal. On average, only 1.0 of the 32
+-#       bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between
+-#       threads. Check the Source Counters section for uncoalesced local loads.
+-# ----- --------------------------------------------------------------------------------------------------------------
+-# OPT   Est. Speedup: 17.41%
+-#       The memory access pattern for local stores to L1TEX might not be optimal. On average, only 1.0 of the 32
+-#       bytes transmitted per sector are utilized by each thread. This could possibly be caused by a stride between
+-#       threads. Check the Source Counters section for uncoalesced local stores.
+-# ```
+-#
+-# This shows what we suspect: our scale loads from global memory are inefficient.
+-# We can fix the issue by changing the layout of the scales in global memory such
+-# that each [BLOCK_M, BLOCK_K // VEC_SIZE] block is contiguous in global memory.
+-#
+-# One naive way to do that is layout the scale tensor as
+-# [M // BLOCK_M, K // BLOCK_K, BLOCK_M, BLOCK_K // VEC_SIZE]
+-# with order=[?, ?, 1, 0], i.e. contiguous along the dim=3 and then dim=2.
+-#
+-# The first two dimensions correspond to the grid index along the M and K dimensions
+-# respectively, and the last two are the scales for a single program.
+-#
+-# We achieve this by dividing the block shape into the original shape by reshaping the tensor into
+-# [M // BLOCK_M, BLOCK_M, (K // BLOCK_K) // (BLOCK_K // VEC_SIZE), BLOCK_K // VEC_SIZE]
+-# and then permuting the block dimensions to the end with order (0, 2, 1, 3).
+-
+-
+ def relayout_scales_contiguous(scales: torch.Tensor, BLOCK_MN: int, BLOCK_K: int, VEC_SIZE: int):
+     MN, SCALE_K = scales.shape[0], scales.shape[1]
+     SCALES_BLOCK_K = BLOCK_K // VEC_SIZE
+     scales = scales.reshape(MN // BLOCK_MN, BLOCK_MN, SCALE_K // SCALES_BLOCK_K, SCALES_BLOCK_K)
+     scales = scales.permute(0, 2, 1, 3)
+     return scales.contiguous()
+-
+-
+-# %%
+-# Now let's reimplement the kernel to account for the new scale layout. This
+-# kernel is the same as `simple_mma_scaled_kernel` except for the way it loads
+-# the scales.
+-
+ 
+ @gluon.jit
+ def mma_scaled_contig_kernel(a_desc, b_desc, c_desc, a_scale_ptr, b_scale_ptr, VEC_SIZE: gl.constexpr):
+@@ -541,8 +398,6 @@
+     fence_async_shared()
+     tma.async_copy_shared_to_global(c_desc, [off_m, off_n], acc_smem)
+     tma.store_wait(0)
+-    # ======= End unchanged code from `simple_mma_scaled_kernel` =======
+-
+ 
+ def mma_scaled_contig(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K, out_dtype=torch.float16):
+     M, N = A.shape[0], B.shape[0]
+@@ -554,89 +409,9 @@
+     mma_scaled_contig_kernel[grid](A_desc, B_desc, C_desc, A_scale, B_scale, VEC_SIZE)
+     return C_desc.base
+ 
+-
+-@pytest.mark.parametrize("M, N, K", [(2048, 2048, 4096)])
+-@pytest.mark.parametrize("BLOCK_N", [32, 64, 128, 256])
+-@pytest.mark.parametrize("BLOCK_K", [32, 64, 128, 256, 512])
+-@pytest.mark.parametrize("a_format, b_format",
+-                         list(itertools.product(["mxfp8", "mxfp4"], repeat=2)) + [("nvfp4", "nvfp4")])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_mma_scaled_contig(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+-    if a_format in ["mxfp4", "nvfp4"] and b_format in ["mxfp4", "nvfp4"] and BLOCK_K <= 32:
+-        pytest.skip("BLOCK_K must be greater than 32 for fp4 formats")
+-    if a_format != b_format and BLOCK_K < 128:
+-        pytest.skip("BLOCK_K must be at least 128 for mixed precision operands")
+-    torch.manual_seed(0)
+-    A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-    B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-    BLOCK_M = 128
+-    VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-    A_scale = relayout_scales_contiguous(A_scale, BLOCK_M, BLOCK_K, VEC_SIZE)
+-    B_scale = relayout_scales_contiguous(B_scale, BLOCK_N, BLOCK_K, VEC_SIZE)
+-    C_ref = A_ref @ B_ref.T
+-    C = mma_scaled_contig(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K)
+-    torch.testing.assert_close(C_ref, C.to(torch.float32), atol=1e-3, rtol=1e-3)
+-
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 8192
+-    BLOCK_M, BLOCK_N = 128, 256
+-    print(f"Benchmarking mma_scaled_contiguous ({M=}, {N=}, {K=})")
+-    print("===============================================================")
+-    print("|    format     |   tflops/s   |")
+-    print("|---------------|--------------|")
+-    for a_format, b_format in formats:
+-        A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-        B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-        # Use BLOCK_K=256 when both operands are fp4, otherwise use BLOCK_K=128.
+-        BLOCK_K = 256 if "fp4" in a_format and "fp4" in b_format else 128
+-        VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-
+-        A_scale = relayout_scales_contiguous(A_scale, BLOCK_M, BLOCK_K, VEC_SIZE)
+-        B_scale = relayout_scales_contiguous(B_scale, BLOCK_N, BLOCK_K, VEC_SIZE)
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: mma_scaled_contig(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"| {a_format} x {b_format} | {tflops_per_sec:>8.2f}     |")
+-    print()
+-
+-# %%
+-# |    format     |   tflops/s   |
+-# |---------------|--------------|
+-# | mxfp8 x mxfp8 |   663.28     |
+-# | mxfp4 x mxfp4 |  1435.05     |
+-# | mxfp8 x mxfp4 |   741.82     |
+-# | nvfp4 x nvfp4 |  1303.69     |
+-#
+-# That's a huge speedup! By changing how the scales are laid out in global memory
+-# so that the inner loop of the kernel can load them more efficiently, we improved
+-# the performance of our kernel by 20x.
+-#
+-# The reason the performance of `simple_mma_scaled` is so much worse is because
+-# the inefficient scale loads were thrashing the L2 caches.
+-#
+-# The next thing we can consider is to use TMAs to load the scales. We will pick
+-# a 5D global memory layout for the scales called a "packed block" layout. For
+-# the A matrix, the layout is
+-#
+-# ```
+-# [M // (32 * 4), K // (VEC_SIZE * 4), 32, 4, 4]
+-# ```
+-#
+-# This way, each tensor core MMA in the matmul inner loop over the K blocks can
+-# achieve contiguous access of a block of 128 rows of scale factors along the M
+-# axis, for each [BLOCK_M, BLOCK_K] subtile of the A tensor.
+-#
+-# Later, on the GPU, we will logically permute and reshape the scales back into
+-# the 2D layout expected by `tcgen05_mma_scaled`.
+-
+-
+ def align_to(a, b):
+     # Return next multiple of `b` greater than or equal to `a`.
+     return triton.cdiv(a, b) * b
+-
+ 
+ def swizzle_scales_packed_block(scales: torch.Tensor, VEC_SIZE: int):
+     # When the scale tensor is not an even multiple of [128, 4], we need to pad
+@@ -651,7 +426,6 @@
+     scales = scales.reshape(REP_MN, 4, 32, REP_K, 4)
+     scales = scales.permute(0, 3, 2, 1, 4)
+     return scales.contiguous()
+-
+ 
+ def make_scales_descriptor(scales: torch.Tensor, BLOCK_MN: int, BLOCK_K: int, VEC_SIZE: int):
+     # Note that this 5D swizzling scheme has minimum block size requirements
+@@ -668,14 +442,12 @@
+     layout = gl.NVMMASharedLayout.get_default_for(block_shape, gl.float8e4nv if IS_NVFP4 else gl.uint8)
+     return TensorDescriptor.from_tensor(scales, block_shape, layout)
+ 
+-
+ @gluon.jit
+ def unswizzle_scales_packed_block(scales, BLOCK_MN: gl.constexpr, BLOCK_K: gl.constexpr, VEC_SIZE: gl.constexpr):
+     # Unswizzle the scales subtile from its packed block layout.
+     scales = scales.reshape(scales.shape[1], scales.shape[2], 32, 4, 4)
+     scales = scales.permute(0, 3, 2, 1, 4)
+     return scales.reshape(BLOCK_MN, BLOCK_K // VEC_SIZE)
+-
+ 
+ @gluon.jit
+ def mma_scaled_packed_block_kernel(a_desc, b_desc, c_desc, a_scale_desc, b_scale_desc, VEC_SIZE: gl.constexpr):
+@@ -783,8 +555,6 @@
+     fence_async_shared()
+     tma.async_copy_shared_to_global(c_desc, [off_m, off_n], acc_smem)
+     tma.store_wait(0)
+-    # ======= End unchanged code from `simple_mma_scaled_kernel` =======
+-
+ 
+ def mma_scaled_packed_block(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K, out_dtype=torch.float16):
+     M, N = A.shape[0], B.shape[0]
+@@ -798,84 +568,11 @@
+     mma_scaled_packed_block_kernel[grid](A_desc, B_desc, C_desc, A_scale_desc, B_scale_desc, VEC_SIZE)
+     return C_desc.base
+ 
+-
+-@pytest.mark.parametrize("M, N, K", [(2048, 2048, 4096)])
+-@pytest.mark.parametrize("BLOCK_N", [128, 256])
+-@pytest.mark.parametrize("BLOCK_K", [128, 256, 512])
+-@pytest.mark.parametrize("a_format, b_format",
+-                         list(itertools.product(["mxfp8", "mxfp4"], repeat=2)) + [("nvfp4", "nvfp4")])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_mma_scaled_packed_block(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+-    torch.manual_seed(0)
+-    A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-    B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-    BLOCK_M = 128
+-    VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-    A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-    B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-    C_ref = A_ref @ B_ref.T
+-    C = mma_scaled_packed_block(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K)
+-    torch.testing.assert_close(C_ref, C.to(torch.float32), atol=1e-3, rtol=1e-3)
+-
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 8192
+-    BLOCK_M, BLOCK_N = 128, 256
+-    print(f"Benchmarking mma_scaled_packed_block ({M=}, {N=}, {K=})")
+-    print("===============================================================")
+-    print("|    format     |   tflops/s   |")
+-    print("|---------------|--------------|")
+-    for a_format, b_format in formats:
+-        A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-        B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-        # Use BLOCK_K=256 when both operands are fp4, otherwise use BLOCK_K=128.
+-        BLOCK_K = 256 if "fp4" in a_format and "fp4" in b_format else 128
+-        VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-
+-        A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-        B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: mma_scaled_packed_block(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"| {a_format} x {b_format} | {tflops_per_sec:>8.2f}     |")
+-    print()
+-
+-# %%
+-# |    format     |   tflops/s   |
+-# |---------------|--------------|
+-# | mxfp8 x mxfp8 |   900.97     |
+-# | mxfp4 x mxfp4 |  2081.76     |
+-# | mxfp8 x mxfp4 |  1000.48     |
+-# | nvfp4 x nvfp4 |  2002.05     |
+-#
+-# By using TMAs, we achieve a ~35% speedup. TMAs load large, contiguous blocks
+-# of memory more efficiently, and because TMA loads the scales directly into
+-# shared memory, we avoid most of the cost of the `convert_layout`.
+-#
+-# However, we still need to roundtrip the scales through registers to transfer
+-# them from shared memory to tensor memory. Next, we can apply `tcgen05_copy`,
+-# which we learned about in the previous tutorial, to asynchronously copy the
+-# scales from shared to tensor memory.
+-#
+-# To avoid this, we can instead view the shared memory in a new layout which undoes
+-# the swizzling. We do this by reshaping and permuting the shared memory descriptor,
+-# in the reverse of the way we generated the original swizzle pattern.
+-
+-
+ @gluon.jit
+ def unswizzle_scales_shared_memory(smem, BLOCK_MN: gl.constexpr, BLOCK_K: gl.constexpr, VEC_SIZE: gl.constexpr):
+     smem = smem.reshape((smem.shape[1], smem.shape[2], 32, 4, 4))
+     smem = smem.permute((0, 3, 2, 1, 4))
+     return smem.reshape((BLOCK_MN, BLOCK_K // VEC_SIZE))
+-
+-
+-# %%
+-# But what will the layout of the final shared memory descriptor be, and will it
+-# be compatible with `tcgen05_copy`? To inspect the layout, we can write a small
+-# stub kernel and use `gl.static_print` to print constexprs.
+-
+ 
+ @gluon.jit
+ def scales_layout_test(scales_desc, BLOCK_M: gl.constexpr, BLOCK_K: gl.constexpr, VEC_SIZE: gl.constexpr):
+@@ -886,84 +583,12 @@
+     smem = unswizzle_scales_shared_memory(smem, BLOCK_M, BLOCK_K, VEC_SIZE)
+     gl.static_print(smem.type.layout)
+ 
+-
+-if __name__ == "__main__":
+-    M, K = 2048, 4096
+-    BLOCK_M, BLOCK_K = 128, 256
+-    VEC_SIZE = 32
+-    scales = torch.empty(M, K, device="cuda", dtype=torch.uint8)
+-    scales = swizzle_scales_packed_block(scales, VEC_SIZE)
+-    scales_desc = make_scales_descriptor(scales, BLOCK_M, BLOCK_K, VEC_SIZE)
+-    # Invoke warmup to compile the kernel and resolve constexprs. Pass
+-    # TRITON_ALWAYS_COMPILE=1 to force recompilation as warmup will not run if
+-    # the kernel is in the cache.
+-    scales_layout_test.warmup(scales_desc, BLOCK_M, BLOCK_K, VEC_SIZE, grid=(1, ))
+-
+-# %%
+-# The printed layouts are
+-#
+-# ```python
+-# NVMMASharedLayout(
+-#     swizzle_byte_width=0,
+-#     element_bitwidth=8,
+-#     rank=5,
+-#     transposed=False,
+-#     fp4_padded=False,
+-#     cga_layout=[]
+-# )
+-#
+-# SharedLinearLayout(
+-#    offset_bases=[[0, 1], [0, 2], [32, 0], [64, 0], [1, 0], [2, 0], [4, 0], [8, 0], [16, 0], [0, 4]],
+-#    block_bases=[],
+-#    alignment=128
+-# )
+-# ```
+-#
+-# To see if this is compatible with `tcgen05_copy`, you would have to refer to the
+-# PTX documentation. Linear layouts can also be tricky to reason about. Instead,
+-# we can just try to use `tcgen05_copy` with this layout and see if the compiler complains.
+-
+-
+ @gluon.jit
+ def tcgen05_copy_layout_test(smem_layout: gl.constexpr, BLOCK_M: gl.constexpr, BLOCK_K: gl.constexpr,
+                              VEC_SIZE: gl.constexpr):
+     smem = gl.allocate_shared_memory(gl.uint8, (BLOCK_M, BLOCK_K // VEC_SIZE), smem_layout)
+     tmem = allocate_tensor_memory(gl.uint8, (BLOCK_M, BLOCK_K // VEC_SIZE), TensorMemoryScalesLayout())
+     tcgen05_copy(smem, tmem)
+-
+-
+-if __name__ == "__main__":
+-    layout = gl.SharedLinearLayout(
+-        offset_bases=[[0, 1], [0, 2], [32, 0], [64, 0], [1, 0], [2, 0], [4, 0], [8, 0], [16, 0], [0, 4]],
+-        block_bases=[], alignment=128)
+-    BLOCK_M, BLOCK_K = 128, 256
+-    VEC_SIZE = 32
+-    tcgen05_copy_layout_test.warmup(layout, BLOCK_M, BLOCK_K, VEC_SIZE, grid=(1, ))
+-
+-# %%
+-# This runs without errors, which means the layout is compatible with `tcgen05_copy`.
+-# If it was not compatible, the compiler would spit out an error like:
+-#
+-# ```
+-# failed to find valid tcgen05.copy layout from shared memory descriptor
+-# ```
+-#
+-# For example, `gl.NVMMASharedLayout(swizzle_byte_width=0, element_bitwidth=32, rank=2)`
+-# is not compatible and would trigger the above error. Also, if we change the original
+-# shared memory layout to have non-zero `swizzle_byte_width`, the unswizzled layout
+-# would trigger the same error. I.e. for NVMMASharedLayout, we have to turn off swizzling
+-# to use `tcgen05_copy`.
+-#
+-# This packed block layout for the scale factors was specifically designed to be
+-# compatible with TMAs and, when unswizzled in shared memory, produces a layout
+-# that is compatible with `tcgen05_copy`.
+-#
+-# For more detailed information on the scale factor layout, see
+-#  1. https://docs.nvidia.com/cuda/parallel-thread-execution/#tcgen05-mma-scale-factor-a-layout-1x
+-#  2. https://docs.nvidia.com/cuda/cublas/#d-block-scaling-factors-layout
+-#
+-# With this information, we can rewrite the kernel to use `tcgen05_copy`.
+-
+ 
+ @gluon.jit
+ def mma_scaled_tcgen05_copy_kernel(a_desc, b_desc, c_desc, a_scale_desc, b_scale_desc, VEC_SIZE: gl.constexpr):
+@@ -1053,8 +678,6 @@
+     fence_async_shared()
+     tma.async_copy_shared_to_global(c_desc, [off_m, off_n], acc_smem)
+     tma.store_wait(0)
+-    # ======= End unchanged code from `mma_scaled_packed_block_kernel` =======
+-
+ 
+ def mma_scaled_tcgen05_copy(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K, out_dtype=torch.float16):
+     M, N = A.shape[0], B.shape[0]
+@@ -1075,67 +698,6 @@
+     mma_scaled_tcgen05_copy_kernel[grid](A_desc, B_desc, C_desc, A_scale_desc, B_scale_desc, VEC_SIZE)
+     return C_desc.base
+ 
+-
+-@pytest.mark.parametrize("M, N, K", [(2048, 2048, 4096)])
+-@pytest.mark.parametrize("BLOCK_N", [128, 256])
+-@pytest.mark.parametrize("BLOCK_K", [128, 256, 512])
+-@pytest.mark.parametrize("a_format, b_format",
+-                         list(itertools.product(["mxfp8", "mxfp4"], repeat=2)) + [("nvfp4", "nvfp4")])
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_mma_scaled_tcgen05_copy(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+-    torch.manual_seed(0)
+-    A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-    B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-    BLOCK_M = 128
+-    VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-    A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-    B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-    C_ref = A_ref @ B_ref.T
+-    C = mma_scaled_tcgen05_copy(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K)
+-    torch.testing.assert_close(C_ref, C.to(torch.float32), atol=1e-3, rtol=1e-3)
+-
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 8192
+-    BLOCK_M, BLOCK_N = 128, 256
+-    print(f"Benchmarking mma_scaled_tcgen05_copy ({M=}, {N=}, {K=})")
+-    print("===============================================================")
+-    print("|    format     |   tflops/s   |")
+-    print("|---------------|--------------|")
+-    for a_format, b_format in formats:
+-        A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-        B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-        # Use BLOCK_K=256 when both operands are fp4, otherwise use BLOCK_K=128.
+-        BLOCK_K = 256 if "fp4" in a_format and "fp4" in b_format else 128
+-        VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-
+-        A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-        B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: mma_scaled_tcgen05_copy(A, B, A_scale, B_scale, VEC_SIZE, BLOCK_M, BLOCK_N, BLOCK_K))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"| {a_format} x {b_format} | {tflops_per_sec:>8.2f}     |")
+-    print()
+-
+-# %%
+-# |    format     |   tflops/s   |
+-# |---------------|--------------|
+-# | mxfp8 x mxfp8 |   929.07     |
+-# | mxfp4 x mxfp4 |  2147.76     |
+-# | mxfp8 x mxfp4 |  1035.60     |
+-# | nvfp4 x nvfp4 |  2092.39     |
+-#
+-# Using `tcgen05_copy`, we observe a modest speedup to the kernel. To achieve
+-# the remaining performance, we will demonstrate a software pipelined and
+-# warp-specialized version of the block-scaled matmul.
+-#
+-# Before we begin, notice that the `tcgen05_copy` of the scales into tensor memory
+-# followed by `tcgen05_mma_scaled` can be abstracted as a single async MMA instruction
+-# with 4 shared memory inputs. Then, we can pipeline it like a regular async MMA.
+-
+-
+ @gluon.jit
+ def async_mma_scaled_impl(a_smem, b_smem, a_scale_smem, b_scale_smem, acc_tmem, use_acc, pred):
+     A_ELEM_PER_BYTE: gl.constexpr = 2 if a_smem.dtype == gl.uint8 else 1
+@@ -1161,15 +723,6 @@
+     tcgen05_mma_scaled(a_smem, b_smem.permute((1, 0)), acc_tmem, a_scale_tmem, b_scale_tmem, a_format, b_format,
+                        use_acc=use_acc, pred=pred)
+ 
+-
+-# This helper function computes all the load indexing and issues the async loads
+-# based on the current `pid_m`, `pid_n`, and `k` indices. The compiler will run
+-# loop-invariant code motion to hoist code that does not depend on `k`, like
+-# `pid_m * BLOCK_M`, outside of the inner loop, so we can safely abstract the
+-# load indexing without performance loss.
+-#
+-# Encapsulating the load indexing logic will help keep our pipelined kernel code
+-# clean, as pipelining can get messy.
+ @gluon.jit
+ def issue_loads(producer, pid_m, pid_n, k, a_desc, b_desc, a_scale_desc, b_scale_desc, a_bufs, b_bufs, a_scale_bufs,
+                 b_scale_bufs, bars, pred):
+@@ -1205,7 +758,6 @@
+                                     b_scale_bufs.index(index), pred)
+     return producer.next(pred)
+ 
+-
+ @gluon.jit
+ def issue_mma(consumer, c_bars, a_bufs, b_bufs, a_scale_bufs, b_scale_bufs, producer, p_bars, acc_tmem, use_acc, pred):
+     c_index = consumer.index
+@@ -1214,7 +766,6 @@
+                           b_scale_bufs.index(c_index), acc_tmem, use_acc, pred)
+     tcgen05_commit(p_bars.index(producer.index), pred)
+     return consumer.next(pred), producer.next(pred)
+-
+ 
+ @gluon.jit
+ def mma_scaled_pipelined_kernel(a_desc, b_desc, c_desc, a_scale_desc, b_scale_desc, num_buffers: gl.constexpr,
+@@ -1337,12 +888,6 @@
+         mbarrier.invalidate(load_bars.index(i))
+     for i in gl.static_range(num_acc_buffers):
+         mbarrier.invalidate(mma_bars.index(i))
+-
+-
+-# %%
+-# We also provide an example warp-specialized implementation. The helpers we
+-# wrote simplify writing the warp-specialized code.
+-
+ 
+ @aggregate
+ class PartitionArgs:
+@@ -1395,7 +940,6 @@
+         self.N = N
+         self.K = K
+ 
+-
+ @gluon.jit
+ def mma_scaled_load_partition(p):
+     state = t8.Counter.create(1, p.load_empty_bars.shape[0])
+@@ -1406,7 +950,6 @@
+             mbarrier.wait(p.load_empty_bars.index(state.index), state.phase)
+             state = issue_loads(state, pid_m, pid_n, k, p.a_desc, p.b_desc, p.a_scale_desc, p.b_scale_desc, p.a_bufs,
+                                 p.b_bufs, p.a_scale_bufs, p.b_scale_bufs, p.load_ready_bars, pred=True)
+-
+ 
+ @gluon.jit
+ def mma_scaled_mma_partition(p):
+@@ -1424,7 +967,6 @@
+         tcgen05_commit(p.acc_ready_bars.index(acc_state.index))
+         acc_state = acc_state.next()
+ 
+-
+ @gluon.jit
+ def mma_scaled_epilogue_partition(p):
+     acc_layout: gl.constexpr = get_tmem_reg_layout(p.c_desc.dtype, (p.BLOCK_M, p.BLOCK_N), p.acc_bufs.type.layout,
+@@ -1445,7 +987,6 @@
+         tma.async_copy_shared_to_global(p.c_desc, [pid_m * p.BLOCK_M, pid_n * p.BLOCK_N], acc_smem)
+     tma.store_wait(0)
+ 
+-
+ @gluon.jit
+ def mma_scaled_warp_specialized_kernel(a_desc, b_desc, c_desc, a_scale_desc, b_scale_desc, num_buffers: gl.constexpr,
+                                        SchedulerImpl: gl.constexpr):
+@@ -1486,7 +1027,6 @@
+         (mma_scaled_mma_partition, (p, )),
+         (mma_scaled_load_partition, (p, )),
+     ], [1, 1], [24, 24])
+-
+ 
+ def mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, impl_kernel, GROUP_SIZE_M=8, out_dtype=torch.float16):
+     BLOCK_M = 128
+@@ -1513,78 +1053,3 @@
+     # mma_scaled_pipelined_kernel[grid](A_desc, B_desc, C_desc, A_scale_desc, B_scale_desc, 3, SchedulerImpl)
+     impl_kernel[grid](A_desc, B_desc, C_desc, A_scale_desc, B_scale_desc, 3, SchedulerImpl)
+     return C_desc.base
+-
+-
+-@pytest.mark.parametrize("K", [128, 640, 704, 1152, 4096])
+-@pytest.mark.parametrize("M, N", [(2048, 2048), (500, 600), (128, 128), (8192, 8192)])
+-@pytest.mark.parametrize("a_format, b_format",
+-                         list(itertools.product(["mxfp8", "mxfp4"], repeat=2)) + [("nvfp4", "nvfp4")])
+-@pytest.mark.parametrize("impl_kernel", [mma_scaled_pipelined_kernel, mma_scaled_warp_specialized_kernel],
+-                         ids=("pipelined", "warp-specialized"))
+-@pytest.mark.skipif(not is_blackwell(), reason="Requires Blackwell")
+-def test_mma_scaled_pipelined(M, N, K, a_format, b_format, impl_kernel):
+-    if a_format != b_format and K % 128 != 0:
+-        pytest.skip("fp4 packed tensor descriptor requires K to be a multiple of 128")
+-    torch.manual_seed(0)
+-    A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-    B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-    VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-    A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-    B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-    C_ref = A_ref @ B_ref.T
+-    C = mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, impl_kernel)
+-    torch.testing.assert_close(C_ref, C.to(torch.float32), atol=1e-3, rtol=1e-3)
+-
+-
+-if __name__ == "__main__":
+-    M, N, K = 8192, 8192, 8192
+-    print(f"Benchmarking mma_scaled ({M=}, {N=}, {K=})")
+-    print("===============================================================")
+-    print("|    format     | pipelined tflops/s | warp-specialized tflops/s |")
+-    print("|---------------|--------------------|---------------------------|")
+-    for a_format, b_format in formats:
+-        A, A_scale, A_ref = random_quantized_tensor(M, K, a_format)
+-        B, B_scale, B_ref = random_quantized_tensor(N, K, b_format)
+-        # Use BLOCK_K=256 when both operands are fp4, otherwise use BLOCK_K=128.
+-        BLOCK_K = 256 if "fp4" in a_format and "fp4" in b_format else 128
+-        VEC_SIZE = 16 if a_format == "nvfp4" else 32
+-
+-        A_scale = swizzle_scales_packed_block(A_scale, VEC_SIZE)
+-        B_scale = swizzle_scales_packed_block(B_scale, VEC_SIZE)
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, mma_scaled_pipelined_kernel))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"| {a_format} x {b_format} |           {tflops_per_sec:>8.2f} |", end="")
+-
+-        ms = triton.testing.do_bench_cudagraph(
+-            lambda: mma_scaled(A, B, A_scale, B_scale, VEC_SIZE, mma_scaled_warp_specialized_kernel))
+-        flops = 2 * M * N * K
+-        tflops_per_sec = flops * 1e-12 / (ms * 1e-3)
+-        print(f"                  {tflops_per_sec:>8.2f} |")
+-    print()
+-
+-# %%
+-# |    format     | pipelined tflops/s | warp-specialized tflops/s |
+-# |---------------|--------------------|---------------------------|
+-# | mxfp8 x mxfp8 |            2018.58 |                   2378.49 |
+-# | mxfp4 x mxfp4 |            3916.62 |                   4870.97 |
+-# | mxfp8 x mxfp4 |            2144.05 |                   2615.73 |
+-# | nvfp4 x nvfp4 |            3842.19 |                   4846.83 |
+-#
+-# As anticipated, we get a huge speedup. In fact, we get pretty close to the
+-# 5 petaflops NVIDIA marketing promised us.
+-#
+-# Although the software pipelined version is slower, it was useful nonetheless
+-# to demonstrate how to implement one as there are cases where software pipelining
+-# will be faster than warp-specialization. We also took the chance to demonstrate
+-# the extra overlap we can achieve with Blackwell MMAs compared to Hopper MMAs.
+-#
+-# We also showed how, with `tcgen05_copy`, we can abstract the MMA scaled into
+-# an async MMA operation and pipeline or warp-specialize it the same way as `tcgen05_mma`.
+-#
+-# The main takeaways from this tutorial:
+-# - The global memory layout of the scales is important and drastically affects
+-#   performance.
+-# - `tcgen05_copy` is a great way to copy the scales into tensor memory.

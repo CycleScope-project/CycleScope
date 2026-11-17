@@ -1,0 +1,33 @@
+{
+ "doc": "imported from legacy mechanism memory.l2.residency",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "l2.replacement_policy": {
+   "kind": "constant"
+  },
+  "l2.resident_lines": {
+   "kind": "constant"
+  },
+  "l2.resident_lines_lower_bound": {
+   "kind": "constant"
+  },
+  "l2.resident_lines_upper_bound_exclusive": {
+   "kind": "constant"
+  },
+  "l2.sets": {
+   "kind": "constant"
+  },
+  "l2.ways": {
+   "kind": "constant"
+  }
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FIF-BSA-BLK128-R03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 330953,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4226126,
+ "completed": 4226126,
+ "cycles": 28074,
+ "hard": 0,
+ "walls": {
+  "convert": 10.5,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 10.3,
+  "total": 21.7
+ },
+ "rss_kb": {
+  "convert": 318764,
+  "segments": 318764,
+  "build": 318764,
+  "sim": 619460
+ },
+ "hw_cycles": 27761.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 7
+}

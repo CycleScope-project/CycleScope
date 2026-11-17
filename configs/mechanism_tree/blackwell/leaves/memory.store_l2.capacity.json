@@ -1,0 +1,16 @@
+{
+ "memory.store_l2.capacity.root": {
+  "fields": {
+   "store_l2.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 59
+    },
+    "sources": [
+     "store_flood.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

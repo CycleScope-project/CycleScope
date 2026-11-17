@@ -1,0 +1,61 @@
+{
+ "doc": "imported from legacy mechanism storage.shared.proxy_fence",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "hopper.proxy_fence",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "enabled": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "hopper.75c19cb3bbf1698810e60061"
+     ]
+    },
+    "latency_cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 10.0
+     },
+     "sources": [
+      "hopper.054b931a21048badc0b1ac67"
+     ]
+    },
+    "queue_capacity_bytes": {
+     "model": {
+      "kind": "constant",
+      "value": 19404.800000000003
+     },
+     "sources": [
+      "hopper.1b9b478cdf138231750db4b1"
+     ]
+    },
+    "sm_drain_bytes_per_cycle": {
+     "model": {
+      "kind": "constant",
+      "value": 128.0
+     },
+     "sources": [
+      "hopper.af21ea01c2ad8b0a45f7fc66"
+     ]
+    },
+    "smsp_drain_bytes_per_cycle": {
+     "model": {
+      "kind": "constant",
+      "value": 51.20000000000002
+     },
+     "sources": [
+      "hopper.b82b4a6b371d1c6731457c7c"
+     ]
+    }
+   },
+   "scope": "sm"
+  }
+ }
+}

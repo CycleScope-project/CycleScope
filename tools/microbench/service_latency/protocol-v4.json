@@ -1,0 +1,28 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "service_latency",
+  "version": 4,
+  "supersedes": "protocol-v3.json (all v3 rules incl. addenda: composition-exact gate via operation_classes(), harness classes constant across U/K (max - min <= 2), single / pair derivation, N_unit divisor, b300 10 % control rule) stay in force; v4 only adds cells",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "purpose": "Classes left unrealised or suspicious after v3, with idioms chosen from the v3 survey: (a) h100 MATCH issue_interval 1 is a predecessor fit while b300 measures 64 on its own pipe; h100 MATCH result 53 is a collapsed predecessor table; (b) DSETP / FSETP failed in v3 only because the cvt partner entered the window; (c) DADD / DMUL compiled to DFMA (FMA contraction of add.rn / mul.rn chains); (d) h100 HFMA2 thr residual 17 % (alternating HFMA2 / HFMA2.MMA); (e) CS2R.CLOCK / CS2R.GLOBALTIMER issue interval (the window parser uses clock reads as boundaries).",
+  "cells": {
+    "MATCH": "single: match.any.sync.b32 x, x, 0xffffffff chain (lat) and 8 independent chains (thr), both devices; b300 is a control (10 % of 64.0 interval, 105 result)",
+    "DSETP": "pair: f64 operands kept in f64 registers across the whole kernel (seeded once before the window from per-lane f64 seeds), step = setp.gt.f64 p, x, y ; selp.f64 x, a, b, p -> composition {DSETP: 1, FSEL: 2} with one FSEL on the critical path (the two FSEL of the 64-bit select are parallel); result(DSETP) = slope - result(FSEL)",
+    "FSETP": "pair: f32 chain, step = setp.gt.f32 p, x, y ; selp.f32 x, a, b, p -> {FSETP: 1, FSEL: 1}; result = slope - result(FSEL); interval via the same-resource rule (FSETP, FSEL both alu_smsp)",
+    "DADD_RZ / DMUL_RZ": "f64 thr chains with add.rz.f64 / mul.rz.f64 (a non-default rounding mode is not contracted into DFMA), 8 distinctly seeded chains, all accumulators pinned after the window; interval per the v3 N_unit rule (fp64_sm); lat cells too (result)",
+    "HFMA2": "h100 only: repeat the v3 HFMA2 cell unchanged (no idiom change); credited only if HFMA2 and HFMA2.MMA both map to the HFMA2 leaf and the thr residual passes",
+    "CS2R_CLOCK / CS2R_GT": "issue-only: K back-to-back mov.u64 %clock64 (resp. %globaltimer) whose values are summed after the window; gate = the window between the first and the last read holds exactly K CS2R (resp. the globaltimer form) and nothing per-step; interval = slope over K of (t_last - t_first) / 1 per read; credited to CS2R.CLOCK / CS2R.GLOBALTIMER; result stays as is (no input dependency)"
+  },
+  "gate": "v3 composition-exact gate with the harness scaling check; CS2R cells use the special window rule above (a separate gate function, same scaling check on everything else)",
+  "acceptance": "v3 verbatim",
+  "install": "v3 install rules (sources service_latency.<device>.v4r<n>[.experimental], run-level description, single run per device); A/B 500 x 2 single-cluster against the other line's current baseline",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; an idiom that fails the gate is unrealised (no idiom search after data)",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "before_install": true,
+      "text": "(1) DADD_RZ / DMUL_RZ: the cells realise DADD.RZ / DMUL.RZ, the converter credits them to the DADD / DMUL classes, but the corpus form is the default rounding (.RN), which ptxas contracts into DFMA in any dependent chain and therefore cannot be isolated; whether .RZ and .RN share latency / interval is not shown by this probe, so these classes are installed experimental at most (status cap, decided before looking at their acceptance numbers' effect on any case). (2) The v2 install credited the DADD / DMUL cells of alu.cu (64.01 on h100, identical medians to DFMA) to DADD / DMUL although the v3 survey shows those PTX chains compile to DFMA; under the v3 crediting rule that value belongs to DFMA only. When the v4 DADD / DMUL cells pass, their value replaces the v2 one (the v2 value and this reason go into the description); if they fail, the v2 source is relabelled experimental with this note (value unchanged)."
+    }
+  ]
+}

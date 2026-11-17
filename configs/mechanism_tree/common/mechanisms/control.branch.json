@@ -1,0 +1,23 @@
+{
+ "doc": "control_envelope: cycles a warp waits after issuing a BRA before its next issue (redirect / predicate resolution floor on the next dynamic instance, control_floor via InstanceTiming.control_envelope). branch_taken is a converter axis (1 when the warp's next dynamic instance's static pc is not pc + 16, else 0; last instance of a warp = 0). The leaf excludes target instruction fetch (cold lines are charged by instruction.fetch). Measured by control_branch protocol v1: serialized forward branches over 16 B with an early-resolved predicate.",
+ "program": {
+  "event": "control_transition",
+  "operation_classes": [
+   "BRA"
+  ],
+  "parameter_schema": "instance_timing"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "control_envelope": {
+   "kind": "discrete",
+   "axes_subset_of": [
+    "branch_taken"
+   ]
+  }
+ }
+}

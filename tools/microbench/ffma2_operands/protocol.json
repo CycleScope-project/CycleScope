@@ -1,0 +1,18 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "ffma2_operands",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": ["instruction.service (b300 FFMA2 issue_interval_cycles)"],
+ "devices": {"b300": "sm_103a"},
+ "question": "service_latency v6 (b300-v6r10b1) measured FFMA2 thr 2.921 cycles per SMSP while FADD2 / FMUL2 in the same harness give 1.991; installed 1.987 (blackwell-prototype w4). Installing 2.921 slowed 19 cases away from the reference. Does the cell measure the FFMA2 issue interval, or a register-operand read limit of its form (three distinct 64-bit register-pair sources, no reuse)?",
+ "cells": "b300, the v6 k_thrx2 harness unchanged (16 warps, 8 independent chains per warp, K in {16, 32, 64}, one op per chain per K, N_unit 32), only the op differs: F3 fma.rn.f32x2 d, a, b, c with a, b, c three distinct chain registers (the v6 cell, reproduction); F2a fma.rn.f32x2 x, x, y, x (two distinct pairs, addend = a multiplicand); F2b fma.rn.f32x2 x, y, k, x with k one loop-invariant register pair shared by every chain (two distinct changing pairs + one invariant); F1 fma.rn.f32x2 x, k1, k2, x with k1, k2 loop-invariant (one changing pair); A2 add.rn.f32x2 x, x, y (FADD2 control, must reproduce 1.991 within 5 %); S3 fma.rn.f32 three distinct scalar registers (FFMA control, must reproduce the installed 1.007 within 10 %). --launches 8 --reps 33, two runs.",
+ "sass_record": "per kernel: composition gate as v6 (exact count of the target class, harness constant across K); for every target instruction in the window record the source register numbers, the reuse flags of its control word, and the register bank of each source (register index mod 4 on sm_103a, reported as the count of sources sharing a bank).",
+ "derivation": "interval(cell) = OLS slope over K / 32, v3 acceptance (residual <= 5 %, runs <= 5 %).",
+ "decision": "(a) operand-read limit: F3 reproduces 2.921 within 5 % and F2a, F2b, F1 are all within 5 % of A2 -> the FFMA2 issue interval is the F2 / F1 value; the installed 1.987 is reproduced (cite) and the extra cost of the three-distinct-pair form is recorded as an unmodelled register-operand mechanism (not folded into the class interval); (b) class property: F2a, F2b, F1 all within 5 % of F3 -> install the F3 value as the FFMA2 interval; (c) anything else (intervals ordered by distinct-register count or bank sharing, controls failing) -> nothing installed, the table is reported. Controls A2 / S3 failing -> nothing installed.",
+ "corpus_check": "static, no GPU: in the traced SASS of the 450 blackwell single-cluster cases count FFMA2 instructions by number of distinct source register pairs (1 / 2 / 3, immediates and uniform registers counted as non-register), reuse flags set, and source bank sharing; reported for all cases and for the 19 cases that slowed in mb4-p2. Context only: it does not change the decision rule.",
+ "install": "per decision; source ffma2_operands.b300.r1; A/B 500 x 2 only if a value changes",
+ "not_allowed": "no case-cycle tuning; no threshold or rule change after data",
+ "addenda": []
+}

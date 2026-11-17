@@ -1,0 +1,86 @@
+{
+ "memory.l2.service.root": {
+  "fields": {
+   "l2.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "mechtree.w9.memq.l2_issue_interval"
+    ]
+   },
+   "l2.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 320.726562
+    },
+    "sources": [
+     "memlat.b300.r2.l2"
+    ]
+   },
+   "l2.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 124.5685775435907
+    },
+    "sources": [
+     "mechtree.w3.memory.l2.sector_bytes_per_cycle",
+     "crossings.memory_port.b300.r3"
+    ]
+   },
+   "l2.loaded_latency_extra_cycles": {
+    "model": {
+     "axis": "shared_utilization",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0.0
+      ],
+      [
+       89,
+       0.0
+      ],
+      [
+       105,
+       0.1
+      ],
+      [
+       177,
+       0.2
+      ],
+      [
+       209,
+       0.1
+      ],
+      [
+       352,
+       0.4
+      ],
+      [
+       413,
+       0.7
+      ],
+      [
+       525,
+       2.0
+      ],
+      [
+       689,
+       3.7
+      ],
+      [
+       780,
+       4.8
+      ]
+     ]
+    },
+    "sources": [
+     "memlat_loaded.b300.r1b.l2"
+    ]
+   }
+  },
+  "scope": "cluster"
+ }
+}

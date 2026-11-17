@@ -1,0 +1,36 @@
+{
+ "memory.global_atomic.root": {
+  "fields": {
+   "dependent_round_trip_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 247.055
+    },
+    "sources": [
+     "fullgpu.mechtree.m3.global_atomic.rt"
+    ]
+   },
+   "release_to_acquire_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 351.9225166876065
+    },
+    "sources": [
+     "global_atomic.b300.r1.release_to_acquire_fence_corrected",
+     "blackwell.derived.release_to_acquire_store_accept",
+     "fullgpu.mechtree.m3.global_atomic.r2a"
+    ]
+   },
+   "same_address_service_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 0.019927454103336805
+    },
+    "sources": [
+     "fullgpu.mechtree.m3.global_atomic"
+    ]
+   }
+  },
+  "scope": "gpu"
+ }
+}

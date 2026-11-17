@@ -1,0 +1,35 @@
+{
+ "memory.global_atomic.root": {
+  "fields": {
+   "dependent_round_trip_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 203.2682790294985
+    },
+    "sources": [
+     "global_atomic.h100.r2.dependent_round_trip",
+     "hopper.derived.global_atomic_fields"
+    ]
+   },
+   "release_to_acquire_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 187.07676368998833
+    },
+    "sources": [
+     "global_atomic.h100.r2.release_to_acquire_fence_corrected"
+    ]
+   },
+   "same_address_service_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 0.022927288673623696
+    },
+    "sources": [
+     "global_atomic.h100.r1.same_address_service",
+     "hopper.derived.global_atomic_fields"
+    ]
+   }
+  }
+ }
+}

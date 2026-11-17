@@ -1,0 +1,28 @@
+{
+ "control.branch.root": {
+  "fields": {
+   "control_envelope": {
+    "model": {
+     "kind": "discrete",
+     "axes": [
+      "branch_taken"
+     ],
+     "points": [
+      [
+       0,
+       0.0
+      ],
+      [
+       1,
+       6.050927109974424
+      ]
+     ]
+    },
+    "sources": [
+     "control_branch.structural.not_taken_fallthrough",
+     "control_branch.h100.r2"
+    ]
+   }
+  }
+ }
+}

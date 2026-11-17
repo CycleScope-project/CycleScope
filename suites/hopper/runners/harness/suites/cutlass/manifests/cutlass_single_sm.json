@@ -1,0 +1,3560 @@
+{
+  "candidate_count": 63,
+  "cases": [
+    {
+      "algorithm": "dense_tma_static",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_tma_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_000_dense_tma_static_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 0,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_non_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 82108.0,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.09902948235055187,
+        "cv_percent_round2": 0.03218625116776021,
+        "cycle_samples_round1": [
+          663770.319,
+          663086.226,
+          662167.752
+        ],
+        "cycle_samples_round2": [
+          662500.444,
+          662635.536,
+          663005.087
+        ],
+        "cycles_round1": 663086.226,
+        "cycles_round2": 662635.536,
+        "reference_cycles": 662860.881,
+        "round_drift_percent": 0.06799164242731356
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_000_dense_tma_static"
+    },
+    {
+      "algorithm": "dense_tma_static",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_tma_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_001_dense_tma_static_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 1,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_non_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 82221.5,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.0156462332759386,
+        "cv_percent_round2": 0.045022893682022044,
+        "cycle_samples_round1": [
+          1320804.309,
+          1320760.358,
+          1321219.103
+        ],
+        "cycle_samples_round2": [
+          1320523.542,
+          1321693.099,
+          1321861.152
+        ],
+        "cycles_round1": 1320804.309,
+        "cycles_round2": 1321693.099,
+        "reference_cycles": 1321248.704,
+        "round_drift_percent": 0.0672689401555725
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_001_dense_tma_static"
+    },
+    {
+      "algorithm": "dense_tma_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tn_ws_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_002_dense_tma_warp_specialized_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 2,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_no_smem_epilogue",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 75133.169,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.06287172208429198,
+        "cv_percent_round2": 0.04138376452394271,
+        "cycle_samples_round1": [
+          616828.604,
+          616116.815,
+          617017.156
+        ],
+        "cycle_samples_round2": [
+          615713.45,
+          616310.021,
+          616171.664
+        ],
+        "cycles_round1": 616828.604,
+        "cycles_round2": 616171.664,
+        "reference_cycles": 616500.1340000001,
+        "round_drift_percent": 0.10655958754423572
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_002_dense_tma_warp_specialized"
+    },
+    {
+      "algorithm": "dense_tma_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tn_ws_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_003_dense_tma_warp_specialized_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 3,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_no_smem_epilogue",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 75106.0,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.018235503088716767,
+        "cv_percent_round2": 0.04539899616015996,
+        "cycle_samples_round1": [
+          1229330.08,
+          1228784.64,
+          1229003.43
+        ],
+        "cycle_samples_round2": [
+          1228630.957,
+          1228069.561,
+          1229429.087
+        ],
+        "cycles_round1": 1229003.43,
+        "cycles_round2": 1228630.957,
+        "reference_cycles": 1228817.1935,
+        "round_drift_percent": 0.03031150621672988
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_003_dense_tma_warp_specialized"
+    },
+    {
+      "algorithm": "dense_tma_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_004_dense_tma_pingpong_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 4,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong",
+        "kernel_tile": "64x128x64",
+        "median_cycles_one_trial": 49051.62,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.08958297538072187,
+        "cv_percent_round2": 0.019088001672541398,
+        "cycle_samples_round1": [
+          652152.709,
+          653094.041,
+          651689.529
+        ],
+        "cycle_samples_round2": [
+          652518.74,
+          652404.724,
+          652216.72
+        ],
+        "cycles_round1": 652152.709,
+        "cycles_round2": 652404.724,
+        "reference_cycles": 652278.7165000001,
+        "round_drift_percent": 0.03863609123294366
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_004_dense_tma_pingpong"
+    },
+    {
+      "algorithm": "dense_tma_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_005_dense_tma_pingpong_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 5,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong",
+        "kernel_tile": "64x128x64",
+        "median_cycles_one_trial": 49110.18,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.05417588136019649,
+        "cv_percent_round2": 0.03461362569930236,
+        "cycle_samples_round1": [
+          1295032.727,
+          1296381.267,
+          1296631.391
+        ],
+        "cycle_samples_round2": [
+          1296951.22,
+          1296517.1,
+          1295859.613
+        ],
+        "cycles_round1": 1296381.267,
+        "cycles_round2": 1296517.1,
+        "reference_cycles": 1296449.1835,
+        "round_drift_percent": 0.010477310004036927
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_005_dense_tma_pingpong"
+    },
+    {
+      "algorithm": "dense_tma_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_006_dense_tma_cooperative_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 6,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 48972.825,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.4247896163182069,
+        "cv_percent_round2": 1.4098439720386708,
+        "cycle_samples_round1": [
+          413997.189,
+          418101.183,
+          417253.625
+        ],
+        "cycle_samples_round2": [
+          406634.987,
+          396470.538,
+          409843.098
+        ],
+        "cycles_round1": 417253.625,
+        "cycles_round2": 406634.987,
+        "reference_cycles": 411944.306,
+        "round_drift_percent": 2.577687771220214
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_006_dense_tma_cooperative"
+    },
+    {
+      "algorithm": "dense_tma_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_007_dense_tma_cooperative_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 7,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 49130.097,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 3.0980567805332195,
+        "cv_percent_round2": 0.9806990698433793,
+        "cycle_samples_round1": [
+          802687.386,
+          861742.415,
+          813989.127
+        ],
+        "cycle_samples_round2": [
+          841561.358,
+          835946.757,
+          855633.99
+        ],
+        "cycles_round1": 813989.127,
+        "cycles_round2": 841561.358,
+        "reference_cycles": 827775.2424999999,
+        "round_drift_percent": 3.3308837452939444
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_007_dense_tma_cooperative"
+    },
+    {
+      "algorithm": "dense_cpasync_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_008_dense_cpasync_warp_specialized_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 8,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 75452.659,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.055407207208914136,
+        "cv_percent_round2": 0.04300146045001875,
+        "cycle_samples_round1": [
+          616062.251,
+          615450.205,
+          615263.717
+        ],
+        "cycle_samples_round2": [
+          616619.556,
+          616805.651,
+          617251.76
+        ],
+        "cycles_round1": 615450.205,
+        "cycles_round2": 616805.651,
+        "reference_cycles": 616127.928,
+        "round_drift_percent": 0.21999424768811915
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_008_dense_cpasync_warp_specialized"
+    },
+    {
+      "algorithm": "dense_cpasync_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_009_dense_cpasync_warp_specialized_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 9,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 75227.915,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.01157340890776978,
+        "cv_percent_round2": 0.04093541997117172,
+        "cycle_samples_round1": [
+          1307557.559,
+          1307691.201,
+          1307324.961
+        ],
+        "cycle_samples_round2": [
+          1299541.383,
+          1298473.585,
+          1298361.833
+        ],
+        "cycles_round1": 1307557.559,
+        "cycles_round2": 1298473.585,
+        "reference_cycles": 1303015.572,
+        "round_drift_percent": 0.6971500721251496
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_009_dense_cpasync_warp_specialized"
+    },
+    {
+      "algorithm": "dense_cpasync_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_010_dense_cpasync_pingpong_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 10,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_pingpong",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 78635.292,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.04871558923757429,
+        "cv_percent_round2": 0.12901460998216152,
+        "cycle_samples_round1": [
+          613877.656,
+          613202.658,
+          613294.833
+        ],
+        "cycle_samples_round2": [
+          611666.521,
+          613580.639,
+          612876.557
+        ],
+        "cycles_round1": 613294.833,
+        "cycles_round2": 612876.557,
+        "reference_cycles": 613085.6950000001,
+        "round_drift_percent": 0.06822472019999656
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_010_dense_cpasync_pingpong"
+    },
+    {
+      "algorithm": "dense_cpasync_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_011_dense_cpasync_pingpong_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 11,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_pingpong",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 78620.867,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.03566757716462836,
+        "cv_percent_round2": 0.01532873685761933,
+        "cycle_samples_round1": [
+          1210160.529,
+          1209280.121,
+          1209214.156
+        ],
+        "cycle_samples_round2": [
+          1214981.559,
+          1215428.04,
+          1215123.389
+        ],
+        "cycles_round1": 1209280.121,
+        "cycles_round2": 1215123.389,
+        "reference_cycles": 1212201.755,
+        "round_drift_percent": 0.4820375796271574
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_011_dense_cpasync_pingpong"
+    },
+    {
+      "algorithm": "dense_cpasync_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_012_dense_cpasync_cooperative_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 12,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 64223.148,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.34757681996486456,
+        "cv_percent_round2": 0.11339211141256733,
+        "cycle_samples_round1": [
+          581761.856,
+          582632.922,
+          586433.83
+        ],
+        "cycle_samples_round2": [
+          591477.821,
+          592461.799,
+          590830.154
+        ],
+        "cycles_round1": 582632.922,
+        "cycles_round2": 591477.821,
+        "reference_cycles": 587055.3715,
+        "round_drift_percent": 1.5066549816928088
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_012_dense_cpasync_cooperative"
+    },
+    {
+      "algorithm": "dense_cpasync_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_013_dense_cpasync_cooperative_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 13,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 63895.181,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.03672234798170107,
+        "cv_percent_round2": 0.03466740775405295,
+        "cycle_samples_round1": [
+          1160747.617,
+          1160980.224,
+          1159982.566
+        ],
+        "cycle_samples_round2": [
+          1152539.238,
+          1153338.734,
+          1153428.585
+        ],
+        "cycles_round1": 1160747.617,
+        "cycles_round2": 1153338.734,
+        "reference_cycles": 1157043.1755,
+        "round_drift_percent": 0.6403290004107671
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_013_dense_cpasync_cooperative"
+    },
+    {
+      "algorithm": "fp8_fastacc_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_014_fp8_fastacc_warp_specialized_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 14,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 39908.911,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.11565529995849252,
+        "cv_percent_round2": 0.06662916435279811,
+        "cycle_samples_round1": [
+          331790.42,
+          331421.279,
+          330858.387
+        ],
+        "cycle_samples_round2": [
+          330930.238,
+          331188.428,
+          330648.509
+        ],
+        "cycles_round1": 331421.279,
+        "cycles_round2": 330930.238,
+        "reference_cycles": 331175.7585,
+        "round_drift_percent": 0.14827202396215491
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_014_fp8_fastacc_warp_specialized"
+    },
+    {
+      "algorithm": "fp8_fastacc_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_015_fp8_fastacc_warp_specialized_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 15,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 39902.166,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.0692699605336593,
+        "cv_percent_round2": 0.027898070706465657,
+        "cycle_samples_round1": [
+          666638.356,
+          665512.494,
+          666161.288
+        ],
+        "cycle_samples_round2": [
+          665709.892,
+          666052.491,
+          666140.621
+        ],
+        "cycles_round1": 666161.288,
+        "cycles_round2": 666052.491,
+        "reference_cycles": 666106.8895,
+        "round_drift_percent": 0.016333264482757473
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_015_fp8_fastacc_warp_specialized"
+    },
+    {
+      "algorithm": "fp8_fastacc_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_016_fp8_fastacc_pingpong_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 16,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 45274.26,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.02624305277914329,
+        "cv_percent_round2": 0.012140210144053174,
+        "cycle_samples_round1": [
+          290769.638,
+          290944.072,
+          290915.174
+        ],
+        "cycle_samples_round2": [
+          290846.533,
+          290932.951,
+          290893.065
+        ],
+        "cycles_round1": 290915.174,
+        "cycles_round2": 290893.065,
+        "reference_cycles": 290904.11950000003,
+        "round_drift_percent": 0.007600098629746884
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_016_fp8_fastacc_pingpong"
+    },
+    {
+      "algorithm": "fp8_fastacc_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_017_fp8_fastacc_pingpong_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 17,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 46355.483,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.007831393893284638,
+        "cv_percent_round2": 0.05213515600347681,
+        "cycle_samples_round1": [
+          572578.447,
+          572685.163,
+          572654.363
+        ],
+        "cycle_samples_round2": [
+          572511.865,
+          572446.35,
+          573109.929
+        ],
+        "cycles_round1": 572654.363,
+        "cycles_round2": 572511.865,
+        "reference_cycles": 572583.1140000001,
+        "round_drift_percent": 0.024886867341327393
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_017_fp8_fastacc_pingpong"
+    },
+    {
+      "algorithm": "fp8_fastacc_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_018_fp8_fastacc_cooperative_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 18,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 27930.118,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.15171447814726527,
+        "cv_percent_round2": 0.23457641005260962,
+        "cycle_samples_round1": [
+          201648.043,
+          201186.067,
+          201927.787
+        ],
+        "cycle_samples_round2": [
+          201605.676,
+          202296.872,
+          201145.735
+        ],
+        "cycles_round1": 201648.043,
+        "cycles_round2": 201605.676,
+        "reference_cycles": 201626.85950000002,
+        "round_drift_percent": 0.021012577443829287
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_018_fp8_fastacc_cooperative"
+    },
+    {
+      "algorithm": "fp8_fastacc_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_019_fp8_fastacc_cooperative_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 19,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 27880.806,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.0451100487312114,
+        "cv_percent_round2": 1.0263762796891218,
+        "cycle_samples_round1": [
+          396607.519,
+          396294.646,
+          396185.669
+        ],
+        "cycle_samples_round2": [
+          405705.571,
+          395735.645,
+          402039.452
+        ],
+        "cycles_round1": 396294.646,
+        "cycles_round2": 402039.452,
+        "reference_cycles": 399167.049,
+        "round_drift_percent": 1.4391984544796388
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_019_fp8_fastacc_cooperative"
+    },
+    {
+      "algorithm": "mixed_convert_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=0",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_040_mixed_convert_f16_fp8_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 40,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.09821272141331581,
+        "cv_percent_round2": 0.05809991627855039,
+        "cycle_samples_round1": [
+          489913.685,
+          489460.513,
+          490629.519
+        ],
+        "cycle_samples_round2": [
+          487912.1,
+          487875.004,
+          488494.262
+        ],
+        "cycles_round1": 489913.685,
+        "cycles_round2": 487912.1,
+        "reference_cycles": 488912.89249999996,
+        "round_drift_percent": 0.4093950130390602
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_040_mixed_convert_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_convert_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=0",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_041_mixed_convert_f16_fp8_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 41,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.1078240883472589,
+        "cv_percent_round2": 0.04017805854521879,
+        "cycle_samples_round1": [
+          970856.303,
+          972277.55,
+          973418.887
+        ],
+        "cycle_samples_round2": [
+          969801.776,
+          970726.901,
+          970059.7
+        ],
+        "cycles_round1": 972277.55,
+        "cycles_round2": 970059.7,
+        "reference_cycles": 971168.625,
+        "round_drift_percent": 0.22836919798558086
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_041_mixed_convert_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_group_scale_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_042_mixed_group_scale_f16_fp8_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 42,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.011672399525176631,
+        "cv_percent_round2": 0.07011804646348586,
+        "cycle_samples_round1": [
+          513678.133,
+          513686.259,
+          513555.209
+        ],
+        "cycle_samples_round2": [
+          515936.462,
+          516611.402,
+          516772.353
+        ],
+        "cycles_round1": 513678.133,
+        "cycles_round2": 516611.402,
+        "reference_cycles": 515144.76749999996,
+        "round_drift_percent": 0.5694067347777204
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_042_mixed_group_scale_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_group_scale_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_043_mixed_group_scale_f16_fp8_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 43,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.08986315100418418,
+        "cv_percent_round2": 0.03115587501846606,
+        "cycle_samples_round1": [
+          1024685.568,
+          1026205.847,
+          1024002.035
+        ],
+        "cycle_samples_round2": [
+          1022949.177,
+          1022935.113,
+          1023618.263
+        ],
+        "cycles_round1": 1024685.568,
+        "cycles_round2": 1022949.177,
+        "reference_cycles": 1023817.3725,
+        "round_drift_percent": 0.169599681216578
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_043_mixed_group_scale_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_scale_zero_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=2",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_044_mixed_scale_zero_f16_fp8_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 44,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.04215697965748362,
+        "cv_percent_round2": 0.06448499239998587,
+        "cycle_samples_round1": [
+          537195.738,
+          537678.226,
+          537199.636
+        ],
+        "cycle_samples_round2": [
+          536863.225,
+          536072.777,
+          536732.785
+        ],
+        "cycles_round1": 537199.636,
+        "cycles_round2": 536732.785,
+        "reference_cycles": 536966.2105,
+        "round_drift_percent": 0.08694234215693246
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_044_mixed_scale_zero_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_scale_zero_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=2",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_045_mixed_scale_zero_f16_fp8_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 45,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.01660968365579378,
+        "cv_percent_round2": 0.07131007999187657,
+        "cycle_samples_round1": [
+          1067298.203,
+          1066919.929,
+          1067293.637
+        ],
+        "cycle_samples_round2": [
+          1068862.043,
+          1067083.15,
+          1068459.847
+        ],
+        "cycles_round1": 1067293.637,
+        "cycles_round2": 1068459.847,
+        "reference_cycles": 1067876.742,
+        "round_drift_percent": 0.1092082966256758
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_045_mixed_scale_zero_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_int4_bf16",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_bf16",
+      "case_id": "cutlass_046_mixed_int4_bf16_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 46,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.012990146219185223,
+        "cv_percent_round2": 0.034922465421093965,
+        "cycle_samples_round1": [
+          485316.56,
+          485162.893,
+          485226.729
+        ],
+        "cycle_samples_round2": [
+          488165.436,
+          488037.208,
+          488445.531
+        ],
+        "cycles_round1": 485226.729,
+        "cycles_round2": 488165.436,
+        "reference_cycles": 486696.0825,
+        "round_drift_percent": 0.6038074078806654
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_bf16_gemm.cu",
+      "source_case_id": "cutlass_046_mixed_int4_bf16"
+    },
+    {
+      "algorithm": "mixed_int4_bf16",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_bf16",
+      "case_id": "cutlass_047_mixed_int4_bf16_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 47,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.0785196825248202,
+        "cv_percent_round2": 0.026870540849600486,
+        "cycle_samples_round1": [
+          967979.493,
+          967452.78,
+          966171.04
+        ],
+        "cycle_samples_round2": [
+          967728.494,
+          967115.988,
+          967271.634
+        ],
+        "cycles_round1": 967452.78,
+        "cycles_round2": 967271.634,
+        "reference_cycles": 967362.2069999999,
+        "round_drift_percent": 0.018725767730976298
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_bf16_gemm.cu",
+      "source_case_id": "cutlass_047_mixed_int4_bf16"
+    },
+    {
+      "algorithm": "mixed_int4_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_fp8",
+      "case_id": "cutlass_048_mixed_int4_fp8_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 48,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.26920340567878126,
+        "cv_percent_round2": 0.07941349019491167,
+        "cycle_samples_round1": [
+          289900.861,
+          287995.728,
+          288925.952
+        ],
+        "cycle_samples_round2": [
+          287672.843,
+          287414.778,
+          287973.845
+        ],
+        "cycles_round1": 288925.952,
+        "cycles_round2": 287672.843,
+        "reference_cycles": 288299.39749999996,
+        "round_drift_percent": 0.43465543489385783
+      },
+      "shape": [
+        4096,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_fp8_gemm.cu",
+      "source_case_id": "cutlass_048_mixed_int4_fp8"
+    },
+    {
+      "algorithm": "mixed_int4_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_fp8",
+      "case_id": "cutlass_049_mixed_int4_fp8_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 49,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.02509633992623822,
+        "cv_percent_round2": 0.07768868638532724,
+        "cycle_samples_round1": [
+          572678.503,
+          572525.346,
+          572327.509
+        ],
+        "cycle_samples_round2": [
+          573009.437,
+          572243.677,
+          571955.67
+        ],
+        "cycles_round1": 572525.346,
+        "cycles_round2": 572243.677,
+        "reference_cycles": 572384.5115,
+        "round_drift_percent": 0.049209752245365286
+      },
+      "shape": [
+        8192,
+        4096,
+        4096
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_fp8_gemm.cu",
+      "source_case_id": "cutlass_049_mixed_int4_fp8"
+    },
+    {
+      "algorithm": "ptr_array_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=4096",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_052_ptr_array_pingpong_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 52,
+      "family": "ptr_array",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.6059119327933682,
+        "cv_percent_round2": 0.9574157054583473,
+        "cycle_samples_round1": [
+          1336368.876,
+          1352631.876,
+          1354588.766
+        ],
+        "cycle_samples_round2": [
+          1366510.971,
+          1398347.502,
+          1377311.007
+        ],
+        "cycles_round1": 1352631.876,
+        "cycles_round2": 1377311.007,
+        "reference_cycles": 1364971.4415,
+        "round_drift_percent": 1.808032772676882
+      },
+      "shape": [
+        2048,
+        2048,
+        4096,
+        8
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_052_ptr_array_pingpong"
+    },
+    {
+      "algorithm": "ptr_array_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=4096",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_053_ptr_array_pingpong_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 53,
+      "family": "ptr_array",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 1.3540884724704045,
+        "cv_percent_round2": 0.17578992998183415,
+        "cycle_samples_round1": [
+          1374963.898,
+          1348865.066,
+          1330355.146
+        ],
+        "cycle_samples_round2": [
+          1335188.483,
+          1337652.787,
+          1331923.301
+        ],
+        "cycles_round1": 1348865.066,
+        "cycles_round2": 1335188.483,
+        "reference_cycles": 1342026.7745,
+        "round_drift_percent": 1.0190991163418177
+      },
+      "shape": [
+        4096,
+        2048,
+        4096,
+        4
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_053_ptr_array_pingpong"
+    },
+    {
+      "algorithm": "topk_softmax_epilogue",
+      "args": [
+        "--m=64",
+        "--n=64",
+        "--k=8192",
+        "--l=1",
+        "--eps=0.00005",
+        "--iterations=1"
+      ],
+      "binary_name": "example61_topk_softmax",
+      "case_id": "cutlass_058_topk_softmax_epilogue_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 58,
+      "family": "epilogue_fusion",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.5255406918812852,
+        "cv_percent_round2": 0.9885499888846158,
+        "cycle_samples_round1": [
+          189835.162,
+          188117.01,
+          187492.411
+        ],
+        "cycle_samples_round2": [
+          186401.034,
+          190793.584,
+          187542.581
+        ],
+        "cycles_round1": 188117.01,
+        "cycles_round2": 187542.581,
+        "reference_cycles": 187829.7955,
+        "round_drift_percent": 0.30582421626498746
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/61_hopper_gemm_with_topk_and_softmax/61_hopper_gemm_with_topk_and_softmax.cu",
+      "source_case_id": "cutlass_058_topk_softmax_epilogue"
+    },
+    {
+      "algorithm": "topk_softmax_epilogue",
+      "args": [
+        "--m=64",
+        "--n=64",
+        "--k=4096",
+        "--l=1",
+        "--eps=0.00005",
+        "--iterations=1"
+      ],
+      "binary_name": "example61_topk_softmax",
+      "case_id": "cutlass_059_topk_softmax_epilogue_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 59,
+      "family": "epilogue_fusion",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.7737536927445315,
+        "cv_percent_round2": 0.24542763670322415,
+        "cycle_samples_round1": [
+          205304.471,
+          206452.706,
+          209126.806
+        ],
+        "cycle_samples_round2": [
+          203373.727,
+          202195.377,
+          203057.028
+        ],
+        "cycles_round1": 206452.706,
+        "cycles_round2": 203057.028,
+        "reference_cycles": 204754.867,
+        "round_drift_percent": 1.6584113724632559
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/61_hopper_gemm_with_topk_and_softmax/61_hopper_gemm_with_topk_and_softmax.cu",
+      "source_case_id": "cutlass_059_topk_softmax_epilogue"
+    },
+    {
+      "algorithm": "fp8_weight_prefetch_split_dma",
+      "args": [
+        "--m=64",
+        "--n=64",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example63_weight_prefetch",
+      "case_id": "cutlass_062_fp8_weight_prefetch_split_dma_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 62,
+      "family": "prefetch",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.24254369831861844,
+        "cv_percent_round2": 0.4379028225099473,
+        "cycle_samples_round1": [
+          337328.065,
+          338951.636,
+          339167.449
+        ],
+        "cycle_samples_round2": [
+          336620.687,
+          339321.44,
+          335886.463
+        ],
+        "cycles_round1": 338951.636,
+        "cycles_round2": 336620.687,
+        "reference_cycles": 337786.1615,
+        "round_drift_percent": 0.6900664579179401
+      },
+      "shape": [
+        8192,
+        512,
+        8192
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/63_hopper_gemm_with_weight_prefetch/63_hopper_gemm_with_weight_prefetch.cu",
+      "source_case_id": "cutlass_062_fp8_weight_prefetch_split_dma"
+    },
+    {
+      "algorithm": "fp8_weight_prefetch_split_dma",
+      "args": [
+        "--m=64",
+        "--n=64",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example63_weight_prefetch",
+      "case_id": "cutlass_063_fp8_weight_prefetch_split_dma_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 63,
+      "family": "prefetch",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.4160231858878148,
+        "cv_percent_round2": 0.4039647612113136,
+        "cycle_samples_round1": [
+          310040.331,
+          310745.805,
+          313071.424
+        ],
+        "cycle_samples_round2": [
+          311249.509,
+          312872.377,
+          309793.496
+        ],
+        "cycles_round1": 310745.805,
+        "cycles_round2": 311249.509,
+        "reference_cycles": 310997.657,
+        "round_drift_percent": 0.1619639211622829
+      },
+      "shape": [
+        4096,
+        1024,
+        8192
+      ],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/63_hopper_gemm_with_weight_prefetch/63_hopper_gemm_with_weight_prefetch.cu",
+      "source_case_id": "cutlass_063_fp8_weight_prefetch_split_dma"
+    },
+    {
+      "algorithm": "dense_tma_static",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_nt_tma_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_078_dense_tma_static_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 78,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_non_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 43589.5,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.030764445465473286,
+        "cv_percent_round2": 0.04284701242999221,
+        "cycle_samples_round1": [
+          694649.804,
+          695006.514,
+          694496.311
+        ],
+        "cycle_samples_round2": [
+          694432.701,
+          694615.546,
+          693913.229
+        ],
+        "cycles_round1": 694649.804,
+        "cycles_round2": 694432.701,
+        "reference_cycles": 694541.2525,
+        "round_drift_percent": 0.03125847445613071
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_078_dense_tma_static"
+    },
+    {
+      "algorithm": "dense_cpasync_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_nt_cpasync_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_079_dense_cpasync_warp_specialized_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 79,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_warp_specialized",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 40203.595,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.003538267649633767,
+        "cv_percent_round2": 0.035046062922365874,
+        "cycle_samples_round1": [
+          662523.687,
+          662506.447,
+          662562.501
+        ],
+        "cycle_samples_round2": [
+          662734.239,
+          662655.851,
+          662207.193
+        ],
+        "cycles_round1": 662523.687,
+        "cycles_round2": 662655.851,
+        "reference_cycles": 662589.7690000001,
+        "round_drift_percent": 0.019946580249715528
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_079_dense_cpasync_warp_specialized"
+    },
+    {
+      "algorithm": "fp8_fastacc_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=fp8_nt_fastacc_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_080_fp8_fastacc_pingpong_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 80,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 26549.074,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.05426916433276607,
+        "cv_percent_round2": 0.06845059519279653,
+        "cycle_samples_round1": [
+          294397.963,
+          294095.526,
+          294032.058
+        ],
+        "cycle_samples_round2": [
+          294433.64,
+          294012.989,
+          294446.712
+        ],
+        "cycles_round1": 294095.526,
+        "cycles_round2": 294433.64,
+        "reference_cycles": 294264.583,
+        "round_drift_percent": 0.114901357327124
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_080_fp8_fastacc_pingpong"
+    },
+    {
+      "algorithm": "mixed_group_scale_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_081_mixed_group_scale_f16_fp8_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 81,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.09975765058041924,
+        "cv_percent_round2": 0.053097720263273064,
+        "cycle_samples_round1": [
+          538419.633,
+          537199.725,
+          537387.227
+        ],
+        "cycle_samples_round2": [
+          536435.906,
+          537040.96,
+          537040.213
+        ],
+        "cycles_round1": 537387.227,
+        "cycles_round2": 537040.213,
+        "reference_cycles": 537213.72,
+        "round_drift_percent": 0.06459514846343956
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_081_mixed_group_scale_f16_fp8"
+    },
+    {
+      "algorithm": "dense_tma_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_tn_ws_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_084_dense_tma_warp_specialized_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 84,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_no_smem_epilogue",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 39782.5,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.03806037166150264,
+        "cv_percent_round2": 0.05361060126634343,
+        "cycle_samples_round1": [
+          658129.829,
+          658344.03,
+          657739.05
+        ],
+        "cycle_samples_round2": [
+          658506.69,
+          658372.433,
+          657700.115
+        ],
+        "cycles_round1": 658129.829,
+        "cycles_round2": 658372.433,
+        "reference_cycles": 658251.131,
+        "round_drift_percent": 0.036855842485431875
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_084_dense_tma_warp_specialized"
+    },
+    {
+      "algorithm": "dense_cpasync_pingpong",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_nt_cpasync_pingpong_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_085_dense_cpasync_pingpong_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 85,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_pingpong",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 43958.611,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.22463298674114085,
+        "cv_percent_round2": 0.5114435475340782,
+        "cycle_samples_round1": [
+          647815.833,
+          645555.267,
+          644310.627
+        ],
+        "cycle_samples_round2": [
+          645144.084,
+          647501.45,
+          639639.617
+        ],
+        "cycles_round1": 645555.267,
+        "cycles_round2": 645144.084,
+        "reference_cycles": 645349.6755,
+        "round_drift_percent": 0.06371476047948535
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_085_dense_cpasync_pingpong"
+    },
+    {
+      "algorithm": "fp8_fastacc_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_086_fp8_fastacc_cooperative_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 86,
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_cta_k_loop",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "cd1225a832b70084be8274e550b3446852ee924e67a2f6c9ca878becbfc21b54",
+        "source_full_kernel_hardware_cycles": 19147.129999999997,
+        "source_native_hardware_cycles": 17022.129999999997
+      },
+      "post_mode": null,
+      "prior_h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 17265.029,
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.1330841566758577,
+        "cv_percent_round2": 0.24226944286367813,
+        "cycle_samples_round1": [
+          224858.302,
+          225226.05,
+          224493.037
+        ],
+        "cycle_samples_round2": [
+          225819.24,
+          224504.834,
+          224955.892
+        ],
+        "cycles_round1": 224858.302,
+        "cycles_round2": 224955.892,
+        "reference_cycles": 224907.097,
+        "round_drift_percent": 0.0433912496767483
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_086_fp8_fastacc_cooperative"
+    },
+    {
+      "algorithm": "mixed_scale_zero_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--mode=2",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_087_mixed_scale_zero_f16_fp8_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 87,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.06003748011983252,
+        "cv_percent_round2": 0.028845592696524112,
+        "cycle_samples_round1": [
+          555921.461,
+          556553.54,
+          556687.481
+        ],
+        "cycle_samples_round2": [
+          556734.653,
+          556644.461,
+          557021.193
+        ],
+        "cycles_round1": 556553.54,
+        "cycles_round2": 556734.653,
+        "reference_cycles": 556644.0965,
+        "round_drift_percent": 0.032536588663886444
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_087_mixed_scale_zero_f16_fp8"
+    },
+    {
+      "algorithm": "ptr_array_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=4096",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_088_ptr_array_pingpong_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "family": "ptr_array",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.35950018614080526,
+        "cv_percent_round2": 0.21578770691833773,
+        "cycle_samples_round1": [
+          1354714.383,
+          1363913.802,
+          1352707.958
+        ],
+        "cycle_samples_round2": [
+          1373933.809,
+          1375143.073,
+          1368343.776
+        ],
+        "cycles_round1": 1354714.383,
+        "cycles_round2": 1373933.809,
+        "reference_cycles": 1364324.096,
+        "round_drift_percent": 1.4087141065930409
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_088_ptr_array_pingpong"
+    },
+    {
+      "algorithm": "dense_tma_pingpong",
+      "args": [
+        "--m=64",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_tt_pingpong_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_090_dense_tma_pingpong_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_pingpong",
+        "kernel_tile": "64x128x64",
+        "median_cycles_one_trial": 28272.75,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.3699317003353956,
+        "cv_percent_round2": 0.19803428805681675,
+        "cycle_samples_round1": [
+          676130.483,
+          670117.134,
+          672252.993
+        ],
+        "cycle_samples_round2": [
+          669872.253,
+          672794.847,
+          670093.487
+        ],
+        "cycles_round1": 672252.993,
+        "cycles_round2": 670093.487,
+        "reference_cycles": 671173.24,
+        "round_drift_percent": 0.3217509089009645
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_090_dense_tma_pingpong"
+    },
+    {
+      "algorithm": "dense_cpasync_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_nt_cpasync_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_091_dense_cpasync_cooperative_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "family": "dense_cpasync",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "cpasync_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 35543.693,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.20546018949323522,
+        "cv_percent_round2": 0.7187264298121346,
+        "cycle_samples_round1": [
+          593735.085,
+          590754.476,
+          592248.731
+        ],
+        "cycle_samples_round2": [
+          606992.355,
+          608419.07,
+          598569.937
+        ],
+        "cycles_round1": 592248.731,
+        "cycles_round2": 606992.355,
+        "reference_cycles": 599620.5430000001,
+        "round_drift_percent": 2.458825697704615
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_091_dense_cpasync_cooperative"
+    },
+    {
+      "algorithm": "mixed_int4_bf16",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_bf16",
+      "case_id": "cutlass_093_mixed_int4_bf16_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 93,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.1868056313996911,
+        "cv_percent_round2": 0.22538416326020388,
+        "cycle_samples_round1": [
+          506714.299,
+          508292.982,
+          508981.216
+        ],
+        "cycle_samples_round2": [
+          507073.445,
+          508732.63,
+          509864.512
+        ],
+        "cycles_round1": 508292.982,
+        "cycles_round2": 508732.63,
+        "reference_cycles": 508512.806,
+        "round_drift_percent": 0.08645760634000366
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_bf16_gemm.cu",
+      "source_case_id": "cutlass_093_mixed_int4_bf16"
+    },
+    {
+      "algorithm": "dense_tma_cooperative",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=f16_nt_coop_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_095_dense_tma_cooperative_single_sm",
+      "delivery_group": 3,
+      "delivery_index": 95,
+      "family": "dense_tma",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_cooperative",
+        "kernel_tile": "128x128x64",
+        "median_cycles_one_trial": 28117.914,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.15292446651175148,
+        "cv_percent_round2": 0.2530669109165788,
+        "cycle_samples_round1": [
+          397067.413,
+          395907.307,
+          395685.657
+        ],
+        "cycle_samples_round2": [
+          398623.284,
+          396220.754,
+          397897.794
+        ],
+        "cycles_round1": 395907.307,
+        "cycles_round2": 397897.794,
+        "reference_cycles": 396902.5505,
+        "round_drift_percent": 0.5015052177146497
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_095_dense_tma_cooperative"
+    },
+    {
+      "algorithm": "fp8_fastacc_warp_specialized",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--variant=fp8_nt_fastacc_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_096_fp8_fastacc_warp_specialized_single_sm",
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "family": "fp8_fastacc",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": "1x1x1",
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": "tma_warp_specialized_fast_accum",
+        "kernel_tile": "128x128x128",
+        "median_cycles_one_trial": 22224.178,
+        "status": "qualified"
+      },
+      "kind": "dense_harness",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.014765765834500049,
+        "cv_percent_round2": 0.09227609254413609,
+        "cycle_samples_round1": [
+          373628.765,
+          373579.909,
+          373495.242
+        ],
+        "cycle_samples_round2": [
+          373977.124,
+          374493.728,
+          373655.837
+        ],
+        "cycles_round1": 373579.909,
+        "cycles_round2": 373977.124,
+        "reference_cycles": 373778.5165,
+        "round_drift_percent": 0.10627015263463534
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "cutlass_096_fp8_fastacc_warp_specialized"
+    },
+    {
+      "algorithm": "mixed_convert_f16_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--mode=0",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_mixed_f16_fp8",
+      "case_id": "cutlass_097_mixed_convert_f16_fp8_single_sm",
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.11403253021927391,
+        "cv_percent_round2": 0.08261153447130412,
+        "cycle_samples_round1": [
+          510588.997,
+          511265.3,
+          509839.804
+        ],
+        "cycle_samples_round2": [
+          510969.553,
+          511142.922,
+          510173.832
+        ],
+        "cycles_round1": 510588.997,
+        "cycles_round2": 510969.553,
+        "reference_cycles": 510779.275,
+        "round_drift_percent": 0.07450498064942837
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+      "source_case_id": "cutlass_097_mixed_convert_f16_fp8"
+    },
+    {
+      "algorithm": "mixed_int4_fp8",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=2048",
+        "--mode=1",
+        "--g=128",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example55_int4_fp8",
+      "case_id": "cutlass_098_mixed_int4_fp8_single_sm",
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "family": "mixed_input",
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 1,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "qualified"
+      },
+      "kind": "upstream_example",
+      "post_mode": null,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "reference_h100": {
+        "active_sm_count_min": 132,
+        "correct": true,
+        "cv_percent_round1": 0.17457495758317532,
+        "cv_percent_round2": 0.14013449662752625,
+        "cycle_samples_round1": [
+          312031.448,
+          310709.968,
+          311231.052
+        ],
+        "cycle_samples_round2": [
+          312922.469,
+          313453.176,
+          312379.084
+        ],
+        "cycles_round1": 311231.052,
+        "cycles_round2": 312922.469,
+        "reference_cycles": 312076.7605,
+        "round_drift_percent": 0.5419874896451823
+      },
+      "shape": [],
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count": 1
+      },
+      "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_int4_fp8_gemm.cu",
+      "source_case_id": "cutlass_098_mixed_int4_fp8"
+    }
+  ],
+  "corpus_revision": "exact241_min20k_final",
+  "excluded_case_count": 48,
+  "excluded_cases": [
+    {
+      "algorithm_or_operation": "dense_stream_k",
+      "case_id": "cutlass_020_dense_stream_k_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": false,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "single-SM wrapper observed grid=(1,132,1); the Stream-K device scheduler does not provide a one-CTA mode",
+      "source_case_id": "cutlass_020_dense_stream_k",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "dense_stream_k",
+      "case_id": "cutlass_021_dense_stream_k_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": false,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "single-SM wrapper observed grid=(1,132,1); the Stream-K device scheduler does not provide a one-CTA mode",
+      "source_case_id": "cutlass_021_dense_stream_k",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "fp8_grouped_blockwise_pingpong_sparse_groups",
+      "case_id": "cutlass_070_fp8_grouped_blockwise_pingpong_sparse_groups_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_070_fp8_grouped_blockwise_pingpong_sparse_groups",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "fp8_grouped_blockwise_pingpong_sparse_groups",
+      "case_id": "cutlass_071_fp8_grouped_blockwise_pingpong_sparse_groups_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_071_fp8_grouped_blockwise_pingpong_sparse_groups",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_f16_fp8",
+      "case_id": "cutlass_072_grouped_mixed_f16_fp8_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_072_grouped_mixed_f16_fp8",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_f16_fp8",
+      "case_id": "cutlass_073_grouped_mixed_f16_fp8_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_073_grouped_mixed_f16_fp8",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_int4_bf16",
+      "case_id": "cutlass_074_grouped_mixed_int4_bf16_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_074_grouped_mixed_int4_bf16",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_int4_bf16",
+      "case_id": "cutlass_075_grouped_mixed_int4_bf16_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_075_grouped_mixed_int4_bf16",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_int4_fp8",
+      "case_id": "cutlass_076_grouped_mixed_int4_fp8_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_076_grouped_mixed_int4_fp8",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "grouped_mixed_int4_fp8",
+      "case_id": "cutlass_077_grouped_mixed_int4_fp8_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": true,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "observed 132 CTA(s) on 132 SM(s), not one CTA on one SM",
+      "source_case_id": "cutlass_077_grouped_mixed_int4_fp8",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "dense_stream_k",
+      "case_id": "cutlass_092_dense_stream_k_single_sm",
+      "h100_qualification": {
+        "active_sm_count": 132,
+        "cluster": null,
+        "correct": false,
+        "cta_count": 132,
+        "kernel_schedule": null,
+        "kernel_tile": null,
+        "median_cycles_one_trial": null,
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "single-SM wrapper observed grid=(1,132,1); the Stream-K device scheduler does not provide a one-CTA mode",
+      "source_case_id": "cutlass_092_dense_stream_k",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm": "collective_builder_tma_static",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_022_collective_builder_tma_static",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_tma_static",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_023_collective_builder_tma_static",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_tma_ws",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_024_collective_builder_tma_ws",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_tma_ws",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_025_collective_builder_tma_ws",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_pingpong",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_026_collective_builder_pingpong",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_pingpong",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_027_collective_builder_pingpong",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_stream_k",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_028_collective_builder_stream_k",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "collective_builder_stream_k",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_029_collective_builder_stream_k",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "custom_evt_epilogue",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_030_custom_evt_epilogue",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "custom_evt_epilogue",
+      "reason": "fixed 2x1x1 CTA cluster",
+      "source_case_id": "cutlass_031_custom_evt_epilogue",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "epilogue_swizzle",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_032_epilogue_swizzle",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "epilogue_swizzle",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_033_epilogue_swizzle",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "gather_scatter_cpasync",
+      "reason": "fixed 2x2x1 CTA cluster",
+      "source_case_id": "cutlass_034_gather_scatter_cpasync",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "gather_scatter_cpasync",
+      "reason": "fixed 2x2x1 CTA cluster",
+      "source_case_id": "cutlass_035_gather_scatter_cpasync",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "gemm_permute",
+      "reason": "fixed 2x2x1 CTA cluster",
+      "source_case_id": "cutlass_036_gemm_permute",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "gemm_permute",
+      "reason": "fixed 2x2x1 CTA cluster",
+      "source_case_id": "cutlass_037_gemm_permute",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_bias_relu_amax_aux",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_038_fp8_bias_relu_amax_aux",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_bias_relu_amax_aux",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_039_fp8_bias_relu_amax_aux",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "reason": "cooperative schedule has a fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_050_ptr_array_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "reason": "cooperative schedule has a fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_051_ptr_array_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_054_grouped_fp8_fastacc_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_055_grouped_fp8_fastacc_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_056_grouped_fp8_fastacc_pingpong",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_057_grouped_fp8_fastacc_pingpong",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_060_sparse_wgmma",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_061_sparse_wgmma",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_064_fp8_blockwise_dense",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_065_fp8_blockwise_dense",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_groupwise_stream_k",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_066_fp8_groupwise_stream_k",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_groupwise_stream_k",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_067_fp8_groupwise_stream_k",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_grouped_blockwise_cooperative",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_068_fp8_grouped_blockwise_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_grouped_blockwise_cooperative",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_069_fp8_grouped_blockwise_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "reason": "cooperative schedule has a fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_082_ptr_array_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_083_sparse_wgmma",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "reason": "fixed 1x2x1 CTA cluster",
+      "source_case_id": "cutlass_089_fp8_blockwise_dense",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_094_grouped_fp8_fastacc_cooperative",
+      "status": "excluded_by_static_analysis"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "reason": "fixed two-CTA cluster in both schedules",
+      "source_case_id": "cutlass_099_grouped_fp8_fastacc_pingpong",
+      "status": "excluded_by_static_analysis"
+    }
+  ],
+  "implementation": null,
+  "minimum_hardware_cycle_policy": {
+    "changed_case_count": 1,
+    "kernel_or_harness_source_changed": false,
+    "plan_id": "exact241_min20k_final",
+    "plan_sha256": "00d2e95d463344aeb6b8b29216d2aacaf54beff0c79734ca85387b59016ba830",
+    "qualification_status": "pending_fresh_h100_topology_and_timing",
+    "source_accuracy_csv_sha256": "c35768893ef098fad464e26e2ab98e62a15c5304885fcd4b868e759fccf1f29b",
+    "threshold_cycles_exclusive": 20000.0
+  },
+  "pending_requalification_case_count": 1,
+  "qualification_rule": "the H100 primary kernel must execute correctly with exactly one CTA on exactly one SM; the public operation/algorithm, dtype and implementation flags must match the source full-GPU case",
+  "qualified_case_count": 51,
+  "schema_version": "cutlass-hopper-single-sm-v1",
+  "selection_rule": "one threadblock tile, one batch/group, cluster shape 1x1x1; H100 runtime must observe exactly one CTA on exactly one SM",
+  "source_case_count": 100,
+  "source_manifest": "manifests/cutlass_100.json"
+}

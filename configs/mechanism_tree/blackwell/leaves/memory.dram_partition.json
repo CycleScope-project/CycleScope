@@ -1,0 +1,34 @@
+{
+ "memory.dram_partition.root": {
+  "fields": {
+   "far_latency_extra_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 395
+    },
+    "sources": [
+     "row_gather.b300.r3"
+    ]
+   },
+   "far_side_gpc_mask": {
+    "model": {
+     "kind": "constant",
+     "value": 228
+    },
+    "sources": [
+     "row_gather.b300.r3"
+    ]
+   },
+   "home_page_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 4096
+    },
+    "sources": [
+     "row_gather.b300.r3"
+    ]
+   }
+  },
+  "scope": "device"
+ }
+}

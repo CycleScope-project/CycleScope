@@ -1,0 +1,25 @@
+{
+ "doc": "operand reads from the general-purpose register file, at most reads_per_cycle per SMSP per cycle, pipelined fetch (protocol dispatch_contention v4 OP2p)",
+ "field_models": {
+  "collector": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "reads_per_cycle": {
+   "kind": "constant"
+  }
+ },
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "operand_read",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ }
+}

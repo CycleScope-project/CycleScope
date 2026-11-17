@@ -1,0 +1,116 @@
+{
+ "instruction.fetch.root": {
+  "fields": {
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.ifetch.enabled"
+    ]
+   },
+   "line_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 128
+    },
+    "sources": [
+     "mechtree.ifetch.structural"
+    ]
+   },
+   "prefetch_depth_lines": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "ifetch.prefetch_depth.engine_default"
+    ]
+   },
+   "capacity_l0_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 32768
+    },
+    "sources": [
+     "ifetch.b300.v3"
+    ]
+   },
+   "capacity_l1_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 114688
+    },
+    "sources": [
+     "ifetch.b300.r1.experimental"
+    ]
+   },
+   "stream_l1_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 18.384151785714284
+    },
+    "sources": [
+     "ifetch.b300.r3.v2"
+    ]
+   },
+   "stream_l2_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 49.248088968211206
+    },
+    "sources": [
+     "ifetch.b300.r3.v2"
+    ]
+   },
+   "stream_cold_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 142.57037421094384
+    },
+    "sources": [
+     "ifetch.b300.r3.v2"
+    ]
+   },
+   "launch_prefetch_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 65536
+    },
+    "sources": [
+     "ifetch.b300.r1",
+     "ifetch.b300.r3"
+    ]
+   },
+   "sharing": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "ifetch.b300.r1",
+     "ifetch.b300.r3"
+    ]
+   },
+   "fetch_parallelism": {
+    "model": {
+     "kind": "constant",
+     "value": 8
+    },
+    "sources": [
+     "mechtree.ifetch.r3"
+    ]
+   },
+   "l0_ways": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "ifetch.b300.v3"
+    ]
+   }
+  }
+ }
+}

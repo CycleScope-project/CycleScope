@@ -1,0 +1,42 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "lsu_accept",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "supersedes": "protocol.json v1 (h100-r7: decision none; last addendum)",
+ "mechanisms": [
+  "storage.global.acceptance (new): per-SMSP request stage + per-SM wavefront stage in front of the memory hierarchy for LDG / STG / LDGSTS / ATOMG / REDG",
+  "memory.l1.service.sector_bytes_per_cycle (candidate home of the per-SM stage)"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a (v1 r3 still queued when this was written)"
+ },
+ "question": "v1 h100-r7: a global request's read barrier is released ~4.0 cycles per queued request after issue at W = 1 for 4 / 8 / 16 B per lane alike (ldgsts4 / 8 / 16 and ldg4 4.0-4.1; ldg16 5.1), while the 16 B-per-lane variants scale with warps on distinct SMSPs as 4.67 / 10.5 / 20.0 (W = 2 / 4 / 8; ldg16 5.2 / 10.6 / 20.2) and the 4 / 8 B ones stay at 4.0 / 5.0 up to W = 4. A single per-SM or per-SMSP queue cannot produce both. Two stages can: a per-SMSP request stage of r cycles per request (bytes-independent) followed by a per-SM stage of c cycles per 128 B wavefront (ldgsts16 = 4 wavefronts: W x 4 x c = 4.67 / 10.5 / 20.0 -> c ~ 0.6; ldgsts4 = 1 wavefront: W x c < r up to W = 4). Which two-stage form holds on each device, and is the per-SM stage the shared-memory acceptance queue (storage.shared.acceptance_sm, 1.01 cycles per wavefront) or a separate one?",
+ "engine_rules_declared_before_data": {
+  "baseline": "present engine (round 38): acceptance = first L2 / DRAM port_acquire start.",
+  "T2 (two stages, separate)": "at issue a global request (LDG / STG / LDGSTS / ATOMG / REDG; TMA / bulk excluded) enters its SMSP's request stage: start1 = max(issue, smsp_next), smsp_next = start1 + r; then the SM's wavefront stage: start2 = max(start1, sm_next), sm_next = start2 + wf x c, wf = ceil(bytes / 128) with bytes = the request's sector bytes; the read barrier is released at start2 and the memory hierarchy is entered at start2 (its L2 / DRAM port model unchanged). LDS / LDSM keep their own kind 5 / 6 rows; the SM stage here is separate from storage.shared.acceptance_sm. Leaves: storage.global.acceptance.request_cycles_smsp = r, wavefront_cycles_sm = c (per access kind if the ldg / ldgsts / stg slopes differ beyond 15 %).",
+  "T2-shared": "as T2 but the SM stage is the storage.shared.acceptance_sm queue (shared_accept_next_[sm]) with the global wavefronts charged c each and the LDS / STS / LDSM wavefronts their installed slope.",
+  "Q (per-SM, per request)": "v1's Q with a per-request leaf: start = max(issue, sm_next), sm_next = start + q; kept as the one-stage alternative.",
+  "candidate order": [
+   "baseline",
+   "T2",
+   "T2-shared",
+   "Q"
+  ],
+  "prediction (analytic, chain windows)": "for a variant with wf wavefronts, W warps (W <= 4 on distinct SMSPs; W = 8 two per SMSP, i.e. 2 requests per SMSP-stage slot): slope_T2(W) = max(r x ceil(W / 4), W x wf x c); slope_Q(W) = W x q; mix (LDGSTS16 + LDS.128 pairs): T2 separate: per pair max(r_ldgsts + r_lds_smsp, 4c) + lds cost on its own queue -> ~ r + s_lds; T2-shared: SMSP stage r + the SM stage carrying 4 c + 4 x 1.01 per pair. Parameters from the data: r = slope(variant, W = 1) of the 4 B variants (ldgsts4, ldg4), c = median over the usable 16 B cells with W >= 2 of slope / (W x 4); q = slope(ldgsts16, W = 1). Acceptance: every usable cell (all variants, W = 1..8, excluding stg16 which v1 showed super-linear and which is reported only) within 15 % or 1 cycle of the candidate's prediction; the first candidate in order that passes is installed; none -> report, unrealised."
+ },
+ "probe": "lsu_accept.cu unchanged except the lds control: each LDS.128 result is consumed (XOR-accumulated into one register) immediately before t_w so ptxas cannot sink the loads past the window; the WAR on the last LDS's address register stays; the mix cell's LDS likewise consumed. Same cells, D in {0, 1, 2, 4, 8, 16}, W in {1, 2, 4, 8}, two runs per device.",
+ "sass_gate": "sass_check.py unchanged plus: lds / mix windows must contain the D LDS and (after the WAR) the consumer LOP3 chain before the second SR_CLOCKLO (the consumers are counted and allowed; nothing else).",
+ "derivation": "model.py --v2: per (variant, W) slope / intercept as v1; r, c, q as above; per-cell predictions for T2 / T2-shared / Q; decision; mix / lds comparison reported.",
+ "install": "T2: common mechanism storage.global.acceptance (event issue, scope smsp + sm fields, timing kind global_acceptance) bound to LDG / STG / LDGSTS / ATOMG / REDG / LD / ST (LD / ST only when the MACC space is non-shared); leaves r, c per device (measured); engine: the two queues as declared, accept_start and the hierarchy entry time = start2; converter binding through program_tables (py == cpp); CTest fixtures (one warp 8 requests -> WAR at 8 r; four warps on distinct SMSPs, 16-sector requests -> 4 x 4 c per request); A/B 500 x 2 against $A/merge/mufu40. Per-device: a device whose run is not available keeps the leaf disabled (enabled 0) until measured.",
+ "not_allowed": "no case-cycle tuning; no threshold / candidate change after data; TMA untouched.",
+ "addenda": [
+  {
+   "date": "2026-11-06",
+   "written_before": "any version-3 run; after reading h100-v2r1 (b300-v2r1 queued, not scheduled)",
+   "text": "(reading of h100-v2r1; decision none, nothing installed) Gate 43 / 48: the lds control is unrealised again -- ptxas moves the whole LDS.128 + XOR-consumer chain past the second SR_CLOCKLO; mix windows pass. Fitted parameters: r = 4.05 (ldgsts4 / ldg4 W = 1), c = 0.59 cycles per 128 B wavefront (16 B-per-lane cells, W >= 2), q = 4.00. Candidates against the 28 usable cells (15 % / 1 cycle): T2 15, T2-shared 15, Q 4. T2 reproduces every 16 B-per-lane cell (ldgsts16 4.0 / 4.7 / 10.6 / 20.0 vs 4.05 / 4.73 / 9.46 / 18.9; ldg16 likewise) and the 4 / 8 B LDGSTS cells up to W = 4 (4.0 / 4.0 / 5.0 vs 4.05 / 4.05 / 4.05), but not ldg4 at W = 4 (10.8 measured, 4.05 predicted: a 4 B-per-lane LOAD scales like the 16 B one while the 4 B LDGSTS does not -- the register write-back of a load (128 B per warp) is a further per-SM stage the model lacks) nor any 4 / 8 B cell at W = 8 (26 measured, 8 predicted: two warps per SMSP triple the per-request cost of the small requests, which no declared stage explains). mix: 9.9 / 14.6 / 28.7 / 61.6 per LDGSTS + LDS pair against T2-shared's 8.1 -- the LDS in the mix window costs ~6 per instruction at W = 1 and grows with W like the 16 B global requests, so the LDS path shares the per-SM wavefront stage (consistent with T2-shared) but with a larger per-LDS cost than the installed 1.01 per wavefront. Remaining structure for a version 3 (needs both devices; the B300 pool has not scheduled a job of this protocol in 5 h): a load write-back stage per SM, the W = 8 small-request behaviour, and an LDS control that survives ptxas (a dependent address chain through shared memory, as the shared protocol's cells do). The round-38 attribution stands qualitatively: at W = 4 the hardware releases the k-th LDGSTS read barrier ~10 cycles x k after issue, the engine ~immediately."
+  }
+ ]
+}

@@ -1,0 +1,125 @@
+{
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 64,
+   "c450_full": {
+    "walk_start": {
+     "batch": 256
+    },
+    "rule": "I=c450; P=batch until every sm_part busy"
+   },
+   "case_id": "flashmla_dense_decode_bf16_mtp_00",
+   "category": "hopper_attention",
+   "causal": false,
+   "correctness_check": true,
+   "delivery_group": 0,
+   "delivery_index": 0,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 16,
+   "implementation": "FlashMLA",
+   "input_seed": 20260929,
+   "invocation": {
+    "argv": [
+     "python3",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashmla/harness/flashmla_cluster_sm.py",
+     "--manifest",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashmla/manifests/flashmla_cluster_sm.json",
+     "--mode",
+     "capture",
+     "--case-id",
+     "flashmla_mla_decode_b01_sk256_hq16_cluster_sm"
+    ],
+    "carveout": "auto",
+    "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashmla",
+    "env": {
+     "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/delivery_tests/flashmla/build/site-packages-flashmla"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+     "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashmla/harness/flashmla_cluster_sm.py",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+   },
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "dense_decode",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 2,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  }
+ ],
+ "coverage": {
+  "correctness_checked_cases": 6,
+  "mechanism_counts": {
+   "mla_causal_speculative_sq": 2,
+   "mla_fp16_path": 1,
+   "mla_mqa_multi_kv_head": 2,
+   "mla_multi_token_query": 1,
+   "mla_paged_kv_cache": 16,
+   "mla_splitkv_decode": 16,
+   "mla_varlen_seqlens": 2
+  },
+  "scope": "single_gpu_hopper",
+  "selection": "shape_first_g0"
+ },
+ "delivery": {
+  "capture_wrapper": "common/capture_case.py",
+  "group_assignment": "delivery_index modulo 8",
+  "groups": 8,
+  "runner": "scripts/run_cluster_sm.sh"
+ },
+ "measurement_status": "unmeasured_new_set",
+ "name": "flashmla_c450_full",
+ "schema_version": "hopper.delivery.cases.v1",
+ "selected_count": 16,
+ "selection": {
+  "constraints": {
+   "causal": "kernel forces causal=false when seqlen_q==1",
+   "dtype": "bf16 or fp16 (identical q/kv dtype)",
+   "head_dims": "head_dim_k 576 (d_v 512 + RoPE 64) with head_dim_v 512; head_dim_k 512 reserved for DeepSeek V4.x",
+   "heads": "heads_q % heads_kv == 0",
+   "page_size": "fixed 64 (csrc/api/dense_decode.cpp TORCH_CHECK)"
+  },
+  "cycle_filter": "target_gpu_cycles_100000_5000000 (deepgemm source_version convention)",
+  "input_seed_rule": "input_seed = 20260929 + delivery_index; varlen seqlens use a deterministic sawtooth (see harness build_inputs)",
+  "mode": "hand_pinned_g0_candidate_set",
+  "operation_class": "mla_decode"
+ },
+ "suite": "flashmla",
+ "supported_gpu_profiles": [
+  "h100"
+ ],
+ "upstream": {
+  "cutlass_commit": "147f5673d0c1c3dcf66f78d677fd647e4a020219",
+  "cutlass_source": "fetched at build time to $HOPPER_ARTIFACT_ROOT/tool_cache/cutlass/<commit> (not vendored, T0005 rev3)",
+  "package": "flash_mla 1.0.0 source build from upstream/ (pip install --no-build-isolation)",
+  "pin_record": "upstream/PINNED.md",
+  "repository": "https://github.com/deepseek-ai/FlashMLA",
+  "revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+  "revision_date": "2026-09-15"
+ },
+ "validated_gpu_profiles": []
+}

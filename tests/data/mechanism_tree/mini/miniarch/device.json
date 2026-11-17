@@ -1,0 +1,1 @@
+{"schema_version": "cyclescope.device.v1", "device": "mini0", "architecture": "miniarch", "sm_arch": "sm_test", "smsps_per_sm": 4}

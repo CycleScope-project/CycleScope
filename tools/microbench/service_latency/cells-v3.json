@@ -1,0 +1,378 @@
+{
+ "protocol": "service_latency protocol-v3.json addendum 2026-11-05",
+ "cells": {
+  "VIADDMNMX": {
+   "kind": "single",
+   "composition": {
+    "VIADDMNMX": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "add.s32 t,x,k; min.s32 d,t,y",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "VIMNMX3": {
+   "kind": "single",
+   "composition": {
+    "VIMNMX3": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "min.s32 t,x,y; min.s32 d,t,k",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "SHFL_BFLY": {
+   "kind": "single",
+   "composition": {
+    "SHFL.BFLY": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "shfl.sync.bfly.b32 imm",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "SHFL_UP": {
+   "kind": "single",
+   "composition": {
+    "SHFL.UP": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "shfl.sync.up.b32 imm",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "SHFL_DOWN": {
+   "kind": "single",
+   "composition": {
+    "SHFL.DOWN": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "shfl.sync.down.b32 imm",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "SHFL_IDX": {
+   "kind": "single",
+   "composition": {
+    "SHFL.IDX": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "shfl.sync.idx.b32 register lane",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "VOTE": {
+   "kind": "single",
+   "composition": {
+    "VOTE": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "vote.sync.any.pred predicate chain",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "SEL": {
+   "kind": "single",
+   "composition": {
+    "SEL": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "selp.b32 with loop-invariant predicate",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "HFMA2": {
+   "kind": "single",
+   "composition": {
+    "HFMA2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "fma.rn.f16x2; sm_90a alternates HFMA2/HFMA2.MMA — credited only if both map to the HFMA2 leaf",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "DSETP": {
+   "kind": "pair",
+   "composition": {
+    "DSETP": 1,
+    "FSEL": 1,
+    "F2I": 1,
+    "I2F": 1
+   },
+   "partners": [
+    "FSEL",
+    "F2I",
+    "I2F"
+   ],
+   "critical_path_partners": [
+    "FSEL",
+    "F2I"
+   ],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "setp.f64 + selp.f32 + cvt per step",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "CREDUX": {
+   "kind": "pair",
+   "composition": {
+    "CREDUX": 1,
+    "IMAD": 1
+   },
+   "partners": [
+    "IMAD"
+   ],
+   "critical_path_partners": [
+    "IMAD"
+   ],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "redux.sync.min.u32 -> CREDUX + IMAD.U32 on sm_103a",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "REDUX": {
+   "kind": "pair",
+   "composition": {
+    "REDUX": 1
+   },
+   "partners": [
+    "MOV",
+    "IMAD"
+   ],
+   "critical_path_partners": [
+    "MOV",
+    "IMAD"
+   ],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "redux.sync.add.u32 + UR->R move; unrealised when the move is a MOV/IMAD.U32 mix (MOV has no measured result)",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "IABS": {
+   "kind": "pair",
+   "composition": {
+    "IABS": 1,
+    "LOP3": 1
+   },
+   "partners": [
+    "LOP3"
+   ],
+   "critical_path_partners": [
+    "LOP3"
+   ],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "abs.s32 then xor with loop-invariant",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "ISETP": {
+   "kind": "pair",
+   "composition": {
+    "ISETP": 1,
+    "SEL": 1
+   },
+   "partners": [
+    "SEL"
+   ],
+   "critical_path_partners": [
+    "SEL"
+   ],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "setp + selp pair; interval via same-resource pair-thr rule",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "FSETP": {
+   "kind": "pair",
+   "composition": {
+    "FSETP": 1,
+    "SEL": 1,
+    "I2FP": 1
+   },
+   "partners": [
+    "SEL",
+    "I2FP"
+   ],
+   "critical_path_partners": [
+    "SEL"
+   ],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "cvt + setp.f32 + selp pair; interval via same-resource pair-thr rule",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "DADD": {
+   "kind": "single",
+   "composition": {
+    "DADD": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "thr_only": true,
+   "idiom": "f64 thr cell, 8 distinctly-seeded chains, fp64_sm scope rule",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "DMUL": {
+   "kind": "single",
+   "composition": {
+    "DMUL": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "thr_only": true,
+   "idiom": "f64 thr cell, 8 distinctly-seeded chains, fp64_sm scope rule",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "DFMA": {
+   "kind": "single",
+   "composition": {
+    "DFMA": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "thr_only": true,
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   },
+   "idiom": "fma.rn.f64 thr cell, 8 distinctly-seeded chains, fp64_sm scope"
+  }
+ },
+ "no_form": {
+  "UFLO": "uniform datapath: kernel-param operands compile to vector ops + LDC/ULDC on both targets",
+  "UPOPC": "same",
+  "UPRMT": "same",
+  "USEL": "same",
+  "USGXT": "same",
+  "USHF": "same",
+  "UISETP": "same",
+  "UMOV": "same",
+  "ULEA": "same",
+  "UPLOP3": "same",
+  "UP2UR": "same",
+  "UVIRTCOUNT": "same",
+  "MOV": "folded",
+  "P2R": "folded",
+  "R2P": "folded",
+  "R2UR": "folded",
+  "PLOP3": "predicate chains folded to ISETP/SEL",
+  "ELECT": "hoisted/idempotent — empty window",
+  "SHFL_IDX_IMM": "immediate-lane idx hoisted",
+  "IADD": "add.cc -> IADD3 + IMAD.X multi-instruction",
+  "LEA": "mixed LEA / IMAD",
+  "FCHK": "div.rn.f32 = FCHK + MUFU + 5xFFMA + CALL emulation sequence",
+  "S2R": "mixed S2R/S2UR/SGXT compositions per issue idiom",
+  "S2UR": "mixed S2R/S2UR/SGXT",
+  "CS2R": "window parser uses CS2R clock reads as boundaries; no cell"
+ }
+}

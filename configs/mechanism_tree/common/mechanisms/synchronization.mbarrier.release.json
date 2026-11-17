@@ -1,0 +1,25 @@
+{
+ "doc": "imported from legacy mechanism synchronization.mbarrier.release; suspended_wake_cycles: phase completion -> resume for a waiter that was suspended in mbarrier.try_wait when the phase completed (trywait_wake protocol, cluster-local); replaces `cycles` for waits that were not ready when issued",
+ "program": {
+  "event": "barrier_release",
+  "operation_classes": [],
+  "parameter_schema": "timing_row",
+  "timing_kind": "mbarrier_phase_release"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "suspended_wake_cycles": {
+   "kind": "constant"
+  }
+ }
+}

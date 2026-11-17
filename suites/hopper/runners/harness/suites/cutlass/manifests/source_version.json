@@ -1,0 +1,13 @@
+{
+  "cycle_filter": {
+    "applied_to_selection": false,
+    "definition": "whole-GPU kernel span from globaltimer, converted with the per-launch clock64/globaltimer ratio",
+    "historical_note": "100000-3000000 was a prior occupancy/window screen; mechanism-first selection does not apply it"
+  },
+  "gpu_scope": "complete multi-CTA kernel on all available device SMs",
+  "independent_measurements": 2,
+  "official_repository": "https://github.com/NVIDIA/cutlass",
+  "revision": "f3fde58372d33e9a5650ba7b80fc48b3b49d40c8",
+  "tag": "v4.2.1",
+  "target_cases": 100
+}

@@ -1,0 +1,1 @@
+{"function_id": 1, "name": "kernel_cutlass_kernel___main__DenseGemmKernel_object_at__TiledMMA_ThrLayoutVMNK21111000_PermutationMNK____MMAAtom_ThrID21_ShapeMNK25612816_TVLayoutA2128161281256_TVLayoutB26416641128_TVLa_0", "ctx": "0x44da02b0", "module": null, "addr": "0x7f47e7400000", "instructions": 769, "related_of": null}

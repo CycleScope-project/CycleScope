@@ -1,0 +1,16 @@
+{
+ "memory.store_dram.capacity.root": {
+  "fields": {
+   "store_dram.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 256
+    },
+    "sources": [
+     "mechtree.w4.store_queue_capacity"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

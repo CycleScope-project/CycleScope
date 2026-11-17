@@ -1,0 +1,14 @@
+{
+  "cycle_filter": {
+    "definition": "whole-GPU kernel span from globaltimer, converted with the per-launch clock64/globaltimer ratio",
+    "maximum_cycles": 5000000,
+    "minimum_cycles": 100000,
+    "role": "collection_statistics"
+  },
+  "gpu_scope": "single-GPU multi-CTA kernel; no artificial SM cap",
+  "independent_measurements": 2,
+  "official_repository": "https://github.com/deepseek-ai/DeepGEMM",
+  "revision": "559d79fb6994a58b8a15b4b93bf13ccc16edf247",
+  "target_cases": 100,
+  "version": "2.6.1"
+}

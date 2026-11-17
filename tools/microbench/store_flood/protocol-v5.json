@@ -1,0 +1,33 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "store_flood",
+  "version": 5,
+  "frozen_before_gpu": true,
+  "kind": "which part of the v2 launch form selects the partly-written-line regime: dynamic shared-memory size or sibling CTAs; no workload-based fitting",
+  "question": "v4: on B300 the line32 stream costs 31.9 cycles per request when launched as one CTA with no dynamic shared memory and 62.0 when launched as a grid of one CTA per SM with large dynamic shared memory. Is it the shared-memory size of the storing CTA (the SM's L1 / shared-memory split), or the other CTAs of the grid? Does H100 leave the regime at some setting?",
+  "probe": "store_flood.cu: the v1 kernel k_flood (geometry line32 = w4.s128.l32, W = 4, and full16 = w16.s16.l32 as the geometry without partly written sectors) with two run-time launch axes: --smem <bytes> = dynamic shared memory of the launch (cudaFuncSetAttribute MaxDynamicSharedMemorySize as needed; the kernel touches its first and last shared byte once before the first window) in {0, 16 KiB, 48 KiB, 96 KiB, 160 KiB, the device maximum per block}; --carveout <default | 0 | 100> = cudaFuncAttributePreferredSharedMemoryCarveout (default, MaxL1, MaxShared), used with smem 0 and 48 KiB only; --siblings <0 | all> = launch one CTA, or a grid of one CTA per SM in which only the CTA on the first SM to arrive runs the windows and the others return at once (siblings with the same smem). Cells: geometry x smem (6) x siblings (2), plus the carveout cells (2 smem x 3 carveouts, siblings 0). 8 launches x 17 repetitions; runs a and b; B300 and H100.",
+  "controls": {
+    "sass": "as v1.",
+    "anchors": "smem 0, siblings 0 reproduces v1 (b300 31.9 line32 / 15.9 full16; h100 63.9 / 15.9) within 5 %; runs a and b within 5 %."
+  },
+  "derivation": "T per request per cell as v1.",
+  "predictions_before_data": {
+    "smem": "b300 line32: T = 31.9 for small smem and 62 from some size on, independent of siblings; full16 15.9 everywhere.",
+    "siblings": "alternatively T = 62 whenever siblings = all, at every smem.",
+    "h100": "63.9 for line32 in every cell (if a cell reads about 32 the regime can be left on h100 too)."
+  },
+  "outcomes_before_data": {
+    "smem": "If the shared-memory size (or the carve-out) selects the regime: an addendum states the threshold and the fact the engine needs (the launch's dynamic shared memory / carve-out is already a capture fact); the partly-written-line leaf then gets that condition per device.",
+    "siblings": "If sibling CTAs select it: follow-up on how many / where.",
+    "other": "Otherwise report the table."
+  },
+  "prediction_check": "none at this stage.",
+  "not_allowed": "No leaf or engine change from this run alone; no tuning to the full-gpu error.",
+  "addenda": [
+    {
+      "when": "after b300-v5r3 and h100-v5r3 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/store_flood/{b300-v5r3,h100-v5r3} (table.txt; anchors and SASS gate passed)",
+      "text": "B300, line32, T per request: dynamic shared memory 0 with the default carve-out 31.94; 16 KiB 45.25; 48 KiB and more 62.0-62.5; shared memory 0 with carve-out MaxShared 62.41; 48 KiB with carve-out MaxL1 31.94; sibling CTAs change nothing (every pair within 0.2). full16 15.94 in every cell. Outcome 'smem': on B300 the extra cycle per partly written line is paid when the SM's L1 is carved out for shared memory and not when the L1 is available. H100: line32 63.94 in every cell - no setting leaves the regime there. This does not yet give an engine rule: kernels that run with the maximum dynamic shared memory and the default carve-out are observed at about the sectors-only cost (H100 f16_nt_tma alone on the card 4.3-5.3 cycles per 4-sector request against 8.4 for the probe; B300 CuTe-DSL software-pipelined GEMM 41.8 per 32-sector request with every SM storing, against 62-71), while the H100 cp.async kernel alone pays 8.6. What those kernels do differently from the probe is not known. Nothing installed; the leaf stays 0."
+    }
+  ]
+}

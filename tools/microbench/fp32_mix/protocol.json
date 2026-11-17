@@ -1,0 +1,36 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "fp32_mix",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "mechanisms": [
+  "instruction.service MUFU / MUFU.EX2: dispatch hold on the SMSP issue slot (issue_group_resource issue_frontend_smsp with its own interval) -- candidate M",
+  "register_file.operand_read (round 37) and the SMSP issue model: checked by the replica, not re-measured"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "fa3 forward (round 42): the tensor pipe's busy time matches hardware, but the hardware softmax section does not overlap it: with 3 consumer warps per SMSP the hardware stalls on dispatch (15 % of samples), not_selected and mio_throttle, and the FMNMX chain costs 11 cycles per instruction against 4.9 in the engine. The round-37 operand-port model covers 3-read FFMAs only. Which part of the softmax quartet (FMNMX / FFMA / MUFU.EX2 / FADD) costs more than the engine's issue model when several warps share an SMSP -- and is it the MUFU dispatch (MIO-queued) that holds the issue slot?",
+ "engine_rules_declared_before_data": {
+  "baseline": "present engine incl. OP2p and the per-class units (MUFU xu_smsp interval 8.26 / 3.97-8.0).",
+  "M (MUFU dispatch hold)": "a MUFU-class instruction holds the SMSP issue slot for k cycles after issue (no other warp issues meanwhile): issue_group_resource = issue_frontend_smsp with issue_interval k for MUFU / MUFU.EX2 / RSQ / LG2 / TANH; k measured below.",
+  "candidate order": [
+   "baseline",
+   "M"
+  ]
+ },
+ "probe": "tools/microbench/fp32_mix/probe/mix.cu: one CTA of 4*W warps (W in {1, 2, 3, 4}, warp w on SMSP w % 4), bar.sync per rep, per-warp clock64 window of U quartets (U in {32, 64, 128}), 4 independent accumulator chains interleaved so no instruction depends on its predecessor within 4 steps; variants: `quartet` = [FMNMX (2 GPR reads, no reuse), FFMA (3 GPR reads, per-lane constants, no reuse), MUFU.EX2, FADD (2 reads)]; `trio` = the same without MUFU; `mufu` = MUFU.EX2 only (4 chains); `fmnmx` = FMNMX only; constants per lane (zero-table trick) so all operands are GPRs. Two runs per device.",
+ "sass_gate": "tools/microbench/fp32_mix/sass_check.py: window = exactly the variant's instructions in the stated order and counts, control words recorded (program emitted for the replica, as sass_check_v2 does).",
+ "derivation": "T per warp median; slope over U per (variant, W) = cycles per quartet (or per instruction for mufu / fmnmx); replica = dispatch_contention model_v2.py's Replica (OP2p rule, class units from the device tree) run on the gate's program for each W -> predicted slope; excess(variant, W) = measured - replica. k = median over W >= 2 of (excess(quartet, W) - excess(trio, W)) / (W x 1 MUFU per quartet per warp) when positive; decision: M installed if excess(quartet, W) > max(5 %, 1 cycle) for W >= 2, excess(trio, W) <= max(10 %, 1 cycle) (the trio is explained by the present model) and k is consistent across W = 2 / 3 / 4 within 20 % -> k measured; if the trio also exceeds the replica -> the gap is not MUFU-specific: report only (unrealised), nothing installed; if nothing exceeds -> baseline.",
+ "install": "M: <arch>/leaves instruction.service MUFU and per-op MUFU.* classes: issue_group_resource issue_frontend_smsp, and a new field? no -- the existing issue_group_resource mechanism occupies the second resource by the class's issue_interval; so install k as the class's issue_interval_cycles only if k agrees with the installed xu interval within 20 %; otherwise install M via a per-class second interval: common instruction.service gains field issue_group_interval_cycles (default = issue_interval) and the engine uses it for the second resource. A/B 500 x 2 vs $A/merge/mr51.",
+ "not_allowed": "no case tuning; no change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-07",
+   "written": "after h100-r4 (b300 runs queued)",
+   "text": "(reading; decision none on h100, nothing installed) Gate 12 / 12 after three probe fixes (PTX names, a sample-buffer overrun, and ptxas deleting three of the four chains when they did not reach an escape point). Measured vs the OP2p replica, cycles per instruction (W = 1 / 2 / 3 / 4): quartet 4.59 / 5.71 / 8.35 / 10.99 vs 2.61 / 5.26 / 7.88 / 10.51; trio 1.69 / 2.65 / 3.98 / 5.33 vs 1.33 / 2.67 / 4.00 / 5.33; mufu 8.0 / 16.0 / 24.0 / 31.9 vs 8.26 / 16.5 / 24.8 / 33.0; fmnmx 2.00 / 3.98 / 6.00 / 8.03 vs 2.01 / 4.02 / 6.03 / 8.04. At W >= 2 the present engine model reproduces every variant within ~0.5 cycle; the quartet - trio difference gives k ~ 0.1-0.2 cycles per MUFU, far under the gate -> no MUFU dispatch hold. The W = 1 quartet excess (+2.0) is a single-warp latency effect outside this protocol. Conclusion for fa3: the softmax non-overlap is not in the per-instruction issue cost of the FMNMX / FFMA / MUFU / FADD mix; remaining candidates are the named-barrier pingpong wait and the scheduler's warp selection under 4 ready warps (not_selected), to be attributed with a per-warp timeline."
+  }
+ ]
+}

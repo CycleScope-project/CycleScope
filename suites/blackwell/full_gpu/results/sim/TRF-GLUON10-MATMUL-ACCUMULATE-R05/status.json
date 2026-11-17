@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-GLUON10-MATMUL-ACCUMULATE-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 196720,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4838304,
+ "completed": 4838304,
+ "cycles": 46265,
+ "hard": 0,
+ "walls": {
+  "convert": 8.9,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 11.5,
+  "total": 21.3
+ },
+ "rss_kb": {
+  "convert": 222144,
+  "segments": 222144,
+  "build": 222144,
+  "sim": 1016832
+ },
+ "hw_cycles": 54525.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 12
+}

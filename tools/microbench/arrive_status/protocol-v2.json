@@ -1,0 +1,29 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "arrive_status",
+  "version": 2,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: issue cost of mbarrier arrives whose state is discarded, for the arrive forms the suite kernels use; no workload-based fitting",
+  "question": "v1: back-to-back arrives with the state discarded cost 3.83 (h100) / 6.00 (b300) cycles each (plain form) and 5.51 / 8.00 (count form); the trees give class SYNCS issue interval 0 (engine replay about 1 cycle each). Do the forms that occur in the suite kernels cost the same: SYNCS.ARRIVE.TRANS64.RED.A1T0 RZ (211 PCs in the sampled cases), SYNCS.ARRIVE.TRANS64 RZ, [..], R (expect_tx), .A1T0 RZ, .RED.A0TR, .RED.A0T1, .RED?",
+  "probe": "arrive_status.cu extended with discard cells per PTX form, each as U back-to-back independent arrives (U in {1, 2, 4, 8, 16}, different barriers of an array, state discarded), window between two clock reads: arrive (v1), arrive_cnt (v1), expect_tx (mbarrier.arrive.expect_tx with a byte count in a register), expect_tx_only (mbarrier.expect_tx), cluster forms (shared::cluster address of the own CTA in a 1-CTA and a 2-CTA cluster, arrive and arrive.expect_tx) - the SASS mnemonic of every cell is recorded and cells are grouped by the mnemonic actually emitted; a mnemonic of the list above that no PTX form produces is reported as not reachable. W = 1 and W = 4 (four warps, own barriers). 8 launches x 33 repetitions, runs a and b; H100 and B300.",
+  "controls": {
+    "sass": "window: exactly U SYNCS.ARRIVE of one mnemonic with destination RZ, independent addresses, nothing else.",
+    "timing": "v1 discard cells reproduce v1 within max(1 cycle, 10 %); runs a and b within max(1 cycle, 5 %); slope fit residual <= 10 %."
+  },
+  "derivation": "I(mnemonic, W) = least-squares slope over U (cycles per arrive).",
+  "predictions_before_data": {
+    "same": "every mnemonic reads the v1 value of its family (3.8 / 6.0; with a count or tx register 5.5 / 8.0) at W = 1 and W = 4."
+  },
+  "outcomes_before_data": {
+    "install": "For each mnemonic measured: instruction.service issue interval of an arrive class keyed by what the classifier can see (A1T0 / ART0 / RED / plain TRANS64 tokens), value = measured slope minus the engine's present slope for the same cell from the H100 replay plus the present leaf value; classes whose mnemonics were not measured keep their values. Then gates, H100 replay of two cells (within max(1 cycle, 15 %)) and the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-gb): the change is kept only if the regression completes with every case ok; the accuracy numbers are reported, not used to choose the values.",
+    "none": "If the slopes are within 1 cycle of the engine's replay: nothing installed."
+  },
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled.",
+  "addenda": [
+    {
+      "when": "after h100-v2r3 and b300-v2r3 and the H100 replay (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/arrive_status/{h100-v2r3,b300-v2r3}; replay fg-over20/arrive2-replay-table.txt",
+      "text": "PTX form -> SASS (both devices): arrive = .A1T0 RZ; arrive with count = .ART0; arrive.expect_tx = plain TRANS64 RZ, [..], R; expect_tx = .RED.A0TR; cluster arrive (relaxed) = .RED.A1T0; cluster arrive.expect_tx = .RED; .RED.A0T1 was not produced. H100 medians for U = 1 / 2 / 4 / 8 / 16 back-to-back arrives: 2 / 3 / 5 / 25 / 57 (.A1T0, .RED.A1T0) and 2 / 3 / 5 / 33 / 81 (forms with a register operand): the first four cost about one cycle each, what the engine gives (replay interval 1), from the fifth on 4 or 6 cycles each; the least-squares slopes of the table (3.83, 5.51) fit a kinked curve and are not issue intervals. B300: the CTA forms are linear at 6 / 8 cycles per arrive on top of a 25-29-cycle offset that comes from pinning the second clock read on the last arrive's returned state (a probe artefact that contaminates these cells); the cluster forms read the H100 numbers. W = 4 about doubles the tail. Outcome: nothing installed. Kernels issue one to three arrives at a time, inside the cheap head; a fixed issue interval per arrive is not what the data shows. Open: a queue of four arrives with 4 / 6 cycles per further arrive (h100), and the B300 CTA forms, which need cells without the pinned read."
+    }
+  ]
+}

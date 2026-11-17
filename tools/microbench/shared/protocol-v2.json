@@ -1,0 +1,56 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "shared",
+  "version": 2,
+  "supersedes": "tools/microbench/shared/protocol.json (version 1, run r1 on both devices, installed at r18)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "instruction.service (LDS / LDSM / STSM result latency)",
+    "storage.shared.issue",
+    "storage.shared.acceptance_sm",
+    "storage.shared.visibility"
+  ],
+  "devices": {
+    "h100": "sm_90a",
+    "b300": "sm_103a"
+  },
+  "purpose": "Version 1 left three open items: (1) LDSM / STSM (k_mtx) unrealised on sm_90a because the probe's 66 KB static shared array exceeds the 48 KB static limit, so the H100 LDSM / STSM leaves are copies of LDS (experimental) and the b300 LDSM issue leaf is a placeholder; (2) once shared-load results gate their consumers (engine fix on task/engine-resource-and-load-ready: data ready = acceptance start + acceptance cycles + service result latency), the version-1 LDS result latency (the full dependent-chain slope, which already contains one wavefront of acceptance) double-counts that wavefront; (3) the per-SMSP issue fit residual was 7-13 %.",
+  "probe": "tools/microbench/shared/probe/smem.cu with two documented changes (the rest stays verbatim): (a) k_mtx takes its 66 KB buffer as dynamic shared memory (extern __shared__, cudaFuncSetAttribute MaxDynamicSharedMemorySize) on both architectures, so the same cell runs on sm_90a; (b) new cell ldsm_chain X (X in {1, 2, 4} matrices, .trans and non-trans): one warp, U dependent ldmatrix where the next row address is derived from the loaded value (a = base + (r & mask)), same window rules as lds_chain. SASS gate: sass_check.py check_smem (verbatim) for the version-1 cells; the new cell is checked for exactly U LDSM of the expected form in the window. --launches 8 --reps 33, two runs per device.",
+  "engine_rule_declared_before_data": "A shared load's destination registers are ready at max(issue + result_latency, acceptance_start + acceptance(wavefronts) + result_latency - acceptance(1)) where acceptance_start = max(issue, per-SM acceptance frontier). With an idle SM this reduces to issue + result_latency, so result_latency is the uncontended dependent-chain slope; the acceptance term only adds queueing and extra wavefronts. This replaces the r22 rule max(issue + result, start + acceptance(wavefronts) + result), which counted the first wavefront twice.",
+  "derivation": {
+    "LDS result_latency": "slope over U of the lds_chain medians at W = 4 (one wavefront), unchanged from version 1",
+    "LDSM result_latency (per matrix count, trans)": "slope over U of ldsm_chain X medians",
+    "storage.shared.issue.cycles": "version-1 rule (issue OP D = 1, SMSP 0 only, slope over K / wps); additionally the median of the per-K increments is reported; if the OLS residual exceeds 5 % but the median-increment value reproduces the OLS slope within 5 %, the OLS value is installed as measured with both numbers in the source description",
+    "storage.shared.acceptance_sm.cycles": "version-1 rule (all 4 SMSPs, slope over K / (wps x 4), knots at D wavefronts), now also for LDSM / STSM from k_mtx",
+    "storage.shared.visibility.cycles": "version-1 rule; a negative difference installs 0 (structural: the store is visible no later than the barrier release)"
+  },
+  "acceptance": {
+    "cell": "fit max relative residual <= 5 % (or the median-increment rule above) and run agreement <= 5 % -> measured, else experimental and listed",
+    "controls": "LDS chain 22.97 (both devices, version 1) and b300 acceptance degree table must be reproduced within 5 %; a failing control stops the install of that field and is reported"
+  },
+  "install": "instruction.service LDS / LDSM / STSM result = completion from this run under the declared engine rule (the engine rule change lands in the same A/B round); storage.shared.* leaves for LDSM / STSM on h100 from k_mtx (replacing the LDS copies), b300 LDSM issue placeholder replaced; source keys shared.<device>.<run> with protocol tools/microbench/shared/protocol-v2.json; one two-architecture 450 A/B round",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "before_install": true,
+      "text": "The declared engine rule (LDS data ready = max(issue + result, acceptance_start + acceptance(wavefronts) + result - acceptance(1))) is implemented without an engine change: the engine already computes data ready = acceptance_start + acceptance(wavefronts) + result (r22 rule), so the installed LDS / LDSM result_latency leaf is the dependent-chain slope minus acceptance(1 wavefront) of the same class on the same device; both forms give identical times for every wavefront count. The leaf therefore means 'result latency beyond one wavefront of acceptance'; the source description states it."
+    },
+    {
+      "date": "2026-11-05",
+      "before_install": true,
+      "written": "install correction after a leaf audit; no new GPU run, derivation and acceptance unchanged",
+      "text": "Audit of the installed instruction.service leaves against the r2 models ($A/microbench/shared-model/{h100-r2d,b300-r2b}/model.json) found the install incomplete or inconsistent with the first addendum's rule (installed result = dependent-chain slope minus acceptance(1 wavefront) of the same class on the same device, completion = result): (a) b300 LDS keeps the version-1 value 22.965 (chain slope, acceptance not subtracted) while h100 LDS has 21.95; (b) b300 LDSM keeps a copy of the LDS value 22.965 (shared.b300.r1.experimental) although r2b measured ldsm x1.mt0 = 28.95; (c) h100 LDS / LDSM completion_latency keep the version-1 22.965 while result is the r2 value; (d) h100 STSM result / completion = 27.99, the LDSM value: the probe has no STSM chain cell (k_mtx times LDSM chains and STSM / LDSM acceptance only), so the STSM service value has no measurement behind it. Corrections, both devices, from the existing r2 models: LDS result = completion = lds chain slope - acceptance_lds(1); LDSM result = completion = ldsm x1.mt0 slope - acceptance_LDSM(1) (storage.shared.acceptance_sm LDSM knot at one wavefront of the same run); STSM result = completion = 1 with source structural.service_owner (a store has no destination register; its acceptance / issue cost is owned by storage.shared.acceptance_sm / issue), as already on b300. Where a device's model lacks acceptance(1) for a class, the result is not changed and the gap is listed. Sources shared.<device>.<r2 run>; A/B 500 x 2."
+    },
+    {
+      "date": "2026-11-05",
+      "before_run": "h100-r3 (no data of the new cell exists)",
+      "item": "Close the gap the previous addendum listed: h100 LDS / LDSM result is the chain slope minus acceptance(1) of the same class and the same run, but the h100-r2d model has no LDS acceptance; the installed h100 LDS 21.954 / LDSM 27.989 subtracted 1.0112, which is the r1 STS slope that the hopper LDS acceptance leaf also copies (shared.h100.r1.experimental).",
+      "observed": "sass_check.py on $A/microbench/shared-sass/h100-r2d-dir/smem.sass: smem/issue/lds/8 passes, smem/issue/lds/16 and /32 fail with 'LDS waits on an earlier in-window LDS' (sm_90a ptxas orders the ld.volatile.shared loads of k_issue; sm_103a does not); the acceptance slope needs K in {8, 16, 32}, so h100 never produced an LDS acceptance.",
+      "new_cell": "k_issue_lds_nv (h100 and b300): identical to k_issue OP 0 except that load k is a non-volatile asm volatile(\"ld.shared.u32 %0, [%1];\") at address a + k x 128 B (one 128 B row per k: every lane shifts by the same row, so the same bank and the same degree-d wavefront pattern per instruction, but distinct addresses so ptxas cannot merge them, all inside the buffer); destination registers r[k] distinct and folded after the closing bar.sync as now. Same knots (degree d), K in {8, 16, 32}, all-SMSP and SMSP0-only variants, the same gate (sass_check.py smem/issue: exactly K LDS, no in-window LDS waiting on another, closed by bar.sync), the same v1 derivation (acceptance = slope over K / (wps x 4) per degree; issue = SMSP0 slope / wps).",
+      "run": "h100-r3: the whole smem probe (chains, k_mtx, issue cells, the new cell) in one run, so the chain slopes and acceptance(1) of LDS (new cell, degree 1) and LDSM (k_mtx, one wavefront) come from the same run; b300 runs the new cell too as a control (its LDS acceptance from k_issue must be reproduced within 5 %, else the new cell's h100 value is reported and not installed).",
+      "install": "h100 instruction.service LDS result = completion = lds chain slope - acceptance_LDS(1); LDSM = ldsm x1.mt0 slope - acceptance_LDSM(1), both from h100-r3; storage.shared.acceptance_sm LDS on h100 <- the new cell's knots (replacing the STS copy) when they pass the v1 acceptance; a field that fails keeps its value and the gap stays listed. Sources shared.h100.r3; A/B 500 x 2."
+    }
+  ]
+}

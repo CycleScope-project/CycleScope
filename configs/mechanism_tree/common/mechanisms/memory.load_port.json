@@ -1,0 +1,22 @@
+{
+ "doc": "memory.load_port: whether a load request occupies each SM load port once per distinct line it touches (load_port_lines protocol); lane_order switches the count to line switches in lane order (gather_hit protocol)",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.load_port",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "line_granular": {
+   "kind": "constant"
+  },
+  "lane_order": {
+   "kind": "constant"
+  }
+ }
+}

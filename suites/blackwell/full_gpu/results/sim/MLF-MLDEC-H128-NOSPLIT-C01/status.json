@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLDEC-H128-NOSPLIT-C01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 420430,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4161924,
+ "completed": 4161924,
+ "cycles": 28018,
+ "hard": 0,
+ "walls": {
+  "convert": 9.4,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 8.5,
+  "total": 18.8
+ },
+ "rss_kb": {
+  "convert": 357696,
+  "segments": 357696,
+  "build": 357696,
+  "sim": 578048
+ },
+ "hw_cycles": 29729.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 8
+}

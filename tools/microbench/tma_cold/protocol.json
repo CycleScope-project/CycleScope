@@ -1,0 +1,48 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "tma_cold",
+ "frozen_before_gpu": true,
+ "date": "2026-11-04",
+ "mechanisms": [
+  "storage.tma.completion",
+  "storage.async.service_start"
+ ],
+ "fields": [
+  "storage.tma.completion cycles (L2-hot issue -> complete_tx total, UTMALDG tile dc1, knots on transfer_bytes)",
+  "storage.tma.completion cold_extra_cycles (new field: DRAM-cold completion minus L2-hot completion, same knots)",
+  "storage.async.service_start cycles (control only: hot slope over U must reproduce the installed leaf)"
+ ],
+ "devices": {
+  "h100": "sm_90a (1 GPU)",
+  "b300": "sm_103a (1 GPU)"
+ },
+ "purpose": "Since the memory-level latencies took effect (mechanism-merge-report r9/r10) a TMA box whose lines are not L2-resident completes at service start + hot leaf + (hierarchy return - L2 hit), i.e. the LDG pointer-chase DRAM excess (875 - 320 = 555 on B300, 698 - 305 = 392 on H100) plus port occupancy. The TMA engine does not traverse the LSU path the chase measures, and the only cold TMA data (blackwell-prototype tma-cold-r1b, two GPUs, hot control within 1 %) shows cold - hot = 330 (128 B .. 2 KiB) .. 495 (32 KiB) on B300. DG3 / FA3 single-cluster GEMM tiles are each touched once, so nearly every TMA load in those kernels is cold; the engine needs the TMA path's own DRAM leg on both devices, measured with one probe and one definition.",
+ "probe": "blackwell-prototype tools/microbench/probes/tma.cu + tools/microbench/mb.cuh copied verbatim into tools/microbench/tma_cold/probe/ (k_tma<DC,U>: one warp issues U back-to-back UTMALDG 2D tile loads (SWIZZLE_128B, 128 B inner, bf16) under one mbarrier expect_tx and reads clock64 at t_s (before the first issue) and t_w (try_wait wake); U = 0 is the plain-arrive control; the `.issue` row is t_issue - t_s per rep (o_s); hot = 512 KiB tensor re-read every rep, cold = every rep reads new rows of a 512 MiB tensor so the box comes from DRAM). Compiled for sm_90a and sm_103a with the same source; the default cell set is run (no --cells), with --launches 16 --reps 33 (first rep of each launch dropped by the probe); the SASS of the sm_90a build is checked for UTMALDG.2D (no .MULTICAST / .2CTA in the dc1 kernels).",
+ "cells": {
+  "dc1_tile": {
+   "box_bytes": [128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768],
+   "temperature": ["hot", "cold"],
+   "U": "hot {0, 1, 2, 4, 8}; cold {1, 2, 4, 8} (U = 0 is box- and temperature-independent, taken from the hot run)"
+  },
+  "multicast_and_2cta": "the probe also emits dc 2/4/8/16 hot cells and the 2CTA 16 KiB cells; they are reported as diagnostics and are not installed by this protocol",
+  "runs": "two independent runs per device (run a, run b: separate jobs, same binary) replace the predecessor's two-GPU agreement check because the quota is one GPU per architecture"
+ },
+ "derivation": {
+  "E_U(box, temp)": "mean of the `k` samples (t_w - t_s) of the variant tma.dc1.<box>.<temp> at U",
+  "o_s(U)": "mean of the matching `.issue` samples at U",
+  "latency(box, temp)": "(E_1(box, temp) - o_s,1(box, temp)) - (E_0(hot) - o_s,0(hot))  [blackwell-prototype wave2 definition: one TMA's issue -> complete_tx minus the plain-arrive control]",
+  "cold_extra(box)": "latency(box, cold) - latency(box, hot)",
+  "service_hot(box)": "least-squares slope of E_U(box, hot) over U in {1, 2, 4, 8}  [control against the installed storage.async.service_start knots]",
+  "se(cell)": "sd(k samples at U=1) / sqrt(n); run agreement = |run a - run b| / mean",
+  "knots": "piecewise-linear (tree model kind `linear`) on transfer_bytes at the accepted box sizes, one knot per box; a rejected cell removes its knot (no neighbour fill)"
+ },
+ "acceptance": {
+  "cell": "se / latency <= 3 % in both runs and |run a - run b| / mean <= 3 % for latency(box, hot) and for cold_extra(box) separately -> measured; a cell failing either bound is experimental and listed",
+  "hot_control_b300": "latency(box, hot) must reproduce the installed b300 storage.tma.completion knot at that box within 10 % and service_hot(box) the installed service_start knot within 10 % (box >= 128 B .. 32 KiB); a failing box is reported with both numbers and the hot leaf at that box is NOT changed (cold_extra is still installed, experimental)",
+  "hot_control_h100": "no installed protocol values exist; the h100 hot knots are installed as measured when the cell bound passes (they replace the predecessor rows of mixed provenance in hopper/leaves/storage.tma.completion.json UTMALDG tile dc1)",
+  "cold_sanity": "cold_extra(box) must be positive and must not exceed the memlat DRAM - L2 difference of the device (555 b300 / 392 h100) by more than 25 %; a violation marks the cell experimental and is listed (it would mean the TMA cold path is slower than a dependent LDG chase, which the engine must then not assume)"
+ },
+ "engine_rule_declared_before_data": "A transfer with TMA_LOAD / BULK_COPY / BULK_REDUCE semantics completes at service start + hot leaf + cold_fraction x cold_extra(bytes), where cold_fraction = sectors serviced from DRAM / sectors of the access as decided by the L2 residency model at issue (the hierarchy still records residency and bandwidth telemetry). The hierarchy's latency no longer enters the TMA completion (replaces the r10 'hierarchy excess over an L2 hit' term); the GPU-shared DRAM bandwidth term for TMA streams stays with the full-GPU loop (mechanism-tree.md). A device without an accepted cold_extra knot set keeps the r10 rule (fail-open is not allowed: the leaf is `unsupported` only if the probe cannot run on that device at all).",
+ "install": "<arch>/leaves/storage.tma.completion.json: UTMALDG tma_form=tile destination_count 0-1 leaf gets `cycles` (hot knots, b300 only where the control passes, h100 measured) and the new `cold_extra_cycles` (knots); the non-tile forms (gather4 / im2col / scatter4) and the multicast / 2CTA leaves get the dc1 tile cold_extra knots as the family-shared prior (experimental, same rule the predecessor used for the hot leaf; listed in the source record). Source keys tma_cold.<device>.<run>; artifact $A/microbench/tma_cold/<device>-<run>/ (tma.jsonl per run, model.json).",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no change of thresholds or of the derivation after seeing data; the multicast / 2CTA diagnostics are not installed from this protocol"
+}

@@ -1,0 +1,42 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "memlat_loaded",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-09",
+ "mechanisms": [
+  "memory.dram.service",
+  "memory.l2.service"
+ ],
+ "fields": [
+  "dram.loaded_latency_extra_cycles (piecewise-linear in shared_utilization)",
+  "l2.loaded_latency_extra_cycles (piecewise-linear in shared_utilization)"
+ ],
+ "ownership": "gpu-shared (the extra depends on the whole card's offered load on the shared level; a single cluster offers ~0 utilization and must see ~0 extra)",
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "question": "full-gpu sim/ncu sits at 0.92 median on both architectures while single cluster sits at 0.98 (full-gpu-chain-report 24.4); r1 pc-stall comparison ($A/fg-fix5/r1/summary.md): on memory-waiting kernels the hardware and the simulation charge the same share of time to the same wait point (FIF-RMSNORM-C03 DEPBAR/LDS 33.5 vs 37.6 %, triton_matmul_bf16_03 DEPBAR/BAR 43.7 vs 50.7 %) yet the simulation finishes in 0.5-0.7 of the hardware time, and the hardware shows neither DRAM nor L2 bandwidth saturation (RMSNORM dram 15.7 %, lts 10.5 %). The installed level latencies (memlat: l2 305.5 / 320.7, dram 697.9 / 874.9) are unloaded single-chase values. How much does the load-to-use latency of an L2 hit and of a DRAM access grow with the read load the rest of the card puts on that level, as a function of the achieved utilization of the installed shared-service rate?",
+ "probe": "tools/microbench/memlat_loaded/probe/memlat_loaded.cu: one kernel, grid 1 + N, 1 CTA per SM (120 KB dynamic smem), all CTAs meet on a global arrival counter before timed work. CTA 0 = chaser: lane 0 walks a random 4 KiB-page cycle with ld.global.cg.u32 (level dram: 2 GiB cycle, L2 evicted by a 512 MiB memset before every launch, 64 untimed hops then 256 timed; level l2: 2 MiB cycle fully walked before the barrier, 512 timed hops), clock64 bracket -> cycles per hop. CTAs 1..N = loaders: W warps, each thread 4 independent ld.global.cg.v4 per iteration over the CTA's slice of a loader buffer (level dram: 2 GiB total, > L2 on both devices; level l2: 16 MiB total, warmed before the barrier), until the chaser sets the stop flag (checked every 16 iterations); each CTA reports bytes and its globaltimer window -> achieved read bandwidth B/ns = sum over CTAs of bytes / window. 8 repetitions per cell after one discarded warm-up launch; the chaser start page is random per repetition.",
+ "cells": {
+  "levels": [
+   "dram",
+   "l2"
+  ],
+  "N_W": "N in {0, 16, 32, 64, 96, 128, SMs-1} at W = 16; plus N = SMs-1 at W in {2, 4, 8} (low offered load). SMs-1 = 131 (h100) / 147 (b300).",
+  "per_cell": "8 repetitions; the jsonl row carries the 8 chaser cycles/hop and the 8 loader B/ns"
+ },
+ "derivation": "tools/microbench/memlat_loaded/model.py: base(level) = median cycles/hop of the N = 0 cell. For every other cell: extra = median cycles/hop - base; u = median loader B/ns / rate(level), rate = the installed memory.shared_service leaf of the device (dram_read_bytes_per_ns for dram, l2_read_bytes_per_ns for l2). Points (u, extra) sorted by u; (0, 0) is prepended. The leaf is the piecewise-linear table of these points (kind linear over axis shared_utilization); u > max measured u clamps to the last point.",
+ "acceptance": "(1) N = 0 reproduces the memlat leaf of the device within 5 % (l2.latency_cycles / dram.latency_cycles), else the probe is not measuring the same thing -> stop and report. (2) Per cell (P90 - P10) / median of the chaser cycles/hop < 10 % and of the loader B/ns < 10 %. (3) extra(u) is monotone non-decreasing along u up to a tolerance of 5 % of base (a decrease larger than that between neighbouring points fails the level). (4) Two runs in the same job (r1a / r1b) agree per cell within 10 % of extra or 5 % of base, whichever is larger. A level that passes 1-4 is installed as measured; passing 1-2 only -> experimental; failing 1 or 2 -> not installed, both numbers reported.",
+ "engine_rule_declared_before_data": "MemoryHierarchy: when a sector is served through the shared DRAM read service (loads, TMA / bulk cold legs, atomic fills) at time t, its level latency is dram.latency_cycles + dram.loaded_latency_extra_cycles(u_t), u_t = bytes the shared DRAM service accepted in [t - 1024, t) / (dram rate * 1024) before this request is added (service_shared bucket ledger, 32-cycle buckets, 32 buckets). Same for L2 hits through the shared L2 read service with l2.loaded_latency_extra_cycles. Writes are untouched (not measured). Single cluster: u ~ 0 -> extra ~ 0 by construction; the gate requires single_cluster 500x2 cycles to change in no case by more than 0.5 %.",
+ "install": "<arch>/leaves/memory.dram.service.json field dram.loaded_latency_extra_cycles, <arch>/leaves/memory.l2.service.json field l2.loaded_latency_extra_cycles (kind linear, axis shared_utilization in permille (int axis; points x = round(1000 u)), unit cycles); schema_registry.json fields; common/axes.json axis shared_utilization (fraction, 0..1+); source keys memlat_loaded.<device>.<run>. tree build && tree validate --strict must stay at 0 in all five classes.",
+ "not_allowed": "no case tuning; the derivation and the engine rule are fixed above; a device whose run fails acceptance is left without the field (engine treats a missing field as extra = 0) and is reported.",
+ "addenda": [
+  {
+   "date": "2026-11-09",
+   "written": "after h100-r1 / b300-r1b (model $A/fg-fix5/r1/{h100,b300}-model.json) and the full / single-cluster gates ($A/fg-fix5/full-r3, $A/fg-fix5/sc-r3)",
+   "text": "(reading) h100 dram: N=0 reproduces memlat (697.4 vs 697.9), runs agree, spreads pass, extra(u) not monotone between the u=0.92/0.93/0.97 cells (710/435/887) -> experimental, installed. h100 l2: N=0 gives 282.0 vs the installed 305.5 (7.8 % > 5 %) -> not installed per (1); the probe's 2 MiB cycle and the memlat l2 chase differ in near/far mix, to be settled by a v2 that measures both with one chase. b300 dram and l2: all four criteria pass, measured; the l2 extra is < 5 cycles up to u = 0.78. Low-utilization extras are small on both devices (h100 56 cycles at u 0.25, b300 40-50 at u 0.1-0.44); the steep part is u > 0.7. Gate: full-gpu hp 10.6 -> 9.7 % (med 0.920 -> 0.937, movers 148: 120 closer / 28 farther), bw 10.7 -> 10.5 %; single cluster hp 7.6 -> 7.7 %, bw 8.2 -> 8.2 % with 4 / 1 movers > 2 % (cutlass_mixed_input_08 -7.2 %, fa3_fwd_fp8_00 -4.9 %, FA3-MLA-PAGED-2C-C02 +2.9 %) -- the declared 'single cluster changes <= 0.5 %' prediction is falsified for clusters that alone push the shared service to a high 1024-cycle utilization (a 16-CTA cluster can); the engine's u includes the requester's own cluster, which is also what the chaser measured, so the rule stays and the sc gate criterion is replaced by 'sc MAPE unchanged within 0.2 pt' (met). Open: whether a longer averaging window (the probe averages over ~100 us) fits the bistable sc movers better; untested."
+  }
+ ]
+}

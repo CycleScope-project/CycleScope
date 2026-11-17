@@ -1,0 +1,17 @@
+{
+ "memory.dram.capacity.root": {
+  "fields": {
+   "dram.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 256
+    },
+    "sources": [
+     "memory_request.b300.r2.dram.outstanding_requests",
+     "mechtree.w4.mem_outstanding"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

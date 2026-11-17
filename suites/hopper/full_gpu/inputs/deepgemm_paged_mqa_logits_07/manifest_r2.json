@@ -1,0 +1,54 @@
+{
+ "cases": [
+  {
+   "avg_kv": 2048,
+   "batch_size": 256,
+   "c450_full": {
+    "rule": "restore source_attention batch/lengths",
+    "walk_start": {
+     "avg_kv": 8192,
+     "batch_size": 256
+    }
+   },
+   "case_id": "deepgemm_paged_mqa_logits_07",
+   "class_id": "paged",
+   "delivery_group": 1,
+   "delivery_index": 97,
+   "gemm_desc_even_sms_required": false,
+   "head_dim": 128,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_fp8_paged_mqa_logits"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_mqa_logits"
+   ],
+   "logits_dtype": "bf16",
+   "mechanisms": [
+    "mqa.logits.paged",
+    "sm90.fp8_paged_mqa_logits"
+   ],
+   "mode": "paged",
+   "next_n": 2,
+   "num_heads": 64,
+   "source_attention": {
+    "avg_kv": 8192,
+    "batch_size": 256,
+    "next_n": 2,
+    "seq_len": null,
+    "seq_len_kv": null
+   },
+   "source_case_id": "deepgemm_paged_small_b256_q2_kv8192_h32_d128_bf16",
+   "source_shape": {},
+   "suite_part": "attention",
+   "target_ctas": 1,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  }
+ ],
+ "selection": {
+  "maximum_cv_percent": 100.0,
+  "trials": 1,
+  "warmups": 3
+ }
+}

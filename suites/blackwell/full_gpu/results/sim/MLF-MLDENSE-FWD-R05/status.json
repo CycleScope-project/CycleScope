@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLDENSE-FWD-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 352343,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3333312,
+ "completed": 3333312,
+ "cycles": 37597,
+ "hard": 0,
+ "walls": {
+  "convert": 6.9,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 7.1,
+  "total": 14.6
+ },
+ "rss_kb": {
+  "convert": 349028,
+  "segments": 349028,
+  "build": 349028,
+  "sim": 561476
+ },
+ "hw_cycles": 37111.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 6
+}

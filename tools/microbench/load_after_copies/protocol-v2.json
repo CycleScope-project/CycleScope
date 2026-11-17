@@ -1,0 +1,37 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "load_after_copies",
+  "version": 2,
+  "frozen_before_gpu": true,
+  "kind": "mechanism of the cost of stack loads (LDL) issued after non-bypass async copies: displacement of the stack lines from L1 or a wait for the copies; no workload-based fitting",
+  "question": "v1: a chain of 8 LDL after K non-bypass cp.async of 512 B costs +700 (K = 4) to +1900 (K = 16) cycles. (1) Does every load of the chain pay or only the first? (2) Is the cost still there when the copies have returned before the chain starts? (3) Does it need the copies to be non-bypass, and the same warp? (4) How does it grow with K and with the number of distinct stack lines?",
+  "probe": "load_after_copies.cu extended. Local victim only (volatile per-thread stack array read by a dependent chain, SASS LDL), array of A words per thread, the chain reads n distinct words spaced so that it touches the declared number of stack lines. Axes: chain length n in {1, 2, 4, 8}; timing of the chain: now (right after the K copies, as v1) or after_wait (the issuing warp executes cp.async.commit_group + cp.async.wait_group 0 after the K copies and before the first clock read, so every copy has returned); form ca / cg; issuer same_warp / other_warp; K in {0, 1, 2, 4, 8, 16, 32}; a store variant stl: before the copies the chain's words are rewritten (STL) so the lines are dirty. Cells: (a) n x {now, after_wait} at K in {0, 4, 16}, ca, same_warp; (b) K sweep at n = 8, now and after_wait, ca, same_warp; (c) cg and other_warp at n = 8, now, K in {0, 4, 16}; (d) stl at n = 8, now and after_wait, K in {0, 4, 16}. 16 launches x 9 repetitions (first discarded), runs a and b; H100 and B300.",
+  "controls": {
+    "sass": "timed window: exactly n LDL, no LDGSTS, no store, no barrier, no cp.async wait (the wait of after_wait cells lies before the first clock read).",
+    "timing": "K = 0 cells: C / n within 20 % of v1's 39 cycles per LDL for every n and both timings; v1 cells (n = 8, now, ca, same_warp, K = 4 / 16) reproduce v1 within 10 %; runs a and b within max(5 cycles, 5 %)."
+  },
+  "derivation": "extra(cell) = C(K) - C(0) of the same (n, timing, form, issuer, stl).",
+  "predictions_before_data": {
+    "displacement": "extra grows with n (about the same per load), is the same now and after_wait, the same for other_warp, and 0 for cg.",
+    "wait": "extra is the same for n = 1 and n = 8 (only the first load waits) and vanishes after_wait.",
+    "engine_today": "to be read from the replay below; expected 0 (stack lines are not displaced by copies in the engine's L1 at these sizes)."
+  },
+  "outcomes_before_data": {
+    "displacement": "If the displacement predictions hold: rule = a non-bypass async copy displaces resident local-memory lines of the SM from L1 (count per copy from the K sweep); a displaced stack line is reloaded at the L2 latency. Engine fact needed: none beyond the present accesses; rule in the L1 model for local-space lines; leaf value(s) from the K sweep, experimental until the replay passes.",
+    "wait": "If the wait predictions hold: rule = a local load issued while non-bypass copies of the SM are pending completes no earlier than their return; structural field.",
+    "mixed": "Otherwise report the table; addendum with the form before any install."
+  },
+  "prediction_check": "H100 replay (tracer -> convert -> engine) of n = 8, now, ca, same_warp at K = 0, 4, 16 first with main's tree (what the engine gives today) and then with the rule: extra within max(30 cycles, 25 %); then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-gb).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled with their reason.",
+  "addenda": [
+    {
+      "when": "after h100-v2r2 and b300-v2r2 and the H100 engine replay (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/load_after_copies/{h100-v2r2,b300-v2r2} (44 cells each, SASS gate passed; v2r1 is void: a template dispatch bug ran the wrong kernels); replay $CYCLESCOPE_ARTIFACT_ROOT/fg-over20/lac-replay-table.txt",
+      "text": "The v2 chain reads a 1-KiB per-thread array, every load 128 B after the previous one. Cycles of the chain at K = 0 (h100 / b300): n = 1 18 / 18, n = 2 330 / 346, n = 4 1000 / 1022, n = 8 2425 / 2509 - every load that moves to another stack line costs 312-345 cycles with no copies at all, in every repetition. On top of that the copies change nothing: extra <= 39 cycles for every K, for now and after_wait, for cg and other_warp. With the lines rewritten before the copies (stl): h100 2342-2694, b300 4767-4837. Neither declared prediction applies (the chain already misses on every line at K = 0); outcome 'mixed', nothing installed. Together with v1 (chain inside a 256-B array: 39 cycles per load at K = 0, +87 to +234 per load after 4-16 non-bypass copies): stack lines are kept in L1 only within a small footprint per thread, and non-bypass copies displace them. Engine today (replay of n = 8, ca, same_warp on main): 483 cycles at K = 0, 4 and 16 against 2425 (v2 form) and 315 / 1015 / 2189 (v1 form) on hardware; the engine models an LDL of 32 threads as one sector with an L1 hit. Open before any rule: how many stack bytes per thread stay resident as a function of the launch's shared-memory carve-out and thread count, and the displacement per non-bypass copy."
+    },
+    {
+      "when": "correction after reading the probe source (2026-11-15)",
+      "text": "The v2 chain started at base = (lane + rep x 7) mod 256: the index differs per lane, so every LDL of v2 read 32 different frame words (a 32-line gather), unlike v1 and unlike the kernels. The v2 numbers (about 330 cycles per load at K = 0) therefore describe a gather over stack lines and say nothing about a uniform stack reload; the sentence 'every load that moves to another stack line costs 312-345 cycles' of the previous addendum is withdrawn. Protocol v3 repeats the questions with a lane-uniform chain."
+    }
+  ]
+}

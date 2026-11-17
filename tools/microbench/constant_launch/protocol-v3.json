@@ -1,0 +1,29 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "constant_launch",
+ "version": 3,
+ "supersedes": "protocol-v2.json keeps its vector-path results (h100-r2 / b300-r2: bank-0 vector LDC 30.0 measured on both; cold bank 3 h100 830 experimental, b300 640 measured). Its declared rule 'every bank-0 access' extended the vector-LDC value to uniform-path loads (ULDC on sm_90a, LDCU on sm_103a) that were never measured; those are the bulk of bank-0 traffic in the corpus and sit in main loops ($A/diag/cb0/attribution.md), and the A/B arms cbi / lc3 moved 456 / 469 hp cases. Version 3 measures the uniform path with the same chain-and-clock form and declares a rule per path.",
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "memory.constant_cache"
+ ],
+ "probe": {
+  "kernel": "as v2 (16 dependent loads per traversal, two traversals, CS2R SR_CLOCKLO before the first load and after every load, 33 clocks), with the chain held in uniform registers: each load is a uniform-register-indexed constant load (sm_90a ULDC UR, c[0x<BANK>][UR(+imm)]; sm_103a LDCU UR, c[0x<BANK>][UR(+imm)]) whose index comes from the previous load. The chain start must be warp-uniform and not a compile-time constant (e.g. a kernel parameter word), and every thread of the warp runs the chain (no threadIdx-dependent branch around it).",
+  "axes": "PATH in {vector, uniform}; BANK in {0, 3}; S = 256 B; W = 1 warp, grid 1. The vector cells repeat v2's cl.b<BANK>.s256 kernel verbatim (control: must reproduce v2 within 5 %); the uniform cells are new (variant names cl.u.b<BANK>.s256).",
+  "sass_gate": "uniform cells: exactly 33 CS2R SR_CLOCKLO and exactly 32 uniform-register-indexed constant loads (ULDC / LDCU with a UR index) alternating with them in program order, no other memory instruction in the window, and between consecutive loads nothing but the CS2R or the same single uniform ALU op (class recorded). Vector cells: the v2 gate. A variant failing the gate is not measured.",
+  "runner": "as v2 (NCU_LAUNCH_METRICS, --cache-control all, --clock-control none, --replay-mode kernel, 34 launches per variant, first 2 dropped, plain pass reported only); two runs per device into $A/microbench/constant_launch/<device>-r3/run-{a,b}. LAUNCH line as v2 with variant cl.b<BANK>.s256 or cl.u.b<BANK>.s256."
+ },
+ "derivation": "v2 derivation unchanged per variant (first / load0 / second medians of clock deltas minus the installed instruction.service result latency of the in-between op class, which for uniform ops is the class the arch rules map the SASS op to).",
+ "acceptance": {
+  "cell": "v2 cell criterion (run agreement <= 5 %, (p90 - p10) / median <= 30 %).",
+  "control": "vector cells reproduce the v2 values within 5 % (else the device's run is not used).",
+  "decision_declared_before_data": {
+   "path_split": "the engine distinguishes the two paths by the instruction's opcode root (LDC = vector; ULDC / LDCU = uniform). A per-path bank-0 rule is installed for a path only when that path's bank-0 first and second cells are measured and second is within 10 % of first: vector -> field bank0_access_cycles = v2 value (30.0 both devices, already measured); uniform -> new field bank0_uniform_access_cycles = mean of the two runs' cl.u.b0.s256 first. A path without an installed rule keeps today's miss / hit / same-line / in-flight rules for bank 0.",
+   "cold_miss": "miss_latency_cycles stays one field: replaced by the bank-3 first value only when the vector and uniform bank-3 first cells are both measured and within 10 % of each other (their mean); otherwise unchanged (installed values kept, both cells reported)."
+  }
+ },
+ "install": "memory.constant_cache fields per the decision, both devices from their own runs (source constant_launch.<device>.r3, protocol tools/microbench/constant_launch/protocol-v3.json); engine path split with a CTest fixture (fields absent -> byte-identical); A/B 500 x 2 against the main baseline; then lifecycle v3 cells re-simulated and the envelope re-derived (lifecycle protocol-v3 dependence clause) with its own A/B.",
+ "limits": "one warp, 16 lines of a 4 KiB parameter struct; loop-resident parameter reads in real kernels repeat a few lines many times, which this probe's second traversal covers only for 16 distinct lines.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, cell or derivation change after data."
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "flashmla_dense_decode_bf16_q1_04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 71056,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 7340917,
+ "completed": 7340917,
+ "cycles": 115933,
+ "hard": 0,
+ "walls": {
+  "convert": 13.0,
+  "segments": 0.0,
+  "build": 1.1,
+  "sim": 14.0,
+  "total": 28.2
+ },
+ "rss_kb": {
+  "convert": 300296,
+  "segments": 300296,
+  "build": 300296,
+  "sim": 989204
+ },
+ "hw_cycles": 118538.0,
+ "reference_cache_control": "all",
+ "placement_digest": "ff75886236d36e1b",
+ "shards": 10
+}

@@ -1,0 +1,100 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "tensor_pipe",
+ "version": 2,
+ "supersedes": "tools/microbench/tensor_pipe/protocol.json (version 1; its only run, b300-r1 with the verbatim umma.cu, is recorded as not installable, see failed_attempt)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "tensor.pipe",
+  "tensor.completion"
+ ],
+ "failed_attempt": "b300-r1 (umma.cu verbatim, U in {1, 2, 4, 8, 16}): the cadence over U <= 16 is not yet linear at N >= 128 (fit residual 10-24 %), so the version-1 slope is not the steady-state pipe beat; the increments at U 8 -> 16 approach N / 2 cycles (44 / 61 / 128 at N 64 / 128 / 256, cta_group 1). The same run shows that the installed b300 tensor.pipe points equal the single-op latency (xw U = 1: 86.0 / 115.2 / 182.1 vs installed 87.7 / 116.2 / 181.7 for f16 cg1 smem N 64 / 128 / 256), i.e. the predecessor leaf holds the pipe for the whole op latency with tensor.completion = 0, which serializes back-to-back MMAs at 1 / latency instead of 1 / cadence. Model output $A/microbench/tensor_pipe-model/b300-r1/model.json.",
+ "devices": {
+  "h100": "sm_90a (1 GPU)",
+  "b300": "sm_103a (1 GPU)"
+ },
+ "probe": {
+  "b300": "tools/microbench/tensor_pipe/probe/umma_cadence.cu: kernels and windows are umma_impl.cuh (verbatim blackwell-prototype); its main() is umma_main() with only the N loop (16..256 step 16, every N the descriptor allows at M = 128 per CTA) and the layout loop (SWIZZLE_128B only) changed; cells 6 umma kinds x cta_group {1, 2} x A from SMEM / TMEM; xw U in {0, 1}; cad U in {16, 32, 64, 128}. umma.cu (version 1) is rebuilt and rerun in the same job as a control. --launches 16 --reps 257, two runs (run-a, run-b) in one job.",
+  "h100": "tools/microbench/tensor_pipe/probe/wgmma.cu as specified in version 1 (one warpgroup, lat U in {0, 1}, cells: HGMMA f16 (F32 and F16 accumulators), bf16, tf32; QGMMA e4m3.e4m3, e4m3.e5m2, e5m2.e5m2; IGMMA s8.s8; every ISA-valid n; ss and rs; wg2 diagnostic) with cad U in {16, 32, 64, 128}; --launches 16 --reps 257, two runs; SASS gate as in version 1"
+ },
+ "derivation": {
+  "E_U, o_s": "as version 1",
+  "beat (tensor.pipe cycles)": "OLS slope of E_U(cad) over U in {32, 64, 128}",
+  "latency_1": "as version 1 (xw / lat U = 1 minus the U = 0 kernel of the same cta_group / source form, minus the o_s difference)",
+  "completion (tensor.completion cycles)": "latency_1 - beat",
+  "linearity diagnostic": "the U = 16 point's deviation from the {32, 64, 128} line is reported"
+ },
+ "acceptance": {
+  "beat": "max relative residual of the {32, 64, 128} fit <= 2 % and run agreement <= 3 % -> measured, else experimental and listed",
+  "completion": "run agreement <= 5 % or <= 2 cycles -> measured; a negative completion within 2 se of 0 installs 0; beyond 2 se: reported, not installed (the point keeps pipe = latency_1, completion = 0)",
+  "b300_control": "the installed b300 tensor.pipe point at the same (class, kind, cta_group, a_src, M, N, K, operation normal, major 0, max shift 0) is compared with latency_1 (not with beat, see failed_attempt); within 10 % -> the predecessor point is confirmed to be the single-op latency and is replaced by beat + completion from this run; beyond 10 % -> both numbers reported and the point is still replaced by this run's values when its cells pass",
+  "h100": "every passing cell installed (measured); experimental cells installed as experimental; census cells (tools/microbench/tensor_pipe/census.py over the hp-sc static SASS) without a realised measurement reported, no neighbour fill"
+ },
+ "install": {
+  "b300": "blackwell/leaves/tensor.pipe.json: at every measured normal-operation point cycles = beat; blackwell/leaves/tensor.completion.json re-partitioned like tensor.pipe (operation_class / umma_kind / cta_group / a_src -> discrete over [tensor_m, tensor_n, tensor_k, umma_operation, umma_operand_major, umma_max_shift]) with completion at the measured points and 0 at the pipe table's other points (those points keep the predecessor's pipe = single-op latency semantics; listed as remaining in docs/en/microbench.md); common tensor.completion field_models already allow these axes",
+  "h100": "per version 1 install.h100 (discrete over [input_dtype, source_mode, tensor_n] per HGMMA / QGMMA / IGMMA for both fields; common axes_subset_of gains input_dtype and source_mode)",
+  "sources": "tensor_pipe.<device>.<run> (protocol tools/microbench/tensor_pipe/protocol-v2.json); artifacts $A/microbench/tensor_pipe/<device>-<run>/, $A/microbench/tensor_pipe-model/<device>-<run>/model.json",
+  "ab": "one two-architecture 450 A/B round per device install (GEMM families watched)"
+ },
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no neighbour fill",
+ "addenda": [
+  {
+   "date": "2026-11-05",
+   "before_install": true,
+   "text": "h100-r1h review (model $A/microbench/tensor_pipe-h100/model-r1h/model.json): (1) the SASS of the U = 0 kernels holds one null op `HGMMA.64x8x16.F16 RZ, gdesc[URZ], RZ, !UPT, gsb0` = the compiler's encoding of the empty commit group; it is not counted as a measured op, but its cost is inside E_0, so every h100 tensor.completion value is installed as experimental (the baseline is not a pure commit) while the beat is unaffected. (2) ptxas reported C7511 'wgmma.mma_async instructions are serialized due to insufficient register resources' for 530 kernels, all rs (A from registers) cad kernels at U 64/128 and 46 at U 32 (ss: none); the SASS shows WARPGROUP.DEPBAR + ARRIVE + register moves between every rs op, so those cadences are serialized single-op latencies, not the pipe beat. The SASS gate now also rejects any kernel ptxas reports as serialized; all rs cells of h100-r1h are unrealised. rs cells are re-run (h100-r2, rs only) with the probe's register budget raised (launch bounds 128 threads x 1 block so ptxas may use up to 255 registers; no other change) and the same gate; if ptxas still serializes, rs stays unrealised. (3) ss cells with a negative completion beyond 2 se (n 8 / 16: cadence above the single-op latency, issue-bound small shapes) install pipe = beat (its own criterion passed) and completion = 0; the parenthetical 'pipe = latency_1' of the completion rule targets b300 predecessor points and is not applied to a passing beat. (4) wg2 ratio 2.00 at n 64 / 128 / 256 confirms one tensor pipe per SM."
+  },
+  {
+   "date": "2026-11-05",
+   "before_run": "h100-r3 (rs only)",
+   "text": "h100-r2c (__launch_bounds__(128,1)) still has 491 C7511-serialized rs kernels (every cad U 64/128, n 256 also U 32): the straight-line U-op window needs more registers than ptxas can give to an rs pipeline. Last attempt for rs: the cad window becomes a runtime loop of G iterations over a body of 16 straight-line rs ops (same D, same A registers), U = 16 x G with G in {2, 4, 8} (U 32 / 64 / 128); the loop branch and counter are the only extra instructions. SASS gate: the loop body holds exactly 16 target ops and no WARPGROUP.DEPBAR / WARPGROUP.ARRIVE between them, and ptxas reports no C7511 for the kernel. beat = OLS slope over U in {32, 64, 128} as before (the loop overhead per 16 ops is part of the slope and is reported from the SASS control words). If ptxas still serializes, or the gate fails, every rs cell is recorded unrealised (installed rs points then keep the predecessor value with its evidence; no fill from ss)."
+  },
+  {
+   "date": "2026-11-05",
+   "before_install": false,
+   "after_data": true,
+   "text": "Post-install correction, written after the b300-r2 data were installed. The umma_cadence SASS shows every UTCxMMA wrapped by ptxas in an ELECT / BRA.U.ANY loop (5906 BRA.U.ANY for 5784 UTCxMMA); the v2 SASS gate did not reject branches between target ops. The b300 v2 beats therefore include per-op loop overhead; the N<=96 floor of 44-48 cycles is suspected to be this overhead (blackwell-prototype elected-form records give 39-40, and about 9 at N<=16). Gate tightened: any BRA/ELECT/WARPSYNC between consecutive target ops fails the kernel. All b300 v2 tensor.pipe and tensor.completion cells are downgraded from measured to experimental until an elected-form remeasure (tensor_pipe_forms protocol, which remeasures the v2 coordinates as its control) replaces them. h100 wgmma kernels contain no BRA.U.ANY and are unaffected."
+  },
+  {
+   "date": "2026-11-05",
+   "name": "h100 serialized-latency cells (ser / grp)",
+   "written_before": "any ser / grp kernel was built or run (h100-r4)",
+   "motivation": "The installed h100 tensor.completion (ss 9 cycles, experimental) comes from latency_1 = E_1(lat) - E_0(lat) where the U = 0 kernel carries the compiler's null HGMMA.64x8x16 for the empty commit group, so one wgmma latency is subtracted away and latency_1 collapses onto the beat (rs n128: latency_1 63.0 vs beat 63.96). Single-cluster accuracy data (round 23, $A/merge/sda): 96 hp GEMM cases whose SASS has one WARPGROUP.DEPBAR.LE gsb0,0x0 per HGMMA (ptxas-serialized wgmma) run at sim/ncu median 0.81; cutlass_stream_k_splitk_01 (two consumer warpgroups, 1024 serialized m64n128k16 bf16 ss ops each) takes 214 hardware cycles per op per warpgroup against 147 in the engine, i.e. the hardware single-op issue -> wait_group-0 latency is far above beat + 9. The completion value has to be measured without a null-op baseline.",
+   "probe": "wgmma.cu / gen_wgmma.py gain two modes, same cells (kind, acc, src, n) and the same descriptors / operands as lat and cad: ser: t_s = clock64; U x { wgmma.fence; one wgmma.mma_async (same D, scale-d 1); wgmma.commit_group; wgmma.wait_group 0 }; t_w = clock64; U in {1, 2, 4, 8}. grp: U x { wgmma.fence; 4 x wgmma.mma_async (same D, scale-d 1); wgmma.commit_group; wgmma.wait_group 0 }; U in {1, 2, 4}; grp only for bf16 ss / e4m3e4m3 ss, n in {64, 128, 256} (diagnostic of the group rule). --launches 16 --reps 257, two runs (run-a, run-b) in one job on one H100.",
+   "sass_gate": "a ser kernel must contain exactly U HGMMA/QGMMA/IGMMA target ops and exactly U WARPGROUP.DEPBAR.LE gsb0, 0x0 between t_s and t_w, no BRA / ELECT / WARPSYNC between them; a grp kernel exactly 4U target ops and U DEPBAR; the null HGMMA.64x8x16 RZ pattern must not appear; ptxas C7511 is irrelevant here (serialization is the intent) and is not a rejection for ser / grp.",
+   "derivation": {
+    "E_ser(cell, U)": "mean over samples of (t_w - t_s)",
+    "L_ser(cell)": "OLS slope of E_ser over U in {1, 2, 4, 8}",
+    "o_ser(cell)": "per-iteration issue stalls of the non-target SASS in one ser iteration (WARPGROUP.ARRIVE, WARPGROUP.DEPBAR, register / UR moves), summed from the control words with sass_ctrl.py (the o_s convention); the engine issues these instructions itself, so their cost is not part of the leaf",
+    "completion_ser(cell)": "L_ser - beat(cell) - o_ser(cell), beat from the same run's cad cells (or the installed h100 beat when the cad cell is absent)",
+    "L_grp / completion_grp": "OLS slope of E_grp over U in {1, 2, 4}; completion_grp = L_grp - 4 x beat - o_grp; reported next to completion_ser of the same cell: agreement within 10 % confirms the engine rule 'group completes at last op pipe start + beat + completion' (one completion per wait, not per op)"
+   },
+   "acceptance": {
+    "ser cell": "max relative residual of the {1, 2, 4, 8} fit <= 2 % and run agreement of completion_ser <= 3 % (or <= 2 cycles) -> measured; residual <= 5 % or agreement <= 8 % -> experimental and listed; otherwise unrealised (cell keeps its current value)",
+    "negative completion_ser": "within 2 se of 0 -> install 0; beyond -> reported, not installed"
+   },
+   "install": "hopper/leaves/tensor.completion.json: every HGMMA / QGMMA / IGMMA (input_dtype, accumulator_dtype, source_mode, tensor_n) point with a passing ser cell gets cycles = completion_ser (evidence per the acceptance clause, source tensor_pipe.h100.completion.ser.<run>); points without a ser cell keep the present value and source. tensor.pipe is not touched by this addendum. Engine rule unchanged (cpp/arch/hopper/wgmma.cpp: op completion = pipe start + beat + completion; wait_group releases at the group's last completion). One hp 500 A/B (b300 tree and engine unchanged, bw is identical by construction and not rerun).",
+   "not_allowed": "no case-cycle tuning; no neighbour fill across n or kinds; no threshold or derivation change after data"
+  },
+  {
+   "date": "2026-11-05",
+   "name": "h100 ser / grp under two-warpgroup contention (wg2 diagnostic)",
+   "written_before": "any ser.wg2 / grp.wg2 kernel was built or run (h100-r5)",
+   "motivation": "With completion_ser installed (h100-r4) cutlass_stream_k_splitk_01 still runs 171 k engine cycles against 219 k hardware: per serialized op per warpgroup 167 vs 214. Its two consumer warpgroups interleave serialized m64n128k16 bf16 ss ops on one SM. The engine's rule (op completion = pipe start + beat + completion, pipe shared by beats across warpgroups) lets the two warpgroups settle into a 64-cycle offset and gives ~128 per op; the hardware number is closer to beat + L_ser = 181, i.e. as if every op waited the whole other-warpgroup op before its own latency. The wg2 cad cells only show throughput (ratio 2.00); the latency a serialized op sees under contention has not been measured.",
+   "probe": "ser and grp windows run by two warpgroups of one CTA concurrently (wgroups = 2, as the existing wg2 cad cells: both warpgroups execute the same window, timing thread = warp 0 lane 0 of warpgroup 0, each warpgroup with its own accumulator and its own smem operand copies). Cells: ser.wg2 for bf16 ss n in {64, 128, 256}, e4m3e4m3 ss n128, tf32 ss n128, U in {1, 2, 4, 8}; grp.wg2 for bf16 ss n in {64, 128, 256}, U in {1, 2, 4}. --launches 16 --reps 257, two runs in one job on one H100. Same SASS gate as the r4 ser / grp cells.",
+   "derivation": {
+    "L_ser_wg2(cell)": "OLS slope of E_ser.wg2 over U in {1, 2, 4, 8} (per-op period of one warpgroup while the other runs the same chain)",
+    "L_grp_wg2(cell)": "OLS slope of E_grp.wg2 over U in {1, 2, 4} (per 4-op group period under contention)",
+    "engine_prediction": "pipe shared by beats, completion once per wait: ser.wg2 -> 2 x beat per op once offset (lower bound) up to beat + L_ser (lockstep); grp.wg2 -> 4 x beat + completion_ser (offset) up to 4 x beat + L_ser (lockstep). The measured slope is placed against these two bounds and reported; this addendum installs nothing"
+   },
+   "acceptance": "fit residual <= 2 % and run agreement <= 3 % -> the slope is a measured diagnostic; otherwise reported as experimental. No leaf is installed from this addendum; an engine-rule change, if the data call for one, is a separate change with its own CTest fixture and 500 A/B.",
+   "not_allowed": "no case-cycle tuning; no derivation change after data"
+  },
+  {
+   "date": "2026-11-07",
+   "before_install": true,
+   "written_before": "any sparse run (h100-r6)",
+   "text": "(sparse wgmma forms, h100) Round 32 attribution: cutlass_sparse (9 cases, median 0.81) issues HGMMA.SP 64xNx32 (bf16 / f16) and QGMMA.SP 64xNx64 (fp8) which the engine times as the dense n-form (beat n/2); hardware WARPGROUP.DEPBAR 329 vs engine 226 per op and WARPGROUP.ARRIVE 100 (metadata LDS). New cell family `wgmma_sp`: gen_wgmma.py gains the `.sp` variant (wgmma.mma_async.sp.sync.aligned.m64nNk32.f32.bf16.bf16 / f16 and .sp...k64.f32.e4m3.e4m3 with the sparse metadata register and selector 0, A from registers (rs) and from smem (ss) as the dense forms), N in the dense set, same 16-op loop body, U in {32, 64, 128}; cadence beat = OLS slope over U (residual <= 2 %, two runs <= 3 % -> measured), completion = single-op latency minus beat as for the dense forms; SASS gate: window = exactly U HGMMA.SP / QGMMA.SP of the form (cuobjdump prints .SP for wgmma), nothing else. Install: new capture axis `tensor_sparse` (0 dense / 1 sparse; converter py + cpp from the SP token of HGMMA / QGMMA / IGMMA, class unchanged), partition of h100 tensor.pipe and tensor.completion under the dtype / source_mode / tensor_n nodes by tensor_sparse with the measured sparse points (dense points unchanged); forms that fail the gate or the residual are unrealised (their sparse axis then resolves to the dense point via the axis default 0 only if the sparse node is absent -- i.e. no silent fallback for a measured-but-failed form: such a form is installed as unsupported, discrete_miss). A/B 500 x 2 vs $A/merge/ns49; the 9 cutlass_sparse cases are the target."
+  }
+ ]
+}

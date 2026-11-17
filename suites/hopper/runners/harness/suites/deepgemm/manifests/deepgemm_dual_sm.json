@@ -1,0 +1,1408 @@
+{
+  "case_count": 46,
+  "cases": [
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m128_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 10,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m128_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 11,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 6,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m128_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 12,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 12,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m128_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 13,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 18,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m128_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 14,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 24,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m128_n2048_k4096_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 15,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 30,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m128_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_m128_n1024_g4_k4096_dual_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 16,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 128,
+        "n": 1024,
+        "num_groups": 4
+      },
+      "shape_variant": 36,
+      "source_case_id": "bf16_kgroup_tn_contiguous_m128_n1024_g4_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g4_k4096_dual_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 17,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 4
+      },
+      "shape_variant": 41,
+      "source_case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g4_k4096",
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m128_n4096_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 35,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 1,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m128_n4096_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 36,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 7,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m128_n4096_k8192_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 37,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 13,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m128_n4096_k8192_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 38,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 19,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m128_n4096_k8192_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 39,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 25,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m128_n4096_k8192_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 40,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 31,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m128_n4096_k8192",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g4_k4096_dual_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 41,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 4
+      },
+      "shape_variant": 37,
+      "source_case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g4_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_m512_n512_g4_k8192_dual_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 42,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 512,
+        "n": 512,
+        "num_groups": 4
+      },
+      "shape_variant": 42,
+      "source_case_id": "fp8_kgroup_nt_contiguous_m512_n512_g4_k8192",
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m256_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 56,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 2,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m256_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 57,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 8,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m256_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 58,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 14,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m256_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 59,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 20,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m256_n2048_k4096_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 60,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 26,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m256_n2048_k4096_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 61,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 256,
+        "n": 2048
+      },
+      "shape_variant": 32,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m256_n2048_k4096",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_m512_n512_g4_k8192_dual_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 62,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 512,
+        "n": 512,
+        "num_groups": 4
+      },
+      "shape_variant": 38,
+      "source_case_id": "bf16_kgroup_tn_contiguous_m512_n512_g4_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_m1024_n256_g4_k4096_dual_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 63,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 1024,
+        "n": 256,
+        "num_groups": 4
+      },
+      "shape_variant": 43,
+      "source_case_id": "fp8_kgroup_nt_contiguous_m1024_n256_g4_k4096",
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m2048_n128_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 74,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 3,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m2048_n128_k4096_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 75,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 9,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m2048_n128_k4096_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 76,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 15,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m2048_n128_k4096_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 77,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 21,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m2048_n128_k4096_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 78,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 27,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m2048_n128_k4096_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 79,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 128
+      },
+      "shape_variant": 33,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m2048_n128_k4096",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g3_k4096_dual_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 80,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 3
+      },
+      "shape_variant": 39,
+      "source_case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g3_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g3_k4096_dual_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 81,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 3
+      },
+      "shape_variant": 44,
+      "source_case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g3_k4096",
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m1024_n256_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 85,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 4,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m1024_n256_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 86,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 10,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m1024_n256_k8192_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 87,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 16,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m1024_n256_k8192_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 22,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m1024_n256_k8192_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 89,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 28,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m1024_n256_k8192_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 1024,
+        "n": 256
+      },
+      "shape_variant": 34,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m1024_n256_k8192",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g2_k4096_dual_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 2
+      },
+      "shape_variant": 40,
+      "source_case_id": "bf16_kgroup_tn_contiguous_m256_n2048_g2_k4096",
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g2_k4096_dual_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 92,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 256,
+        "n": 2048,
+        "num_groups": 2
+      },
+      "shape_variant": 45,
+      "source_case_id": "fp8_kgroup_nt_contiguous_m256_n2048_g2_k4096",
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_m512_n512_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 5,
+      "source_case_id": "bf16_dense_nt_acc_bf16_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_m512_n512_k8192_dual_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 11,
+      "source_case_id": "bf16_dense_nt_acc_fp32_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_m512_n512_k8192_dual_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 17,
+      "source_case_id": "bf16_dense_nn_acc_bf16_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_m512_n512_k8192_dual_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 99,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 23,
+      "source_case_id": "bf16_dense_tn_acc_fp32_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_m512_n512_k8192_dual_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 100,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 29,
+      "source_case_id": "bf16_dense_tt_acc_fp32_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_m512_n512_k8192_dual_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 101,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "qualification_status": "pending_h100_topology_and_timing",
+      "requested_num_sms": 2,
+      "shape": {
+        "k": 8192,
+        "m": 512,
+        "n": 512
+      },
+      "shape_variant": 35,
+      "source_case_id": "fp8_dense_nt_acc_fp32_m512_n512_k8192",
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite": "deepgemm",
+      "suite_part": "core"
+    }
+  ],
+  "schema_version": "deepgemm-hopper-dual-sm-cluster-v1",
+  "selection_rule": "acc dense and kgroup groups=4 shapes expected to select TMA multicast=2; requested_num_sms=2",
+  "source_manifest": "manifests/deepgemm_single_sm.json"
+}

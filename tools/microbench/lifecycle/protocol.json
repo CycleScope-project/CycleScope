@@ -1,0 +1,15 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "lifecycle",
+ "frozen_before_gpu": true,
+ "date": "2026-11-04",
+ "mechanism": "kernel.lifecycle",
+ "fields": ["envelope_cycles (linear in launch_warps_per_cta)"],
+ "devices": {"h100": "sm_90a, CYCLESCOPE_NCU", "b300": "sm_103a, image ncu"},
+ "purpose": "One launch envelope definition for both architectures under the cold reference (ncu --cache-control all): envelope = sm__cycles_active.max of the launch minus the per-SM span of the kernel's own instruction timeline (first clock read to last clock read on the SM). The h100 tree carries warm_cycles(launch_warps_per_cta) 320-362 + cold_extra 326 measured under cache-control none / first launch; b300 carries 0 (placeholder). Both are replaced by envelope_cycles measured here; the cold_extra field is dropped (every launch is cold under `all`).",
+ "probe": "blackwell-prototype tools/microbench/probes/lifecyc.cu (k_life<L>: every thread reads clock64 as the first instruction, runs a dependent FFMA chain of L, reads clock64 again; lane 0 of every warp stores t0/t1, thread 0 of every CTA stores %smid) copied verbatim into tools/microbench/lifecycle/probe/, compiled for sm_90a / sm_103a. Axes: W warps per CTA in {1, 4, 8, 16, 32}, cluster size C in {1, 2} (one CTA per cluster member, grid = C), dynamic smem S in {0, 64 KiB}, L in {64, 4096}. 16 launches per variant.",
+ "runner": "ncu --metrics sm__cycles_active.max,sm__cycles_elapsed.max,smsp__inst_executed.sum --cache-control all --clock-control none --replay-mode kernel; per launch the probe prints the per-SM marker span max(t1) - min(t0) over the warps on that SM.",
+ "derivation": "envelope(W, C, S, L) = sm__cycles_active.max - max over SMs of the marker span (median over launches 2..15). Install envelope_cycles as linear points over launch_warps_per_cta = W using the C=1, S=0 cells; L=64 vs L=4096 must agree within 5 % (the envelope does not depend on body length); C=2 and S=64 KiB cells are reported (cluster launch / smem carve-out extras) and only installed as a partition if they differ from the C=1, S=0 cell by more than 10 % AND the capture carries the axis (cluster size yes; dynamic smem yes via LNCH.shared_dynamic_bytes).",
+ "acceptance": "per-launch spread (P90 - P10) / median < 10 % for every installed cell; L-independence within 5 %; otherwise the field is installed as experimental with the spread recorded.",
+ "install": "<arch>/leaves/kernel.lifecycle.json: envelope_cycles linear(launch_warps_per_cta) with source key lifecycle.<device>.<run>; the h100 cold_extra_cycles field and the engine's function_prior_launches branch are removed (mechanism-merge-plan.md section 2.1)."
+}

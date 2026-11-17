@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-BF16-TN-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 71720,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 747084,
+ "completed": 747084,
+ "cycles": 17004,
+ "hard": 0,
+ "walls": {
+  "convert": 4.5,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 2.9,
+  "total": 7.7
+ },
+ "rss_kb": {
+  "convert": 256612,
+  "segments": 256612,
+  "build": 256612,
+  "sim": 299368
+ },
+ "hw_cycles": 19696.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

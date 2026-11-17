@@ -1,0 +1,48 @@
+{
+  "schema_version": "hopper.delivery.v1",
+  "suite": "deepgemm",
+  "name": "DeepGEMM Hopper full-GPU delivery tests",
+  "architecture": "sm_90a",
+  "formal_source_root": "suites/deepgemm",
+  "generated_artifacts_root": "artifacts/suites/deepgemm",
+  "generated_artifacts_env": "DEEPGEMM_DELIVERY_ARTIFACTS_ROOT",
+  "supported_gpu_profiles": [
+    "h20",
+    "h100",
+    "h200"
+  ],
+  "validated_gpu_profiles": [],
+  "qualification_status": "not_two_round_qualified",
+  "case_sets": {
+    "deepgemm_100": {
+      "case_count": 100,
+      "manifest": "manifests/deepgemm_100.json",
+      "qualification_status": "not_two_round_qualified",
+      "validated_gpu_profiles": []
+    }
+  },
+  "historical_case_sets": {
+    "deepgemm_single_sm": {
+      "manifest": "manifests/deepgemm_single_sm.json",
+      "status": "historical",
+      "purpose": "archived identity only; not a registered or executable full100 entry"
+    },
+    "deepgemm_dual_sm": {
+      "manifest": "manifests/deepgemm_dual_sm.json",
+      "status": "historical",
+      "purpose": "archived identity only; not a registered or executable full100 entry"
+    }
+  },
+  "reference_profile": "h100",
+  "timing_protocol": {
+    "primary_metric": "device globaltimer span",
+    "raw_intervals_per_case": 36,
+    "raw_intervals_per_recorded_sample": 4,
+    "recorded_samples_per_case": 9,
+    "summary": "median",
+    "cv_definition": "sample standard deviation divided by mean",
+    "results_directory": "cycles_v2_globaltimer_9"
+  },
+  "source_revision": "559d79fb6994a58b8a15b4b93bf13ccc16edf247",
+  "cutlass_dependency": "../cutlass/upstream"
+}

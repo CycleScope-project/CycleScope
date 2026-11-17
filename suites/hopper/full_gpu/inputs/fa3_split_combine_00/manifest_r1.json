@@ -1,0 +1,199 @@
+{
+ "schema_version": "flashattention3-full-gpu-candidates-v1",
+ "name": "FlashAttention-3 Hopper full-GPU mechanism candidate pool",
+ "implementation": "FA3",
+ "architecture": "sm_90a",
+ "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+ "source_url": "https://github.com/Dao-AILab/flash-attention/tree/main/hopper",
+ "candidate_count": 128,
+ "primary_mechanism_count": 32,
+ "seeds_per_primary": {
+  "cluster_even": 4,
+  "cluster_odd": 4,
+  "mma_pv_ss_hd64": 4,
+  "mma_pv_rs_hd128": 4,
+  "mma_pv_ss_hd96": 4,
+  "fp8_transpose_hd96": 4,
+  "fp8_hd192_cluster": 4,
+  "paged_tma": 4,
+  "paged_nontma": 4,
+  "dv512_mla": 4,
+  "dv256_qv": 4,
+  "hd192_dv128": 4,
+  "pack_gqa": 4,
+  "causal_lpt": 4,
+  "local_window": 4,
+  "attention_chunk": 4,
+  "softcap": 4,
+  "varlen_fwd": 4,
+  "split_kv_fixed": 4,
+  "split_varlen_dense_combine": 4,
+  "split_varlen_sparse_combine": 4,
+  "kvcache_append_rotary": 4,
+  "kvcache_paged_decode": 4,
+  "kvcache_leftpad": 4,
+  "bwd_deterministic": 4,
+  "bwd_dqacc_bulk": 4,
+  "bwd_dqacc_atomic_d256": 4,
+  "bwd_gqa_varlen": 4,
+  "bwd_causal_softcap": 4,
+  "combine_standalone": 4,
+  "hd256_fwd": 4,
+  "reuse_scheduler_metadata": 4
+ },
+ "h100_cycle_filter": {
+  "minimum_cycles": 100000,
+  "maximum_cycles": 1500000,
+  "status": "unmeasured_candidates",
+  "measurement": "GPU kernel cycles collected during qualification; not a simulator parameter"
+ },
+ "tuning_policy": "axis in {batch,seqlen_k,num_splits,repeat_seqlens_batch}; values is an ordered legal list. Default is batch doubling. Varlen/sparse uses repeat_seqlens_batch to keep long/short ratio. Apply with apply_tuning(); never loop the same launch.",
+ "qualification_status": "candidate",
+ "cases": [
+  {
+   "api": "flash_attn_varlen_func",
+   "append_kv": false,
+   "attention_chunk": 0,
+   "batch": 4,
+   "c450_full": {
+    "walk_start": {
+     "replicate_factor": 1,
+     "batch": 256
+    },
+    "rule": "I=c450; P=batch until est grid>=132"
+   },
+   "cache_batch_idx": false,
+   "cache_leftpad": false,
+   "case_id": "fa3_split_combine_00",
+   "causal": false,
+   "cluster_sm": null,
+   "deterministic": false,
+   "dtype": "fp16",
+   "head_dim": 64,
+   "head_dim_v": 64,
+   "heads_kv": 8,
+   "heads_q": 8,
+   "implementation": "FA3",
+   "input_seed": 0,
+   "invocation": {
+    "allow_missing_lineinfo": true,
+    "argv": [
+     "python3",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/harness/run_full_gpu.py",
+     "--manifest",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/manifests/fa3_cluster_sm100.json",
+     "--case-id",
+     "fa3_split_varlen_dense_combine_02_cluster_sm",
+     "--mode",
+     "capture",
+     "--build-root",
+     "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+    ],
+    "carveout": "auto",
+    "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3",
+    "env": {},
+    "kernel_range": "",
+    "marker_contract": {
+     "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/harness/run_full_gpu.py",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+   },
+   "mechanism_evidence": {
+    "condition": "varlen+split; 2*ceil(total_q/kBlockM) >= B*ceil(max_q/kBlockM) \u2192 STANDARD",
+    "files": [
+     "upstream/hopper/flash_fwd_combine_kernel.h",
+     "upstream/hopper/flash_api.cpp"
+    ],
+    "observed_cluster_source": false,
+    "primary": "split_varlen_dense_combine",
+    "sm_margin": "official flash_attn_* sm_margin \u2192 params.num_sm = multiProcessorCount - sm_margin",
+    "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+    "symbols": [
+     "choose_scheduling_algo",
+     "STANDARD",
+     "run_mha_fwd_combine"
+    ]
+   },
+   "mechanisms": [
+    "split_varlen_dense_combine",
+    "mma_pv_ss",
+    "split_kv",
+    "combine_dense"
+   ],
+   "num_splits": 0,
+   "operation": "varlen_fwd",
+   "pack_gqa": null,
+   "page_size": null,
+   "predicted_cluster_m": 1,
+   "primary_mechanism": "split_varlen_dense_combine",
+   "qv": false,
+   "reuse_scheduler_metadata": false,
+   "rotary_dim": 0,
+   "rotary_interleaved": true,
+   "seed_index": 2,
+   "seqlen_k": 16384,
+   "seqlen_new": null,
+   "seqlen_q": 192,
+   "seqlens_k": [
+    8192,
+    8192,
+    8192,
+    8192
+   ],
+   "seqlens_q": [
+    192,
+    192,
+    192,
+    192
+   ],
+   "sm_margin": null,
+   "softcap": 0.0,
+   "source": "upstream/hopper/flash_attn_interface.py",
+   "source_case_id": "fa3_split_varlen_dense_combine_02",
+   "source_evidence": {
+    "condition": "varlen+split; 2*ceil(total_q/kBlockM) >= B*ceil(max_q/kBlockM) \u2192 STANDARD",
+    "files": [
+     "upstream/hopper/flash_fwd_combine_kernel.h",
+     "upstream/hopper/flash_api.cpp"
+    ],
+    "symbols": [
+     "choose_scheduling_algo",
+     "STANDARD",
+     "run_mha_fwd_combine"
+    ]
+   },
+   "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+   "suite": "flashattention3",
+   "target_ctas": 1,
+   "trigger": {
+    "cluster_m": 1,
+    "combine_dense": true,
+    "combine_sparse": false,
+    "dqacc_atomic_d256": false,
+    "dqacc_bulk_tma": false,
+    "element_size": 2,
+    "enable_cluster": false,
+    "fp8_transpose_v": false,
+    "has_qv": false,
+    "intra_wg_overlap": true,
+    "is_local": false,
+    "is_split": true,
+    "is_varlen": true,
+    "kBlockM": 192,
+    "kBlockN": 192,
+    "mma_pv_is_rs": false,
+    "n_m_tiles": 1,
+    "pack_gqa": true,
+    "pagedkv_nontma": false,
+    "pagedkv_tma": false
+   },
+   "uses_cluster": null,
+   "window_size": [
+    -1,
+    -1
+   ]
+  }
+ ]
+}

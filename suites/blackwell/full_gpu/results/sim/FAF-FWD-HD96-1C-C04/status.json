@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-HD96-1C-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 291828,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4510397,
+ "completed": 4510397,
+ "cycles": 29377,
+ "hard": 0,
+ "walls": {
+  "convert": 6.9,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 9.9,
+  "total": 17.5
+ },
+ "rss_kb": {
+  "convert": 374032,
+  "segments": 374032,
+  "build": 374032,
+  "sim": 610340
+ },
+ "hw_cycles": 30885.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 7
+}

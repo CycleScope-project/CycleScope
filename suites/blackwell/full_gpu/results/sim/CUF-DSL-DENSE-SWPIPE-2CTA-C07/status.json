@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-DENSE-SWPIPE-2CTA-C07",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 84470,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 321842,
+ "completed": 321842,
+ "cycles": 48068,
+ "hard": 0,
+ "walls": {
+  "convert": 2.7,
+  "segments": 0.0,
+  "build": 0.2,
+  "sim": 1.9,
+  "total": 4.8
+ },
+ "rss_kb": {
+  "convert": 179948,
+  "segments": 179948,
+  "build": 179948,
+  "sim": 229104
+ },
+ "hw_cycles": 66306.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 2
+}

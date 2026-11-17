@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLNORM-ROPE-S02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2162295,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 16416583,
+ "completed": 16416583,
+ "cycles": 108391,
+ "hard": 0,
+ "walls": {
+  "convert": 26.6,
+  "segments": 0.0,
+  "build": 1.6,
+  "sim": 38.9,
+  "total": 67.1
+ },
+ "rss_kb": {
+  "convert": 676232,
+  "segments": 676232,
+  "build": 676232,
+  "sim": 1786460
+ },
+ "hw_cycles": 116148.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 16
+}

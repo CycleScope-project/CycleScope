@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C92-MOE-REG-S05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 232991,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3831720,
+ "completed": 3831720,
+ "cycles": 34990,
+ "hard": 0,
+ "walls": {
+  "convert": 5.9,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 5.7,
+  "total": 12.1
+ },
+ "rss_kb": {
+  "convert": 674324,
+  "segments": 674324,
+  "build": 674324,
+  "sim": 674324
+ },
+ "hw_cycles": 36013.0,
+ "reference_cache_control": "all",
+ "placement_digest": "64ae7b62139130c2",
+ "shards": 7
+}

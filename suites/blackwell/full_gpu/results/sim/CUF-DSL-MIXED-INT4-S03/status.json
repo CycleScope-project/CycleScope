@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-MIXED-INT4-S03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 323254,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2483750,
+ "completed": 2483750,
+ "cycles": 20705,
+ "hard": 0,
+ "walls": {
+  "convert": 5.5,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 5.1,
+  "total": 11.1
+ },
+ "rss_kb": {
+  "convert": 324848,
+  "segments": 324848,
+  "build": 324848,
+  "sim": 392640
+ },
+ "hw_cycles": 22209.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 5
+}

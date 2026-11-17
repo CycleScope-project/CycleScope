@@ -1,0 +1,116 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "wgmma_overlap",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "mechanisms": [
+  "hopper.wgmma.register_file_issue_steal (kind 44, legacy placeholder 0.24-0.55 cycles per launch, truncates to 0 in the engine)",
+  "register_file.operand_read (OP2p, dispatch_contention v4)",
+  "scheduler issue slot"
+ ],
+ "devices": {
+  "h100": "sm_90a, pod (wgmma is sm_90a only; Blackwell UMMA reads smem / TMEM, the 500-case residuals show no issue-density gradient there, so no b300 cell)"
+ },
+ "question": "Whole-set attribution on main 8ed4e9b0 (mr51, 500 h100 single-cluster cases): the residual log(sim/ref) falls with the kernel's issue density (sim IPC per SMSP, Spearman -0.42, R^2 0.21; top decile median 0.83, families fa3 / deepgemm / flashmla), while Blackwell shows no such gradient (R^2 0.003). Per-PC hardware stall samples (pcstalls2, 7 under-estimated cases) show the ALU phases that run while a wgmma of the same CTA is executing cost 1.4-2.7x the simulator's per-instruction time (fa3_fwd_hdim_small_05: FMNMX row-max chain 13.5 vs 4.9 cycles per step at 3 consumer warps per SMSP; softmax / rescale regions 555 / 592 / 1011 vs 232 / 304 / 513 cycles per iteration), with the extra hardware samples in the reasons dispatch / wait / not_selected / math. A diagnostic engine arm (CYCLESCOPE_DIAG_WGMMA_STEAL=k: every issue on an SM with an executing wgmma gets a control floor of now + 1 + k; $A/merge/acc53-k{1,2}) moves the set as the hypothesis predicts: k=2 hp MAPE 9.1 -> 7.8 %, P90 20.0 -> 17.2, median 0.961 -> 0.998, fa3 11.2 -> 6.7 %, deepgemm 7.7 -> 5.5, flashmla 8.3 -> 7.3, the IPC gradient flattens (Spearman -0.14; top decile 0.83 -> 0.945) while cublas worsens 7.5 -> 8.2 %. Question: by how much, and through which unit, does an executing wgmma slow instruction issue of the warps on its SM? The three candidate units are the SMSP issue slot (a per-instruction floor or a halved issue rate), the general-purpose register-file read ports (OP2p reads_per_cycle), and nothing (the arm's movement was coincidental).",
+ "engine_rules_declared_before_data": {
+  "R0 (none)": "No rule; every usable gating cell has |excess| <= max(5 %, 0.25 cycles per instruction).",
+  "R-F (issue floor, SM scope)": "While at least one wgmma op is executing on the SM (tensor.pipe op_start .. completion of the op; queued-but-not-started ops do not count), every instruction issued by any warp of the SM pushes that warp's control floor to issue + 1 + k (k a constant, candidates 1 / 2 / 3, chosen as the value with the smallest maximum gating-cell error; max() with the control-word stall, never additive). Closed-form prediction per instruction: t = max(t_ctrl, 1 + k) for a single warp; at W warps per SMSP the SMSP issue slot (1 per cycle) is the further bound: t = max(t_ctrl(W), 1 + k, W). Hence dependent chains whose control stall >= 1 + k do not move; independent streams move from t_ctrl to 1 + k.",
+  "R-P (operand read ports, SM scope)": "While a wgmma op is executing on the SM, register_file.operand_read.reads_per_cycle drops from 2 to r (candidates 1 / 0.5; 0.5 = one GPR read every two cycles) for every SMSP of the SM; the OP2p packing / fresh-cycle rules are unchanged. Prediction per instruction with n unserved GPR reads (reuse-served operands, uniform registers, immediates, constants, RZ do not count): single warp t = max(t_ctrl, n / r); W warps interleaving t = max(t_ctrl(W), W * n / r). Hence the uniform-register chain (n = 0) and the reuse-served ilp8 stream (n = 1, r = 1) do not move, ilp8n (n = 3) moves 1.5 -> 3 (r = 1) or 6 (r = 0.5), dependent FFMA chains at W = 1 (stall 4) do not move for r = 1 and move to 6 for r = 0.5.",
+  "R-S (issue rate, SM scope)": "While a wgmma op is executing on the SM, each SMSP of the SM issues at most one instruction every 2 cycles (any warp). Prediction: single warp t = max(t_ctrl, 2); W warps t = max(t_ctrl(W), 2 W). Hence at W = 1 R-S coincides with R-F(k = 1); the W = 3 stream cells separate them (R-F(1): 3, R-S: 6).",
+  "scope": "Each rule is declared SM-scope (the register file and the issue slot belong to the SMSP; every warpgroup spans all four SMSPs, so a wgmma of warpgroup 0 touches every SMSP). The `other` cells (window run by warpgroups that did not issue the wgmma) test it: if their excess agrees with the matching `self` cell within tolerance the SM scope stands; if their excess is <= tolerance while `self` moves, the rule is re-scoped to the issuing warpgroup's warps (an addendum, no value change).",
+  "form dependence": "If the accepted rule parameter differs between forms (ss / rs, n64 / n256, HGMMA / QGMMA) beyond tolerance, the parameter becomes a discrete table on (operation_class, source_mode, tensor_n) with the measured forms as points and no placeholder default (fail closed: unmeasured forms are unsupported:engine:discrete_miss until measured); otherwise one constant.",
+  "candidate order (simplest first)": [
+   "R0",
+   "R-F",
+   "R-P",
+   "R-S"
+  ],
+  "dropped": "a warpgroup-private penalty on the wgmma issuer only (the per-PC data shows the steal on warps of all three consumer warpgroups while only one has an executing op), and the legacy kind-44 per-launch block (0.24-0.55 cycles, no effect)."
+ },
+ "probe": {
+  "file": "tools/microbench/wgmma_overlap/probe/overlap.cu (new; built on tensor_pipe/probe/gen_wgmma.py descriptors and mb.cuh like wgmma_handoff/probe/handoff.cu; window units copied from dispatch_contention/probe/contention_v3.cu)",
+  "layout": "one CTA of 4 W warps, W in {1, 2, 3} (warp w sits on SMSP w % 4, warpgroup g = warps 4g .. 4g+3, so every SMSP hosts W warps, one per warpgroup); 1 CTA per launch; dynamic smem 48 KiB holds the wgmma A / B tiles (no-swizzle K-major descriptors as in handoff.cu).",
+  "rep": "bar.sync; warpgroup 0 only: wgmma.fence; G x (wgmma.mma_async of form F into one accumulator set, chained D += A B); wgmma.commit_group; bar.sync; active warps: t_s = clock64; window of U units of kind V (fully unrolled, as contention_v3 EmitUnits); t_w = clock64; warpgroup 0 only: wgmma.wait_group 0; t_d = clock64. Lane 0 of every active warp records (t_s, t_w); lane 0 of warpgroup 0's warps additionally records t_d. All live registers are folded into a sink after the rep loop.",
+  "modes": {
+   "self.w<W>": "warpgroup 0 issues the G ops, then all 4 W warps run the window (active = W per SMSP)",
+   "other.w<W>": "W >= 2; warpgroup 0 issues the G ops and goes straight to wgmma.wait_group 0 (no window; its t_s / t_w are not recorded); warpgroups 1 .. W-1 run the window (active = W-1 per SMSP)",
+   "ctrl.w<W>": "G = 0 (no wgmma, no fence / commit / wait); all 4 W warps run the window (active = W per SMSP). The control of self.w<W> is ctrl.w<W>; the control of other.w<W> is ctrl.w<W-1>."
+  },
+  "forms": {
+   "hgmma_bf16_n256_ss": {
+    "cid": 190,
+    "G": 16,
+    "beat_leaf": 128
+   },
+   "hgmma_bf16_n256_rs": {
+    "cid": 191,
+    "G": 16,
+    "beat_leaf": 127.96
+   },
+   "hgmma_bf16_n64_ss": {
+    "cid": 142,
+    "G": 64,
+    "beat_leaf": 32
+   },
+   "qgmma_e4m3_n256_ss": {
+    "cid": 318,
+    "G": 16,
+    "beat_leaf": 128
+   }
+  },
+  "G_rule": "G = round(2048 / beat_leaf(form)) so that the G chained ops occupy the tensor pipe for about 2048 cycles, longer than every window (the longest window is a W = 3 dependent chain: 128 units x <= 13.5 cycles = 1728); a rep whose t_d - t_w <= 0 (the ops completed before the window ended) is an overlap failure and is dropped; a (form, V, mode) cell with more than 10 % overlap failures in a launch is unusable.",
+  "window_kinds": {
+   "dep3r": "FFMA chain d = fma(d, a, b), a / b reusable (contention_v3 V0): 3 GPR reads, 1 unserved after reuse; stall 4",
+   "dep2": "FFMA chain d = fma(d, a, d) (V2): 2 GPR reads; stall 4",
+   "fmnmx": "max.NaN chain d = max(d, c[i & 3]) (V9 ring, FMNMX only): 2 GPR reads; stall 4 (the fa3 row-max chain)",
+   "ilp8n": "8 independent FFMA d[i] = fma(d[i], a8[i], b8[i]) (V5): 3 distinct GPR reads, none reuse-served; the OP2p 1.5-cycle cell",
+   "ilp8": "8 independent FFMA d[i] = fma(d[i], a, b) (V4): a / b reuse-served, 1 unserved read; 1 cycle",
+   "imad": "mad.lo.u32 chain (V8): 3 GPR reads; stall 4",
+   "mufu.ex2": "ex2.approx chain (V10): 1 GPR read; XU, result ~17",
+   "uadd": "warp-uniform integer chain u = u + p (p a kernel parameter added to a 64-bit loop-invariant value from the kernel parameter block, never lane-dependent): expected SASS UIADD3 x U on the uniform datapath (0 GPR reads). The sass gate requires every unit to be a U* opcode; if ptxas keeps it on the vector path the cell is unrealised:not_uniform and the uniform-register prediction of R-P is untested (recorded, no substitute)."
+  },
+  "U": "128 for every kind; ilp8 and ilp8n additionally at 256 (stream cells are short; the second length checks that the excess is per instruction, not per window)",
+  "cells": "forms (4) x window kinds (8) x modes (self.w1, self.w2, self.w3, other.w2, other.w3) + ctrl (8 kinds x 3 W) + the U = 256 stream variants; --launches 8 --reps 33 (launch 0 and rep 0 dropped), two runs (run-a / run-b) in one job.",
+  "sass_gate": "tools/microbench/wgmma_overlap/sass_check.py per kernel: (1) between the two clock reads of the window exactly U instructions of the kind's expected opcode (FFMA / FMNMX / IMAD / MUFU.EX2 / U*) and nothing else (no LDC / MOV / IMAD.MOV rematerialisation, no uniform-to-vector moves); (2) the operand register sets match the kind's declared read counts (ilp8n: three distinct GPRs per FFMA none reused across consecutive units; ilp8: .reuse on a / b; fmnmx: FMNMX not FMNMX3); (3) warpgroup 0's pre-window block contains exactly G HGMMA / QGMMA of the form's shape and source mode followed by one WARPGROUP.ARRIVE / commit and the window's BAR.SYNC; (4) the post-window block has WARPGROUP.DEPBAR.LE gsb0, 0x0. A kernel failing (1)-(4) makes its cells unusable (recorded as gate failures); 0 usable gating cells = protocol failure, nothing installed."
+ },
+ "derivation": {
+  "window": "T(cell, run) = median over launches 1..7 of the per-launch median over reps 1..32 and active warps of (t_w - t_s); overlap failures dropped first (G_rule).",
+  "excess": "e(form, V, W, mode) = (T(overlap cell) - T(matching ctrl cell)) / U, cycles per instruction; t_ctrl(V, W) = T(ctrl) / U is the baseline per-instruction time and must reproduce the dispatch_contention v4 values for the shared kinds (dep3r 4 / 5 / 6, ilp8n 1.5, ilp8 1.0, imad 4) within 10 % or the run is discarded as a harness fault.",
+  "two runs": "a cell is accepted when run-a and run-b agree within 3 % or 0.25 cycles per instruction; evidence measured when every gating cell of the chosen rule is accepted, experimental when any gating cell relies on one run.",
+  "gating cells": "self.w1 for every (form, V) with U = 128 (and the U = 256 stream cells), plus other.w2 for every (form, V) (scope). self.w2 / self.w3 / other.w3 are secondary: the chosen rule must predict their direction and be within 25 % or 0.5 cycles per instruction, otherwise the W dependence is recorded as open and the rule is still installed with its W = 1 parameter (the 500-case kernels mostly run 2-3 consumer warps per SMSP, so this is noted in the status).",
+  "parameter fit": "for R-F, k in {1, 2, 3}; for R-P, r in {1, 0.5}: the value minimising the maximum |prediction - measurement| over gating cells; one parameter for all forms unless the form test fails (then per form).",
+  "model": "tools/microbench/wgmma_overlap/model.py <run dir> ... -> model.json: per-cell T, e, usable flags, per-rule predictions and errors, decision; written before the data (closed forms above), not changed after."
+ },
+ "decision": "The first rule in candidate order whose predictions are within tolerance max(5 %, 0.25 cycles per instruction) of every usable gating cell is chosen. R0 is chosen only if every gating excess is within tolerance of 0. If no rule fits, nothing is installed; the table of excesses is recorded in docs/en/microbench.md and a v2 protocol with new candidates is written before any further GPU run. Install evidence: measured / experimental per the two-run rule.",
+ "install": {
+  "R-F": "common mechanism hopper.wgmma.register_file_issue_steal is re-declared: fields enabled (1), floor_cycles (k), scope sm; the legacy discrete per-launch `cycles` table is deleted (its three predecessor source records quoted in the new source description). Engine: HopperModule tracks executing ops per SM (op_start .. complete) and on_instance_issue pushes control_floor to issue + 1 + k for warps of that SM. CTest fixtures: (a) one warp stream of 1-cycle instructions during an executing wgmma -> 1 + k per instruction; (b) the same after completion -> 1; (c) a dependent chain with stall 4 during the op -> 4 (floor is max, not additive); (d) a second CTA on another SM unaffected.",
+  "R-P": "register_file.operand_read gains executing_tensor_reads_per_cycle (r); engine: Simulator::operand collector uses r while the arch module reports an executing wgmma on the SM (ArchitectureModule hook tensor_executing(sm, now)). Fixtures: ilp8n stream 1.5 -> 3 / r during the op; ilp8 unchanged; uniform-only stream unchanged.",
+  "R-S": "hopper.wgmma.register_file_issue_steal re-declared with issue_interval_cycles 2 (SMSP issue slot occupancy while executing); engine: SmspState issue gate. Fixtures: single stream 1 -> 2; W = 3 streams 3 -> 6; dependent chain stall 4 unchanged.",
+  "after install": "tree build && tree validate --strict (five classes 0); CTest + pytest in a CPU pod; no converter change expected (py == cpp gate still run on the 5 standard cases if the converter is touched); 500 x 2 single-cluster A/B against mr51 (hp expected to move toward the acc53-k2 arm, bw expected unchanged); report row, status, docs/en/microbench.md."
+ },
+ "record_only": {
+  "tail": "t_d - t_w of warpgroup 0 (how long the ops outlive the window) per cell: whether the ALU window slows the tensor op itself is read off the ctrl-free comparison of t_d - t_s against G x beat_leaf (recorded, no rule).",
+  "W dependence beyond the chosen rule": "secondary cells outside 25 % are listed with both numbers."
+ },
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, candidate or derivation change after data; the diagnostic arm value k = 2 is not evidence for k.",
+ "addenda": [
+  {
+   "date": "2026-11-07",
+   "run": "h100-r1 (probe form only; no derivation / candidate / threshold change)",
+   "finding": "With `G x wgmma.mma_async; one commit_group` ptxas serialises the chain into G x (WARPGROUP.ARRIVE; HGMMA; WARPGROUP.DEPBAR.LE gsb0, 0x0): every op completes before the window starts (tails ~15 cycles, every overlap cell equals its ctrl cell) and the gate (4) fails on all 240 non-ctrl kernels. The same serial form is what tensor_pipe's own k_wgmma compiles to; wgmma_handoff's `op; commit_group` per op compiles to one ARRIVE, N ops, one DEPBAR of the requested depth (pipelined). Two gate findings: ilp8's last FFMA of a window carries no .reuse (no later consumer) and the asm `add.u64 \"+l\"` chain is placed on the vector path (IADD3 / IADD3.X, 1.5 instructions per unit).",
+   "change": "probe: one commit_group after every op (G groups of one op each; wgmma.wait_group 0 unchanged, after the window); gate (3) now requires, between the rep's second BAR.SYNC and the window's first clock read, exactly G wgmma ops of the form and zero WARPGROUP.DEPBAR (any number of WARPGROUP.ARRIVE), gate (4) exactly one WARPGROUP.DEPBAR.LE gsb0, 0x0 after the window; ilp8 gate accepts the window's last FFMA without .reuse; uadd is rewritten as plain C `u += p` on a 64-bit kernel-parameter value (no asm) so ptxas may choose the uniform datapath -- the gate still requires U* opcodes, else unrealised:not_uniform. Cells, U, forms, derivation, candidates and tolerances are unchanged; r1 is recorded as a harness-form failure (0 usable cells)."
+  },
+  {
+   "date": "2026-11-07",
+   "run": "h100-r2 (probe form only)",
+   "finding": "ptxas C7518 on every non-ctrl kernel: `wgmma.mma_async instructions are serialized due to program dependence on compiler-inserted WG.DP in divergent path` -- the ops (inside `if (wg == 0)`), the all-warp window and the wait (inside a second `if (wg == 0)`) sit in different branch regions, so ptxas inserts a wait-all after each op; commit-per-op (addendum 1) does not help. The only pipelined form seen so far (wgmma_handoff) keeps issue, window and wait in one straight-line region.",
+   "change": "probe: the rep loop is split by role at the top of the kernel, as warp-specialised kernels do: warpgroup 0 runs its own loop { bar.sync 1, 128 W; fence; G x (op; commit_group); bar.sync 1, 128 W; [self: t_s; window; t_w]; wait_group 0; t_d; record } and returns; warpgroups >= 1 run { bar.sync 1, 128 W; bar.sync 1, 128 W; t_s; window; t_w; record } (named barrier 1 with the full CTA count replaces __syncthreads so both roles meet at the same two barriers per rep). ctrl kernels keep one loop for all warps with two bar.sync and the window. The build log must contain no C7518 line for the probe; if it still does the run is a harness failure again. Gate (3) region = between the two BAR.SYNC of warpgroup 0's rep body (exactly G ops, zero WARPGROUP.DEPBAR); gate (4) one WARPGROUP.DEPBAR.LE gsb0, 0x0 after the window (other mode: after the second BAR.SYNC). The t_d register of non-issuing warps is written as a literal 0 so no CS2R SRZ lands in the window. Nothing else changes."
+  },
+  {
+   "date": "2026-11-07",
+   "run": "h100-r3 (data run; model $A/microbench/wgmma_overlap-model/h100-r3/model.json)",
+   "outcome": "225 / 270 kernels pass the gate (27 uadd unrealised:not_uniform; 18 hgmma_bf16_n256_rs at W = 3 ptxas C7511 register-resource serialisation); ctrl cells reproduce dispatch_contention v4 (dep3r 4 / 5 / 6, ilp8 1.0, ilp8n 1.5, imad 4). No candidate fits the 61 gating cells (R0 misses 30, R-F / R-S 43-45, R-P 35-48): the issuing warpgroup's streams move to 3.84 (ilp8) / 3.31 (ilp8n) while another warpgroup's streams do not (SM scope refuted) and another warpgroup's dependent chains move by +0.6-1.0 (n256) / +1.5-3.0 (n64) while the issuing warpgroup's do not. Nothing installed. Harness facts: with W = 1 the ops completed 886 cycles after the window start (about half ran during the issue phase), with W >= 2 after 2090-2470; n64 (G = 64) windows only partly covered. Continued in protocol-v2.json."
+  }
+ ]
+}

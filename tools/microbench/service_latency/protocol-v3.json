@@ -1,0 +1,95 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "service_latency",
+ "version": 3,
+ "supersedes": "protocol-v2.json (version 2 installed r3r / r3s; this version only ADDS cells for the classes still placeholder after the backend_occupancy removal and the structural-source cleanup of 2026-11-05; v2 definitions, derivation, acceptance and ownership rule apply verbatim)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "instruction.service"
+ ],
+ "fields": [
+  "result_latency_cycles",
+  "completion_latency_cycles",
+  "issue_interval_cycles",
+  "resource (structural: class_resource.json; the b300 classes without a binding get one from the h100 binding of the same class, or issue_frontend_smsp when their time is owned by another mechanism -- listed below)"
+ ],
+ "purpose": "Placeholder-only timing fields left in instruction.service: h100 44 classes (mostly issue_interval from the predecessor, plus whole-leaf placeholders CS2R.ZERO 22, DSETP 64, FCHK 59, REDUX 45, SHFL 30, VOTE 32, UPLOP3 51, ELECT 5, IABS 10, P2R 9, R2P 7, UP2UR 7, HFMA2 5, VIADD 5, IADD 4, ULEA 4, PLOP3 4, R2UR 4, MOV 1, UMOV 1); b300 ~45 register-producing classes at 1 / 1 / 0 (CS2R*, DSETP, ELECT, FCHK, IABS, IADD, LEA, MOV, P2R, PLOP3, R2P, R2UR, REDUX, S2R, S2UR, SHFL, UFLO, ULEA, UMOV, UP2UR, UPLOP3, UPOPC, VIADD, VIADDMNMX, VOTEU, CREDUX, USGXT, UVIRTCOUNT, VHMNMX) and the resource binding of 16 classes.",
+ "cells": {
+  "direct (PTX chain, v2 alu/alu3 form)": [
+   "DSETP: setp.gt.f64 + selp.f64 pair chain (partner DSEL/FSEL subtracted as v1 pair rule)",
+   "IADD: add.s32 with a 64-bit carry form (addc) that lowers to IADD (gate decides; if ptxas emits IADD3 the cell is unrealised)",
+   "IABS: abs.s32",
+   "VIADD: add.s32 with immediate second operand in a chain (x = x + 7)",
+   "VIADDMNMX: min(add) idiom min.s32(x + c, y)",
+   "LEA / ULEA: mad.lo / shl+add idiom (gate decides LEA vs IMAD)",
+   "MOV / UMOV: mov.b32 chain through a volatile asm barrier",
+   "SHFL: shfl.sync.idx with register lane (SHFL class without modifier-specific root)",
+   "VOTE / VOTEU: vote.sync.ballot / uniform predicate vote",
+   "ELECT: elect.sync",
+   "REDUX / CREDUX: redux.sync.add.u32 / cluster-scope redux if PTX exposes it (else unrealised)",
+   "FCHK: the v2 misc fchk cell on both devices (install the b300 value; h100 59 placeholder replaced)",
+   "CS2R / CS2R.CLOCK / CS2R.GLOBALTIMER / CS2R.ZERO: mov.u64 %clock64 / %globaltimer / mov.b64 0 chains; result = issue -> dependent issue",
+   "S2R / S2UR: mov.u32 %tid.x / %ctaid.x (issue_interval only; result already measured)",
+   "P2R / R2P: predicate pack/unpack idiom (set 4 predicates from compares, pack with selp/or into one register and back) -- gate decides whether P2R / R2P appear; else unrealised",
+   "PLOP3 / UPLOP3 / UP2UR: predicate logic on uniform predicates (compare of kernel parameters) -- gate decides",
+   "UFLO / UPOPC / USGXT / UPRMT / USHF / USEL / UISETP / UVIRTCOUNT: uniform-datapath forms of clz / popc / bfe / prmt / shf / selp / setp on kernel-parameter operands (ptxas emits U* when the value is warp-uniform); UVIRTCOUNT has no PTX form -> unrealised unless the gate finds it",
+   "VHMNMX: f16x2 min/max fused with add (fma-like idiom) -- gate decides",
+   "FENCE / MEMBAR (generic roots) / MEMBAR.SC.SYS / MEMBAR.ALL.SYS: v2 k_fence definition for membar.sys forms; the generic roots stay structural"
+  ]
+ },
+ "sass_gate": "v2 alu3 rule (sass_check_alu3.py): the window holds exactly U (lat) / 8K (thr) instructions of the target class root (+ the pair partner for pair cells) and nothing else but the alu3 allow-list; a cell whose kernels do not realise the class (0 target instructions or a different root) is unrealised for that class and the leaf is untouched; a cell may realise a different class than intended -- it is then credited to the class the gate found, never to the intended one.",
+ "acceptance": "v2 verbatim (5 % residual / 5 % run agreement -> measured; 15 % -> experimental; b300 control rule 10 % for classes with an installed measured leaf; h100 placeholder values are replaced whenever the cell passes)",
+ "resource_bindings_structural": {
+  "from h100 same-class binding": [
+   "CGAERRBAR",
+   "ERRBAR",
+   "MEMBAR.SC.SYS",
+   "MEMBAR.ALL.SYS",
+   "LEPC",
+   "CCTL.IVALL"
+  ],
+  "issue_frontend_smsp (time owned by blackwell.tmem.* / tensor / clc mechanisms)": [
+   "LDTM/*",
+   "STTM/*",
+   "tmem_load_stat",
+   "UTCCP",
+   "UTCBAR",
+   "UTCATOMSWS",
+   "UGETNEXTWORKID",
+   "RPCMOV"
+  ],
+  "measured classes get the unit of their h100 analogue": [
+   "CREDUX -> REDUX unit",
+   "VHMNMX -> VIMNMX unit",
+   "USGXT -> SGXT unit (uniform_smsp)",
+   "UVIRTCOUNT -> uniform_smsp"
+  ]
+ },
+ "install": "both devices, per class as the gate credits it; sources service_latency.<device>.<run> / .experimental; structural bindings cite structural.class_resource (class_resource.json extended) -- the binding change is a pure refactor commit (values 1/1/0 untouched) separate from the measured install. A/B 500 x 2 single-cluster per architecture.",
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install of a class the gate did not credit",
+ "addenda": [
+  {
+   "date": "2026-11-05",
+   "before_gpu_run": true,
+   "written": "after the v3r1 build failure (no data) and the compile-only SASS survey $A/microbench/service_latency/survey/{h100,b300}-svy6 (local copies ~/tmp/svy/*-survey.txt); no timing data of this protocol exists",
+   "text": "Revision of the alu4 cells, gate and derivation before any measurement. Reasons: (a) the first alu4 gate allowed I2F/F2I/F2F/FSEL/SEL/IMAD/VIADD/CS2R/S2R anywhere in the window and model_v3 credited the whole chain slope to the credited class, so multi-instruction cells (DSETP = I2F+DSETP+FSEL+F2I) would have installed chain latency as class latency; (b) the 'uniform' cells used a per-lane operand and the CS2R/S2R lat cells had no input dependency. Revised rules: (1) GATE: every cell declares its per-step composition {class: count} using the converter's operation_classes() (python/cyclescope/arch/<arch>/rules.py) credited to the first class that has an instruction.service leaf on that device; the window must contain exactly U x composition (lat) / 8K x composition (thr) of those classes, plus only per-window harness constants (LDS/STS/BAR/BRA/NOP/clock CS2R and loop control that does not scale with U/K). No per-step allow-list. (2) SINGLE cells (composition {T:1}): result = completion = lat slope; issue_interval = thr slope / 8, divided by 4 when T's class_resource has scope sm (mma_sync v3 resource-scope rule); v2 acceptance. (3) PAIR cells (target + partners on the critical path): result(T) = lat slope - sum of the partners' installed result_latency on that device read from the tree at the branch head at model time; every partner must carry measured evidence there, otherwise the cell is unrealised; status capped at experimental; issue_interval(T) = thr step - sum of partner issue_interval only when T and every partner share one class_resource and the partner intervals are measured, else not installed. (4) Cells: SINGLE VIADDMNMX (min(add)), VIMNMX3 (min of min, s32), SHFL.BFLY / SHFL.UP / SHFL.DOWN (immediate lane), SHFL.IDX (register lane), VOTE (vote.sync.any.pred predicate chain), SEL (selp with a loop-invariant predicate), HFMA2 (fma.rn.f16x2; on sm_90a the window alternates HFMA2 / HFMA2.MMA: credited only if both map to the HFMA2 leaf, else unrealised on h100); PAIR DSETP (setp.f64 + selp + cvt: DSETP + FSEL + F2I per step), CREDUX (b300 redux.sync.min/max.u32: CREDUX + IMAD.U32 per step), REDUX (redux.sync.add.u32: REDUX + the UR->R move; unrealised when the move is a mix of IMAD.U32 and MOV because MOV has no measured result), IABS (abs.s32 then xor with a loop-invariant: IABS + LOP3), ISETP / FSETP issue_interval via the same-resource pair-thr rule with SEL (cells ISETP+SEL, FSETP+SEL); DADD / DMUL issue_interval: f64 thr cell with 8 chains seeded with distinct values (the survey harness merged identical chains), scope rule applied (fp64_sm). (5) unrealised:no_form, leaves untouched, recorded in the model and the report: all U* uniform-datapath classes (UFLO UPOPC UPRMT USEL USGXT USHF UISETP UMOV ULEA UPLOP3 UP2UR UVIRTCOUNT: PTX operands from kernel parameters compile to vector ops + LDC/ULDC on both targets), MOV, P2R, R2P, R2UR, PLOP3 (predicate chains are folded), ELECT and SHFL.IDX-immediate (hoisted / idempotent), IADD (add.cc -> IADD3 + IMAD.X), LEA (mixed LEA / IMAD), FCHK (div.rn.f32 = FCHK + MUFU + 5 FFMA + CALL), S2R / S2UR issue cells (mixed S2R / S2UR / SGXT compositions), CS2R* (the window parser uses CS2R clock reads as boundaries; no cell)."
+  },
+  {
+   "date": "2026-11-05",
+   "before_gpu_run": true,
+   "written": "before the first valid v3 run (v3r2 not yet produced data)",
+   "text": "Corrections to addendum 1. (1) Interval divisor: addendum 1 wrote 'thr slope / 8, /4 for sm scope', which is the alu / alu2 wps-1 rule (1 warp per SMSP x 8 chains). The alu4 k_thr harness is the alu3 shape (16 warps = 4 per SMSP, 8 chains each), so for every alu4 thr cell: issue_interval = OLS slope over K / N_unit, N_unit = instructions of the target class issued per K step on one copy of its unit = 4 x 8 x n (smsp-scoped unit) or 16 x 8 x n (sm-scoped unit, e.g. fp64_sm), n = target instructions per chain step (composition count). cells-v3.json records N_unit per cell; the model computes it from class_resource.json + resources.json scope. (2) Uniform datapath: the no_form verdict of addendum 1 applies to the survey harness only. alu2.cu (v2, blackwell-prototype verbatim) realises U* forms with its ulat / uthr harness (kernel-argument chain whose only consumer is a uniform constant-bank address); in v2 the h100 alu2 gate output was never produced, so the h100 install kept predecessor intervals for UIADD3 / UIMAD / ULOP3 / USHF / UPRMT / USEL / UPOPC / UISETP (0 / 0 / 0 / 3 / 3 / 4 / 8 / 2, the zeros mislabelled structural.service_owner). v3 runs alu2 again (run.sh runs every probe) and adds an alu2 gate; for the classes alu2 emits, result and issue_interval are derived by the v2 rule exactly as model_v2.py did for b300 r3q (uthr wps 1: slope / 8), and installed on both devices with v2 acceptance; b300 values are controls (10 %). U* classes alu2 does not emit (UFLO, ULEA, UMOV, UPLOP3, UP2UR, UVIRTCOUNT) stay unrealised:no_form. (3) f64: the f64 thr cell covers DFMA, DADD, DMUL (and DSETP via the pair rule only for result); h100 DFMA / DADD / DMUL issue_interval are 0 / 0 / 64 from predecessor or mislabelled structural sources while the measured DMMA interval (128 per SM for 256 FMA lanes) implies about 16 cycles per DFMA warp instruction per SM; b300 DFMA 15.99 / DADD 18.99 measured are controls. (4) The mislabelled structural.service_owner sources on h100 compute-class intervals (DFMA, UIADD3, UIMAD, ULOP3) are replaced by the measured source when the cell passes, otherwise by an explicit placeholder source (no value change), in the same install commit."
+  },
+  {
+   "date": "2026-11-05",
+   "before_gpu_run": false,
+   "written": "after v3r2/v3r3 gate results: dthr f64 harness dead-code-eliminated 7 of 8 chains (sink read only x[0]+y[7]); window held K DFMA not 8K. Build fix: consume all chains in sink and pin each accumulator with a volatile asm operand before the second clock read. Harness-only change; cells and compositions unchanged.",
+   "text": "dthr harness fix only."
+  }
+ ]
+}

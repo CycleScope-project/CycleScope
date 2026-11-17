@@ -1,0 +1,50 @@
+{
+  "storage.ldgsts.completion.root": {
+    "fields": {
+      "cycles": {
+        "model": {
+          "axis": "copies_per_group",
+          "kind": "linear",
+          "points": [
+            [
+              1,
+              494.28333333333336
+            ],
+            [
+              2,
+              356.37083333333334
+            ],
+            [
+              4,
+              430.45
+            ],
+            [
+              8,
+              587.5520833333334
+            ],
+            [
+              16,
+              853.0958333333333
+            ],
+            [
+              32,
+              1425.5270833333334
+            ]
+          ]
+        },
+        "sources": [
+          "tma_forms.h100.r3"
+        ]
+      },
+      "enabled": {
+        "model": {
+          "kind": "constant",
+          "value": 1
+        },
+        "sources": [
+          "tma_forms.h100.r3"
+        ]
+      }
+    }
+  }
+}

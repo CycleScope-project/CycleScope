@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-BWD-CAUSAL-1C-R02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 515576,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 5956357,
+ "completed": 5956357,
+ "cycles": 67871,
+ "hard": 0,
+ "walls": {
+  "convert": 14.9,
+  "segments": 0.0,
+  "build": 1.1,
+  "sim": 16.7,
+  "total": 32.7
+ },
+ "rss_kb": {
+  "convert": 408980,
+  "segments": 408980,
+  "build": 408980,
+  "sim": 1112980
+ },
+ "hw_cycles": 79244.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 12
+}

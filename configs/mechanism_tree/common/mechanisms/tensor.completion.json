@@ -1,0 +1,66 @@
+{
+ "doc": "Cycles from the end of an MMA op's pipe occupancy to its result being readable (accumulator handoff on Hopper; zero on Blackwell where the commit delay is blackwell.umma.commit). Measurement scope (both devices): the pipe beat and completion are measured with accumulating same-D operations (wgmma / tcgen05.mma chains that accumulate into one D); input-D-disabled and independently pipelined D variants are not measured separately and are modelled with the same values (formerly the b300 source experimental.umma.accumulating_scope).",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "HGMMA",
+   "QGMMA",
+   "IGMMA",
+   "UTCHMMA",
+   "UTCQMMA",
+   "UTCOMMA"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "tensor_result_latency"
+ },
+ "root": {
+  "children": [
+   {
+    "classes": [
+     "HGMMA",
+     "QGMMA",
+     "IGMMA",
+     "UTCHMMA",
+     "UTCQMMA",
+     "UTCOMMA"
+    ],
+    "parameter": {
+     "fields": "device"
+    }
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "HGMMA",
+   "IGMMA",
+   "QGMMA",
+   "UTCHMMA",
+   "UTCOMMA",
+   "UTCQMMA"
+  ]
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "discrete",
+   "axes_subset_of": [
+    "datatype",
+    "tensor_m",
+    "tensor_n",
+    "tensor_k",
+    "a_src",
+    "cta_group",
+    "umma_kind",
+    "umma_operation",
+    "umma_operand_major",
+    "umma_max_shift",
+    "input_dtype",
+    "accumulator_dtype",
+    "source_mode",
+    "tensor_sparse"
+   ]
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

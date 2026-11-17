@@ -1,0 +1,51 @@
+{
+ "doc": "L1 data residency per SM. data_array_bytes / reserved_bytes: the array (l1_residency v4: 248 KiB usable on both devices). shared_configuration_<i>_bytes (i = 0..9, ascending, absent beyond the device's list): the shared-memory carveout configurations the driver can select; the engine derives the launch's configuration with the occupancy rule (n_res = min(32 CTAs per SM, 64 warps per SM / warps per CTA, largest configuration / (static + dynamic + 1 KiB per CTA)); configuration = smallest listed value >= n_res x per-CTA need, else the largest) and the L1 data budget is data_array - reserved - configuration (protocol-v4 engine_finding; 10 / 10 default-hint cells on both devices).",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "l1.data_array_bytes": {
+   "kind": "constant"
+  },
+  "l1.reserved_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_0_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_1_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_2_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_3_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_4_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_5_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_6_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_7_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_8_bytes": {
+   "kind": "constant"
+  },
+  "l1.shared_configuration_9_bytes": {
+   "kind": "constant"
+  }
+ }
+}

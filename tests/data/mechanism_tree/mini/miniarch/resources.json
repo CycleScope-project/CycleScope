@@ -1,0 +1,3 @@
+[
+  {"name": "fma_smsp", "scope": "smsp", "copy_count": 1, "max_inflight_per_copy": 1, "initiation_interval_cycles": 1, "sources": ["src.structural"]}
+]

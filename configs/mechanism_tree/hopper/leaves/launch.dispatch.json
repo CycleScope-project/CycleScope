@@ -1,0 +1,75 @@
+{
+ "launch.dispatch.root": {
+  "fields": {
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1.0
+    },
+    "sources": [
+     "hopper.89d9526ba39d50cba240b583"
+    ]
+   },
+   "first_wave_interval_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 1.2219919110212336
+    },
+    "sources": [
+     "hopper.f76caef4e244fb9c105e10bd"
+    ]
+   },
+   "serial_ns_per_cta": {
+    "model": {
+     "kind": "constant",
+     "value": 0.617
+    },
+    "sources": [
+     "dispatch.h100.r3.experimental"
+    ]
+   },
+   "slot_free_to_entry_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 150.3
+    },
+    "sources": [
+     "dispatch_refill.h100.r1",
+     "dispatch_refill.h100.r4"
+    ]
+   },
+   "slot_free_to_entry_slow_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 183.5
+    },
+    "sources": [
+     "dispatch_refill.h100.r1",
+     "dispatch_refill.h100.r4"
+    ]
+   },
+   "slow_gpc_mask": {
+    "model": {
+     "kind": "constant",
+     "value": 142
+    },
+    "sources": [
+     "dispatch_refill.h100.r1",
+     "dispatch_refill.h100.r4"
+    ]
+   },
+   "dependents_launch_serial_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 0.586
+    },
+    "sources": [
+     "dispatch_refill.h100.r1",
+     "dispatch_refill.h100.r4"
+    ]
+   }
+  },
+  "scope": "device",
+  "evidence": "experimental"
+ }
+}

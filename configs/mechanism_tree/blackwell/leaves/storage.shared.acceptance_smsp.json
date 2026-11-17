@@ -1,0 +1,310 @@
+{
+ "storage.shared.acceptance_smsp.root/operation_class=STS/remote_smem=0/width_bytes=0-4": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       4.388
+      ],
+      [
+       2,
+       4.388
+      ],
+      [
+       3,
+       6.0
+      ],
+      [
+       4,
+       8.0
+      ],
+      [
+       8,
+       15.99
+      ],
+      [
+       16,
+       31.98
+      ],
+      [
+       32,
+       63.95
+      ]
+     ]
+    },
+    "sources": [
+     "shared.b300.store_wave"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.store_wave"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.acceptance_smsp.root/operation_class=STS/remote_smem=0/width_bytes=5-8": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       7.89
+      ],
+      [
+       3,
+       7.89
+      ],
+      [
+       4,
+       8.13
+      ],
+      [
+       8,
+       16.0
+      ],
+      [
+       16,
+       32.0
+      ],
+      [
+       32,
+       64.0
+      ]
+     ]
+    },
+    "sources": [
+     "shared.b300.store_wave.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.store_wave.experimental"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.acceptance_smsp.root/operation_class=STS/remote_smem=0/width_bytes=9-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       12.8
+      ],
+      [
+       6,
+       12.8
+      ],
+      [
+       7,
+       14.0
+      ],
+      [
+       8,
+       16.0
+      ],
+      [
+       16,
+       31.99
+      ],
+      [
+       32,
+       63.97
+      ]
+     ]
+    },
+    "sources": [
+     "shared.b300.store_wave"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.store_wave"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.acceptance_smsp.root/operation_class=ST/remote_smem=0/width_bytes=0-4": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       4.388
+      ],
+      [
+       2,
+       4.388
+      ],
+      [
+       3,
+       6.0
+      ],
+      [
+       4,
+       8.0
+      ],
+      [
+       8,
+       15.99
+      ],
+      [
+       16,
+       31.98
+      ],
+      [
+       32,
+       63.95
+      ]
+     ]
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.acceptance_smsp.root/operation_class=ST/remote_smem=0/width_bytes=5-8": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       7.89
+      ],
+      [
+       3,
+       7.89
+      ],
+      [
+       4,
+       8.13
+      ],
+      [
+       8,
+       16.0
+      ],
+      [
+       16,
+       32.0
+      ],
+      [
+       32,
+       64.0
+      ]
+     ]
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave.experimental"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.acceptance_smsp.root/operation_class=ST/remote_smem=0/width_bytes=9-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       12.8
+      ],
+      [
+       6,
+       12.8
+      ],
+      [
+       7,
+       14.0
+      ],
+      [
+       8,
+       16.0
+      ],
+      [
+       16,
+       31.99
+      ],
+      [
+       32,
+       63.97
+      ]
+     ]
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.store_wave"
+    ]
+   }
+  },
+  "scope": "smsp"
+ }
+}

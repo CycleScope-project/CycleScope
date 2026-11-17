@@ -1,0 +1,34 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "load_after_copies",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: does an L1-hit load wait behind async copies (cp.async, LDGSTS) the SM issued before it; no workload-based fitting",
+  "question": "A load whose line is resident in L1 is issued right after K cp.async copies (16 B per lane, 512 B per instruction) whose data has not returned yet. Does the load's result wait for those copies - issued by the same warp or by another warp of the SM - and for how long?",
+  "motivation": "Hardware PC sampling of cutlass_dense_cpasync_03 (H100, sim / hw 0.70; $CYCLESCOPE_ARTIFACT_ROOT/fg-over20/notes/NOTES.md, 2026-11-15): the first consumer of a stack reload (LDL [R1 + ..]) stalls 400-1090 cycles per execution in long_scoreboard where the engine gives 12-377; summed over the kernel about half of a warp's residency is long_scoreboard on plain arithmetic (IMAD 17.5 k cycles per warp against 5.3 k simulated, IADD3 6.9 k against 1.8 k, VIADD 4.4 k against 0.7 k, poll branches 11.4 k against 1.7 k). The reloads are L1 hits (engine about 36-52 cycles); the warps that issue them also issue the cp.async copies (LDGSTS.E.LTC128B.128) of the main loop. load_after_stores showed that a load waits for global stores issued before it on the SM (installed as store_l2.orders_loads); the same question was never asked for async copies. ldgsts_l1 excluded L1 eviction by the copies.",
+  "probe": "load_after_copies.cu from tools/microbench/load_after_stores/probe/load_after_stores.cu (same victims: 8 lines 4 KiB apart, loaded twice before every repetition so they are L1 resident, all lanes of a load on one word; same timed chain of 8 dependent victim loads between two clock reads by warp 0). The K store instructions are replaced by K async copies: cp.async of 16 B per lane (512 B per instruction, 16 sectors, source rows of a table that is resident in L2 after a discarded first launch and far larger than L1, every copy fresh rows; destination a 1024-B-aligned shared-memory ring), in two forms: ca (cp.async.ca.shared.global, SASS LDGSTS without .BYPASS) and cg (cp.async.cg, LDGSTS .BYPASS). Issued by warp 0 itself (same_warp) or by warp 1 while warp 0 waits on a barrier (other_warp). No cp.async wait before the timed chain; after it the issuing warp waits for all copies (cp.async.wait_all) and the CTA syncs. K in {0, 1, 2, 4, 8, 16, 32}. A second victim kind, local: the timed chain reads a per-thread stack array (volatile local buffer indexed by the previous value, SASS LDL) instead of global victims, at K in {0, 4, 16}, form ca, same_warp - only if the SASS shows LDL in the chain. 16 launches x 9 repetitions (first discarded), runs a and b; H100 and B300.",
+  "controls": {
+    "sass": "timed window: exactly 8 loads of the declared kind (LDG, or LDL for the local cells) between the two clock reads, no LDGSTS, no store, no barrier; the K copies are LDGSTS of the declared form.",
+    "timing": "C(mode, 0) / 8 within 20 % of the K = 0 chain of load_after_stores (43.0 h100 / 42.1 b300 cycles per load); runs a and b within max(5 cycles, 5 %); same_warp and other_warp at K = 0 equal within 5 %."
+  },
+  "derivation": "C(form, issuer, K) = median chain cycles; extra = C(K) - C(0).",
+  "predictions_before_data": {
+    "engine_today": "extra = 0 for cg at every K; for ca the engine's L1 model may evict nothing at these sizes: extra = 0.",
+    "ordered": "if loads are served in order behind the copies: extra(K >= 1) about the time the last copy issued before the chain needs to return = L2 hit latency (about 305 cycles on h100) plus the copies' delivery (16 sectors each) minus what the chain itself takes: 250-320 at K = 1, growing with K by the per-copy delivery time; same for other_warp.",
+    "partial": "extra well below the L2 latency but growing with K: the load waits for port time only (a few cycles per copy)."
+  },
+  "outcomes_before_data": {
+    "ordered": "If extra(K = 4) >= 150 cycles for the forms the kernels use (ca; cg reported separately) and it holds for other_warp: rule = a plain load issued on an SM starts its access no earlier than the return of the async copies issued before it on that SM; engine: the ordered-load wait already used for stores also takes the latest return time of pending async copies of the SM; structural field per device (experimental until the replay passes). If it holds for same_warp only, the rule is per warp.",
+    "port": "If extra is a few cycles per copy: install nothing; the kernel's stalls have another cause.",
+    "none": "If extra is within 10 cycles of 0 everywhere: no ordering behind async copies."
+  },
+  "prediction_check": "H100 replay (tracer -> convert -> engine) of ca same_warp at K = 0, 4, 16 with the rule: extra within max(20 cycles, 25 %); then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-gb).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled with their reason.",
+  "addenda": [
+    {
+      "when": "after h100-r3 and b300-r3 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/load_after_copies/{h100-r3,b300-r3} (table.txt; SASS gate passed: ca = LDGSTS.E.128, cg = LDGSTS.E.BYPASS.128, chains 8 x LDG.E / 8 x LDL; runs a and b equal)",
+      "text": "Global victims, chain of 8 (C(0) = 340-350 cycles on both devices, control met): cg extra 0 at every K and issuer; ca extra 0 up to K = 8, at K = 16 +131 (h100 same_warp; +2 other_warp) / +115 (b300, both issuers), at K = 32 +726-735 (h100) / +503-508 (b300) for both issuers. Outcome for global loads: not 'ordered' (no wait at K = 1..8); the growth from K = 16 is what ldgsts_l1 already describes (non-bypass copies displace L1 lines). Local victims (LDL), ca, same_warp: C(0) = 315; K = 4 +700 (h100) / +1118 (b300); K = 16 +1874 / +1893, i.e. 87-234 extra cycles per stack load after 2-8 KiB of copies - an order of magnitude more sensitive than the global victims. Three cells do not say whether the stack lines are displaced (every load pays, also after the copies have returned) or the loads wait for the copies. Nothing installed. Protocol v2 asks that question."
+    }
+  ]
+}

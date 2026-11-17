@@ -1,0 +1,11 @@
+{
+  "schema_version": "cyclescope.schema-registry.v1",
+  "schemas": {
+    "instruction_template": {"id": 1, "target": "InstructionTemplate", "fields": {
+      "latency_cycles": {"id": 1, "type": "uint64", "unit": "cycles"},
+      "resource": {"id": 2, "type": "uint64", "unit": "resource"}}},
+    "timing_row": {"id": 4, "target": "TimingRow", "fields": {
+      "cycles": {"id": 0, "type": "float64", "unit": "cycles"},
+      "enabled": {"id": 1, "type": "uint64", "unit": "boolean"}}}
+  }
+}

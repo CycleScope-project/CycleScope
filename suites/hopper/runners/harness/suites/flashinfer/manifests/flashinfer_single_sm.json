@@ -1,0 +1,2369 @@
+{
+  "candidate_count": 68,
+  "cases": [
+    {
+      "backend": "fa3",
+      "case_id": "flashinfer_single_prefill_01_single_sm",
+      "category": "hopper_attention",
+      "causal": false,
+      "delivery_group": 0,
+      "delivery_index": 0,
+      "dtype": "fp16",
+      "head_dim": 64,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "kv_layout": "NHD",
+      "logits_soft_cap": null,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_query_cta_key_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "d76c5f59c3eb5f49180a5ffec39c55d989b809d55dda64bab6d97b8ee206f65b",
+        "source_full_kernel_hardware_cycles": 9994.547173650746,
+        "source_native_hardware_cycles": 9994.547173650746
+      },
+      "operation": "single_prefill",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 12186,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi64ELi64ELi192ELi128ELi2EN7cutlass6half_tES6_S6_iNS_17StandardAttentionEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen_k": 512,
+      "seqlen_q": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_prefill_01",
+      "window_left": -1
+    },
+    {
+      "backend": "fa3",
+      "case_id": "flashinfer_single_prefill_12_single_sm",
+      "category": "hopper_attention",
+      "causal": true,
+      "delivery_group": 3,
+      "delivery_index": 11,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "kv_layout": "NHD",
+      "logits_soft_cap": null,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_query_cta_key_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "8be7ea9a7a998f7c391d91179735866601435259753f85e75333e0d1eadcfdb5",
+        "source_full_kernel_hardware_cycles": 12624.062717462595,
+        "source_native_hardware_cycles": 12624.062717462595
+      },
+      "operation": "single_prefill",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 15142,
+        "primary_kernel_name": "_ZN10flashinfer27FP8PrefillWithKVCacheKernelINS_21FP8CollectiveMainloopIN6Params16AdditionalParamsENS_24FP8AttentionKernelTraitsILb1ELi256ELi128ELi128ELi2EN7cutlass12float_e4m3_tES6_NS5_10bfloat16_tEiNS_20StandardFP8AttentionEEELb1EEENS_21FP8CollectiveEpilogueIS9_EES9_Lb0ELb1ENS_19SingleTileSchedulerEEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen_k": 512,
+      "seqlen_q": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_prefill_12",
+      "window_left": -1
+    },
+    {
+      "backend": "fa3",
+      "case_id": "flashinfer_single_prefill_13_single_sm",
+      "category": "hopper_attention",
+      "causal": false,
+      "delivery_group": 0,
+      "delivery_index": 12,
+      "dtype": "fp8_e4m3",
+      "head_dim": 64,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "kv_layout": "NHD",
+      "logits_soft_cap": null,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_query_cta_key_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "8d595072f1084031a21467a2081d0f57e2733ecbb9617c2135eb9bcd535ec4ed",
+        "source_full_kernel_hardware_cycles": 10453.398631767366,
+        "source_native_hardware_cycles": 10453.398631767366
+      },
+      "operation": "single_prefill",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 12750,
+        "primary_kernel_name": "_ZN10flashinfer27FP8PrefillWithKVCacheKernelINS_21FP8CollectiveMainloopIN6Params16AdditionalParamsENS_24FP8AttentionKernelTraitsILb1ELi64ELi192ELi128ELi4EN7cutlass12float_e4m3_tES6_NS5_10bfloat16_tEiNS_20StandardFP8AttentionEEELb0EEENS_21FP8CollectiveEpilogueIS9_EES9_Lb0ELb0ENS_19SingleTileSchedulerEEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen_k": 512,
+      "seqlen_q": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_prefill_13",
+      "window_left": -1
+    },
+    {
+      "backend": "fa3",
+      "case_id": "flashinfer_single_prefill_14_single_sm",
+      "category": "hopper_attention",
+      "causal": true,
+      "delivery_group": 1,
+      "delivery_index": 13,
+      "dtype": "fp8_e4m3",
+      "head_dim": 128,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "kv_layout": "NHD",
+      "logits_soft_cap": null,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_query_cta_key_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "8250822364cd5b26b789e072ae9991f427b7c441c7f472d2cfd055f8de2f53d2",
+        "source_full_kernel_hardware_cycles": 11245.844728437572,
+        "source_native_hardware_cycles": 11245.844728437572
+      },
+      "operation": "single_prefill",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 13571,
+        "primary_kernel_name": "_ZN10flashinfer27FP8PrefillWithKVCacheKernelINS_21FP8CollectiveMainloopIN6Params16AdditionalParamsENS_24FP8AttentionKernelTraitsILb1ELi128ELi128ELi192ELi2EN7cutlass12float_e4m3_tES6_NS5_10bfloat16_tEiNS_20StandardFP8AttentionEEELb1EEENS_21FP8CollectiveEpilogueIS9_EES9_Lb0ELb1ENS_19SingleTileSchedulerEEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen_k": 512,
+      "seqlen_q": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_prefill_14",
+      "window_left": -1
+    },
+    {
+      "backend": "fa3",
+      "case_id": "flashinfer_single_prefill_15_single_sm",
+      "category": "hopper_attention",
+      "causal": false,
+      "delivery_group": 2,
+      "delivery_index": 14,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "kv_layout": "NHD",
+      "logits_soft_cap": null,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_query_cta_key_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "47200bc5f6416f1e759a90be11fb6823e3eb7a3cb57cc1c52d12cf1326e27baa",
+        "source_full_kernel_hardware_cycles": 12031.956129012102,
+        "source_native_hardware_cycles": 12031.956129012102
+      },
+      "operation": "single_prefill",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 14899,
+        "primary_kernel_name": "_ZN10flashinfer27FP8PrefillWithKVCacheKernelINS_21FP8CollectiveMainloopIN6Params16AdditionalParamsENS_24FP8AttentionKernelTraitsILb1ELi256ELi128ELi128ELi2EN7cutlass12float_e4m3_tES6_NS5_10bfloat16_tEiNS_20StandardFP8AttentionEEELb0EEENS_21FP8CollectiveEpilogueIS9_EES9_Lb0ELb0ENS_19SingleTileSchedulerEEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen_k": 512,
+      "seqlen_q": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_prefill_15",
+      "window_left": -1
+    },
+    {
+      "case_id": "flashinfer_single_decode_01_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 3,
+      "delivery_index": 35,
+      "dtype": "fp16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "4619c6a9166e6d392986765204b5c9d99a86fa7c76d3694bf6fda26b3c94d374",
+        "source_full_kernel_hardware_cycles": 5850.766410603599,
+        "source_native_hardware_cycles": 5850.766410603599
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 5408,
+        "primary_kernel_name": "_ZN10flashinfer29SingleDecodeWithKVCacheKernelILNS_15PosEncodingModeE0ELj2ELj8ELj8ELj8ELj1ELj16ENS_16DefaultAttentionILb0ELb0ELb0ELb0EEE6ParamsEEvT7_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_01",
+      "use_tensor_cores": false
+    },
+    {
+      "case_id": "flashinfer_single_decode_02_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 0,
+      "delivery_index": 36,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "0a27f43d8fc805e2596beae6cbd11ce5a7412efdb619e39d41950713079c6342",
+        "source_full_kernel_hardware_cycles": 19854.468196191818,
+        "source_native_hardware_cycles": 19854.468196191818
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "ROPE_LLAMA",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 42528,
+        "primary_kernel_name": "_ZN10flashinfer29SingleDecodeWithKVCacheKernelILNS_15PosEncodingModeE1ELj2ELj1ELj8ELj16ELj8ELj4ENS_16DefaultAttentionILb0ELb0ELb0ELb0EEE6ParamsEEvT7_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_02",
+      "use_tensor_cores": false
+    },
+    {
+      "case_id": "flashinfer_single_decode_03_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 1,
+      "delivery_index": 37,
+      "dtype": "fp16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "7e445a8797a248e1226985008ec788c30c7c25899168ec2f96b68935a19df9c3",
+        "source_full_kernel_hardware_cycles": 8300.123960817673,
+        "source_native_hardware_cycles": 8300.123960817673
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 13008,
+        "primary_kernel_name": "_ZN10flashinfer29SingleDecodeWithKVCacheKernelILNS_15PosEncodingModeE0ELj2ELj1ELj8ELj8ELj8ELj8ENS_16DefaultAttentionILb0ELb0ELb0ELb0EEE6ParamsEEvT7_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_03",
+      "use_tensor_cores": false
+    },
+    {
+      "case_id": "flashinfer_single_decode_04_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 2,
+      "delivery_index": 38,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "cc9cf5a98347bb8c2d36fc40916352f81f1116b8a0e418f1ef5f3ddcc0265a1f",
+        "source_full_kernel_hardware_cycles": 19846.04101872829,
+        "source_native_hardware_cycles": 19846.04101872829
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "ROPE_LLAMA",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 42528,
+        "primary_kernel_name": "_ZN10flashinfer29SingleDecodeWithKVCacheKernelILNS_15PosEncodingModeE1ELj2ELj1ELj8ELj16ELj8ELj4ENS_16DefaultAttentionILb0ELb0ELb0ELb0EEE6ParamsEEvT7_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_04",
+      "use_tensor_cores": false
+    },
+    {
+      "case_id": "flashinfer_single_decode_05_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 3,
+      "delivery_index": 39,
+      "dtype": "fp16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "b0ceeb434529ac76770a97a8383f55efb6a75ee5e7d91a97f7cecad3bdeed7f6",
+        "source_full_kernel_hardware_cycles": 7777.091349813333,
+        "source_native_hardware_cycles": 7777.091349813333
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 5267,
+        "primary_kernel_name": "_ZN10flashinfer30SinglePrefillWithKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj4ELj4ELj1ELj4ELNS_15PosEncodingModeE0E6__halfS4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE6ParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_05",
+      "use_tensor_cores": true
+    },
+    {
+      "case_id": "flashinfer_single_decode_06_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 0,
+      "delivery_index": 40,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "ece14a3028610b0799a53546c952d40cf00fb12775376609a92fec65cd667a93",
+        "source_full_kernel_hardware_cycles": 13092.41026222787,
+        "source_native_hardware_cycles": 13092.41026222787
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "ROPE_LLAMA",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 10502,
+        "primary_kernel_name": "_ZN10flashinfer30SinglePrefillWithKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj2ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE1E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE6ParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_06",
+      "use_tensor_cores": true
+    },
+    {
+      "case_id": "flashinfer_single_decode_07_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 1,
+      "delivery_index": 41,
+      "dtype": "fp16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "19aac02a37c966cce7762424947284817dea388da8d4524d40a46ffe391480bc",
+        "source_full_kernel_hardware_cycles": 7822.266813364713,
+        "source_native_hardware_cycles": 7822.266813364713
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "NONE",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 5267,
+        "primary_kernel_name": "_ZN10flashinfer30SinglePrefillWithKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj4ELj4ELj1ELj4ELNS_15PosEncodingModeE0E6__halfS4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE6ParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_07",
+      "use_tensor_cores": true
+    },
+    {
+      "case_id": "flashinfer_single_decode_08_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 2,
+      "delivery_index": 42,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 256,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_decode_work_within_one_cta_gqa_group",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "9a85499e0b547cef775418b4780d343836625304a88557c663473a51230fac88",
+        "source_full_kernel_hardware_cycles": 13123.360741725794,
+        "source_native_hardware_cycles": 13123.360741725794
+      },
+      "operation": "single_decode",
+      "pos_encoding_mode": "ROPE_LLAMA",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 14256,
+        "primary_kernel_name": "_ZN10flashinfer30SinglePrefillWithKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj64ELj1ELj8ELj8ELj8ELj4ELj1ELNS_15PosEncodingModeE1E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE6ParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_single_decode_08",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_01_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 3,
+      "delivery_index": 43,
+      "disable_split_kv": true,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "73418bdb25d46781d6bd3ba91abbcc169236f887acd96c8f4abc36f9806fb38a",
+        "source_full_kernel_hardware_cycles": 17470.46312090015,
+        "source_native_hardware_cycles": 17470.46312090015
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 1,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 18318,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat1613__nv_fp8_e4m3S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_01",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_02_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 0,
+      "delivery_index": 44,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 16,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "94a75c856b0e29de8e0938d28ac1cb1c615e3badd29155ead15d22b6332302bc",
+        "source_full_kernel_hardware_cycles": 11343.202604684295,
+        "source_native_hardware_cycles": 11343.202604684295
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 16,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 7917,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj2ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_02",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_03_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 1,
+      "delivery_index": 45,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 32,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "cf17a746f4530232e0accb1018dde83940c96d4a09f7fff198292f2ada3b765b",
+        "source_full_kernel_hardware_cycles": 11546.738295721088,
+        "source_native_hardware_cycles": 11546.738295721088
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 32,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 9770,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj64ELj1ELj8ELj8ELj8ELj4ELj1ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_03",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_04_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 2,
+      "delivery_index": 46,
+      "disable_split_kv": true,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "84460a3130872c8fae457e36eb8890e682266d106d27c73535bfae52081c2236",
+        "source_full_kernel_hardware_cycles": 17586.68520927374,
+        "source_native_hardware_cycles": 17586.68520927374
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 1,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 18318,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat1613__nv_fp8_e4m3S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_04",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_05_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 3,
+      "delivery_index": 47,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "9f739d7816877158a8ff43988874b5269a3764b20acb8cb223c35d80950dd828",
+        "source_full_kernel_hardware_cycles": 11341.748588672734,
+        "source_native_hardware_cycles": 11341.748588672734
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 16,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 7917,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj2ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_05",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_06_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 0,
+      "delivery_index": 48,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "db0972b07e360055eeb000c7d234ca9ef8bd7828ce996041ed0151b9de184a61",
+        "source_full_kernel_hardware_cycles": 11724.101415325269,
+        "source_native_hardware_cycles": 11724.101415325269
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 32,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 9868,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj64ELj1ELj8ELj8ELj8ELj4ELj1ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_06",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_07_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 1,
+      "delivery_index": 49,
+      "disable_split_kv": true,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "b46e90ce2f701f1b3a5c5d6beef0ac3a523c8641ca1ac202dcfec64b98a2aab1",
+        "source_full_kernel_hardware_cycles": 17393.561957774207,
+        "source_native_hardware_cycles": 17393.561957774207
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 1,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 18318,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat1613__nv_fp8_e4m3S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_07",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_08_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 2,
+      "delivery_index": 50,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 16,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "8588acd3501fda88e4b5ba766d8bd9fd70eb3afcc86be69d6bbd13aefc49ba96",
+        "source_full_kernel_hardware_cycles": 11379.525153709295,
+        "source_native_hardware_cycles": 11379.525153709295
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 16,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 7917,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj2ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_08",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_09_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 3,
+      "delivery_index": 51,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 32,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "82b62a8b1ad138c2b430eec299c98851a48f3735966e4ffa0902d22cfb3a782d",
+        "source_full_kernel_hardware_cycles": 11606.442907561534,
+        "source_native_hardware_cycles": 11606.442907561534
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 32,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 9770,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj64ELj1ELj8ELj8ELj8ELj4ELj1ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_09",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_10_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 0,
+      "delivery_index": 52,
+      "disable_split_kv": true,
+      "dtype": "fp8_e4m3",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "d548a1217f6a467353b733bda1a709683aa200128e2bbd2479c4dbdb2ef7d168",
+        "source_full_kernel_hardware_cycles": 17472.421553426637,
+        "source_native_hardware_cycles": 17472.421553426637
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 1,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 18318,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj4ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat1613__nv_fp8_e4m3S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_10",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_11_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 1,
+      "delivery_index": 53,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "f2cd647a87e20b687395ebd22e0379d6d0904fe50143b9617baa2bf13450ae77",
+        "source_full_kernel_hardware_cycles": 11320.2170189348,
+        "source_native_hardware_cycles": 11320.2170189348
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 16,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 7917,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj16ELj1ELj2ELj8ELj8ELj1ELj4ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_11",
+      "use_tensor_cores": true
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_batch_decode_paged_12_kv64_single_sm",
+      "category": "decode",
+      "delivery_group": 2,
+      "delivery_index": 54,
+      "disable_split_kv": true,
+      "dtype": "bf16",
+      "head_dim": 256,
+      "heads_kv": 1,
+      "heads_q": 64,
+      "kv_len": 512,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": true,
+        "mechanism": "increase_batch_decode_key_iteration_with_split_kv_disabled",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "40f13bcc50b12a58d4062ee68dfeec4ad9e49a9838c1fa4216ead72855705aca",
+        "source_full_kernel_hardware_cycles": 11792.547322843908,
+        "source_native_hardware_cycles": 11792.547322843908
+      },
+      "operation": "batch_decode_paged",
+      "page_size": 32,
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 9868,
+        "primary_kernel_name": "_ZN10flashinfer34BatchPrefillWithPagedKVCacheKernelINS_12KernelTraitsILNS_8MaskModeE0ELj64ELj1ELj8ELj8ELj8ELj4ELj1ELNS_15PosEncodingModeE0E13__nv_bfloat16S4_S4_fiNS_16DefaultAttentionILb0ELb0ELb0ELb0EEEEE11PagedParamsEEvT0_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_batch_decode_paged_12",
+      "use_tensor_cores": true
+    },
+    {
+      "algorithm": "vertical",
+      "batch": 1,
+      "case_id": "flashinfer_mamba_state_update_02_single_sm",
+      "category": "state_space",
+      "delivery_group": 0,
+      "delivery_index": 68,
+      "dim": 256,
+      "dstate": 256,
+      "dt_softplus": true,
+      "dtype": "bf16",
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_cta_state_matrix",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "bd597eb31dad3de3cb943da4b824d064b19d0c93c1f684fee3d5626833260c07",
+        "source_full_kernel_hardware_cycles": 11844.254695582298,
+        "source_native_hardware_cycles": 11844.254695582298
+      },
+      "operation": "mamba_state_update",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 6912,
+        "primary_kernel_name": "_ZN10flashinfer5mamba56selective_state_update_kernel_producer_consumer_verticalI13__nv_bfloat16fffivLi64ELi128ELi0ELi4ELi16ELi3EEEvNS0_26SelectiveStateUpdateParamsE14CUtensorMap_st",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_mamba_state_update_02"
+    },
+    {
+      "algorithm": "horizontal",
+      "batch": 1,
+      "case_id": "flashinfer_mamba_state_update_03_single_sm",
+      "category": "state_space",
+      "delivery_group": 1,
+      "delivery_index": 69,
+      "dim": 256,
+      "dstate": 256,
+      "dt_softplus": false,
+      "dtype": "bf16",
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_cta_state_matrix",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "9fe8b4faa3e094e3d7d9ddcb7b12e63b31332e68c7ef4eb01cb6324e4ccb9147",
+        "source_full_kernel_hardware_cycles": 9809.459811663717,
+        "source_native_hardware_cycles": 9809.459811663717
+      },
+      "operation": "mamba_state_update",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 6332,
+        "primary_kernel_name": "_ZN10flashinfer5mamba58selective_state_update_kernel_producer_consumer_horizontalI13__nv_bfloat16fffiLi64ELi128ELi0ELi1ELi4ELi16ELi4EEEvNS0_26SelectiveStateUpdateParamsE14CUtensorMap_st",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_mamba_state_update_03"
+    },
+    {
+      "case_id": "flashinfer_rmsnorm_01_single_sm",
+      "category": "serving_aux",
+      "delivery_group": 3,
+      "delivery_index": 75,
+      "dtype": "fp16",
+      "enable_pdl": false,
+      "hidden": 131072,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_row_cta_hidden_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "253c277d4c879d4643e5a6aafa1259fd4c990954d1d561d6eada4c4259f4c1af",
+        "source_full_kernel_hardware_cycles": 4292.491413333837,
+        "source_native_hardware_cycles": 4292.491413333837
+      },
+      "operation": "rmsnorm",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 2362,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfernormkernelsrmsnormRMSNormKernel_object_at__tensorptrf16gmemalign128oi64409640961_tensorptrf16gmemalign16o40961_tensorptrf16gmemalign128oi64409640961___Fals_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "rows": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_rmsnorm_01"
+    },
+    {
+      "case_id": "flashinfer_rmsnorm_02_single_sm",
+      "category": "serving_aux",
+      "delivery_group": 0,
+      "delivery_index": 76,
+      "dtype": "bf16",
+      "enable_pdl": true,
+      "hidden": 131072,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_row_cta_hidden_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "1cea460f4f102ad17d069acd48d4f1a2184bd2f0186e376ac5b7a416507f4c33",
+        "source_full_kernel_hardware_cycles": 5148.7314972657205,
+        "source_native_hardware_cycles": 5148.7314972657205
+      },
+      "operation": "rmsnorm",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 2792,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfernormkernelsrmsnormRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64819281921_tensorptrbf16gmemalign16o81921_tensorptrbf16gmemalign128oi64819281921___T_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "rows": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_rmsnorm_02"
+    },
+    {
+      "case_id": "flashinfer_fused_add_rmsnorm_01_single_sm",
+      "category": "serving_aux",
+      "delivery_group": 1,
+      "delivery_index": 77,
+      "dtype": "fp16",
+      "enable_pdl": false,
+      "hidden": 57344,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_fused_single_row_cta_hidden_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "e911670a87392dea3fa3004ada78000bd1efd08f2df34ec9e223c224cb4a7955",
+        "source_full_kernel_hardware_cycles": 5087.782246752971,
+        "source_native_hardware_cycles": 5087.782246752971
+      },
+      "operation": "fused_add_rmsnorm",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 2680,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrf16gmemalign128oi64409640961_tensorptrf16gmemalign128oi64409640961_tensorptrf16gmemal_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "rows": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_fused_add_rmsnorm_01"
+    },
+    {
+      "case_id": "flashinfer_fused_add_rmsnorm_02_single_sm",
+      "category": "serving_aux",
+      "delivery_group": 2,
+      "delivery_index": 78,
+      "dtype": "bf16",
+      "enable_pdl": true,
+      "hidden": 57344,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_fused_single_row_cta_hidden_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "5aee0bdd5dc2c733b00b2283ba21177bce7693c92e1be3fd2b7468d6cdbc9d69",
+        "source_full_kernel_hardware_cycles": 6527.32488981615,
+        "source_native_hardware_cycles": 6527.32488981615
+      },
+      "operation": "fused_add_rmsnorm",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 3316,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfernormkernelsfused_add_rmsnormFusedAddRMSNormKernel_object_at__tensorptrbf16gmemalign128oi64819281921_tensorptrbf16gmemalign128oi64819281921_tensorptrbf16gme_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "rows": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_fused_add_rmsnorm_02"
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_sample_01_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 3,
+      "delivery_index": 87,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_batch_cta_vocabulary_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "7e5c6396fb643d48ec750139b0a662cc04d5851f612a88431c2c6e1b5363316e",
+        "source_full_kernel_hardware_cycles": 7777.738771606037,
+        "source_native_hardware_cycles": 7777.738771606037
+      },
+      "operation": "sample",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 11513,
+        "primary_kernel_name": "_ZN10flashinfer8sampling22SamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_jPmmSB_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_sample_01",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 131072
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_top_k_sample_01_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 31018,
+        "primary_kernel_name": "_ZN10flashinfer8sampling26TopKSamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_S9_jjPmmSB_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "operation": "top_k_sample",
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_top_k_sample_01",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 256
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_top_p_sample_01_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 1,
+      "delivery_index": 89,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_batch_cta_vocabulary_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "93ae49bf6383110c863b1eeea52211c77944803e06133d49d8b1746c0116ddd3",
+        "source_full_kernel_hardware_cycles": 13943.589129076881,
+        "source_native_hardware_cycles": 13943.589129076881
+      },
+      "operation": "top_p_sample",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 15613,
+        "primary_kernel_name": "_ZN10flashinfer8sampling26TopPSamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_PffjPmmSC_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_top_p_sample_01",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 32768
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_sample_02_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_batch_cta_vocabulary_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "90e30947101dcd9011b7a2b548cdf1923a9496ffec5fe4afcec976fedd40cc7b",
+        "source_full_kernel_hardware_cycles": 7819.623121514352,
+        "source_native_hardware_cycles": 7819.623121514352
+      },
+      "operation": "sample",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 11513,
+        "primary_kernel_name": "_ZN10flashinfer8sampling22SamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_jPmmSB_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_sample_02",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 131072
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_top_k_sample_02_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 31018,
+        "primary_kernel_name": "_ZN10flashinfer8sampling26TopKSamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_S9_jjPmmSB_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "operation": "top_k_sample",
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_top_k_sample_02",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 256
+    },
+    {
+      "batch": 1,
+      "case_id": "flashinfer_top_p_sample_02_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 0,
+      "delivery_index": 92,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_batch_cta_vocabulary_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "95523191a54a700b13691cb1c8f9f53586d294de793807d93f978a7847c1c5c9",
+        "source_full_kernel_hardware_cycles": 13934.252541956661,
+        "source_native_hardware_cycles": 13934.252541956661
+      },
+      "operation": "top_p_sample",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 15613,
+        "primary_kernel_name": "_ZN10flashinfer8sampling26TopPSamplingFromProbKernelILj1024ELN3cub16_V_300302_SM_90018BlockScanAlgorithmE2ELNS3_20BlockReduceAlgorithmE2ELj4ELb1EfiEEvPT4_PT5_PbS9_PffjPmmSC_m",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_top_p_sample_02",
+      "top_k": 64,
+      "top_p": 0.9,
+      "vocab": 32768
+    },
+    {
+      "bitorder": "big",
+      "case_id": "flashinfer_packbits_01_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 1,
+      "delivery_index": 93,
+      "elements": 1048576,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "replace_fixed_extent_packbits_with_single_segment_loop",
+        "mode": "same_family_case_replacement",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "fd75693e5d026c845c1799e9651173db4cef3cc61d168b2322c644e958d3541f",
+        "source_full_kernel_hardware_cycles": 3041.1490949049903,
+        "source_native_hardware_cycles": 3041.1490949049903
+      },
+      "operation": "segment_packbits",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 416,
+        "primary_kernel_name": "_ZN10flashinfer12quantization14PackBitsKernelILNS0_8BitOrderE0EEEvPbPhl",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "segments": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_packbits_01"
+    },
+    {
+      "bitorder": "little",
+      "case_id": "flashinfer_packbits_02_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 2,
+      "delivery_index": 94,
+      "elements": 1048576,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "replace_fixed_extent_packbits_with_single_segment_loop",
+        "mode": "same_family_case_replacement",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "2e5a0c99ad4f7bcc03924c885b75bc98179914a2163aeaa97b09bfe60f72ff52",
+        "source_full_kernel_hardware_cycles": 3080.1538963363273,
+        "source_native_hardware_cycles": 3080.1538963363273
+      },
+      "operation": "segment_packbits",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 415,
+        "primary_kernel_name": "_ZN10flashinfer12quantization14PackBitsKernelILNS0_8BitOrderE1EEEvPbPhl",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "segments": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_packbits_02"
+    },
+    {
+      "bitorder": "big",
+      "case_id": "flashinfer_segment_packbits_01_single_sm",
+      "category": "sampling_quant",
+      "delivery_group": 3,
+      "delivery_index": 95,
+      "elements": 1048576,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_segment_cta_iteration",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "609fdd9254e6d6fabb80b6283704315837fe03466fa8ca187bf897248a849e6e",
+        "source_full_kernel_hardware_cycles": 3100.347990363751,
+        "source_native_hardware_cycles": 3100.347990363751
+      },
+      "operation": "segment_packbits",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 800,
+        "primary_kernel_name": "_ZN10flashinfer12quantization21SegmentPackBitsKernelILNS0_8BitOrderE0EiEEvPbPhPT0_S6_",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "segments": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_segment_packbits_01"
+    },
+    {
+      "case_id": "flashinfer_merge_state_01_single_sm",
+      "category": "cascade",
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "dtype": "fp16",
+      "head_dim": 128,
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "replace_binary_merge_with_single_cta_multi_state_reduction",
+        "mode": "same_family_case_replacement",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "d22d3ad4e35afa74780d5b796c1b8a0bdacd43d6da1ebb99a77dbbc937d8aa2a",
+        "source_full_kernel_hardware_cycles": 2837.565402704929,
+        "source_native_hardware_cycles": 2837.565402704929
+      },
+      "operation": "merge_states",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 86,
+        "primary_kernel_name": "_ZN10flashinfer16MergeStateKernelILj8E6__halfS1_EEvPT0_PfS3_S4_PT1_S4_jj",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_merge_state_01",
+      "states": 1024
+    },
+    {
+      "case_id": "flashinfer_merge_state_02_single_sm",
+      "category": "cascade",
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "replace_binary_merge_with_single_cta_multi_state_reduction",
+        "mode": "same_family_case_replacement",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "98c7a7eb628f19e0a39ed3dc63016a6f01fba84433cc4229f11ec675ed3ea911",
+        "source_full_kernel_hardware_cycles": 2845.947015376597,
+        "source_native_hardware_cycles": 2845.947015376597
+      },
+      "operation": "merge_states",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 94,
+        "primary_kernel_name": "_ZN10flashinfer16MergeStateKernelILj8E13__nv_bfloat16S1_EEvPT0_PfS3_S4_PT1_S4_jj",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_merge_state_02",
+      "states": 1024
+    },
+    {
+      "case_id": "flashinfer_merge_states_01_single_sm",
+      "category": "cascade",
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "dtype": "fp16",
+      "head_dim": 128,
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_cta_state_reduction",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "f949eec78ddc3cbe707c832d3b8fa3501d2e89fb09a73b9ce3db33dc9730df35",
+        "source_full_kernel_hardware_cycles": 4229.191772953938,
+        "source_native_hardware_cycles": 4229.191772953938
+      },
+      "operation": "merge_states",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 2320,
+        "primary_kernel_name": "_ZN10flashinfer34MergeStatesLargeNumIndexSetsKernelILj8ELj16ELj8ELj4E6__halfS1_EEvPT3_PfPT4_S4_jj",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_merge_states_01",
+      "states": 1024
+    },
+    {
+      "case_id": "flashinfer_merge_states_02_single_sm",
+      "category": "cascade",
+      "delivery_group": 3,
+      "delivery_index": 99,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "heads": 1,
+      "min_cycle_revision": {
+        "kernel_or_harness_source_changed": false,
+        "mechanism": "increase_single_cta_state_reduction",
+        "mode": "workload_parameter_change",
+        "requires_fresh_h100_topology_and_timing": true,
+        "revision": "exact241_min20k_final",
+        "source_contract_digest": "e9b561aadcd234d387e6c04a68be4b8100cd343e10b9f05f7651ea6825e7d49f",
+        "source_full_kernel_hardware_cycles": 4466.546437028258,
+        "source_native_hardware_cycles": 4466.546437028258
+      },
+      "operation": "merge_states",
+      "prior_h100_qualification": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1,
+        "primary_kernel_dynamic_instruction_count": 2871,
+        "primary_kernel_name": "_ZN10flashinfer34MergeStatesLargeNumIndexSetsKernelILj8ELj16ELj8ELj4E13__nv_bfloat16S1_EEvPT3_PfPT4_S4_jj",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "qualified"
+      },
+      "qualification_status": "pending_h100_requalification_min20k",
+      "seqlen": 1,
+      "single_sm_requirements": {
+        "primary_kernel_active_sm_count": 1,
+        "primary_kernel_cta_count": 1
+      },
+      "source": "upstream/flashinfer",
+      "source_case_id": "flashinfer_merge_states_02",
+      "states": 1024
+    }
+  ],
+  "corpus_revision": "exact241_min20k_final",
+  "excluded_case_count": 56,
+  "excluded_cases": [
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_02_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 4,
+        "primary_kernel_cta_count": 4,
+        "primary_kernel_dynamic_instruction_count": 44064,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi128ELi128ELi128ELi128ELi2EN7cutlass10bfloat16_tES6_S6_iNS_17StandardAttentionEEELb1EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb1ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_02",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_03_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 199438,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi256ELi256ELi128ELi64ELi2EN7cutlass6half_tES6_S6_iNS_17StandardAttentionEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_03",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_04_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 207849,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi64ELi64ELi192ELi128ELi2EN7cutlass10bfloat16_tES6_S6_iNS_17StandardAttentionEEELb1EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb1ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_04",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_05_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 2,
+        "primary_kernel_cta_count": 2,
+        "primary_kernel_dynamic_instruction_count": 25523,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi128ELi128ELi128ELi192ELi2EN7cutlass6half_tES6_S6_iNS_17StandardAttentionEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_05",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_06_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 8,
+        "primary_kernel_cta_count": 8,
+        "primary_kernel_dynamic_instruction_count": 100864,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi256ELi256ELi128ELi64ELi2EN7cutlass10bfloat16_tES6_S6_iNS_17StandardAttentionEEELb1EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb1ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_06",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_07_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 4,
+        "primary_kernel_cta_count": 4,
+        "primary_kernel_dynamic_instruction_count": 48917,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi64ELi64ELi192ELi128ELi2EN7cutlass6half_tES6_S6_iNS_17StandardAttentionEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_07",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_08_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 32,
+        "primary_kernel_cta_count": 32,
+        "primary_kernel_dynamic_instruction_count": 379237,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi128ELi128ELi128ELi128ELi2EN7cutlass10bfloat16_tES6_S6_iNS_17StandardAttentionEEELb1EEENS_18CollectiveEpilogueIS8_EES8_Lb1ELb1ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_08",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_09_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 4,
+        "primary_kernel_cta_count": 4,
+        "primary_kernel_dynamic_instruction_count": 51821,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi256ELi256ELi128ELi64ELi2EN7cutlass6half_tES6_S6_iNS_13LogitsSoftCapEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_09",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_10_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 2,
+        "primary_kernel_cta_count": 2,
+        "primary_kernel_dynamic_instruction_count": 25952,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi64ELi64ELi192ELi128ELi2EN7cutlass10bfloat16_tES6_S6_iNS_17StandardAttentionEEELb1EEENS_18CollectiveEpilogueIS8_EES8_Lb0ELb1ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_10",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "single_prefill",
+      "case_id": "flashinfer_single_prefill_11_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 8,
+        "primary_kernel_cta_count": 8,
+        "primary_kernel_dynamic_instruction_count": 117178,
+        "primary_kernel_name": "_ZN10flashinfer24PrefillWithKVCacheKernelINS_18CollectiveMainloopIN6Params16AdditionalParamsENS_21AttentionKernelTraitsILb1ELi128ELi128ELi128ELi192ELi2EN7cutlass6half_tES6_S6_iNS_17StandardAttentionEEELb0EEENS_18CollectiveEpilogueIS8_EES8_Lb1ELb0ENS_19SingleTileSchedulerELb0EEEvNT_6ParamsENT0_6ParamsENT4_6ParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_single_prefill_11",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "simple",
+      "case_id": "flashinfer_mamba_state_update_01_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 15824,
+        "primary_kernel_name": "_ZN10flashinfer5mamba36selective_state_update_kernel_simpleI13__nv_bfloat16fffivLi64ELi64ELi4ELi4ELi0EEEvNS0_26SelectiveStateUpdateParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_mamba_state_update_01",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "auto",
+      "case_id": "flashinfer_mamba_state_update_04_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 20448,
+        "primary_kernel_name": "_ZN10flashinfer5mamba36selective_state_update_kernel_simpleI13__nv_bfloat16fffivLi64ELi256ELi4ELi4ELi0EEEvNS0_26SelectiveStateUpdateParamsE",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_mamba_state_update_04",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "gdn_prefill",
+      "case_id": "flashinfer_gdn_prefill_01_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 32,
+        "primary_kernel_cta_count": 32,
+        "primary_kernel_dynamic_instruction_count": 22528,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfergdn_kernelsdelta_rule_dsldelta_rule_cp_sm90CPDeltaRuleFixupSimtSm90_object_at__tensorptrf32gmemalign128oi641i64i64_tensorptrf32gmemalign128oi641i64i64_None_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_gdn_prefill_01",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "gdn_prefill",
+      "case_id": "flashinfer_gdn_prefill_02_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 32,
+        "primary_kernel_cta_count": 32,
+        "primary_kernel_dynamic_instruction_count": 22528,
+        "primary_kernel_name": "kernel_cutlass_kernel_flashinfergdn_kernelsdelta_rule_dsldelta_rule_cp_sm90CPDeltaRuleFixupSimtSm90_object_at__tensorptrf32gmemalign128oi641i64i64_tensorptrf32gmemalign128oi641i64i64_None_0",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_gdn_prefill_02",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "gdn_decode",
+      "case_id": "flashinfer_gdn_decode_01_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 31984,
+        "primary_kernel_name": "kernel_cutlass_gdn_decode_kernel_small_batch_nontranspose_TiledCopy_TilerMN321161_TVLayouttiled4324128132_CopyAtom_ThrID10_TVLayoutSrc1401_TVLayoutDst1401_Valuetypef32_tensorptrf32gmemali_0",
+        "primary_kernel_selection": "largest dynamic instruction count inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_gdn_decode_01",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "gdn_decode",
+      "case_id": "flashinfer_gdn_decode_02_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 16,
+        "primary_kernel_cta_count": 16,
+        "primary_kernel_dynamic_instruction_count": 31984,
+        "primary_kernel_name": "kernel_cutlass_gdn_decode_kernel_small_batch_nontranspose_TiledCopy_TilerMN321161_TVLayouttiled4324128132_CopyAtom_ThrID10_TVLayoutSrc1401_TVLayoutDst1401_Valuetypef32_tensorptrf32gmemali_0",
+        "primary_kernel_selection": "largest dynamic instruction count inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_gdn_decode_02",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "rope",
+      "case_id": "flashinfer_rope_01_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 2,
+        "primary_kernel_cta_count": 2,
+        "primary_kernel_dynamic_instruction_count": 2354,
+        "primary_kernel_name": "_ZN10flashinfer24BatchQKApplyRotaryKernelILb0ELj128ELj8ELj16E6__halfiEEvPT3_S3_S3_S3_PT4_S5_jjjjmmmmmmmmffff",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_rope_01",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "rope",
+      "case_id": "flashinfer_rope_02_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 5,
+        "primary_kernel_cta_count": 5,
+        "primary_kernel_dynamic_instruction_count": 4088,
+        "primary_kernel_name": "_ZN10flashinfer24BatchQKApplyRotaryKernelILb1ELj128ELj8ELj16E13__nv_bfloat16iEEvPT3_S3_S3_S3_PT4_S5_jjjjmmmmmmmmffff",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_rope_02",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "rope",
+      "case_id": "flashinfer_rope_03_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 9,
+        "primary_kernel_cta_count": 9,
+        "primary_kernel_dynamic_instruction_count": 10579,
+        "primary_kernel_name": "_ZN10flashinfer24BatchQKApplyRotaryKernelILb0ELj128ELj8ELj16E6__halfiEEvPT3_S3_S3_S3_PT4_S5_jjjjmmmmmmmmffff",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_rope_03",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "rope",
+      "case_id": "flashinfer_rope_04_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 65,
+        "primary_kernel_cta_count": 65,
+        "primary_kernel_dynamic_instruction_count": 53048,
+        "primary_kernel_name": "_ZN10flashinfer24BatchQKApplyRotaryKernelILb1ELj128ELj8ELj16E13__nv_bfloat16iEEvPT3_S3_S3_S3_PT4_S5_jjjjmmmmmmmmffff",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_rope_04",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "append_paged_kv",
+      "case_id": "flashinfer_append_paged_kv_01_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 132,
+        "primary_kernel_cta_count": 132,
+        "primary_kernel_dynamic_instruction_count": 738,
+        "primary_kernel_name": "_ZN10flashinfer24AppendPagedKVCacheKernelILj128ELj8E6__halfiEEvNS_10paged_kv_tIT1_T2_EEPS3_S6_PS4_S7_jmmmm",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_append_paged_kv_01",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "append_paged_kv",
+      "case_id": "flashinfer_append_paged_kv_02_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 132,
+        "primary_kernel_cta_count": 132,
+        "primary_kernel_dynamic_instruction_count": 738,
+        "primary_kernel_name": "_ZN10flashinfer24AppendPagedKVCacheKernelILj128ELj8E13__nv_bfloat16iEEvNS_10paged_kv_tIT1_T2_EEPS3_S6_PS4_S7_jmmmm",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_append_paged_kv_02",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "append_paged_kv",
+      "case_id": "flashinfer_append_paged_kv_03_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 132,
+        "primary_kernel_cta_count": 132,
+        "primary_kernel_dynamic_instruction_count": 738,
+        "primary_kernel_name": "_ZN10flashinfer24AppendPagedKVCacheKernelILj128ELj8E6__halfiEEvNS_10paged_kv_tIT1_T2_EEPS3_S6_PS4_S7_jmmmm",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_append_paged_kv_03",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "algorithm_or_operation": "append_paged_kv",
+      "case_id": "flashinfer_append_paged_kv_04_single_sm",
+      "h100_qualification": {
+        "primary_kernel_active_sm_count": 132,
+        "primary_kernel_cta_count": 132,
+        "primary_kernel_dynamic_instruction_count": 738,
+        "primary_kernel_name": "_ZN10flashinfer24AppendPagedKVCacheKernelILj128ELj8E13__nv_bfloat16iEEvNS_10paged_kv_tIT1_T2_EEPS3_S6_PS4_S7_jmmmm",
+        "primary_kernel_selection": "largest suite-owned kernel inside one profiler-selected public operation",
+        "status": "excluded_after_h100_topology_check"
+      },
+      "reason": "largest traced kernel used more than one CTA or more than one SM",
+      "source_case_id": "flashinfer_append_paged_kv_04",
+      "status": "excluded_after_h100_topology_check"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_01_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_01",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_02_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_02",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_03_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_03",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_04_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_04",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_05_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_05",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_06_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_06",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_07_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_07",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_08_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_08",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_09_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_09",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_ragged_10_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_ragged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_ragged_10",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_01_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_01",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_02_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_02",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_03_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_03",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_04_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_04",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_05_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_05",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_06_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_06",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_07_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_07",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_08_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_08",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_09_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_09",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_batch_prefill_paged_10_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "batch_prefill_paged",
+      "reason": "the Hopper batch-prefill implementation uses BatchPrefillPersistentTileScheduler and launches one persistent CTA per H100 SM even after batch, sequence, and head axes are minimized",
+      "source_case_id": "flashinfer_batch_prefill_paged_10",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_01_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_01",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_02_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_02",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_03_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_03",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_04_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_04",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_05_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_05",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_06_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_06",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_07_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_07",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_08_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_08",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_09_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_09",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_10_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_10",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_11_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_11",
+      "status": "excluded"
+    },
+    {
+      "case_id": "flashinfer_segment_gemm_12_single_sm",
+      "observed_h100_active_sm_count": 132,
+      "observed_h100_cta_count": 132,
+      "operation": "segment_gemm",
+      "reason": "the Hopper CUTLASS grouped GEMM implementation uses a persistent device grid and launches one CTA per H100 SM even after groups, tokens, and output width are minimized",
+      "source_case_id": "flashinfer_segment_gemm_12",
+      "status": "excluded"
+    }
+  ],
+  "implementation": null,
+  "minimum_hardware_cycle_policy": {
+    "changed_case_count": 42,
+    "kernel_or_harness_source_changed": true,
+    "plan_id": "exact241_min20k_final",
+    "plan_sha256": "00d2e95d463344aeb6b8b29216d2aacaf54beff0c79734ca85387b59016ba830",
+    "qualification_status": "pending_fresh_h100_topology_and_timing",
+    "source_accuracy_csv_sha256": "c35768893ef098fad464e26e2ab98e62a15c5304885fcd4b868e759fccf1f29b",
+    "threshold_cycles_exclusive": 20000.0
+  },
+  "pending_requalification_case_count": 42,
+  "qualification_rule": "the H100 primary kernel must execute correctly with exactly one CTA on exactly one SM; the public operation/algorithm, dtype and implementation flags must match the source full-GPU case",
+  "qualified_case_count": 2,
+  "schema_version": "flashinfer-hopper-single-sm-v1",
+  "selection_rule": "preserve public operation, backend, dtype and feature flags; reduce independent batch/token/head axes before the primary H100 kernel topology check",
+  "source_case_count": 100,
+  "source_manifest": "manifests/flashinfer_100.json"
+}

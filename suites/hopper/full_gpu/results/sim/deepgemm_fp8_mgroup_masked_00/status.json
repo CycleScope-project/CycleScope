@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "deepgemm_fp8_mgroup_masked_00",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 15532,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1618348,
+ "completed": 1618348,
+ "cycles": 22029,
+ "hard": 0,
+ "walls": {
+  "convert": 6.9,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 3.5,
+  "total": 10.7
+ },
+ "rss_kb": {
+  "convert": 334284,
+  "segments": 334284,
+  "build": 334284,
+  "sim": 334284
+ },
+ "hw_cycles": 21263.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6c25e71b777249fb",
+ "shards": 2
+}

@@ -1,0 +1,70 @@
+{
+ "memory.constant_cache.root": {
+  "fields": {
+   "capacity_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 65536
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "hit_latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 107.17
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "line_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 64
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "miss_latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 406.51
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "same_line_latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 37.0
+    },
+    "sources": [
+     "crossings.constant_cache.h100.r2"
+    ]
+   },
+   "bank0_access_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 30.0
+    },
+    "sources": [
+     "constant_launch.h100.r3"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

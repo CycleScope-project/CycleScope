@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "flashinfer_rope_append_kv_01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 10156544,
+ "completed": 10156544,
+ "cycles": 46674,
+ "hard": 0,
+ "walls": {
+  "convert": 9.3,
+  "segments": 0.1,
+  "build": 1.1,
+  "sim": 33.0,
+  "total": 43.5
+ },
+ "rss_kb": {
+  "convert": 224552,
+  "segments": 224552,
+  "build": 224552,
+  "sim": 998236
+ },
+ "hw_cycles": 48906.0,
+ "reference_cache_control": "all",
+ "placement_digest": "2b816652481ae116",
+ "shards": 14
+}

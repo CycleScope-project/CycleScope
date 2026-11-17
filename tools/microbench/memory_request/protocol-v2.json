@@ -1,0 +1,49 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "memory_request",
+  "version": 2,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "supersedes": "protocol.json (v1). v1 r1 facts (h100 GPU-4a698cd4, b300 GPU-3326338b, model $A/microbench/memory_request-model/<device>-r1/model.json): the memq probe's D = 1 group is not 'one request in flight' -- the K loads of a body are address-independent, ptxas issues them back to back and the body is issue-bound (W 1 D 1: 12.4 / 18.1 / 27.9 cycles per load on h100 l1 / l2 / dram; D 1 plateaus at 0.353 request/cycle for every level from W 8 on = the loop's own instruction rate), so latency_unloaded is not a latency, C3 fails on every level and no in-flight count is known; v1 r1 installs nothing (recorded as a failed attempt; the C3 band is not re-judged). What r1 did establish, two runs within 0.1 %: the saturated 1-sector load rate is 1.011 / 1.016 (l1) and 0.999 / 1.001 (l2) requests per cycle per SM on h100 / b300 -- one memory instruction per SM per cycle, reached for L1 hits and L2 hits alike -- and st.dist saturates at 2.55 / 2.61 cycles per 1-sector store. v2 replaces the load probe by dependent pointer chases so the in-flight count is exact and W 1 D 1 is the load-to-use latency.",
+  "ownership": "single-cluster loop (per-SM port quantities); shared L2 / DRAM bandwidth and DRAM latency stay with the full-GPU loop.",
+  "mechanisms": ["memory.l1.service", "memory.l2.service", "memory.dram.service", "memory.store_l2.service", "memory.l1.capacity", "memory.l2.capacity", "memory.dram.capacity"],
+  "purpose": "same as v1: saturated 1-sector request rate per level and for stores (issue_interval_cycles, the engine's per-request port floor is max(1, value)); per-SM in-flight cap per level (outstanding_requests) by Little's law with an exact in-flight count; fence-covered store ack reported only.",
+  "engine_consumer": "as v1 (MemoryHierarchy::load()/store(), per-request floor 9461e47, request-level inflight ring 259a18f).",
+  "probe": "tools/microbench/memory_request/probe/memq.cu v2: k_ld<LVL,D,K> becomes a dependent chase. Layout: the level's region is an array of 32 B sectors whose eight words all hold the index of the next sector, next(s) = (s + STRIDE) mod region_sectors, written by a device init kernel (l1 / l2 once, dram per slab). Chain c (c = warp x D + d, 0 <= c < W x D) starts at sector 4 c. Every warp holds D chain indices; one step issues D loads idx[d] = ld(region + idx[d] * 32 + (lane & 7) * 4) (every lane reads the same sector, as in v1) and the next step's addresses depend on the values, so exactly W x D requests are in flight and a W 1 D 1 body is one load-to-use latency per step. K steps per body, body between two clock reads, reps per launch as v1. Levels: l1 = ld.global.ca, region 16 KiB per CTA, STRIDE 4 sectors (chains revisit the region: all hits by construction), warmed by one pass; l2 = ld.global.cg, region 4 MiB, STRIDE 8192 sectors (chain cycle 16 steps, revisits are L2 hits long after completion), warmed by one pass; dram = ld.global.cg, every rep its own fresh 64 MiB slab of the 8 GiB buffer (slab r of launch l at l x 1088 MiB + r x 64 MiB; 7 launches x 17 reps), STRIDE 8192 sectors (cycle 256 steps = K max, no revisit, 4 c < 8192 so chains never share a line), no warming. Store (st.dist / st.same) and ack kernels unchanged from v1. Build sm_90a / sm_103a, cuobjdump -sass saved.",
+  "cells": {
+    "ld_inflight_series": {"(W,D)": [[1, 1], [2, 1], [4, 1], [8, 1], [16, 1], [32, 1], [32, 2], [32, 4], [32, 8], [32, 16], [32, 32]], "levels": ["l1", "l2", "dram"], "K": [64, 128, 256]},
+    "st": {"W": [1, 4, 16, 32], "K": [16, 32, 64], "forms": ["dist", "same"]},
+    "ack": {"lines": 64},
+    "launches": {"l1": 8, "l2": 8, "dram": 7, "st": 8, "ack": 8},
+    "reps": {"l1": 33, "l2": 33, "dram": 17, "st": 33, "ack": 33}
+  },
+  "runs": "RUN=r2: two runs (run-a, run-b) inside one job per device on one card each; identity.csv and clocks.sm before / after.",
+  "derivation": {
+    "cycles_per_step(level,W,D)": "OLS slope of the per-rep body cycles over K (steps), launches 1.., reps 1..; linearity gate: fit residual <= 2 % of the largest body time, else the point is void",
+    "latency_unloaded(level)": "cycles_per_step at (W 1, D 1); control against memlat: l1 within 15 %, l2 within 10 %, dram within 15 % of the installed <level>.latency_cycles (h100 52.5 / 305.5 / 697.9, b300 38.47 / 320.73 / 874.9)",
+    "rate(level,W,D)": "W x D / cycles_per_step, requests per cycle per SM",
+    "rate_saturated(level)": "median of the rate over the in-flight points within 3 % of the maximum rate (>= 2 such points)",
+    "issue_interval_cycles(level)": "1 / rate_saturated(level)",
+    "inflight_cap(level)": "Little's law: concurrency_eff(N) = rate(N) x latency_unloaded. RESOLVED when at the first in-flight point N* whose next point is within 3 % (rate stopped growing) (i) N* >= 1.2 x concurrency_eff(N*) and (ii) rate(N*) <= 0.9 x ceiling, ceiling = the maximum rate_saturated over the three levels of the same run (the SM's memory-instruction rate, ~1.0 / cycle from v1 r1); then outstanding_requests = round(concurrency_eff(N*)). Otherwise UNRESOLVED with lower bound = the largest N whose rate grew > 3 % over the previous point",
+    "store_issue_interval_cycles": "st.dist: cycles per store at W 32 (OLS over K x W); rate_saturated over W 1 / 4 / 16 / 32 within 3 % of the maximum; issue_interval = 1 / rate_saturated",
+    "store_same_sector": "st.same cycles per store at W 32 (reported)",
+    "ack_cycles": "ack.cold / ack.warm medians (reported only)"
+  },
+  "acceptance": {
+    "C1_runs": "installable quantities agree between runs within 5 %; per-point rep CV <= 3 %",
+    "C2_linearity": "the residual gate holds for every point feeding an installed quantity",
+    "C3_control": "latency_unloaded within the bands above on both runs; a failing level installs nothing from that level",
+    "C4_l1_sanity": "l1 rate_saturated >= 0.9 request / cycle on both devices"
+  },
+  "install": {
+    "<level>.issue_interval_cycles (l1, l2, dram)": "C1, C2, C4 and that level's C3 hold -> installed as measured on both devices (evidence measured)",
+    "store_l2.issue_interval_cycles": "C1, C2 hold on st.dist -> installed (measured)",
+    "<level>.outstanding_requests (l1, l2, dram)": "RESOLVED on both runs within 5 % and that level's C3 holds -> installed (measured); UNRESOLVED -> value unchanged, source record becomes experimental quoting 'no cap up to N in flight (rate still growing)'",
+    "store_l2.outstanding_requests / store_l2.latency_cycles": "not installable here; ack cycles reported",
+    "sources": "memory_request.<device>.r2.<quantity>; artifacts $A/microbench/memory_request/<device>-r2/ and $A/microbench/memory_request-model/<device>-r2/model.json from tools/microbench/memory_request/model_v2.py; cyclescope tree build && cyclescope tree validate --strict at 0",
+    "after_install": "single-cluster 500 x 2 A/B against the current baseline"
+  },
+  "sass_gate": "k_ld bodies: exactly K x D LDG (LDG.E.STRONG.SM / .GPU by level) between the two clock reads, each LDG's address register produced from the previous step's load of the same chain (dependent), no other global memory instruction; k_st / k_ack as v1. A failure voids the variant.",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no cap installed from an unresolved series; v1 r1 values are not installed",
+  "addenda": []
+}

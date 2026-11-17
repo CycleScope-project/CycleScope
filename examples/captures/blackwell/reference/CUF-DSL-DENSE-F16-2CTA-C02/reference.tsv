@@ -1,0 +1,2 @@
+case	kernel	launch_ordinal	grid	block	cluster	cycles_median	cycles_min	cycles_max	cycles_active_avg	sm_clock_khz	sm_clock_source	cache_control	clock_control	repeats	status	source
+CUF-DSL-DENSE-F16-2CTA-C02	kernel_cutlass_kernel___main__DenseGemmKernel_object_at__TiledMMA_ThrLayoutVMNK21111000_PermutationMNK____MMAAtom_ThrID21_ShapeMNK25612816_TVLayoutA2128161281256_TVLayoutB26416641128_TVLa_0	4	16x15x1	128x1x1	2x1x1	19872	19595	19924		1931842	ncu	all	none	3	success	cyclescope reference

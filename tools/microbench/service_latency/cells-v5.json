@@ -1,0 +1,144 @@
+{
+ "protocol": "service_latency protocol-v5.json",
+ "cells": {
+  "CS2R_CLOCK": {
+   "kind": "issue",
+   "composition": {"CS2R.CLOCK": 1},
+   "special_window": "whole kernel: exactly K ops of class CS2R.CLOCK (the 64-bit SR_CLOCKLO form); nothing else scales with K",
+   "devices": ["h100", "b300"],
+   "credits": "CS2R.CLOCK"
+  },
+  "CS2R_GT": {
+   "kind": "issue",
+   "composition": {"CS2R.GLOBALTIMER": 1},
+   "special_window": "between the two clock reads: exactly K ops of class CS2R.GLOBALTIMER (64-bit SR_GLOBALTIMERLO form)",
+   "devices": ["h100", "b300"],
+   "credits": "CS2R.GLOBALTIMER"
+  },
+  "HFMA2": {
+   "kind": "single",
+   "composition": {"HFMA2": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100"],
+   "idiom": "v3 HFMA2 cell unchanged; thr K {16,24,32,48,64,96,128}",
+   "n_unit": {"smsp": 32, "sm": 128}
+  },
+  "DADD_RN": {
+   "kind": "single",
+   "composition": {"DADD": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "add.rn.f64 x, x, y (survey RN1); lat + dthr 8 pinned chains",
+   "n_unit": {"fp64_sm": 64},
+   "credits": "DADD",
+   "fp64": true
+  },
+  "DMUL_RN": {
+   "kind": "single",
+   "composition": {"DMUL": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "mul.rn.f64 x, x, y (survey RN3); lat + dthr",
+   "n_unit": {"fp64_sm": 64},
+   "credits": "DMUL",
+   "fp64": true
+  },
+  "DADD_RZ": {
+   "kind": "single",
+   "composition": {"DADD": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["b300"],
+   "idiom": "add.rz.f64 (v4 body rerun on b300)",
+   "n_unit": {"fp64_sm": 64},
+   "credits": "DADD",
+   "fp64": true
+  },
+  "DMUL_RZ": {
+   "kind": "single",
+   "composition": {"DMUL": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["b300"],
+   "idiom": "mul.rz.f64 (v4 body rerun on b300)",
+   "n_unit": {"fp64_sm": 64},
+   "credits": "DMUL",
+   "fp64": true
+  },
+  "DSETP": {
+   "kind": "pair",
+   "composition": {"DSETP": 1, "FSEL": 2},
+   "partners": ["FSEL"],
+   "critical_path_partners": ["FSEL"],
+   "devices": ["b300"],
+   "idiom": "setp.gt.f64 p,x,y; selp.f64 x,a,b,p (v4 body, b300 rerun)",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "pair_root": "DSETP",
+   "probe_cell": "DSETP_P",
+   "fp64": true
+  },
+  "MATCH_d1": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "match.any.sync.b32 chain, d=1 distinct value",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 1
+  },
+  "MATCH_d2": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "d=2",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 2
+  },
+  "MATCH_d4": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "d=4",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 4
+  },
+  "MATCH_d8": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "d=8",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 8
+  },
+  "MATCH_d16": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "d=16",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 16
+  },
+  "MATCH_d32": {
+   "kind": "single",
+   "composition": {"MATCH": 1},
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": ["h100", "b300"],
+   "idiom": "d=32",
+   "n_unit": {"smsp": 32, "sm": 128},
+   "match_d": 32
+  }
+ }
+}

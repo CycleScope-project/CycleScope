@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-TF32-C02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 229165,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2442804,
+ "completed": 2442804,
+ "cycles": 44404,
+ "hard": 0,
+ "walls": {
+  "convert": 7.4,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 9.2,
+  "total": 17.3
+ },
+ "rss_kb": {
+  "convert": 434756,
+  "segments": 434756,
+  "build": 434756,
+  "sim": 777884
+ },
+ "hw_cycles": 47266.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 5
+}

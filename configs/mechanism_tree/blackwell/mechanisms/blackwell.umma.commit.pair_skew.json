@@ -1,0 +1,36 @@
+{
+ "doc": "imported from legacy mechanism tensor.umma.commit.pair_skew",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "UTCBAR"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "blackwell_umma_pair_arrive_skew"
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 29.92919921875
+     },
+     "sources": [
+      "mechtree.w1.tensor.umma.commit.pair_skew"
+     ]
+    },
+    "enabled": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "mechtree.w1.tensor.umma.commit.pair_skew"
+     ]
+    }
+   },
+   "scope": "cta"
+  }
+ }
+}

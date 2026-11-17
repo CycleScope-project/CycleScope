@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FIF-CLASSIC-TOP-K-SAMPLING-E05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 28686628,
+ "completed": 28686628,
+ "cycles": 109041,
+ "hard": 0,
+ "walls": {
+  "convert": 30.1,
+  "segments": 0.1,
+  "build": 2.5,
+  "sim": 59.9,
+  "total": 92.6
+ },
+ "rss_kb": {
+  "convert": 510980,
+  "segments": 510980,
+  "build": 510980,
+  "sim": 2565764
+ },
+ "hw_cycles": 113745.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 16
+}

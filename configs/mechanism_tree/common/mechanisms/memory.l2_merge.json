@@ -1,0 +1,37 @@
+{
+ "doc": "imported from legacy mechanism memory.l2_merge; domain_sms: an L2 read is shared only by requests of SMs with the same floor(sm / domain_sms); 0 or absent = any SM (the former rule); domain_gpc: 0 = off (floor(sm / domain_sms), 0 = any SM); 1 = TMA / bulk tensor loads share inside the SM's gpc, other kinds inside floor(sm / domain_sms); 2 = TMA / bulk tensor loads and async copies share inside the gpc; SMs without a gpc share inside floor(sm / domain_sms); async_copy_window_cycles: the window of a read opened by an async copy (cp.async); absent or 0 = window_cycles; async_copy_window_from_service = 1: that window counts from the time the opening request's sector leaves the shared L2 / DRAM read service (a read that waits can be joined while it waits)",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.l2_merge",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "delivered_bytes_per_cycle": {
+   "kind": "constant"
+  },
+  "max_requests_per_read": {
+   "kind": "constant"
+  },
+  "window_cycles": {
+   "kind": "constant"
+  },
+  "domain_sms": {
+   "kind": "constant"
+  },
+  "domain_gpc": {
+   "kind": "constant"
+  },
+  "async_copy_window_cycles": {
+   "kind": "constant"
+  },
+  "async_copy_window_from_service": {
+   "kind": "constant"
+  }
+ }
+}

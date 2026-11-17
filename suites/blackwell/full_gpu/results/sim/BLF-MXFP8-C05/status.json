@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-MXFP8-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 620048,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1129050,
+ "completed": 1129050,
+ "cycles": 24222,
+ "hard": 0,
+ "walls": {
+  "convert": 6.6,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 4.7,
+  "total": 11.7
+ },
+ "rss_kb": {
+  "convert": 449060,
+  "segments": 449060,
+  "build": 449060,
+  "sim": 449060
+ },
+ "hw_cycles": 29968.0,
+ "reference_cache_control": "all",
+ "placement_digest": "bfdc2d45d3e1fdf2",
+ "shards": 5
+}

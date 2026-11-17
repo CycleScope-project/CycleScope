@@ -1,0 +1,298 @@
+{
+ "storage.atomic.issue.root/operation_class=ATOM": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "cache_line_count",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       4.7
+      ],
+      [
+       2,
+       9.46
+      ],
+      [
+       4,
+       18.9
+      ],
+      [
+       8,
+       37.34
+      ],
+      [
+       16,
+       44.72
+      ],
+      [
+       32,
+       58.35
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r5"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.atomic.issue.root/operation_class=ATOMG": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "cache_line_count",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       4.61
+      ],
+      [
+       2,
+       9.3
+      ],
+      [
+       4,
+       18.7
+      ],
+      [
+       8,
+       37.07
+      ],
+      [
+       16,
+       44.3
+      ],
+      [
+       32,
+       56.66
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r5"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.atomic.issue.root/operation_class=ATOMS": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "atomic_same_address_lanes",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       1.31
+      ],
+      [
+       2,
+       2.22
+      ],
+      [
+       4,
+       4.03
+      ],
+      [
+       8,
+       8.07
+      ],
+      [
+       16,
+       16.13
+      ],
+      [
+       32,
+       32.28
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.atomic.issue.root/operation_class=RED": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "cache_line_count",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       5.0
+      ],
+      [
+       2,
+       10.0
+      ],
+      [
+       4,
+       20.0
+      ],
+      [
+       8,
+       40.0
+      ],
+      [
+       16,
+       48.0
+      ],
+      [
+       32,
+       32.0
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r3",
+     "atomic_issue.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.atomic.issue.root/operation_class=REDG": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "cache_line_count",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       5.0
+      ],
+      [
+       2,
+       10.0
+      ],
+      [
+       4,
+       20.0
+      ],
+      [
+       8,
+       40.0
+      ],
+      [
+       16,
+       48.0
+      ],
+      [
+       32,
+       32.0
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r3",
+     "atomic_issue.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.atomic.issue.root/operation_class=REDS": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "atomic_same_address_lanes",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       1.3
+      ],
+      [
+       2,
+       2.12
+      ],
+      [
+       4,
+       4.24
+      ],
+      [
+       8,
+       8.44
+      ],
+      [
+       16,
+       17.2
+      ],
+      [
+       32,
+       34.64
+      ]
+     ]
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "atomic_issue.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

@@ -1,0 +1,53 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "memory_request",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "ownership": "single-cluster loop for the per-SM port quantities (request rate, in-flight cap, store request rate are SM-local); the shared L2 / DRAM bandwidth and the DRAM latency itself stay with the full-GPU loop and are not touched here.",
+  "mechanisms": ["memory.l1.service", "memory.l2.service", "memory.dram.service", "memory.store_l2.service", "memory.l1.capacity", "memory.l2.capacity", "memory.dram.capacity", "memory.store_l2.capacity"],
+  "purpose": "The engine (cpp/core/memory_hierarchy.cpp, task/memory-sync-gaps 9461e47) now charges every warp-level request at least max(1, <level>.issue_interval_cycles) of port time; both trees carry issue_interval 0 (h100 predecessor placeholders; b300 memq w9 recorded ~1.0 request/cycle and wrote 0 'at the engine's 1-cycle floor'). The per-SM in-flight caps (outstanding_requests) are h100 placeholders 288 / 589 / 43 / 43 / 60 copied from hopper-prototype and b300 experimental 256 = the w4 probe's own ceiling ('256 is the probe's ceiling, not the hardware's'); store_l2.latency_cycles h100 42 is a placeholder and b300 165 is a fence-covered ack proxy. This protocol measures on both devices (a) the saturated 1-sector request rate per level and for stores, (b) whether a per-SM in-flight cap is reachable with up to 1024 independent 1-sector loads in flight, (c) the fence-covered store ack as a reported quantity only.",
+  "engine_consumer": "MemoryHierarchy::load()/store(): per sector port occupation sector_bytes / <level>.sector_bytes_per_cycle, per request floor max(1, <level>.issue_interval_cycles); port_acquire() blocks a new request while <level>.outstanding_requests requests of this SM are in flight (unit = warp-level request, main 259a18f); store completion = accept + store_l2.latency_cycles.",
+  "probe": "tools/microbench/memory_request/probe/memq.cu: blackwell-prototype tools/microbench/probes/memq.cu (fullgpu/s3) copied with these edits only: add D = 32 to the load in-flight series (W 32 x D 32 = 1024 requests in flight), keep every existing variant name; uses this repository's tools/microbench/<x>/mb.cuh (same MbArgs / MbWriter API). Build for sm_90a and sm_103a, cuobjdump -sass saved.",
+  "forms": {
+    "ld.<lvl>.d<D>.w<W>": "one CTA of W warps on one SM; every warp instruction is one 32 B sector; each warp issues K loads in groups of D independent loads (group consumed before the next) so W x D requests are in flight; K = 64 / 128 / 256 (l2 also 512 / 1024); l1 = ld.global.ca over a warmed 16 KiB per-CTA region, l2 = ld.global.cg over a warmed 4 MiB region, dram = ld.global.cg over a fresh 256 MiB region of an 8 GiB buffer per launch",
+    "st.<dist|same>.w<W>": "K = 16 / 32 / 64 one-sector st.global.u32 per warp between bar.sync; dist = every store a new sector of a 4 MiB L2-resident region, same = every store of a warp to one sector (offsets opaque to ptxas)",
+    "ack.<cold|warm>": "lane 0 of one warp: t0; st.global.u32; fence.sc.gpu; t1 on 64 lines (cold = fresh line, warm = the same line again)"
+  },
+  "cells": {
+    "ld_inflight_series": {"(W,D)": [[1, 1], [2, 1], [4, 1], [8, 1], [16, 1], [32, 1], [32, 2], [32, 4], [32, 8], [32, 16], [32, 32]], "levels": ["l1", "l2", "dram"], "K": {"l1": [64, 128, 256], "l2": [64, 128, 256, 512, 1024], "dram": [64, 128, 256]}},
+    "st": {"W": [1, 4, 16, 32], "K": [16, 32, 64], "forms": ["dist", "same"]},
+    "ack": {"lines": 64},
+    "launches": 8,
+    "reps": 33
+  },
+  "runs": "RUN=r1: two runs (run-a, run-b) inside one job per device on one card each; identity.csv and nvidia-smi clocks before / after.",
+  "derivation": {
+    "cycles_per_request(level,W,D)": "per (level, W, D): OLS slope of the per-rep body cycles over K x W (total requests of the body), launches 1..7, reps 1..32; linearity gate: residual of the fit <= 2 % of the largest body time, else the point is void",
+    "rate(level,W,D)": "1 / cycles_per_request, requests per cycle per SM",
+    "latency_unloaded(level)": "cycles_per_request at (W 1, D 1): one request in flight at a time = the load-to-use latency of this level in this probe (control against memlat: l1 within 15 %, l2 / dram within 10 % of the installed <level>.latency_cycles)",
+    "rate_saturated(level)": "median of the rate over the in-flight points within 3 % of the maximum rate (needs >= 2 such points)",
+    "issue_interval_cycles(level)": "1 / rate_saturated(level)",
+    "inflight_cap(level)": "Little's law per point: concurrency_eff = rate x latency_unloaded. The cap is RESOLVED when, at the first in-flight point N* where the rate stops growing (next point within 3 %), (i) the offered in-flight N* exceeds concurrency_eff(N*) by >= 20 % and (ii) rate(N*) is below 0.9 x the request-rate ceiling (1 request / cycle per port is the structural ceiling; if rate_saturated is itself below 0.9 / cycle the ceiling is rate_saturated of the l1 level as the fastest port); then outstanding_requests = round(concurrency_eff(N*)). Otherwise UNRESOLVED: lower bound = the largest N with rate still growing > 3 % over the previous point",
+    "store_issue_interval_cycles": "st.dist: cycles per store request at W 32 (OLS over K x W as above); rate_saturated over W 1 / 4 / 16 / 32 within 3 % of the maximum; issue_interval = 1 / rate_saturated",
+    "store_same_sector": "st.same: cycles per store at W 32 (reported: same-sector store serialisation)",
+    "ack_cycles": "ack.cold / ack.warm medians over 64 lines x launches (reported only: fence-covered, not a store acceptance measurement)"
+  },
+  "acceptance": {
+    "C1_runs": "every installable quantity agrees between run-a and run-b within 5 %; per-point rep CV <= 3 %",
+    "C2_linearity": "the OLS residual gate above holds for every point that feeds an installed quantity",
+    "C3_control": "latency_unloaded within the stated bands of the installed memlat leaves on both runs; a failing level installs nothing (machine state does not match the tree)",
+    "C4_l1_sanity": "l1 rate_saturated >= 0.9 request / cycle on both devices (the b300 w9 l1 cell measured 1.016-1.030); if not, the probe is suspected (register pressure / unroll) and no issue_interval is installed on any level"
+  },
+  "install": {
+    "<level>.issue_interval_cycles (l1, l2, dram, store_l2)": "C1-C4 hold -> installed as measured on both devices (b300 l2 and l1 replace the w9 0 with the measured interval; expected ~1.0). The engine floor is max(1, value), so a value <= 1 leaves the floor at 1 cycle",
+    "<level>.outstanding_requests (l1, l2, dram)": "RESOLVED on both runs within 5 % -> installed, evidence measured; UNRESOLVED -> the installed value stays, its source record becomes experimental and quotes the lower bound 'no cap up to N in flight' from this run (h100 placeholders 288 / 589 / 60 then carry an explicit bound instead of hopper-prototype provenance)",
+    "store_l2.outstanding_requests": "not installable from this probe (stores return no value; the st.dist rate is bandwidth / accept bound) -> reported only",
+    "store_l2.latency_cycles": "not installed (ack is fence-covered) -> ack cycles reported in the model file for the store_accept protocol",
+    "sources": "memory_request.<device>.r1.<quantity>; artifact $A/microbench/memory_request/<device>-r1/ and $A/microbench/memory_request-model/<device>-r1/model.json from tools/microbench/memory_request/model.py; nothing installed by hand; cyclescope tree build && cyclescope tree validate --strict at 0",
+    "after_install": "single-cluster 500 x 2 A/B against the current baseline, reported per family"
+  },
+  "sass_gate": "tools/microbench/memory_request/sass_check.py on the saved cuobjdump: every k_ld<LVL,D,K> timed body has exactly K LDG (LDG.E.STRONG.SM for l1 / LDG.E.STRONG.GPU for l2 and dram, one per request) between the two CS2R / S2R SR_CLOCKLO reads and no other global memory instruction; k_st bodies exactly K STG.E; k_ack one STG.E + MEMBAR.SC.GPU per pass. A gate failure voids the variant.",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no cap installed from an unresolved series",
+  "addenda": []
+}

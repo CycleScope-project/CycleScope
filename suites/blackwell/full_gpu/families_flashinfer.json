@@ -1,0 +1,2389 @@
+{
+  "suite": "flashinfer",
+  "cap": 8,
+  "families": [
+    {
+      "id": "fmha_bf16",
+      "stratum": "fmha_prefill",
+      "spec": {
+        "kind": "fmha",
+        "entry": "flashinfer.cute_dsl.attention.fmha.fmha.BlackwellFusedMultiHeadAttentionForward",
+        "kernel": "BlackwellFusedMultiHeadAttentionForward",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4,
+          4,
+          64
+        ],
+        "shape_tag": "4_4096_4_4_64",
+        "dtype": "bf16",
+        "params": {
+          "head_dim": 64,
+          "mma_tiler": [
+            128,
+            128
+          ],
+          "mask": "RESIDUAL_MASK",
+          "ex2_emulation": false,
+          "skip_correction": true,
+          "tma_store": true
+        },
+        "entry_family": "fi_fmha_prefill",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.3",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * heads * batch",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/fmha/helpers/fmha_helpers.py:336-376",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/fmha/helpers/fmha_helpers.py:336-376"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*fmhafmhaBlackwellFusedMultiHeadAttentionForward.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "fmha_fp16",
+      "stratum": "fmha_prefill",
+      "spec": {
+        "kind": "fmha",
+        "entry": "flashinfer.cute_dsl.attention.fmha.fmha.BlackwellFusedMultiHeadAttentionForward",
+        "kernel": "BlackwellFusedMultiHeadAttentionForward",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4,
+          4,
+          128
+        ],
+        "shape_tag": "4_4096_4_4_128",
+        "dtype": "fp16",
+        "params": {
+          "head_dim": 128,
+          "mma_tiler": [
+            128,
+            128
+          ],
+          "mask": "RESIDUAL_MASK",
+          "ex2_emulation": false,
+          "skip_correction": true,
+          "tma_store": true
+        },
+        "entry_family": "fi_fmha_prefill",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.3",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*fmhafmhaBlackwellFusedMultiHeadAttentionForward.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "fmha_fp8",
+      "stratum": "fmha_prefill",
+      "spec": {
+        "kind": "fmha",
+        "entry": "flashinfer.cute_dsl.attention.fmha.fmha.BlackwellFusedMultiHeadAttentionForward",
+        "kernel": "BlackwellFusedMultiHeadAttentionForward",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4,
+          4,
+          128
+        ],
+        "shape_tag": "4_4096_4_4_128",
+        "dtype": "e4m3",
+        "params": {
+          "head_dim": 128,
+          "mma_tiler": [
+            128,
+            128
+          ],
+          "mask": "RESIDUAL_MASK",
+          "ex2_emulation": false,
+          "skip_correction": true,
+          "tma_store": true,
+          "qkv_dtype": "float8_e4m3fn"
+        },
+        "entry_family": "fi_fmha_prefill",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.3",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*fmhafmhaBlackwellFusedMultiHeadAttentionForward.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "fmha_bs_nvf4",
+      "stratum": "fmha_prefill",
+      "spec": {
+        "kind": "fmha_bs",
+        "entry": "flashinfer.cute_dsl.attention.fmha.fmha_blockscaled",
+        "kernel": "BlackwellFusedMultiHeadBlockScaledAttentionForward",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4,
+          4,
+          128
+        ],
+        "shape_tag": "4_4096_4_4_128",
+        "dtype": "nvfp4",
+        "params": {
+          "head_dim": 128,
+          "ab_dtype": "float4_e2m1fn",
+          "sf_dtype": "float8_e4m3fn",
+          "sf_vec_size": 16
+        },
+        "entry_family": "fi_fmha_blockscaled",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.3",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "non-persistent CuTe-DSL blockscaled FMHA tile grid",
+        "evidence": "flashinfer@v0.7.0:flashinfer/attention/cute_dsl/fmha_blockscaled.py:202-214",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*fmha_blockscaled.*|.*fmhablockscaled.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; probe-fi1 P05 did not write done/result: its work directory is empty and ncu_r0.log ends after \u201cConnected to process\u201d; no application traceback or source-level failure was captured (artifacts/rebuild/c450full/probe-fi1/shards/s1/out/cases/FIF-FMHA-BS-NVF4-P05)"
+    },
+    {
+      "id": "mla_fp16",
+      "stratum": "mla_decode",
+      "spec": {
+        "kind": "mla_decode",
+        "entry": "flashinfer.cute_dsl.attention.monolithic.mla_decode_fp16",
+        "kernel": "MLADecodeKernel",
+        "cta_group": 2,
+        "cluster": "2x1x1",
+        "sms": 2,
+        "shape": [
+          128,
+          1,
+          128,
+          576,
+          512,
+          64
+        ],
+        "shape_tag": "128_1_128_576_512_64",
+        "dtype": "bf16",
+        "params": {
+          "heads": 128,
+          "latent": 512,
+          "rope": 64,
+          "seq_k": 512,
+          "page": 64,
+          "batch": 128
+        },
+        "entry_family": "fi_mla_decode",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "params.batch",
+            "base": 128,
+            "min": 74,
+            "max": 128,
+            "step": 2
+          }
+        ],
+        "I": {
+          "path": "params.seq_k",
+          "base": 512,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "min(max_active_clusters * cluster_size, cluster_size * batch * query_tiles * split_kv)",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-192",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-192"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*split_kv_kernel.*mla_decode_fp16.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "R01/R03/R04 in probe-fi2 had grid128 at batch64; the persistent scheduler grid is min(max_active_clusters*cluster_size, cluster_size*batch*query_tiles*split_kv). Batch128 reaches the 148-CTA cap and min74 preserves at least148; I varies seq_k and leaves split_kv to the library heuristic (flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:99-146,721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-194)"
+    },
+    {
+      "id": "mla_fp8",
+      "stratum": "mla_decode",
+      "spec": {
+        "kind": "mla_decode",
+        "entry": "flashinfer.cute_dsl.attention.monolithic.mla_decode_fp8",
+        "kernel": "MLADecodeKernel",
+        "cta_group": 2,
+        "cluster": "2x1x1",
+        "sms": 2,
+        "shape": [
+          128,
+          1,
+          128,
+          576,
+          256,
+          64
+        ],
+        "shape_tag": "128_1_128_576_256_64",
+        "dtype": "e4m3",
+        "params": {
+          "heads": 128,
+          "latent": 512,
+          "rope": 64,
+          "seq_k": 256,
+          "page": 64,
+          "batch": 128
+        },
+        "entry_family": "fi_mla_decode",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "params.batch",
+            "base": 128,
+            "min": 74,
+            "max": 128,
+            "step": 2
+          }
+        ],
+        "I": {
+          "path": "params.seq_k",
+          "base": 256,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "min(max_active_clusters * cluster_size, cluster_size * batch * query_tiles * split_kv)",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-192",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-192"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*split_kv_kernel.*mla_decode_fp8.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "R01/R03/R04 in probe-fi2 had grid128 at batch64; the persistent scheduler grid is min(max_active_clusters*cluster_size, cluster_size*batch*query_tiles*split_kv). Batch128 reaches the 148-CTA cap and min74 preserves at least148; I varies seq_k and leaves split_kv to the library heuristic (flashinfer@v0.7.0:flashinfer/cute_dsl/attention/monolithic/mla_decode.py:99-146,721-733; flashinfer/cute_dsl/attention/scheduler/mla_persistent.py:179-194)"
+    },
+    {
+      "id": "bs_sm100_nvf4",
+      "stratum": "gemm_blockscaled",
+      "spec": {
+        "kind": "gemm_bs",
+        "entry": "flashinfer.gemm.kernels.dense_blockscaled_gemm_sm100.Sm100BlockScaledPersistentDenseGemmKernel",
+        "kernel": "Sm100BlockScaledPersistentDenseGemmKernel",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          1,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "1_4096_4096_4096",
+        "dtype": "nvfp4",
+        "params": {
+          "sm": 100,
+          "tile_m": 128,
+          "sf_vec_size": 16,
+          "ab_dtype": "float4_e2m1fn",
+          "sf_dtype": "float8_e4m3fn"
+        },
+        "entry_family": "fi_bs_gemm_sm100",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 4096
+        }
+      },
+      "grid": {
+        "formula": "persistent tile grid bounded by max_active_clusters",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm100.py:1428-1456",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm100.py:1428-1456"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*dense_blockscaled_gemm.*",
+      "aux_kernels": [
+        "(?i).*convert_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; cutlass_torch.cute_tensor_like input conversions are preprocessing, not the GEMM main kernel (suites/flashinfer/run.py:238-245); the probe-fi1 P05 NCU capture contains both the convert kernel and dense_blockscaled_gemm in artifacts/rebuild/c450full/probe-fi1/shards/s0/out/cases/FIF-BS-SM100-NVF4-P05/ncu_timing.jsonl; full mode uses get_max_active_clusters(cluster_size) (suites/flashinfer/run.py:call_bs_gemm; flashinfer@v0.7.0:flashinfer/cute_dsl/utils.py:187-200)"
+    },
+    {
+      "id": "bs_sm103_nvf4",
+      "stratum": "gemm_blockscaled",
+      "spec": {
+        "kind": "gemm_bs",
+        "entry": "flashinfer.gemm.kernels.dense_blockscaled_gemm_sm103.Sm103BlockScaledPersistentDenseGemmKernel",
+        "kernel": "Sm103BlockScaledPersistentDenseGemmKernel",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          1,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "1_4096_4096_4096",
+        "dtype": "nvfp4",
+        "params": {
+          "sm": 103,
+          "tile_m": 128,
+          "sf_vec_size": 16,
+          "use_tma_store": true,
+          "ab_dtype": "float4_e2m1fn",
+          "sf_dtype": "float8_e4m3fn"
+        },
+        "entry_family": "fi_bs_gemm_sm103",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 4096
+        }
+      },
+      "grid": {
+        "formula": "persistent tile grid bounded by max_active_clusters",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm103.py:2145-2173",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm103.py:2145-2173"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*dense_blockscaled_gemm.*",
+      "aux_kernels": [
+        "(?i).*convert_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; probe-fi1 P04 did not write done/result: its work directory is empty and ncu_r0.log ends after \u201cConnected to process\u201d; no application traceback or source-level failure was captured (artifacts/rebuild/c450full/probe-fi1/shards/s0/out/cases/FIF-BS-SM103-NVF4-P04); full mode uses get_max_active_clusters(cluster_size) (suites/flashinfer/run.py:call_bs_gemm; flashinfer@v0.7.0:flashinfer/cute_dsl/utils.py:187-200); cute_tensor_like input conversions are preprocessing; full mode converts once, then calls the GEMM API calls times"
+    },
+    {
+      "id": "bs_sm100_mxf8",
+      "stratum": "gemm_blockscaled",
+      "spec": {
+        "kind": "gemm_bs",
+        "entry": "flashinfer.gemm.kernels.dense_blockscaled_gemm_sm100.Sm100BlockScaledPersistentDenseGemmKernel",
+        "kernel": "Sm100BlockScaledPersistentDenseGemmKernel",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          1,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "1_4096_4096_4096",
+        "dtype": "mxfp8",
+        "params": {
+          "sm": 100,
+          "tile_m": 128,
+          "sf_vec_size": 32,
+          "ab_dtype": "float8_e4m3fn",
+          "sf_dtype": "float8_e8m0fnu"
+        },
+        "entry_family": "fi_bs_gemm_sm100",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "persistent tile grid bounded by max_active_clusters",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm100.py:1428-1456",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm100.py:1428-1456"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*dense_blockscaled_gemm.*",
+      "aux_kernels": [
+        "(?i).*convert_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; cute_tensor_like input conversions are preprocessing; full mode converts once, then calls the GEMM API calls times"
+    },
+    {
+      "id": "bmm_fp8_1c",
+      "stratum": "gemm_fp8",
+      "spec": {
+        "kind": "bmm",
+        "entry": "flashinfer.gemm.kernels.bmm_fp8_blackwell",
+        "kernel": "bmm_fp8_cute_dsl",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4_4096_4096_4096",
+        "dtype": "e4m3",
+        "params": {
+          "use_2cta": false,
+          "cluster": [
+            1,
+            1
+          ]
+        },
+        "entry_family": "fi_bmm_fp8",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 2048
+        }
+      },
+      "grid": {
+        "formula": "min(tile_count, max_active_clusters) * cluster_size",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/bmm_fp8_blackwell.py:763-784; flashinfer/cute_dsl/utils.py:187-200",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/bmm_fp8_blackwell.py:763-784; flashinfer/cute_dsl/utils.py:187-200"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*bmm_fp8_blackwell.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; full mode passes get_max_active_clusters(cluster_size) instead of the c450v2 single-cluster cap"
+    },
+    {
+      "id": "bmm_fp8_2c",
+      "stratum": "gemm_fp8",
+      "spec": {
+        "kind": "bmm",
+        "entry": "flashinfer.gemm.kernels.bmm_fp8_blackwell",
+        "kernel": "bmm_fp8_cute_dsl",
+        "cta_group": 2,
+        "cluster": "2x1x1",
+        "sms": 2,
+        "shape": [
+          4,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4_4096_4096_4096",
+        "dtype": "e4m3",
+        "params": {
+          "use_2cta": true,
+          "cluster": [
+            2,
+            1
+          ]
+        },
+        "entry_family": "fi_bmm_fp8",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 2048
+        }
+      },
+      "grid": {
+        "formula": "min(tile_count, max_active_clusters) * cluster_size",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/bmm_fp8_blackwell.py:763-784; flashinfer/cute_dsl/utils.py:187-200",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/bmm_fp8_blackwell.py:763-784; flashinfer/cute_dsl/utils.py:187-200"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*bmm_fp8_blackwell.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; full mode passes get_max_active_clusters(cluster_size) instead of the c450v2 single-cluster cap"
+    },
+    {
+      "id": "grp_msk_nvf4",
+      "stratum": "grouped_moe",
+      "spec": {
+        "kind": "grouped_msk",
+        "entry": "flashinfer.gemm.kernels.grouped_gemm_masked_blackwell",
+        "kernel": "GroupedGemmMaskedBlackwell",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4_4096_4096_4096",
+        "dtype": "nvfp4",
+        "params": {
+          "groups": 4,
+          "tile_m": 128,
+          "cluster": [
+            1,
+            1
+          ],
+          "ab_dtype": "float4_e2m1fn",
+          "sf_vec_size": 16
+        },
+        "entry_family": "fi_grouped_masked",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 8,
+            "max": 65536,
+            "step": 8
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "min(tile_count, max_active_clusters) * cluster_size",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/grouped_gemm_masked_blackwell.py:63",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/grouped_gemm_masked_blackwell.py:63"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*grouped_gemm.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "probe-fi2 unsupported cases had N values 3847/6107/2423; with C major N and BF16 C, 16B alignment requires N divisible by8, while FP4 A/B K=1024 already satisfies its 32-element alignment (flashinfer@v0.7.0:flashinfer/gemm/kernels/dense_blockscaled_gemm_sm100.py:1610-1621; flashinfer/gemm/kernels/grouped_gemm_masked_blackwell.py:2799-2803)"
+    },
+    {
+      "id": "grp_ctg_nvf4",
+      "stratum": "grouped_moe",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4_4096_4096_4096",
+        "kind": "grouped",
+        "dtype": "nvf4",
+        "cta_group": 1,
+        "entry_family": "fi_grouped_contiguous",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": true,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*grouped_gemm.*",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "moe_nvf4",
+      "stratum": "grouped_moe",
+      "spec": {
+        "kind": "moe_g1",
+        "entry": "flashinfer.fused_moe.cute_dsl.blockscaled_contiguous_gather_grouped_gemm_act_fusion",
+        "kernel": "blockscaled_contiguous_gather_grouped_gemm_act_fusion",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          16384,
+          4096,
+          14336,
+          8,
+          2
+        ],
+        "shape_tag": "16384_4096_14336_8_2",
+        "dtype": "nvfp4",
+        "params": {
+          "tile": 128,
+          "experts": 8,
+          "topk": 2,
+          "seq_len": 16384,
+          "hidden": 4096,
+          "inter": 14336
+        },
+        "entry_family": "fi_fused_moe",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "params.seq_len",
+            "base": 16384,
+            "min": 9728,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "params.hidden",
+          "base": 4096,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "min(max_active_clusters * cluster_size, num_experts * ceil_div((seq_len * topk) // num_experts, tile_size))",
+        "evidence": "flashinfer@v0.7.0:flashinfer/fused_moe/cute_dsl/blockscaled_contiguous_gather_grouped_gemm_act_fusion.py:147-162,740-744,3586; suites/flashinfer/run.py:385-410",
+        "persistent": true,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/fused_moe/cute_dsl/blockscaled_contiguous_gather_grouped_gemm_act_fusion.py:147-162,740-744,3586"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*moe.*|.*grouped_gemm.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "The runner uses params.seq_len, hidden, and inter; shape.0 was ignored. P now scales seq_len, which controls group_m and the number of scheduler tiles; I scales hidden (GEMM K) (flashinfer@v0.7.0:flashinfer/fused_moe/cute_dsl/blockscaled_contiguous_gather_grouped_gemm_act_fusion.py:147-162; suites/flashinfer/run.py:385-410)"
+    },
+    {
+      "id": "tgv_t5",
+      "stratum": "gemm_fp8",
+      "spec": {
+        "kind": "tgv",
+        "entry": "flashinfer.gemm.kernels.tgv_gemm_cute_ext",
+        "kernel": "tgv_bmm",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4096_4096_4096",
+        "dtype": "bf16",
+        "params": {
+          "tactic": 5,
+          "use_2cta": false
+        },
+        "entry_family": "fi_tgv_gemm",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "non-persistent;<=1 tile",
+        "evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/tgv_gemm_cute_ext.py:249-258",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/gemm/kernels/tgv_gemm_cute_ext.py:249-258"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*tgv_gemm.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "tgv_t18",
+      "stratum": "gemm_fp8",
+      "spec": {
+        "kind": "tgv",
+        "entry": "flashinfer.gemm.kernels.tgv_gemm_cute_ext",
+        "kernel": "tgv_bmm",
+        "cta_group": 2,
+        "cluster": "2x1x1",
+        "sms": 2,
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "4096_4096_4096",
+        "dtype": "bf16",
+        "params": {
+          "tactic": 18,
+          "use_2cta": true
+        },
+        "entry_family": "fi_tgv_gemm",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*tgv_gemm.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "gqa_dec",
+      "stratum": "gqa_decode",
+      "spec": {
+        "kind": "gqa_dec",
+        "entry": "flashinfer.cute_dsl.attention.gqa_decode.GroupedQueryAttentionDecode",
+        "kernel": "GroupedQueryAttentionDecode",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          1,
+          128,
+          8,
+          128,
+          0
+        ],
+        "shape_tag": "4_1_128_8_128_0",
+        "dtype": "bf16",
+        "params": {
+          "kv_splits": 1,
+          "reduction": "none",
+          "paged": false,
+          "seq_k": 8192
+        },
+        "entry_family": "fi_gqa_decode",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 2,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "params.seq_k",
+          "base": 8192,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "kv_splits * query_tiles * heads * batch",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/gqa_decode.py:1900-1901,2076-2081",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/gqa_decode.py:1900-1901,2076-2081"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*gqa_decode.*|.*GroupedQueryAttention.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "num_qo_heads is pinned at128 (num_kv_heads=8); P varies batch only (min batch2 keeps the launch grid above148) and I varies seq_k. The wrapper requires num_qo_heads % num_kv_heads == 0 (flashinfer@v0.7.0:flashinfer/cute_dsl/attention/wrappers/batch_decode.py:806-810; flashinfer/cute_dsl/attention/gqa_decode.py:188-203)"
+    },
+    {
+      "id": "gqa_paged",
+      "stratum": "gqa_decode",
+      "spec": {
+        "kind": "gqa_dec_paged",
+        "entry": "flashinfer.cute_dsl.attention.gqa_decode_paged.GroupedQueryAttentionDecodePaged",
+        "kernel": "GroupedQueryAttentionDecodePaged",
+        "cta_group": 1,
+        "cluster": "2x1x1",
+        "sms": 2,
+        "shape": [
+          4,
+          1,
+          128,
+          8,
+          128,
+          0
+        ],
+        "shape_tag": "4_1_128_8_128_0",
+        "dtype": "bf16",
+        "params": {
+          "kv_splits": 2,
+          "reduction": "atomic",
+          "paged": true,
+          "page": 64,
+          "seq_k": 8192
+        },
+        "entry_family": "fi_gqa_decode_paged",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 2,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "params.seq_k",
+          "base": 8192,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "kv_splits * query_tiles * heads * batch",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/gqa_decode_paged.py:499,1948-1953",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/attention/gqa_decode_paged.py:499,1948-1953"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*gqa_decode_paged.*|.*GroupedQueryAttention.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "num_qo_heads is pinned at128 (num_kv_heads=8); P varies batch only (min batch2 keeps the launch grid above148) and I varies seq_k. The wrapper requires num_qo_heads % num_kv_heads == 0 (flashinfer@v0.7.0:flashinfer/cute_dsl/attention/wrappers/batch_decode.py:806-810; flashinfer/cute_dsl/attention/gqa_decode.py:188-203)"
+    },
+    {
+      "id": "bsa_blk128",
+      "stratum": "block_sparse_attn",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          16,
+          128,
+          128
+        ],
+        "shape_tag": "4_4096_16_128_128",
+        "kind": "bsa",
+        "dtype": "bf16",
+        "cta_group": 1,
+        "entry_family": "fi_bsa",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 16,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, block_size) * heads * batch",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/sparse/sm100_blk128/tile_scheduler.py:115-128",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/sparse/sm100_blk128/tile_scheduler.py:115-128"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_blk128flash_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "bsa_blk64",
+      "stratum": "block_sparse_attn",
+      "spec": {
+        "kind": "bsa",
+        "entry": "flashinfer.cute_dsl.sparse.bsa_attn_sm100_blk64",
+        "kernel": "bsa_attn_sm100_blk64",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          4,
+          4096,
+          16,
+          128,
+          64
+        ],
+        "shape_tag": "4_4096_16_128_64",
+        "dtype": "bf16",
+        "params": {
+          "block": 64,
+          "clc": 0
+        },
+        "entry_family": "fi_bsa",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 16,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_blk64.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop; blk64 CuTe-DSL requires MHA (Hq=Hkv) and D=DV=128 (flashinfer@v0.7.0:flashinfer/cute_dsl/sparse/bsa_attn_sm100_blk64.py:107-146)"
+    },
+    {
+      "id": "rmsnorm",
+      "stratum": "norm_quant",
+      "spec": {
+        "kind": "rmsnorm_q",
+        "entry": "flashinfer.cute_dsl.rmsnorm_fp4quant",
+        "kernel": "rmsnorm_fp4quant",
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 1,
+        "shape": [
+          32768,
+          4096
+        ],
+        "shape_tag": "32768_4096",
+        "dtype": "nvfp4",
+        "params": {
+          "sf_vec_size": 16
+        },
+        "entry_family": "fi_rmsnorm_fp4quant",
+        "suite": "flashinfer",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 32768,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 4096
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, rows_per_CTA)",
+        "evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/rmsnorm_fp4quant.py:297",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/cute_dsl/rmsnorm_fp4quant.py:297"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*RMSNormFP4Quant.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "classic_batch_decode_paged",
+      "stratum": "classic_attention",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "batch_decode_paged",
+        "dtype": "bf16",
+        "shape": [
+          4,
+          1,
+          16,
+          4,
+          128
+        ],
+        "shape_tag": "4_1_16_4_128",
+        "params": {
+          "operation": "batch_decode_paged",
+          "page_size": 64,
+          "seq_k": 8192
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 16,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "params.seq_k",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "batch * query_heads * kv_splits",
+        "evidence": "flashinfer@v0.7.0:flashinfer/attention/prims_ts/decode.py:2900-2913",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/attention/prims_ts/decode.py:2900-2913"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*batch_decode.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "dropped",
+      "notes": "probe-fi1 TypeError: Task._run_task_body_impl() got an unexpected keyword argument 'context' (smoke-fi1 runner result.json); the installed Task API is incompatible"
+    },
+    {
+      "id": "classic_single_prefill",
+      "stratum": "classic_attention",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "single_prefill",
+        "dtype": "bf16",
+        "shape": [
+          4096,
+          8192,
+          16,
+          4,
+          128
+        ],
+        "shape_tag": "4096_8192_16_4_128",
+        "params": {
+          "operation": "single_prefill",
+          "causal": false
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 16,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * heads * batch",
+        "evidence": "flashinfer@v0.7.0:flashinfer/prefill.py:1284-1308",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/prefill.py:1284-1308"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*SinglePrefillWithKVCacheKernel.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "draft",
+      "notes": "JIT source paths are redirected to the v0.7.0 source tree before compilation; main kernel regex matches the observed NCU symbol."
+    },
+    {
+      "id": "classic_merge_state",
+      "stratum": "classic_attention",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "merge_state",
+        "dtype": "bf16",
+        "shape": [
+          512,
+          16,
+          128
+        ],
+        "shape_tag": "512_16_128",
+        "params": {
+          "operation": "merge_state",
+          "seed": 0
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 512,
+            "min": 256,
+            "max": 1024,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 16,
+            "min": 8,
+            "max": 32,
+            "step": 8
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 128,
+          "min": 128,
+          "max": 128,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "seq_len (one CTA per sequence row)",
+        "evidence": "flashinfer@v0.7.0:include/flashinfer/attention/cascade.cuh:45-72,579-590; csrc/cascade.cu:23-52",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:include/flashinfer/attention/cascade.cuh:45-72,579-590"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*MergeStateKernel.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "dropped",
+      "notes": "Dropped after full-mode numeric verification failed against the upstream trace reference, including its base-2 LSE conversion and seed/input order. smoke-x6-merge2 P01 (seq_len=512) still had 8/1,048,576 mismatches, max abs=0.0078125 at rtol=atol=1e-3; the larger 16,384-token input had 224 one-ULP mismatches. Tolerance was not loosened."
+    },
+    {
+      "id": "classic_top_k_sampling",
+      "stratum": "sampling_topk",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "top_k_sampling",
+        "dtype": "bf16",
+        "shape": [
+          4096,
+          8192
+        ],
+        "shape_tag": "4096_8192",
+        "params": {
+          "operation": "top_k_sampling",
+          "top_k": 50
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "batch_size reduction grid",
+        "evidence": "flashinfer@v0.7.0:flashinfer/sampling.py:1096-1203",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/sampling.py:1096-1203"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*TopKSamplingFromProbKernel.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "draft",
+      "notes": "JIT source paths are redirected to the v0.7.0 source tree before compilation; main kernel regex matches the observed NCU symbol."
+    },
+    {
+      "id": "classic_silu_and_mul",
+      "stratum": "rope_page",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "silu_and_mul",
+        "dtype": "bf16",
+        "shape": [
+          32768,
+          8192
+        ],
+        "shape_tag": "32768_8192",
+        "params": {
+          "operation": "silu_and_mul"
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 32768,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_tokens = input.numel() / input.size(-1) = rows",
+        "evidence": "flashinfer@v0.7.0:flashinfer/jit/activation.py:36-46; include/flashinfer/activation.cuh:29-35",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:flashinfer/jit/activation.py:36-46"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*act_and_mul_kernel.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "draft",
+      "notes": "The JIT source layout is redirected to the v0.7.0 source tree; the grid has one CTA per input row (jit/activation.py:36-46)."
+    },
+    {
+      "id": "classic_apply_rope",
+      "stratum": "rope_page",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "classic_jit",
+        "entry_family": "fi_classic_jit",
+        "entry": "apply_rope",
+        "dtype": "bf16",
+        "shape": [
+          8,
+          256,
+          24,
+          4,
+          128
+        ],
+        "shape_tag": "8_256_24_4_128",
+        "params": {
+          "operation": "apply_rope"
+        },
+        "cta_group": 1,
+        "cluster": "1x1x1",
+        "sms": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 8,
+            "min": 7,
+            "max": 16,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 256,
+            "min": 128,
+            "max": 512,
+            "step": 128
+          },
+          {
+            "path": "shape.2",
+            "base": 24,
+            "min": 20,
+            "max": 48,
+            "step": 4
+          }
+        ],
+        "I": {
+          "path": "shape.4",
+          "base": 128,
+          "min": 128,
+          "max": 512,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "batch_size * (num_qo_heads + num_kv_heads)",
+        "evidence": "flashinfer@v0.7.0:include/flashinfer/pos_enc.cuh:1461-1506",
+        "persistent": false,
+        "persistent_evidence": "flashinfer@v0.7.0:include/flashinfer/pos_enc.cuh:1461-1506"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*BatchQKApplyRotaryKernel.*",
+      "aux_kernels": [
+        "(?i).*reference.*",
+        "(?i).*compare.*"
+      ],
+      "status": "draft",
+      "notes": "The launch grid is B*(Hq+Hkv); P minima B=7,Hq=20,Hkv=4 keep grid>=168. D=128/512 are supported by the runtime dispatch (pos_enc.cuh:1475-1483); this family uses the library-default apply_rope call."
+    },
+    {
+      "id": "classic_prefill_paged",
+      "stratum": "classic_attention",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "no classic JIT CUDA call builder in the current runner"
+    },
+    {
+      "id": "classic_prefill_ragged",
+      "stratum": "classic_attention",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "no classic JIT CUDA call builder in the current runner"
+    },
+    {
+      "id": "bs_sm100_splitk",
+      "stratum": "gemm_blockscaled",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks the block-scaled split-K family call builder"
+    },
+    {
+      "id": "bf16_splitk",
+      "stratum": "gemm_blockscaled",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks the BF16 split-K family call builder"
+    },
+    {
+      "id": "fused_add_rmsnorm",
+      "stratum": "norm_quant",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks fused_add_rmsnorm input/call builder"
+    },
+    {
+      "id": "layernorm",
+      "stratum": "norm_quant",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks the FlashInfer LayerNorm call builder"
+    },
+    {
+      "id": "add_rmsnorm_fp4quant",
+      "stratum": "norm_quant",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks the FP4 fused norm call builder"
+    },
+    {
+      "id": "top_p_sampling",
+      "stratum": "sampling_topk",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "top-p sampling call builder is not implemented"
+    },
+    {
+      "id": "min_p_sampling",
+      "stratum": "sampling_topk",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "min-p sampling call builder is not implemented"
+    },
+    {
+      "id": "append_paged_kv",
+      "stratum": "rope_page",
+      "spec": {
+        "suite": "flashinfer",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "append_paged_kv_cache input/layout builder is not implemented"
+    }
+  ]
+}

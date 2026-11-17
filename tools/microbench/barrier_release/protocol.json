@@ -1,0 +1,13 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "barrier_release",
+ "frozen_before_gpu": true,
+ "date": "2026-11-04",
+ "mechanisms": ["synchronization.mbarrier.release", "synchronization.cta.release", "synchronization.cluster.release", "synchronization.cp_async.arrival", "synchronization.mbarrier.trywait_timeout"],
+ "devices": {"h100": "sm_90a", "b300": "sm_103a"},
+ "purpose": "The Blackwell tree carries measured release latencies (mbarrier 87.8, BAR.SYNC 16-25 by warps, cluster 87, cp.async arrive 12.7) from the blackwell-prototype wave1/2/9 probes; the Hopper tree carries 0 / placeholder values for the same mechanisms and a trywait suspend bound only Hopper has (7892). One probe build measures all five quantities on both devices with the same definition: E[t_waiter_wake - t_last_arrive] minus the probe's own clock-read and instruction overheads, waiter blocked in try_wait / BAR.SYNC / barrier.cluster.wait, last arriver jittered so the waiter is always already blocked.",
+ "probe": "blackwell-prototype tools/microbench/probes/sync_mb.cu (mbarrier arrive -> try_wait wake; complete_tx -> wake; try_wait suspend bound: a try_wait with no arrival ever, time until it returns false), sync_bar.cu (BAR.SYNC last arriver -> other warps wake, W in 2..32), sync_xw.cu (cluster barrier) and async.cu cp.async.mbarrier.arrive.noinc delay; copied verbatim into tools/microbench/barrier_release/probe/, compiled for both archs. cluster probes need sm_90a+ clusters (both devices). 2048 samples per cell per device.",
+ "derivation": "mbarrier.release = median E[t_w - t_s] - o_s - o_w (blackwell-prototype wave1 definition, pooled over arrive and complete_tx completions); cta.release(W) = first-waking warp delay for W in {2,4,8,12,16,32} as linear points; cluster.release = same for barrier.cluster.arrive/wait over 2 CTAs; cp_async.arrival = arrive.noinc with no pending copies minus plain mbarrier.arrive; trywait_timeout = median cycles a try_wait suspends before returning false when nobody arrives (PTX system-dependent bound).",
+ "acceptance": "cell spread (P90 - P10) / median < 10 % -> measured; b300 cells must reproduce the installed b300 leaves within 10 % (else both numbers reported, new one installed as experimental); a cell whose definition the probe could not realise on a device (e.g. cluster barrier variant failing the SASS gate) stays as it is in the tree and is listed.",
+ "install": "<arch>/leaves/synchronization.*.json with source keys barrier_release.<device>.<run>; the Hopper `expected_tx_bytes` / `expected_arrivals` / `actual_participant_ctas` partitions are dropped (one leaf, linear in actual_participant_warps where the probe shows W-dependence)."
+}

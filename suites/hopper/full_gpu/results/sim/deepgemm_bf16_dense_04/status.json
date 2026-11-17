@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "deepgemm_bf16_dense_04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2503,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1176884,
+ "completed": 1176884,
+ "cycles": 16794,
+ "hard": 0,
+ "walls": {
+  "convert": 6.4,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 3.2,
+  "total": 9.9
+ },
+ "rss_kb": {
+  "convert": 205496,
+  "segments": 205496,
+  "build": 205496,
+  "sim": 243192
+ },
+ "hw_cycles": 17482.0,
+ "reference_cache_control": "all",
+ "placement_digest": "8ed9134de4d01363",
+ "shards": 2
+}

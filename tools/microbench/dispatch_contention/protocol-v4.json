@@ -1,0 +1,46 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "dispatch_contention",
+ "version": 4,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "supersedes": "protocol-v3.json (v3r1: h100 OP2q by the letter with the contradicting ilp8n cell excluded, b300 nothing; last addendum)",
+ "mechanisms": [
+  "register_file.operand_read (new, candidate OP2p; OP2q / OP2x kept for comparison)",
+  "resource.fma_smsp (candidate P, kept)"
+ ],
+ "devices": {
+  "h100": "sm_90a (1 GPU)",
+  "b300": "sm_103a (1 GPU)"
+ },
+ "question": "v3r1 established (both devices): operand reads from the general-purpose register file are limited to two per SMSP per cycle; a single warp's consecutive stream packs reads across instruction boundaries (ilp8n: 3 reads per instruction -> 1.5 cycles), an instruction issued after another warp's starts on a fresh cycle (dep3r / dep3n / imad / mixed FFMA: 2 cycles per 3-read instruction once warps interleave), a reuse-served consumer also starts on a fresh cycle after its producer's reads (ilp2 pair = 2 + 1 = 3 cycles at W >= 2, latency-bound 2.0 per instruction at W = 1), and the issue slot runs ahead of the collector by at most one instruction (OP2q's queue, which is what keeps the W = 1 ilp2 cell at 2.0 and lets mixed pack at 6 per instruction). Does the declared OP2p form reproduce a fresh pair of runs on both devices?",
+ "engine_rules_declared_before_data": {
+  "baseline": "as protocol v2 / v3.",
+  "OP2p (operand ports, pipelined fetch)": "Issue as today (one instruction per SMSP per cycle; stall floor and result latency count from the issue cycle). Behind the issue slot a per-SMSP operand collector reads at most two general-purpose registers per cycle (read slots numbered 2 per cycle). An issued instruction with n unserved GPR reads (a GPR named twice counts once; a 64-bit pair counts both registers; uniform registers, predicates, immediates, constant-bank operands and RZ do not count; n = 0 uses no slots) takes the next n slots: it CONTINUES in the current cycle's spare slot when the collector's last instruction was the same warp's immediately preceding instruction and this instruction is not reuse-served; otherwise (another warp's instruction was last, or this instruction consumes operands from the reuse cache, or no spare slot) it starts on a fresh cycle, i.e. at the first slot of the next free cycle. Its service start is the cycle of its first slot; the SMSP may not issue a further instruction (of any warp) while the most recently issued instruction with n > 0 has not yet started (one in service, at most one waiting). Reuse-served: an operand is served when the same warp's immediately preceding instruction (program order) carried the reuse flag on that operand slot with the same register and was the SMSP's immediately preceding issue. Class units stay as installed. Leaf: register_file.operand_read enabled 1, reads_per_cycle 2, collector 2 (pipelined). Replica dry run on v3r1: every usable gating cell of both devices within tolerance (ilp8n 1.50 / 1.50, dep3r 6 / 8, dep3n 6 / 8, dep2 / dep1 4, ilp8 1.0, ilp8n2 1.0, ilp2 2 / 3 / 4.5 / 6, imad); record cells: dep3r W = 2 4 vs 5, dep3n W = 2 4 vs 3.86 / 4.50, mixed 5 / 5 / 5 / 6 vs 5 / 5.25 / 5.25 / 6.25.",
+  "OP2q (in-order collector queue, as v3)": "as protocol v3 (ceil(n / 2) per instruction, no packing). Dry run on v3r1: misses ilp8n (2.0 vs 1.5).",
+  "OP2x (exclusive hold, as v2 / v3)": "as before; misses ilp8n and ilp2 W = 1.",
+  "P (pipe pairing, as v2)": "as before; misses dep2 / dep1 at W >= 3 and ilp8n.",
+  "candidate order (simplest first)": [
+   "baseline",
+   "OP2p",
+   "OP2q",
+   "OP2x",
+   "P"
+  ],
+  "dropped": "OP2s and the banked / per-bank forms (v2 / v3 readings)."
+ },
+ "probe": "contention_v3.cu unchanged (V3=1 run switch; RUN tag v4r1), --launches 16 --reps 65, two runs per device.",
+ "sass_gate": "sass_check_v2.py --v3 unchanged.",
+ "derivation": "as protocol v3; model_v2.py <A> <dev> <run> --v4 (candidate order above, OP2p rule added).",
+ "decision": "as protocol v3 (usable cell, gating cells, CTA-only rule for bimodal greedy cells, tolerance max(5 %, 0.25 cycles per instruction), first accepted candidate in order, evidence measured / experimental). The W = 2 dependent FP32 cells, mixed at W >= 2 and mufu.* remain record only.",
+ "install": {
+  "OP2p": "common mechanism register_file.operand_read (event initialization, scope smsp): fields enabled (0 / 1), reads_per_cycle (2), collector (2 pipelined / 1 queue / 0 exclusive); <arch>/leaves with source dispatch_contention.<device>.v4r<n>. Converter (python and cpp segment builders identical, py == cpp gate): REGS rows gain flags u8 (bit0 reuse_served: the static predecessor at pc - 16 carries the reuse flag on this operand slot with the same register; bit1 pair: 64-bit register-pair operand -- `.64`-suffixed names and the pair-operand class table), REGS 4 -> 8 bytes, container format_version 1 -> 2, formats.md. Engine: at issue n = distinct GPR source registers (pairs count 2) minus the reuse_served ones when the SMSP's last issue was this warp (its previous instance); per-SMSP collector state = next free read slot, warp owning the open cycle, service start of the last entry; checked in resource_ready (wait bucket resource, retry at the service start) and committed with the issue. CTest fixtures: (a) one warp, 3-read independent stream, no reuse -> 1.5 cycles per instruction; (b) two / three / four warps' 3-read dependent chains -> 4 / 6 / 8 per step; (c) reuse-served stream -> 1 / cycle; (d) 2-read stream -> 1; (e) served consumer after a 3-read producer -> fresh cycle (pair 3).",
+  "after install": "tree build && tree validate --strict; py == cpp on the 5 standard cases; 500 x 2 A/B against hp $A/merge/rba, bw $A/merge/if36 (facts $A/merge/cbk); report row, status, docs/en/microbench.md"
+ },
+ "record_only": {
+  "mufu ops": "as v3",
+  "dep3r / dep3n W = 2": "5.00 / 3.86-4.50: a one-cycle effect confined to two interleaved dependent FP32 chains"
+ },
+ "not_allowed": "no case-cycle tuning; no values from other machines; no change of candidates, order, thresholds, gating set or variants after v4 data.",
+ "addenda": []
+}

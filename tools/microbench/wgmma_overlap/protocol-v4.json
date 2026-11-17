@@ -1,0 +1,44 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "wgmma_overlap",
+ "version": 4,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "supersedes": "protocol-v3.json (C3 / C4 installed experimental from h100-r5; A/B wo53 moved hp only 9.1 -> 9.0 % while the SM-scope diagnostic arm (floor 3 on every issue) reached 7.8 %)",
+ "mechanisms": ["hopper.wgmma.register_file_issue_steal (kind 44): C3 operand-form extensions"],
+ "devices": {"h100": "sm_90a, pod"},
+ "question": "C3 predicts 2 cycles for every 1- or 2-GPR-read instruction of the issuing warpgroup while its wgmma is in flight. The 500-case kernels' overlapped streams (fa3 softmax, deepgemm promotion) are mostly 2-GPR instructions with a uniform-register or constant-bank third operand and a .reuse flag (FFMA R, R, UR, -R.reuse; FMUL R, R, R.reuse; FADD R, -R, R; F2FP R, R, R; MUFU R, R), forms v3 never measured; v3's own reuse-flagged 3-GPR stream (ilp8) ran 0.5-0.9 cycles slower than the unflagged one (ilp8n). v4 measures the kernel forms and declares two additive extensions of C3's read accounting: a reuse-flagged operand costs half a read slot (C5) and a uniform / constant-bank operand costs one read slot (C6).",
+ "engine_rules_declared_before_data": {
+  "C3 (installed)": "t = max(stall, 2, n) with n = distinct GPR sources (reuse not served).",
+  "C5 (reuse flag cost)": "while in flight, each source operand carrying the .reuse flag adds 0.5 to n (implemented as an alternating extra slot). ilp8 (3 GPR, 2 flags) -> 4; fmul_r (2 GPR, 1 flag) -> 2.5; ffma_ur_r (2 GPR + UR, 1 flag) -> 2.5 under C3+C5.",
+  "C6 (uniform / constant operand cost)": "while in flight, a uniform-register or constant-bank source operand counts as one GPR read. ffma_ur (2 GPR + UR, no flag) -> 3; ffma_ur_r -> 3 (C3+C6) or 3.5 (C3+C5+C6); fmul_ur (1 GPR + UR) -> 2.",
+  "candidate order": ["C3 alone", "C3+C5", "C3+C6", "C3+C5+C6"],
+  "decision": "first candidate in order whose predictions fit every gating cell within max(15 %, 0.5); install measured at 100 % / experimental at >= 80 % with no cell beyond 1.0 (as v3)."
+ },
+ "probe": {
+  "file": "tools/microbench/wgmma_overlap/probe/overlap_v3.cu (overlap_v2.cu role-split form; V3=1 build / run)",
+  "forms": {"hgmma_bf16_n256_ss": {"cid": 190, "G": 8, "U": 128}, "hgmma_bf16_n128_ss": {"cid": 158, "G": 8, "U": 64}, "hgmma_bf16_n256_rs": {"cid": 191, "G": 8, "U": 128}},
+  "window_kinds": {
+   "ilp8": "v3 (3 GPR, 2 .reuse)", "ilp8n": "v3 (3 GPR)", "fadd1": "v3 (1 GPR, immediate)", "fmul2": "v3 (2 GPR, no reuse)",
+   "fmul_r": "8 independent FMUL d[i] = mul(d[i], a) with one shared GPR a (ptxas .reuse on a) -- 2 GPR, 1 flag",
+   "fadd2n": "8 independent FADD d[i] = add(d[i], a8[i]) -- 2 GPR, no reuse (FADD pipe check vs fmul2)",
+   "ffma_ur": "8 independent FFMA d[i] = fma(d[i], p, b8[i]) with p a kernel parameter kept warp-uniform (expected UR or c[0x0][..] operand; the gate records which) -- 2 GPR + uniform, no reuse",
+   "ffma_ur_r": "8 independent FFMA d[i] = fma(d[i], p, a) with p uniform and a shared GPR a -- 2 GPR + uniform, 1 .reuse",
+   "fmul_ur": "8 independent FMUL d[i] = mul(d[i], p) -- 1 GPR + uniform",
+   "f2fp": "4 independent cvt.rn.f16x2.f32 h[j] = pack(d[2j], d[2j+1]) (F2FP.F16.F32.PACK_AB, 2 GPR; results consumed by the sink) -- ALU-class convert",
+   "mufu8": "8 independent ex2.approx on d[i] (MUFU.EX2, 1 GPR, XU pipe)",
+   "dep3r": "v3 chain (floor check)"
+  },
+  "modes": "self.w1 (gating), other.w2 (scope check: streams unchanged), ctrl.w1; --launches 8 --reps 33, two runs",
+  "sass_gate": "sass_check_v3.py: window = exactly U instructions of the kind's opcode; operand forms as declared (fmul_r: .reuse on the shared operand except the last unit; ffma_ur / ffma_ur_r / fmul_ur: one UR<n> or c[...] operand per instruction, recorded as 'ur' / 'cbank' per kernel; f2fp: F2FP.F16.F32.PACK_AB with two GPRs; mufu8: MUFU.EX2); warpgroup 0's block as v2 addendum 2; no C7518 / C7511. A kind whose uniform operand ends up in a GPR (ptxas materialised it) is unrealised:not_uniform for that kind."
+ },
+ "derivation": "as v3 (T, excess, usable, two-run acceptance). n per kind: ilp8 3(+2 flags), ilp8n 3, fadd1 1, fmul2 2, fmul_r 2(+1 flag), fadd2n 2, ffma_ur 2(+1 uniform), ffma_ur_r 2(+1 uniform, +1 flag), fmul_ur 1(+1 uniform), f2fp 2, mufu8 1 (XU: t_ctrl ~8 dominates, floor check only), dep3r chain. Gating cells: self.w1 of every stream kind at the three forms (rs included this time: C5 / C6 have no shape parameter, and the kernels' PV wgmma is rs); other.w2 streams must stay within tolerance of ctrl.",
+ "install": {
+  "C5": "hopper.wgmma.register_file_issue_steal field `reuse_flag_half_reads` (0/1); engine: in the steal path n += 0.5 per source with REGS flags bit0 (alternating slot). Fixture: 3-GPR 2-flag stream during in-flight -> 4.",
+  "C6": "field `uniform_operand_reads` (0/1); engine: in the steal path count uniform-register (reg_id >= 256 uniform class) and constant-bank sources as GPR reads; the converter already records uniform registers in REGS (check: `UR` sources present as register_refs with the uniform id range); constant-bank operands need a template flag -- if absent in the segment format, C6 covers UR sources only and the gap is recorded. Fixture: 2-GPR + UR stream -> 3.",
+  "after install": "tree build && validate --strict; CTest + pytest; py == cpp if the converter is touched; 500 x 2 A/B against wo53."
+ },
+ "record_only": ["rs vs ss residuals per kind", "ur vs cbank operand placement per kernel"],
+ "not_allowed": "no case-cycle tuning; no threshold, candidate or derivation change after data; the diagnostic arm k = 2 is not evidence.",
+ "addenda": []
+}

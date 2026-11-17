@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "deepgemm_einsum_04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 357980,
+ "completed": 357980,
+ "cycles": 15684,
+ "hard": 0,
+ "walls": {
+  "convert": 1.0,
+  "segments": 1.7,
+  "build": 0.2,
+  "sim": 1.2,
+  "total": 4.1
+ },
+ "rss_kb": {
+  "convert": 186336,
+  "segments": 186336,
+  "build": 186336,
+  "sim": 186336
+ },
+ "hw_cycles": 16476.0,
+ "reference_cache_control": "all",
+ "placement_digest": "701d816d3bae33ad",
+ "shards": 1
+}

@@ -1,0 +1,17 @@
+{
+ "memory.l2.capacity.root": {
+  "fields": {
+   "l2.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 288
+    },
+    "sources": [
+     "memory_request.h100.r2.l2.outstanding_requests",
+     "hopper.ed116159b0511d0c34ae6f15"
+    ]
+   }
+  },
+  "scope": "cluster"
+ }
+}

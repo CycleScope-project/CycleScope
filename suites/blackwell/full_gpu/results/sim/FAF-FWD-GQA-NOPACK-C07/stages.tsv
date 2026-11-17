@@ -1,0 +1,37 @@
+split	4.9	39648	0	8.4
+convert-shard6	2.4	421900	0	10.8
+convert-shard0	2.5	461584	0	13.3
+convert-shard2	2.6	464740	0	15.9
+convert-shard4	2.7	464740	0	18.7
+convert-shard5	2.9	464740	0	21.6
+convert-shard3	3.0	464740	0	24.7
+convert-shard7	3.1	464740	0	27.8
+convert-shard1	3.4	466276	0	31.3
+segments-shard6	2.9	466276	0	34.2
+segments-shard0	3.2	466276	0	37.4
+segments-shard2	3.2	466276	0	40.7
+segments-shard4	3.3	466276	0	43.9
+segments-shard5	3.2	466276	0	47.1
+segments-shard3	3.5	466276	0	50.6
+segments-shard7	3.6	466276	0	54.2
+segments-shard1	4.5	466276	0	58.7
+convert-shard8	2.7	466276	0	61.5
+convert-shard10	2.7	466276	0	64.2
+convert-shard12	2.8	466276	0	67.0
+convert-shard9	3.1	466276	0	70.1
+convert-shard11	2.9	466276	0	73.1
+convert-shard14	2.6	466276	0	75.7
+convert-shard13	2.9	466276	0	78.6
+convert-shard15	3.0	466276	0	81.7
+segments-shard8	4.3	466276	0	86.0
+segments-shard10	4.7	466276	0	90.7
+segments-shard12	4.7	466276	0	95.3
+segments-shard9	4.7	466276	0	100.1
+segments-shard11	4.9	466276	0	105.0
+segments-shard14	4.8	466276	0	109.7
+segments-shard13	4.8	466276	0	114.5
+segments-shard15	5.0	466276	0	119.5
+convert	3.4	466276	0
+segments	5.0	466276	0
+build	1.4	466276	0	120.9
+sim	28.7	1401656	0	149.5

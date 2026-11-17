@@ -1,0 +1,43 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "dispatch",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "ownership": "full-GPU loop (gpu-shared: launch.dispatch). Single-cluster runs bind launch.dispatch only through the first wave of the one sampled cluster; the single-cluster A/B is reported, not used to judge the leaf.",
+  "mechanisms": [
+    "launch.dispatch"
+  ],
+  "purpose": "h100 launch.dispatch.serial_ns_per_cta is a placeholder 0 (hopper.placeholder.dispatch_serial), b300 first_wave_interval_ns is a placeholder 0 (blackwell.placeholder.dispatch_first_wave). b300 serial_ns_per_cta 0.5136 is the blackwell-prototype M4 amendment-1 value (fullgpu_dispatch_protocol.json: c16 aggregate dispatch interval under full-card backlog, two cards 0.510 / 0.511, scope gpu vs tpc/sm not discriminated, experimental-grade evidence although recorded measured). The engine (cpp/core/simulator.cpp) applies serial_per_cta as one GPU-wide serial dispatcher and first_wave_interval as rank x interval in (sm, slot) order.",
+  "probe": "blackwell-prototype tools/microbench/probes/fullgpu/dispatch.cu copied verbatim into tools/microbench/dispatch/probe/ (modes waves / tail and the amendment-1 mode tput: grid = sm_count x ctas_per_sm x waves, 128-thread CTAs, dynamic shared memory sized so exactly ctas_per_sm CTAs fit one SM, hold 0; per CTA %smid, %warpid, entry / exit %globaltimer and clock64). Build for sm_90a and sm_103a; sm_count from the device.",
+  "cells": {
+    "tput": "ctas_per_sm 4 and 16, waves 2 / 8 / 32, 6 launches each (launch 0 discarded)",
+    "first_wave": "the first wave of every tput launch (sm_count x ctas_per_sm CTAs)",
+    "controls": "tail (hold 20 us, 10 launches): slot_free_to_entry median; h100 compared with the installed 174.92 ns (hopper-prototype measured), b300 with 160 ns"
+  },
+  "runs": "RUN=r1, two runs (run-a, run-b) inside one job per device",
+  "derivation": {
+    "aggregate_interval_ns": "blackwell-prototype amendment-1 definition: per launch, entries sorted by gt_in; backlog window = first exit to last entry; aggregate interval = window / entries inside it; median over launches 1..5",
+    "kernel_slope_ns_per_cta": "OLS slope of (last gt_out - first gt_in) over grid size across waves 2 / 8 / 32 at one ctas_per_sm",
+    "serial_ns_per_cta": "c16 aggregate interval, two-run mean",
+    "first_wave_spread_ns": "per launch, max - min gt_in over the first wave; median over launches. first_wave_interval_ns = spread / (first-wave CTAs - 1) if the spread exceeds two globaltimer ticks (the tick is read from the gt_in value set: the smallest positive difference between distinct gt_in values), otherwise the interval is not resolved and only the bound spread_max / (CTAs - 1) is reported"
+  },
+  "acceptance": {
+    "serial_ns_per_cta": "runs agree within 10 %, launch CV <= 10 %, kernel_slope within 15 % of the c16 aggregate interval -> experimental (the scope question of the blackwell-prototype amendment 2 stays open: the value is the aggregate pipeline rate, applied by the engine as a GPU-wide serializer). b300 is a control: within 10 % of 0.5136 -> kept and cited; else replaced.",
+    "first_wave_interval_ns": "resolved (> 2 ticks) and runs within 10 % -> experimental value; unresolved -> the installed 0 stays, its source becomes an experimental record quoting the measured bound (b300); h100 1.222 ns (hopper-prototype) is compared and reported",
+    "controls": "slot_free_to_entry within 10 % of the installed value on each device, else the run is reported and nothing is installed"
+  },
+  "install": "sources dispatch.<device>.r1; artifact $A/microbench/dispatch/<device>-r1/ and $A/microbench/dispatch-model/<device>-r1/model.json; single-cluster 500 x 2 A/B reported (expected unchanged or near-unchanged); full-GPU effect left to the full-GPU loop",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "before_run": "r4 (written before any run of this derivation; r3's tail data are not re-derived)",
+      "item": "h100 slot_free_to_entry_ns: the r3 tail control resolves the gap only as <= 64 ns because %globaltimer advances in 32 ns ticks on H100, so the installed 174.92 (hopper-prototype) can neither be confirmed nor replaced.",
+      "derivation": "the probe already records clock64 at entry (clk_in) and at exit (clk_out) of every CTA. In tail mode the extra CTA (cta index sm_count) enters the SM whose CTA released its slot; both events are on that SM, so the gap is read on one SM clock: gap_cycles = clk_in(extra) - clk_out(previous CTA on the same smid); that SM's clock rate during the 20 us hold f = (clk_out - clk_in) / (gt_out - gt_in) of the previous CTA (cycles per ns, 32 ns tick over 20 us = 0.16 %); gap_ns = gap_cycles / f. Per launch one value; median over launches 1..9 (launch 0 dropped). A launch where the extra CTA's smid has no earlier CTA, or where two CTAs share that smid's slot in an unexpected order, is dropped and counted.",
+      "acceptance": "two runs within 10 % and launch CV <= 15 % per run; b300 control: the clock-derived gap within max(10 %, 32 ns) of the installed 160 ns (itself a globaltimer value) and within one tick of the same run's globaltimer gap; h100: the clock-derived gap must lie inside the same run's globaltimer bracket (consistency check). Passing -> h100 slot_free_to_entry_ns = gap_ns, measured, source dispatch.h100.r4; b300 kept and cited. A failing control installs nothing.",
+      "runs": "RUN=r4 on both devices with the unchanged run.sh (tput cells rerun as a reproduction of r3's serial_ns_per_cta; nothing else installed from them).",
+      "ownership": "full-GPU loop leaf: the single-cluster 500 x 2 A/B is reported only."
+    }
+  ]
+}

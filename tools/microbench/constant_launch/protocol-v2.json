@@ -1,0 +1,29 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "constant_launch",
+ "version": 2,
+ "supersedes": "tools/microbench/constant_launch/protocol.json (version 1; runs h100-r1 / b300-r1, model $A/microbench/constant_launch-model/<device>-r1/model.json): every slope experimental. Bank-0 first-traversal launch means are deterministic (h100 U 4/8/16 = 135 / 244 / 543, b300 153 / 262 / 534; S = 64 and S = 256 identical) but not linear in U (fit residual 36-50 % of the slope), i.e. the U axis changes the code shape inside the window; a slope over separate kernels cannot meet the residual criterion. Reported v1 values: bank 0 ~32-34 cycles per dependent load on both traversals; bank 3 cold first traversal at S = 256 852 (h100) / 1105 (b300) per load vs installed miss 406.51 / 502.78.",
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "memory.constant_cache"
+ ],
+ "probe": {
+  "kernel": "one kernel shape per BANK: U = 16 dependent register-indexed loads per traversal, two traversals, a clock read (CS2R SR_CLOCKLO) before the first load and after every load: t_0, load_0, t_1, load_1, t_2, ..., load_15, t_16 (first traversal), then load_0' .. load_15' with t_17 .. t_32 (second traversal). Chain data as v1 (load k reads byte offset k x S, next[] gives the following offset, last -> 0). Each t_{j+1} issues right after load_j and load_{j+1} waits for load_j's value, so d_j = t_{j+1} - t_j (j >= 1) measures load_{j-1} plus whatever sits between two loads in the chain.",
+  "chain_form": "preferred: the table holds byte offsets so consecutive LDCs are linked with no instruction between them (LDC R, c[0x<BANK>][R+imm] feeding the next LDC directly). If ptxas needs one ALU op between consecutive loads (e.g. IMAD.WIDE / IMAD.SHL), the same op must sit between every pair and its class is recorded by the gate; the derivation subtracts that class's installed instruction.service result latency (the engine charges it separately).",
+  "axes": "BANK in {0, 3}; S in {64, 256} B (S = 256 x 16 = 4096 B); W = 1 warp, grid 1; BANK 0 table = by-value 4096 B kernel parameter struct, BANK 3 = 4096 B __constant__ array written with cudaMemcpyToSymbol before the first launch.",
+  "sass_gate": "per variant: exactly 33 CS2R SR_CLOCKLO, exactly 32 register-indexed LDC R, c[0x<BANK>][R(+imm)] alternating with them in program order (t, load, t, load, ...), no other memory instruction between the first and last CS2R, and between consecutive loads either nothing but the CS2R or the same single ALU op (class recorded). Variants failing the gate are not measured.",
+  "runner": "as v1: ncu with NCU_LAUNCH_METRICS, --cache-control all, --clock-control none, --replay-mode kernel, 34 launches per variant (launches 0 and 1 dropped); a plain no-ncu pass reported only; two runs per device: $A/microbench/constant_launch/<device>-r2/run-{a,b}. LAUNCH line: `LAUNCH k_cl variant=cl.b<BANK>.s<S> launch=<n> t=<t_0>,<t_1>,...,<t_32> idx=<v>`."
+ },
+ "derivation": "t_{j+1} issues right after load_j without waiting, and load_{j+1} waits for load_j, so d_j = t_{j+1} - t_j measures load_{j-1} for j >= 1 (d_0 is issue only). First traversal: loads 0..15 are measured by d_1..d_16 (load_0' of the second traversal consumes load_15, so t_17 closes d_16); second traversal: loads 0'..14' by d_17..d_31 (load 15' has no closing clock). Per-load latency x = d - a, a = installed instruction.service result latency of the in-between ALU class (0 when none). Per variant and run: first = median of x over first-traversal loads 1..15 (d_2..d_16) and all kept launches; load0 = median of x for load 0 (d_1, reported); second = median of x over loads 0'..14' (d_17..d_31); p10 / p90 of each set.",
+ "acceptance": {
+  "cell": "per (BANK, S, traversal): run agreement |a - b| / mean <= 5 %, and (p90 - p10) / median <= 30 % within each run -> measured; else experimental (not installed).",
+  "decision_declared_before_data": {
+   "bank0": "engine rule: every bank-0 constant access returns now + bank0_access_cycles (no miss / hit / same-line distinction for bank 0) with bank0_access_cycles = mean over the two runs of the bank-0 S = 256 first value; installed only if the bank-0 S = 256 first and second cells are measured and second is within 10 % of first (otherwise the 'no distinction' rule is not supported and nothing is installed for bank 0).",
+   "other_banks": "miss_latency_cycles is the cold miss under the reference cache control: replaced by the mean over the two runs of the bank-3 S = 256 first value when that cell is measured (non-zero banks keep the hit / same-line / in-flight rules; the installed hit and same-line leaves are compared with the bank-3 second value and reported, not changed)."
+  }
+ },
+ "install": "memory.constant_cache: new field bank0_access_cycles, revised miss_latency_cycles, both devices from their own runs (source constant_launch.<device>.r2, protocol tools/microbench/constant_launch/protocol-v2.json); engine rule above with a CTest fixture; then the lifecycle v3 cells are re-simulated and re-derived (lifecycle protocol-v3 dependence clause) and one two-architecture 500-case single-cluster A/B.",
+ "limits": "bank-0 residency is measured for 16 lines of a 4 KiB parameter struct read by one warp; larger parameter / driver footprints and many-warp contention are outside the probe.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, cell or derivation change after data."
+}

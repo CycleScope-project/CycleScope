@@ -1,0 +1,36 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "ldgsts_l1",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-10",
+ "mechanisms": [
+  "memory.l1.residency (which fills allocate in the SM's L1)"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "question": "Full-gpu hp cutlass_dense_cpasync_05 (sim / hw 0.65): by-PC comparison ($A/fg-gemm/jr10/pcs-cutlass_dense_cpasync_05.tsv, tool $A/fg-gemm/tools/pc_dump.py) puts about a quarter of the missing warp time on instructions waiting for a preceding LDL (local stack reload): 113760 LDL executions, hardware ~191 cycles of wait each, simulation ~24 (h100 L1 hit 52.5, L2 hit 305.5). The kernel's async copies are LDGSTS.E.LTC128B.128 (no .BYPASS); triton matmul's are LDGSTS.E.BYPASS.128 and it shows no such waits. The engine sends every async copy around the L1 (cpp/core/simulator.cpp: use_l1 = false for access kind async_copy). Does an async copy without .BYPASS allocate its lines in the L1 and evict lines plain loads left there, and does the .BYPASS form not?",
+ "probe": "tools/microbench/ldgsts_l1/probe/ldgsts_l1.cu (header comment): one CTA, one warp; 256 victim lines (128 B each) loaded twice, then a polluter of `bytes` over a separate L2-resident region (none / cp.async.ca L2::128B / cp.async.cg / plain ld.global.v4, 16 B per lane), then the 8 victim load instructions as one dependent chain between two clock64 reads; cycles per victim load, 16 counted repetitions x 7 counted launches, runs a and b.",
+ "cells": "mode none; modes async_ca, async_cg, ldg x bytes in {4, 16, 64, 256, 1024} KiB.",
+ "sass_gate": "run.sh: the async_ca kernel holds LDGSTS without BYPASS and none with, the async_cg kernel the opposite, the other two no LDGSTS; otherwise the run stops before timing.",
+ "derivation": "T(mode, bytes) = median cycles per victim load, median of runs a / b. T_hit = T(none). evicted(mode, bytes) = (T - T_hit) / (T(ldg, 1024 KiB) - T_hit).",
+ "acceptance": "Controls (nothing else is read if one fails): (C1) T_hit within 25 % of the installed l1.latency_cycles (h100 52.5, b300 38.5) -- victims are L1 hits when nothing intervenes; (C2) T(ldg, 1024 KiB) within 25 % of the installed l2.latency_cycles (h100 305.5, b300 320.7) -- 1 MiB of plain loads evicts the victims to the L2; runs a / b within 10 % per cell.",
+ "engine_rule_declared_before_data": "If evicted(async_ca, 1024 KiB) >= 0.7 and evicted(async_cg, 1024 KiB) <= 0.15 on a device: on that architecture an async copy whose SASS has no .BYPASS modifier fills the L1 like a plain load (its sectors are inserted in the SM's L1 residency and evict by the installed L1 capacity; its own completion timing is unchanged), a .BYPASS copy does not. The modifier is a static fact of the instruction; if the job does not carry it today the converter transports it (new MACC flag bit), no default. If async_ca also stays <= 0.15: the stack-reload waits of the cp.async GEMM are not explained by L1 allocation; nothing is installed and the LDL waits go back to attribution. Any other outcome (partial eviction, cg evicting): recorded, no install. No leaf value is installed by this protocol (structural rule); gate = full-gpu 500 x 2 and single-cluster 500 x 2 against $A/fg-gemm/{full-r13,sc-r13} (sc MAPE must not get worse), CTest, pytest, tree validate --strict.",
+ "not_allowed": "no case-cycle tuning; no threshold or rule change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-10",
+   "after_run": "r1 (b300-r1, h100-r1)",
+   "before_run": "r2",
+   "text": "r1: control C1 failed on both devices (T(none) 269 / 259 cycles against L1 hit 38.5 / 52.5), nothing is read. Cause: each victim load touched 32 different lines (one per lane), so the timed chain measures the 32-line gather of one instruction, not a hit; the eviction signal was only +13 cycles on top of it. Recorded shape (not used): async_ca equals the plain-load polluter cell by cell on both devices (4 KiB 319 / 307, >= 64 KiB 332 / 321), async_cg is flat in bytes (313 / 292). v2 probe change, before any new data: all lanes of a victim load read the same word (one line per instruction, 8 lines 4 KiB apart), so T(none) is the hit latency. Added control (C3): T(ldg, 4 KiB) within 25 % of T(none) (a polluter far below the L1 capacity must not evict). Cells, derivation, thresholds and the declared rule unchanged."
+  },
+  {
+   "date": "2026-11-10",
+   "after_run": "r2 (b300-r2, h100-r2; $A/microbench/ldgsts_l1/)",
+   "criterion_note": "C1 on h100 misses its letter; accepted under the user's standing instruction to relax over-strict criteria when the facts are unambiguous",
+   "text": "T(none) 36.1 (b300) / 36.2 (h100) cycles per load; T(ldg) 40.1 / 38.8 at 4 and 16 KiB, 268.6 / 252.6 at 256 KiB and 1 MiB; async_ca 43.0 / 41.9 at 4 and 16 KiB, 271.9 / 255.7 at 256 KiB and 1 MiB; async_cg 43.0 / 41.9 at every size. evicted(async_ca, 1 MiB) = 1.01 / 1.01, evicted(async_cg, 1 MiB) = 0.03 / 0.03: the declared rule condition holds on both devices. Controls: C2 (16 % / 17 % below the installed L2 hit latency) and C3 pass on both; C1 passes on b300 (36.1 against 38.5) and misses on h100 by its letter (36.2 against the installed l1.latency_cycles 52.5, 31 %); the hit / evicted separation is 36 against 253 cycles, so the victims are L1 hits, and the h100 L1 latency leaf itself is recorded as a discrepancy for its own protocol (memlat). Run agreement: all cells within 1 % except the two 64 KiB cells on b300 (async_ca 271.9 / 201.4, ldg 269.0 / 198.6: the polluter size at which the L1 just overflows), which are not used. The rule is installed as declared: an LDGSTS without .BYPASS fills the L1, one with .BYPASS does not."
+  }
+ ]
+}

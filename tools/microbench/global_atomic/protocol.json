@@ -1,0 +1,152 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "global_atomic",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "ownership": "full-GPU loop (gpu-shared: memory.global_atomic). Single-cluster containers carry GSYN rows only when the sampled cluster synchronises through global memory with itself; the 500 x 2 single-cluster A/B is reported, not used to judge the leaf.",
+  "mechanisms": [
+    "memory.global_atomic"
+  ],
+  "purpose": "h100 memory.global_atomic.release_to_acquire_ns is a placeholder 0 (hopper.placeholder.release_to_acquire): every cross-CTA release->acquire chain on H100 becomes visible the cycle the producer store completes. The two other h100 fields (dependent_round_trip_ns 150.21, same_address_service_ns 0.02285) are hopper-prototype numbers renamed at import (hopper.derived.global_atomic_fields) and have never been reproduced in this repository. b300 release_to_acquire_ns was derived (blackwell-prototype m3, fullgpu.mechtree.m3.global_atomic.r2a) as one_way - 521.08 - 284.6 and re-derived here against the installed store_l2.latency 165.0 (blackwell.derived.release_to_acquire_store_accept); it has never been measured in one run with the store leaf it is defined against. This protocol measures all three fields on both devices in one run each and installs the h100 values and a consistent b300 residual.",
+  "engine_consumer": "cpp/core/simulator.cpp: a GSYN producer's completion is its kResultReady cycle = MemoryHierarchy::store() return = store-port accept + memory.store_l2.service store_l2.latency_cycles (schedule(): gsync_done_); an acquire (modes from / any / count) is ready at producer completion + release_to_acquire (ns -> cycles by the reference SM clock), and the acquiring load then pays its own hierarchy latency (L2 hit = memory.l2.service l2.latency_cycles). atom / red chain links wait predecessor completion + release_to_acquire; a value-returning atomic's result is gated by dependent_round_trip_ns; same_address_service_ns is added per atomic in MemoryHierarchy::store(). So release_to_acquire_ns is by definition a RESIDUAL: one-way visibility latency minus what the engine already charges on the producer's store path and the consumer's load path.",
+  "probe": "tools/microbench/global_atomic/probe/global_atomic.cu: blackwell-prototype tools/microbench/probes/fullgpu/global_atomic.cu (fullgpu/s3) copied with these edits only: MAX_SM 148 -> read the device SM count at run time (h100 132, b300 148) and size the tables from it; argv form names unchanged; forms used here are red_same, atom_same, atom_chain_addr, pingpong_addr, chase_l2 (the others stay in the binary, unused). Build for sm_90a and sm_103a with cuobjdump -sass saved next to the binary.",
+  "forms": {
+    "red_same": "every thread red.global.add.u32 to ONE 4 B word; aggregate ops/ns over the union %globaltimer window of all CTAs (one CTA per SM, first wave)",
+    "atom_same": "red_same with atom.global.add.u32 (returned value accumulated into a sink); diagnostic for C2",
+    "atom_chain_addr": "one lane, dependent chain of atom.global.add.u32 (returned value feeds the next operand) on 64 distinct 128 B lines spread over a 1 GiB buffer (line k at k x (16 MiB + 128 B)); cycles per link per line; the unloaded dependent round trip, address-bimodal by home L2 partition",
+    "pingpong_addr": "CTA 0 and CTA peer (different SMs) exchange a flag with st.release.gpu / ld.acquire.gpu spin, 16 flag placements on the same 1 GiB sweep buffer (placement k: flag_a line 2k, flag_b line 2k+1); one-way cycles = round trip / 2 per placement",
+    "chase_l2": "control: one CTA, one lane, dependent 128 B pointer chase over a 4 MiB region warmed by one pass; cycles per step = L2-hit load latency on this machine in this run"
+  },
+  "cells": {
+    "red_same": {
+      "threads": 1024,
+      "iters": 2048,
+      "trials": 5,
+      "nsm": {
+        "h100": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          66,
+          132
+        ],
+        "b300": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          74,
+          148
+        ]
+      }
+    },
+    "atom_same": {
+      "threads": 1024,
+      "iters": 2048,
+      "trials": 5,
+      "nsm": {
+        "h100": [
+          1,
+          132
+        ],
+        "b300": [
+          1,
+          148
+        ]
+      }
+    },
+    "atom_chain_addr": {
+      "threads": 32,
+      "iters": 1024,
+      "trials": 3,
+      "lines": 64
+    },
+    "pingpong_addr": {
+      "threads": 32,
+      "iters": 1000,
+      "trials": 3,
+      "placements": 16,
+      "nsm": {
+        "h100": 132,
+        "b300": 148
+      },
+      "peer": 8
+    },
+    "chase_l2": {
+      "threads": 32,
+      "steps": 8192,
+      "region_mb": 4,
+      "warm": 1,
+      "trials": 5
+    }
+  },
+  "runs": "RUN=r1: two runs (run-a, run-b) inside one job per device on ONE card each (quota 1 x H100 + 1 x B300); every cell is executed twice in the order chase_l2, pingpong_addr, atom_chain_addr, red_same, atom_same; nvidia-smi clocks.sm recorded before and after each run; f_sm per cell = median over its records of (clk1 - clk0) / (gt1 - gt0).",
+  "derivation": {
+    "L_ld": "chase_l2: median over trials of cycles per step, per run",
+    "one_way_cycles": "pingpong_addr: per placement the median over trials of RT cycles / 2 for CTA 0; the installable quantity is the MEDIAN over the 16 placements; the histogram (bin 100 cycles), the mode shares and min / max are reported",
+    "store_visibility_cycles": "one_way_cycles - L_ld (same run): store issue on one SM -> flag visible to an acquire load on another SM, with the acquire's own load latency removed. Reported per run for the store_accept work; not installed (no leaf field)",
+    "L_st": "memory.store_l2.service store_l2.latency_cycles read from this tree's configs/trees/<device>.json at analysis time (h100 42, b300 165.0 at freeze); recorded in the model file",
+    "release_to_acquire_ns": "max(0, one_way_cycles - L_st - L_ld) / f_sm(pingpong), per run; installed value = two-run mean",
+    "dependent_round_trip_ns": "atom_chain_addr: per line the median over trials of cycles per link; installable quantity = median over the 64 lines / f_sm(atom_chain_addr); histogram (bin 50 cycles) and mode shares reported; two-run mean",
+    "same_address_plateau": "red_same: per nsm the median over trials 1..5 of agg_ops_per_ns; plateau = median over the nsm points within 3 % of the maximum point (needs >= 3 such points)",
+    "same_address_service_ns": "1 / same_address_plateau, two-run mean"
+  },
+  "acceptance": {
+    "C0_placement": "PLACEMENT distinct_sm == nsm in every multi-CTA cell; otherwise that cell is void",
+    "C1_runs": "for every installable quantity the two runs agree within 5 %; trial CV <= 3 % in the cells that feed it (chase_l2, red_same, pingpong_addr per placement, atom_chain_addr per line). atom_same is diagnostic only",
+    "C2_plateau": "red_same reaches a plateau (>= 3 nsm points within 3 % of the maximum); atom_same at full nsm within 10 % of red_same at full nsm (reported either way)",
+    "C3_control": "L_ld within 10 % of the installed l2.latency_cycles (h100 305.5, b300 320.7) in both runs; if it fails the residual is not meaningful and release_to_acquire_ns is NOT installed (the other fields may still be)",
+    "C4_placement_spread": "one_way_cycles max / min over the 16 placements <= 1.25 -> the median is a single-mode value; otherwise the median is still installed but the source records 'home-partition bimodal (near / far one-way values), median installed, no address axis in the leaf'"
+  },
+  "install": {
+    "h100.release_to_acquire_ns": "C0, C1, C3 hold -> installed (replaces the 0 placeholder); evidence experimental (residual over a placeholder-grade store_l2.latency 42 and bimodal by placement); the residual, L_st, L_ld, one_way and store_visibility_cycles are all quoted in the source so a later store_accept protocol can re-split without re-measuring",
+    "h100.dependent_round_trip_ns": "C0, C1 hold -> installed, evidence experimental (address-bimodal median, no address axis); the hopper-prototype 150.21 is compared in the source text",
+    "h100.same_address_service_ns": "C0, C1, C2 hold -> installed, evidence measured; C2 fails with C0, C1 holding -> install the full-nsm value as experimental ('plateau not reached')",
+    "b300.release_to_acquire_ns": "C0, C1, C3 hold -> installed from this run (replaces blackwell.derived.release_to_acquire_store_accept, which is the same residual computed from the old two-card data); evidence experimental; the m3 one-way (1425.68) is compared in the source text",
+    "b300.dependent_round_trip_ns / same_address_service_ns": "controls: within 10 % of the installed 247.055 / 0.019927 -> kept, this run cited as a reproduction; outside 10 % -> reported, not replaced (the installed values are two-card measurements, this run is one card)",
+    "sources": "global_atomic.<device>.r1 (one key per field); artifact $A/microbench/global_atomic/<device>-r1/ and $A/microbench/global_atomic-model/<device>-r1/model.json written by tools/microbench/global_atomic/model.py, nothing installed by hand; cyclescope tree build && cyclescope tree validate --strict must stay at 0",
+    "after_install": "single-cluster 500 x 2 A/B against the current baseline (expected: hp unchanged except cases whose job has GSYN rows; bw unchanged or GSYN cases only); the full-GPU effect is left to the full-GPU loop"
+  },
+  "sass_gate": "tools/microbench/global_atomic/sass_check.py on the saved cuobjdump: red_same / atom_same loop bodies contain exactly one RED.E.ADD / ATOMG.E.ADD per iteration and no LDG / STG; atom_chain one ATOMG.E.ADD whose destination feeds the next source; pingpong_addr one ST.E.STRONG.GPU (or MEMBAR + ST, record which) and one LD.E.STRONG.GPU in the spin; chase_l2 one dependent LDG.E.STRONG.GPU per step. A gate failure voids the cell.",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; the residual form may not be replaced by the raw one-way latency (store and load paths would be charged twice); no near/far axis invented for the leaf",
+  "addenda": [
+    {
+      "id": 1,
+      "date": "2026-11-05",
+      "after_runs": [
+        "h100-r1",
+        "b300-r1"
+      ],
+      "facts": "b300-r1 (GPU-e4a018ff, driver 580.159.03): C0-C4 pass; one_way run-a/run-b 1448.32/1447.96 cycles (single mode, placement max/min 1.089), L_ld 300.6, L_st 165.0 -> residual 982.5 cycles -> release_to_acquire_ns 484.59/484.42, installed 484.50 experimental (db5c877); dependent_round_trip 257.33 ns (+4.2 % vs installed 247.055) and same_address_service 0.019909 ns (-0.09 % vs 0.019927) within the 10 % control band -> kept, reproduction cited. h100-r1 (GPU-4a698cd4, driver 570.124.06): C0, C2, C3 (L_ld 291.15/291.16 vs 305.5), C4 pass; C1 FAILS on one_way: run-a median 1388.0 (placements 1222-1428, bins 1200/1300/1400 at 44/19/38 %), run-b 1153.6 (1115-1177, one bin) -> 18.5 % apart; r2a per run 532.8/414.4 ns; dependent_round_trip 213.11/213.12 ns (hopper-prototype 150.21), same_address plateau 43.63/43.61 ops/ns -> 0.02292 ns (hopper-prototype 0.02285). Per install rule nothing is installed on h100 from r1. Reading (inference): each run is a separate process with its own cudaMalloc, so the 16 placements of a run sample the flag home partitions with a per-process offset; 16 placements per run do not resolve the near/far mixture on H100 (b300 amendment 2 of the predecessor saw the same per-process effect).",
+      "changes": {
+        "r2_cells": "RUN=r2, h100 only: six runs (run-a..run-f) of chase_l2 (5 trials) + pingpong_addr (16 placements, 3 trials, nsm 132, peer 8) + atom_chain_addr (64 lines, 3 trials); red_same / atom_same not repeated (their r1 values pass C1)",
+        "one_way_install_quantity": "the median over the POOLED 96 placements of the six runs; histogram (bin 100), per-run medians and min/max recorded",
+        "C1_r2": "C1 for one_way becomes: the pooled median of runs a-c and the pooled median of runs d-f agree within 10 %; per-placement trial CV <= 3 % unchanged. C1 for dependent_round_trip: pooled line medians of a-c vs d-f within 5 %. L_ld: six-run medians within 5 % and C3 unchanged",
+        "install_r2": "h100 release_to_acquire_ns = max(0, pooled one_way median - L_st 42 - six-run median L_ld) / f_sm (pingpong), evidence experimental with the note 'home-partition mixture (per-run medians <list>), pooled median over 96 placements; residual over placeholder-grade store_l2.latency 42'; dependent_round_trip_ns = pooled 64 x 6 line median / f_sm, experimental; same_address_service_ns from r1 (C0, C1, C2 passed there) = two-run mean 0.02292, measured. If the r2 C1 still fails nothing is installed and the field stays 0 with the r1 + r2 facts in the source record",
+        "not_changed": "no other threshold or derivation; r1 b300 install stands"
+      }
+    },
+    {
+      "id": 2,
+      "date": "2026-11-05",
+      "after_runs": [
+        "h100-r1",
+        "h100-r2",
+        "b300-r1"
+      ],
+      "facts": "SASS of pingpong_addr_kernel (saved cuobjdump, both devices): st.release.gpu.global.u32 compiles to MEMBAR.ALL.GPU ; ERRBAR ; CGAERRBAR ; STG.E.STRONG.GPU, and the ld.acquire.gpu spin to LDG.E.STRONG.GPU ; CCTL.IVALL. The measured one-way therefore starts at the MEMBAR issue and contains the fence's own latency. The engine_consumer paragraph of this protocol omitted that main b97d744 (2026-11-05) made the MEMBAR*/FENCE* service result the issuing warp's next-issue floor: in the engine the producer's STG issues only after instruction.service MEMBAR.ALL.GPU result_latency_cycles (h100 655.192, b300 268.866; ERRBAR / CGAERRBAR / STG / CCTL.IVALL result latency 1). The r1 / r2 residual (one_way - L_st - L_ld) thus double-charges the fence by ~655 / ~269 cycles once installed. h100-r2 (GPU-765e9826): pooled one_way 1357.42, L_ld 290.155, f_sm 1.978 GHz; b300-r1 (GPU-e4a018ff): one_way 1448.32 / 1447.96, L_ld 300.6, f_sm 2.028 GHz.",
+      "changes": {
+        "release_to_acquire_ns": "residual = max(0, one_way_cycles - L_fence - L_st - L_ld) / f_sm, where L_fence = instruction.service result_latency_cycles of the operation_class the release form compiled to (MEMBAR.ALL.GPU; read from this tree's configs/trees/<device>.json at analysis time), plus the result latencies of ERRBAR / CGAERRBAR if > 1 (they are 1 and are ignored). The SASS gate must record the release form; a release form without a fence-family instruction uses L_fence = 0",
+        "reinstall": "both devices re-derived from the existing r2 (h100) and r1 (b300) data, no new GPU run: h100 ~ (1357.42 - 655.192 - 42 - 290.155) = 370.07 cycles -> ~187 ns; b300 ~ (1448.14 - 268.866 - 165.0 - 300.6) = 713.7 cycles -> ~352 ns (exact values from model.py with per-run f_sm). Evidence experimental; the source text quotes one_way, L_fence, L_st, L_ld and store_visibility_cycles so a later change of either leaf can re-split",
+        "superseded": "global_atomic.h100.r2.release_to_acquire (518.25 ns) and global_atomic.b300.r1.release_to_acquire (484.50 ns) are superseded by the fence-corrected values; blackwell.derived.release_to_acquire_store_accept (480.66, same omission) is superseded as well",
+        "not_changed": "all other quantities, thresholds and installs"
+      }
+    }
+  ]
+}

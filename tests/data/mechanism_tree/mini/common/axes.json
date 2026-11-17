@@ -1,0 +1,4 @@
+{
+  "width_bytes": {"kind": "int", "owner": "capture", "unit": "bytes", "minimum": 0, "maximum": 8},
+  "operation_class": {"kind": "enum", "owner": "capture", "unit": "enum", "values": ["X", "Y"]}
+}

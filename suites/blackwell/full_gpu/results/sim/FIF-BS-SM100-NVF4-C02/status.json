@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FIF-BS-SM100-NVF4-C02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 40605,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1421864,
+ "completed": 1421864,
+ "cycles": 16141,
+ "hard": 0,
+ "walls": {
+  "convert": 7.3,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 3.0,
+  "total": 10.6
+ },
+ "rss_kb": {
+  "convert": 253888,
+  "segments": 253888,
+  "build": 253888,
+  "sim": 298568
+ },
+ "hw_cycles": 17537.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 2
+}

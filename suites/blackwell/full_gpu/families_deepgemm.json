@@ -1,0 +1,2285 @@
+{
+  "suite": "deepgemm",
+  "cap": 8,
+  "families": [
+    {
+      "id": "bf16_nn",
+      "stratum": "bf16_dense",
+      "spec": {
+        "fn": "bf16_nn",
+        "dtype": "bf16",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "bf16_nt",
+      "stratum": "bf16_dense",
+      "spec": {
+        "fn": "bf16_nt",
+        "dtype": "bf16",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "bf16_nt_accc",
+      "stratum": "bf16_dense",
+      "spec": {
+        "fn": "bf16_accc",
+        "dtype": "bf16",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "bf16_tn",
+      "stratum": "bf16_dense",
+      "spec": {
+        "fn": "bf16_tn",
+        "dtype": "bf16",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "bf16_tt",
+      "stratum": "bf16_dense",
+      "spec": {
+        "fn": "bf16_tt",
+        "dtype": "bf16",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:80,120; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "bf16_einsum_bhd_hdr_bhr",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "bf16",
+        "einsum": "bhd,hdr->bhr",
+        "edtype": "bf16",
+        "einsum_dims": [
+          4,
+          64,
+          128,
+          128
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 64,
+            "min": 1,
+            "max": 256,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.2",
+          "base": 128,
+          "min": 16,
+          "max": 4096,
+          "step": 16
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:320,355; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:320,355; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "bf16_einsum_bhr_hdr_bhd",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "bf16",
+        "einsum": "bhr,hdr->bhd",
+        "edtype": "bf16",
+        "einsum_dims": [
+          4,
+          64,
+          128,
+          128
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 64,
+            "min": 1,
+            "max": 256,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.2",
+          "base": 128,
+          "min": 16,
+          "max": 4096,
+          "step": 16
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:320,355; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:320,355; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "bf16_einsum_bmk_bnk_mn",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "bf16",
+        "einsum": "bmk,bnk->mn",
+        "edtype": "bf16",
+        "einsum_dims": [
+          4,
+          512,
+          128,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4,
+            "min": 4,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 512,
+            "min": 512,
+            "max": 512,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.3",
+          "base": 4096,
+          "min": 4096,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_mn_blocks * ceil(num_sk_blocks / split_factor), with split_factor=ceil(num_sk_blocks / max(num_sms / num_mn_blocks, 1))",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bmk_bnk_mn.hpp:79-82,127",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bmk_bnk_mn.hpp:79-82,127"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bmn_bnk_mn_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "The upstream selects split_factor from num_sms and launches num_mn_blocks * ceil(num_sk_blocks/split_factor); this is SM-count-derived scheduling. S=4,M=512,N=128,K=4096 yields 4 MN tiles and 256 SK blocks, so the launch reaches grid148; axes are pinned to preserve the full grid while I scales K (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bmk_bnk_mn.hpp:67-82,115-127)"
+    },
+    {
+      "id": "fp8_einsum_bhd_bhr_hdr",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "fp8",
+        "einsum": "bhd,bhr->hdr",
+        "edtype": "fp8",
+        "einsum_dims": [
+          4096,
+          8,
+          4096,
+          1024
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 8,
+            "min": 1,
+            "max": 256,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; batch P is a multiple of 128 because per_channel_cast_to_fp8 requires x.size(0) % gran_k == 0 (deepgemm@559d79f:deep_gemm/utils/math.py:52-59); input layout follows tests/test_einsum.py:142-157; API dispatches fp8_einsum to fp8_bmm, then SM100 fp8_bmm; the implementation instantiates sm100_fp8_fp4_gemm_1d1d_impl (deepgemm@559d79f:csrc/apis/einsum.hpp:195-210; csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46-58)"
+    },
+    {
+      "id": "fp8_einsum_bhd_hdr_bhr",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "fp8",
+        "einsum": "bhd,hdr->bhr",
+        "edtype": "fp8",
+        "einsum_dims": [
+          4,
+          8,
+          4096,
+          1024
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 8,
+            "min": 1,
+            "max": 256,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; input layout follows deepgemm@559d79f:tests/test_einsum.py:83-139; API dispatches fp8_einsum to fp8_bmm, then SM100 fp8_bmm; the implementation instantiates sm100_fp8_fp4_gemm_1d1d_impl (deepgemm@559d79f:csrc/apis/einsum.hpp:195-210; csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46-58)"
+    },
+    {
+      "id": "fp8_einsum_bhr_hdr_bhd",
+      "stratum": "einsum",
+      "spec": {
+        "fn": "einsum",
+        "dtype": "fp8",
+        "einsum": "bhr,hdr->bhd",
+        "edtype": "fp8",
+        "einsum_dims": [
+          4,
+          8,
+          4096,
+          1024
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "einsum_dims.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "einsum_dims.1",
+            "base": 8,
+            "min": 1,
+            "max": 256,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "einsum_dims.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:393,449; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; input layout follows deepgemm@559d79f:tests/test_einsum.py:83-139; API dispatches fp8_einsum to fp8_bmm, then SM100 fp8_bmm; the implementation instantiates sm100_fp8_fp4_gemm_1d1d_impl (deepgemm@559d79f:csrc/apis/einsum.hpp:195-210; csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46-58)"
+    },
+    {
+      "id": "fp8_nn",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "fp8_nn",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8_nt",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "fp8_nt",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8_nt_accc",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "fp8_accc",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8_skiphead",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "skiphead",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8_tn",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "fp8_tn",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8_tt",
+      "stratum": "fp8_dense",
+      "spec": {
+        "fn": "fp8_tt",
+        "dtype": "fp8",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8fp4_nn",
+      "stratum": "fp8fp4_dense",
+      "spec": {
+        "fn": "fp8fp4_nn",
+        "dtype": "fp8fp4",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8fp4_nt",
+      "stratum": "fp8fp4_dense",
+      "spec": {
+        "fn": "fp8fp4_nt",
+        "dtype": "fp8fp4",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8fp4_tn",
+      "stratum": "fp8fp4_dense",
+      "spec": {
+        "fn": "fp8fp4_tn",
+        "dtype": "fp8fp4",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "fp8fp4_tt",
+      "stratum": "fp8fp4_dense",
+      "spec": {
+        "fn": "fp8fp4_tt",
+        "dtype": "fp8fp4",
+        "dense": [
+          4096,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "dense.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:93,141; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "hc_prenorm",
+      "stratum": "hc_prenorm",
+      "spec": {
+        "fn": "hc",
+        "dtype": "bf16",
+        "dense": [
+          512,
+          32,
+          35392
+        ],
+        "suite": "deepgemm",
+        "mode": "full",
+        "num_splits": 148
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 512,
+            "min": 256,
+            "max": 1024,
+            "step": 64
+          },
+          {
+            "path": "dense.1",
+            "base": 32,
+            "min": 16,
+            "max": 32,
+            "step": 8
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 35392,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_splits * ceil_div(M, BLOCK_M=64); num_splits=148 (B300 SM count)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_tf32_hc_prenorm_gemm.hpp:66-73,137-138",
+        "persistent": false,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_tf32_hc_prenorm_gemm.hpp:66-73,137-138"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_tf32_hc_prenorm_gemm.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "M is a runtime token dimension, no runner cap; source uses BLOCK_M=64 and launches num_splits*ceil_div(M,64), with num_splits=148 fixed to the B300 SM count. probe-x6 P01 at M=16384,N=32,K=35392 measured 1,434,536 cycles/grid 37888; measured cycles scale approximately linearly with M at fixed N,K. Recentered P01 M=512 estimates ~44.8k cycles and keeps P-minimum grid >=592. K remains 64-aligned. N is limited to 16..32, multiples of8, by the HC output-swizzle constraint (sm100_tf32_hc_prenorm_gemm.cuh:58; wrapper hpp:77-82)."
+    },
+    {
+      "id": "kg_bf16_tn",
+      "stratum": "kgrouped",
+      "spec": {
+        "fn": "kg_bf16",
+        "dtype": "bf16",
+        "kgroup": [
+          4,
+          4096,
+          4096,
+          2048
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "kgroup.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "kgroup.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "kgroup.3",
+          "base": 2048,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:257,307; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:257,307; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "kg_fp8_tn",
+      "stratum": "kgrouped",
+      "spec": {
+        "fn": "kg",
+        "dtype": "fp8",
+        "kgroup": [
+          4,
+          4096,
+          4096,
+          2048
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "kgroup.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "kgroup.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "kgroup.3",
+          "base": 2048,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:313,374; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:313,374; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mega_moe_bf16",
+      "stratum": "mega_moe",
+      "spec": {
+        "fn": "mega",
+        "dtype": "bf16",
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 128,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 128,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_mega_moe.hpp:202,226",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_mega_moe.hpp:202,226"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_.*mega_moe.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "dropped",
+      "notes": "run_mega raises RuntimeError: mega_moe full setup not implemented; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "mega_moe_fp8fp4",
+      "stratum": "mega_moe",
+      "spec": {
+        "fn": "mega",
+        "dtype": "fp8",
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "dense.0",
+            "base": 128,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "dense.2",
+          "base": 128,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_mega_moe.hpp:277,309",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_mega_moe.hpp:277,309"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_.*mega_moe.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "dropped",
+      "notes": "run_mega raises RuntimeError: mega_moe full setup not implemented; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "mgc_bf16_nn",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_bf16_nn",
+        "dtype": "bf16",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:133,189; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:133,189; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "mgc_bf16_nt",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_bf16",
+        "dtype": "bf16",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:133,189; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:133,189; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "mgc_fp8_nn",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_c_nn",
+        "dtype": "fp8",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mgc_fp8_nt",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_c",
+        "dtype": "fp8",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mgc_fp8fp4_nn",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_c_fp8fp4_nn",
+        "dtype": "fp8fp4",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "FP8/FP4 NN-major grouped path; runtime grid/heuristic pending R=1; calls=4 is the c450full protocol, not an upstream-defined loop; API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mgc_fp8fp4_nt",
+      "stratum": "mgroup_contiguous",
+      "spec": {
+        "fn": "mg_c",
+        "dtype": "fp8fp4",
+        "grouped": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "grouped.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "grouped.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "grouped.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:161,224; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mgm_bf16_nt",
+      "stratum": "mgroup_masked",
+      "spec": {
+        "fn": "mgm_bf16",
+        "dtype": "bf16",
+        "masked": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "masked.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "masked.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "masked.3",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:202,244; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:202,244; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_bf16_gemm_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; observed API implementation is the generic SM100 BF16 kernel (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36); API dispatches to the generic SM100 BF16 implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_bf16_gemm.hpp:36)"
+    },
+    {
+      "id": "mgm_fp8_nt",
+      "stratum": "mgroup_masked",
+      "spec": {
+        "fn": "mg_m",
+        "dtype": "fp8",
+        "masked": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "masked.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "masked.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "masked.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:244,293; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:244,293; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; observed API implementation is the generic SM100 FP8/FP4 1D1D kernel (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mgm_fp8fp4_nt",
+      "stratum": "mgroup_masked",
+      "spec": {
+        "fn": "mg_m",
+        "dtype": "fp8fp4",
+        "masked": [
+          4,
+          1024,
+          4096,
+          4096
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "masked.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "masked.1",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "masked.3",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:244,293; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:244,293; deepgemm@559d79f:csrc/jit_kernels/heuristics/sm100.hpp:39,91-130"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_fp8_fp4_gemm_1d1d_impl.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count; observed API implementation is the generic SM100 FP8/FP4 1D1D kernel (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); API dispatches to the generic SM100 FP8/FP4 1D1D implementation (deepgemm@559d79f:csrc/jit_kernels/impls/sm100_fp8_fp4_gemm_1d1d.hpp:46); K step 128 (1x128 per-block scales; probe-dg2: 'cannot broadcast scale (3456, 24) onto (3456, 3008)')"
+    },
+    {
+      "id": "mqa_logits_fp8",
+      "stratum": "mqa_logits",
+      "spec": {
+        "fn": "mqa",
+        "dtype": "fp8",
+        "mqa": [
+          128,
+          8192
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "mqa.0",
+            "base": 128,
+            "min": 1,
+            "max": 4096,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "mqa.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:208,287",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:208,287"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_mqa_logits.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "mqa_logits_fp8fp4",
+      "stratum": "mqa_logits",
+      "spec": {
+        "fn": "mqa",
+        "dtype": "fp8",
+        "mqa": [
+          128,
+          8192
+        ],
+        "suite": "deepgemm",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "mqa.0",
+            "base": 128,
+            "min": 1,
+            "max": 4096,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "mqa.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms from the library default (B300 exposes 148 SMs)",
+        "evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:208,287",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:208,287"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_mqa_logits.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid runtime shape and kernel selection pending R=1 probes; calls=4 is the c450full protocol; upstream tests use bench_kineto (e.g. tests/test_bf16.py:45) with a different repeat count, so no source line proves this 3+1 count"
+    },
+    {
+      "id": "paged_mqa_logits_fp8",
+      "stratum": "paged_mqa_logits",
+      "spec": {
+        "fn": "pmqa",
+        "dtype": "fp8",
+        "pmqa": [
+          128,
+          8192,
+          64
+        ],
+        "suite": "deepgemm",
+        "mode": "full",
+        "pmqa_api": "fp8"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "pmqa.0",
+            "base": 128,
+            "min": 1,
+            "max": 4096,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "pmqa.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms; B300 DeepGEMM metadata and paged-MQA kernel both use deep_gemm.get_num_sms() (148 on B300)",
+        "evidence": "deepgemm@559d79f:csrc/apis/attention.hpp:184-216; csrc/jit_kernels/impls/sm100_mqa_logits.hpp:381-487",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:381-487"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_paged_mqa_logits.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "Full-mode inputs and reference follow upstream tests/test_attention.py:256-284,368-423: B requests, one query token per request, context_lens=(B,1), block_table over paged FP8 KV cache, and the FP8 or unified FP8/FP4 API entrypoint. The 148-SM grid is independent of the M/K axes; metadata uses the same num_sms (attention.hpp:184-216)."
+    },
+    {
+      "id": "paged_mqa_logits_fp8fp4",
+      "stratum": "paged_mqa_logits",
+      "spec": {
+        "fn": "pmqa",
+        "dtype": "fp8",
+        "pmqa": [
+          128,
+          8192,
+          64
+        ],
+        "suite": "deepgemm",
+        "mode": "full",
+        "pmqa_api": "fp8_fp4"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "pmqa.0",
+            "base": 128,
+            "min": 1,
+            "max": 4096,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "pmqa.1",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "num_sms; B300 DeepGEMM metadata and paged-MQA kernel both use deep_gemm.get_num_sms() (148 on B300)",
+        "evidence": "deepgemm@559d79f:csrc/apis/attention.hpp:184-216; csrc/jit_kernels/impls/sm100_mqa_logits.hpp:381-487",
+        "persistent": true,
+        "persistent_evidence": "deepgemm@559d79f:csrc/jit_kernels/impls/sm100_mqa_logits.hpp:381-487"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on the same allocated inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sm100_paged_mqa_logits.*",
+      "aux_kernels": [
+        "_ZN9deep_gemm\\d+transpose_and_pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+pack_fp32_into_ue8m0.*",
+        "_ZN9deep_gemm\\d+smxx_clean_logits.*"
+      ],
+      "status": "draft",
+      "notes": "Full-mode inputs and reference follow upstream tests/test_attention.py:256-284,368-423: B requests, one query token per request, context_lens=(B,1), block_table over paged FP8 KV cache, and the FP8 or unified FP8/FP4 API entrypoint. The 148-SM grid is independent of the M/K axes; metadata uses the same num_sms (attention.hpp:184-216)."
+    }
+  ]
+}

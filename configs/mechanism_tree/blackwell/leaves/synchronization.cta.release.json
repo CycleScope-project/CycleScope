@@ -1,0 +1,43 @@
+{
+ "synchronization.cta.release.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "actual_participant_warps",
+     "kind": "linear",
+     "points": [
+      [
+       4,
+       16.0
+      ],
+      [
+       8,
+       16.62
+      ],
+      [
+       12,
+       16.0
+      ],
+      [
+       16,
+       16.0
+      ]
+     ]
+    },
+    "sources": [
+     "barrier_release.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "barrier_release.b300.r3"
+    ]
+   }
+  },
+  "scope": "cta"
+ }
+}

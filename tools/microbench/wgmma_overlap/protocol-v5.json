@@ -1,0 +1,48 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "wgmma_overlap",
+ "version": 5,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "supersedes": "protocol-v4.json (h100-r6: no v4 candidate fits -- the uniform operand costs nothing (ffma_ur 2.00 = fmul2 2.03 at n256 ss), while every stream carrying a .reuse flag runs at 3.75 (n128) / 3.87 (n256 ss) / 4.05-4.13 (rs) regardless of how many flags or GPR reads it has: fmul_r (2 GPR, 1 flag) = ffma_ur_r (2 GPR + UR, 1 flag) = ilp8 (3 GPR, 2 flags) = 3.87; unflagged 1-2 read streams 2.00-2.03 (n256 ss), 2.44-2.46 (n128 / fadd1 n256), 2.54-2.59 (rs); ilp8n 3.00 / 3.44 / 3.59; mufu8 9.38 vs ctrl 8.19; f2fp unrealised (ptxas splits the pack into F2FP + LOP3 / FADD))",
+ "mechanisms": [
+  "hopper.wgmma.register_file_issue_steal (kind 44): C3 reuse-flag extension"
+ ],
+ "devices": {
+  "h100": "sm_90a, pod"
+ },
+ "question": "Is the in-flight cost of a .reuse-flagged instruction a fixed floor independent of its operand count (the reuse cache is unavailable while the tensor core owns the operand path, and a flagged instruction replays its operand fetch), and is the rs residual a constant offset?",
+ "engine_rules_declared_before_data": {
+  "C3 (installed)": "t = max(stall, 2, n_GPR), reuse not served.",
+  "C7 (reuse-flagged floor)": "while in flight, an instruction with >= 1 source carrying the .reuse flag (REGS flags bit0, i.e. the static predecessor marked the operand for reuse) issues at floor 4 instead of 2: t = max(stall, 4, n_GPR). Unflagged instructions unchanged. Predictions: ilp8 4, fmul_r 4, ffma_ur_r 4; all other v4 kinds as C3.",
+  "R (rs offset)": "when the in-flight op is an rs-form wgmma (A operand from registers) every floor above is +0.5 (alternating +1). Predictions rs: unflagged 1-2 reads 2.5, ilp8n 3.5, flagged 4.5.",
+  "C6 dropped": "uniform / constant operand free (r6).",
+  "candidate order": [
+   "C3 alone",
+   "C3+C7",
+   "C3+C7+R"
+  ],
+  "decision": "first candidate fitting every gating cell within max(15 %, 0.5); install measured at 100 % / experimental at >= 80 % with no cell beyond 1.0. R is only installable if it fits the rs cells and is reported separately (partition by source_mode of the in-flight op)."
+ },
+ "probe": "overlap_v3.cu unchanged (V3=1), --launches 8 --reps 33, two runs; f2fp excluded from gating (unrealised: multi-instruction lowering); mufu8 excluded (XU pipe, t_ctrl 8.19 dominates; recorded).",
+ "derivation": "as v4 (model_v2 cells); gating = self.w1 streams of the three forms except f2fp / mufu8 + other.w2 streams (scope) + dep3r self.w1 (floor is max); model_v5.py.",
+ "install": {
+  "C7": "field `reuse_flag_floor_cycles` (4) on hopper.wgmma.register_file_issue_steal; engine steal path: floor = reuse_flag_floor when any source REGS flags bit0 is set, else cycles (2). Fixtures: flagged 2-GPR stream during in-flight -> 4; unflagged -> 2; stall-4 chain -> 4; after completion -> ctrl.",
+  "R": "field `rs_extra_half_cycles` (0/1): +1 every second steal-floored issue while the newest in-flight op of the warpgroup is rs (source_mode fact of the kind-44 row). Fixture: rs op, unflagged stream -> 2.5 average.",
+  "after install": "tree build && validate --strict; CTest + pytest; 500 x 2 A/B against wo53."
+ },
+ "record_only": [
+  "N dependence (n128 2.44 vs n256 2.03 for unflagged 2-read streams; 3.75 vs 3.87 flagged)",
+  "mufu8 +1.2",
+  "f2fp lowering"
+ ],
+ "not_allowed": "no case-cycle tuning; no threshold, candidate or derivation change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-07",
+   "run": "h100-r7 installed (ad99cba4), A/B wo54 vs wo53",
+   "finding": "wo54 == wo53 to the cycle on 486 / 500 hp cases although steal applies to ~half of the issues in fa3 (tele StealBlocks 22884 of ~44k in fa3_fwd_hdim_small_05). Cause: the engine keyed C7 on REGS flags bit0 (`reuse_served`, dispatch_contention v4: the static predecessor at pc - 16 carries the reuse flag on the same slot / register), and that bit is set on 0 of 4323 REGS rows of the fa3 segment (python and cpp builders agree): in real SASS the reuse carrier and its consumer are routinely separated by uniform / constant instructions (ULDC, UIADD3, ...) that do not touch the GPR operand slots, so the pc - 16 rule almost never fires. The protocol's C7 variable is the instruction that CARRIES a .reuse flag (the probe's flagged streams are carriers; every unit but the first is also served), not the served consumer.",
+   "change": "REGS flags gain bit2 `reuse_carrier` = this instruction's own control-word reuse_mask bit for the operand slot (a fact copy; python and cpp builders, py == cpp gate); the engine's C7 test uses bit2. bit0 stays as defined (its pc - 16 rule is recorded as an open item of register_file.operand_read: served operands across intervening non-GPR instructions are not recognised, so OP2p's reuse service is effectively off in real kernels). No value, cell or threshold change; r7's decision stands."
+  }
+ ]
+}

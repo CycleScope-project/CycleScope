@@ -1,0 +1,35 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "lifecycle",
+  "version": 2,
+  "supersedes": "tools/microbench/lifecycle/protocol.json (version 1; h100-r1 and b300-r2 both rejected: per-launch spread 12-67 %, L = 4096 systematically lower)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "kernel.lifecycle"
+  ],
+  "fields": [
+    "envelope_cycles linear(launch_warps_per_cta)"
+  ],
+  "devices": {
+    "h100": "sm_90a, CYCLESCOPE_NCU",
+    "b300": "sm_103a, image ncu"
+  },
+  "purpose": "Version 1 asked a per-launch quantity to be constant within 10 %; the b300-r2 samples are bimodal across launches (about 1.1 k vs 1.5 k cycles at W = 1, launch-to-launch, i.e. placement / GPC distance under cache-control all), so the spread criterion cannot hold while the engine needs the expected value. Version 1 also counted the kernel's own cold instruction fetch inside the envelope although the engine charges instruction.fetch separately.",
+  "probe": "tools/microbench/lifecycle/probe/lifecyc.cu unchanged (verbatim), runner run_ncu.sh with 64 launches per variant (first 2 dropped), cells C = 1, S = 0, W in {1, 4, 8, 16, 32}, L in {64, 1024, 4096}; C = 2 and S = 64 KiB reported",
+  "engine_rule_declared_before_data": "cycles(job) = core timeline (including instruction.fetch of the kernel's code) + envelope_cycles(launch_warps_per_cta); the envelope therefore excludes the probe kernel's own instruction fetch",
+  "derivation": "per launch: env = sm__cycles_active.max - max over SMs of the marker span - fetch(probe kernel), where fetch(probe kernel) = the installed instruction.fetch model's cost for the probe kernel's code bytes before the first marker (cold, from the SASS size of the kernel prologue up to the first clock read; computed by model.py from the installed device leaf and recorded); envelope(W) = mean over launches and over L",
+  "acceptance": {
+    "cell": "se(mean env) / mean <= 3 % in both runs, run agreement <= 5 %, and |mean env(L = 4096) - mean env(L = 64)| <= 10 % -> measured; else experimental with the per-L means recorded",
+    "report": "the launch-level distribution (modes) is recorded in model.json"
+  },
+  "install": "kernel.lifecycle envelope_cycles linear points over launch_warps_per_cta from the C = 1, S = 0 cells, both devices (source lifecycle.<device>.<run>, protocol tools/microbench/lifecycle/protocol-v2.json); one two-architecture 450 A/B round",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+  "addenda": [
+    {
+      "date": "2026-11-04",
+      "written_before": "any v2 run (h100 / b300 v2 data not yet collected)",
+      "text": "Transcription corrections against the verbatim probe lifecyc.cu: the body-length axis of the probe is L in {0, 1024, 4096} (not {64, 1024, 4096}) and the dynamic-shared axis is S in {0, 204800 B} (not 64 KiB); the acceptance clause reads |mean env(L = 4096) - mean env(L = 0)| <= 10 %, the install cells are C = 1, S = 0, and C = 2 / S = 204800 are reported. Runner: run_ncu.sh writes run-a / run-b under $A/microbench/lifecycle/<device>-<run>/ with --launches 64; model.py drops launches 0 and 1 of every variant as in version 1."
+    }
+  ]
+}

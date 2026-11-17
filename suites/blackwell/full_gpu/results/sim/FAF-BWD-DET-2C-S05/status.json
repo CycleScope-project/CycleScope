@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-BWD-DET-2C-S05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 120319,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2272803,
+ "completed": 2272803,
+ "cycles": 49044,
+ "hard": 0,
+ "walls": {
+  "convert": 6.3,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 6.0,
+  "total": 12.9
+ },
+ "rss_kb": {
+  "convert": 302492,
+  "segments": 302492,
+  "build": 302492,
+  "sim": 420900
+ },
+ "hw_cycles": 57179.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 4
+}

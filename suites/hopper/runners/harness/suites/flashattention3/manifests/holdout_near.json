@@ -1,0 +1,2347 @@
+{
+  "architecture": "sm_90a",
+  "cases": [
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 3,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_01_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 64,
+      "head_dim_v": 64,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "hd<=64 && dv not 256/512 && !causal && !local → BlockN=192, MmaPV_is_RS=false (SS)",
+        "files": [
+          "upstream/hopper/tile_size.h",
+          "upstream/hopper/mainloop_fwd_sm90_tma_gmma_ws.hpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "mma_pv_ss_hd64",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "tile_size_fwd_sm90",
+          "MmaPV_is_RS"
+        ]
+      },
+      "mechanisms": [
+        "mma_pv_ss_hd64",
+        "mma_pv_ss"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "mma_pv_ss_hd64",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "batch",
+          "seqlen_k",
+          "seqlen_q"
+        ],
+        "nearest_296_case_id": "fa3_mma_pv_ss_hd64_03_cluster_sm",
+        "rationale": "batch=3（296 同族 b=1）+ 奇数 seqlen_k=1041 + sq=200 非 2 幂",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1041,
+      "seqlen_new": null,
+      "seqlen_q": 200,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_01",
+      "source_evidence": {
+        "condition": "hd<=64 && dv not 256/512 && !causal && !local → BlockN=192, MmaPV_is_RS=false (SS)",
+        "files": [
+          "upstream/hopper/tile_size.h",
+          "upstream/hopper/mainloop_fwd_sm90_tma_gmma_ws.hpp"
+        ],
+        "symbols": [
+          "tile_size_fwd_sm90",
+          "MmaPV_is_RS"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 192,
+        "kBlockN": 192,
+        "mma_pv_is_rs": false,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_01_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_02_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp16",
+      "head_dim": 256,
+      "head_dim_v": 256,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "cluster-eligible but m-tiles odd → ClusterM=1",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "cluster_odd",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "Enable_cluster",
+          "CLUSTER_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "cluster_odd",
+        "mma_pv_rs"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "cluster_odd",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "head_dim",
+          "head_dim_v",
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_cluster_odd_02_cluster_sm",
+        "rationale": "head_dim=256 外推（296 cluster_odd d∈{128,192}，且 hd256 仅有 causal hd256_fwd）+ 奇数 sk",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1031,
+      "seqlen_new": null,
+      "seqlen_q": 128,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_02",
+      "source_evidence": {
+        "condition": "cluster-eligible but m-tiles odd → ClusterM=1",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "symbols": [
+          "Enable_cluster",
+          "CLUSTER_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": true,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 80,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_02_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 200,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_03_r6c4_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "delivery_group": 2,
+      "delivery_index": 2,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 160,
+      "head_dim_v": 160,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "attention_chunk>=1 forces local window clamp",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "attention_chunk",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "attention_chunk",
+          "is_local"
+        ]
+      },
+      "mechanisms": [
+        "attention_chunk",
+        "mma_pv_rs"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "attention_chunk",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "attention_chunk",
+          "head_dim",
+          "head_dim_v",
+          "seqlen_k",
+          "seqlen_q"
+        ],
+        "nearest_296_case_id": "fa3_attention_chunk_03_cluster_sm",
+        "rationale": "head_dim=160 内插（296 无 160）+ chunk=200 新值 + 奇数 sq/sk",
+        "rev6": {
+          "admission": {
+            "cycle_window": "(0, 500000]（marker scope，296 同窗）",
+            "median_drift_percent": 0.02580377348787529,
+            "round2": "qualified",
+            "runtime_round1": "qualified",
+            "static": "pass (generator, pre-GPU)"
+          },
+          "cell_failure": "round1: status=unresolved reason=main_kernel_cycles=1055799.4656188604; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=1055799.4656188604 samples=9; round2: status=unresolved reason=main_kernel_cycles=1057543.8864323949; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=1057543.8864323949 samples=9; two-round median drift 0.17% (limit 5.0%)",
+          "replaces": "fa3_holdout_shape_03",
+          "seed_order_candidate": "4",
+          "why_this_candidate": "同格补选：同 primary mechanism family，形状/档位按原种子顺序取下一候选（只看准入+硬件计时）"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 544,
+      "seqlen_new": null,
+      "seqlen_q": 128,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_03_r6c4",
+      "source_evidence": {
+        "condition": "attention_chunk>=1 forces local window clamp",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "attention_chunk",
+          "is_local"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": true,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 96,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_03_r6c4_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_varlen_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 2,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_04_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "cu_seqlens/seqused/leftpad → Varlen persistent scheduler",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "varlen_fwd",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "VarlenDynamicPersistentTileScheduler",
+          "VARLEN_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "varlen_fwd",
+        "mma_pv_rs"
+      ],
+      "num_splits": 1,
+      "operation": "varlen_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "varlen_fwd",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "seqlen_k",
+          "seqlen_q",
+          "seqlens_k",
+          "seqlens_q"
+        ],
+        "nearest_296_case_id": "fa3_varlen_fwd_01_cluster_sm",
+        "rationale": "varlen 奇数长度 [100,48]/[1031,520]（296 全为 128 倍数）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1031,
+      "seqlen_new": null,
+      "seqlen_q": 100,
+      "seqlens_k": [
+        1031,
+        520
+      ],
+      "seqlens_q": [
+        100,
+        48
+      ],
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_04",
+      "source_evidence": {
+        "condition": "cu_seqlens/seqused/leftpad → Varlen persistent scheduler",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "symbols": [
+          "VarlenDynamicPersistentTileScheduler",
+          "VARLEN_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": true,
+        "kBlockM": 128,
+        "kBlockN": 176,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_04_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_with_kvcache",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_05_r6c4_cluster_sm",
+      "causal": true,
+      "cluster_sm": true,
+      "delivery_group": 4,
+      "delivery_index": 4,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 4,
+      "heads_q": 4,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "small seqlen_q paged decode; seqlen_q*(h/h_k)<=kBlockM disables TMA",
+        "files": [
+          "upstream/hopper/flash_attn_interface.py",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "kvcache_paged_decode",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "flash_attn_with_kvcache",
+          "page_table"
+        ]
+      },
+      "mechanisms": [
+        "kvcache_paged_decode",
+        "mma_pv_rs",
+        "paged_nontma"
+      ],
+      "num_splits": 1,
+      "operation": "kvcache",
+      "pack_gqa": null,
+      "page_size": 96,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "kvcache_paged_decode",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "heads_kv",
+          "page_size",
+          "seqlen_k",
+          "seqlen_q"
+        ],
+        "nearest_296_case_id": "fa3_kvcache_paged_decode_03_cluster_sm",
+        "rationale": "paged decode：page=96×d=128（296 该组合只有 fp16/d64 与 ps 64/256）+ sk=7968=83 页",
+        "rev6": {
+          "admission": {
+            "cycle_window": "(0, 500000]（marker scope，296 同窗）",
+            "median_drift_percent": 0.15848414185477147,
+            "round2": "qualified",
+            "runtime_round1": "qualified",
+            "static": "pass (generator, pre-GPU)"
+          },
+          "cell_failure": "round1: status=unresolved reason=main_kernel_cycles=726709.3702305406; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=726709.3702305406 samples=9; round2: status=unresolved reason=main_kernel_cycles=726765.2306827309; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=726765.2306827309 samples=9; two-round median drift 0.01% (limit 5.0%)",
+          "replaces": "fa3_holdout_shape_05",
+          "seed_order_candidate": "4",
+          "why_this_candidate": "同格补选：同 primary mechanism family，形状/档位按原种子顺序取下一候选（只看准入+硬件计时）"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1920,
+      "seqlen_new": null,
+      "seqlen_q": 6,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_05_r6c4",
+      "source_evidence": {
+        "condition": "small seqlen_q paged decode; seqlen_q*(h/h_k)<=kBlockM disables TMA",
+        "files": [
+          "upstream/hopper/flash_attn_interface.py",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "flash_attn_with_kvcache",
+          "page_table"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": true,
+        "pagedkv_nontma": true,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_05_r6c4_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_06_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp16",
+      "head_dim": 96,
+      "head_dim_v": 96,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "window_size_left/right >=0 && !causal",
+        "files": [
+          "upstream/hopper/flash_api.cpp",
+          "upstream/hopper/static_switch.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "local_window",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "is_local",
+          "CAUSAL_LOCAL_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "local_window",
+        "mma_pv_ss"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "local_window",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "seqlen_k",
+          "seqlen_q",
+          "window_size"
+        ],
+        "nearest_296_case_id": "fa3_local_window_04_cluster_sm",
+        "rationale": "非对称新窗口 [333,0]（296 为 256/512/192）+ 奇数 seqlen",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1041,
+      "seqlen_new": null,
+      "seqlen_q": 200,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_06",
+      "source_evidence": {
+        "condition": "window_size_left/right >=0 && !causal",
+        "files": [
+          "upstream/hopper/flash_api.cpp",
+          "upstream/hopper/static_switch.h"
+        ],
+        "symbols": [
+          "is_local",
+          "CAUSAL_LOCAL_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": true,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 192,
+        "kBlockN": 128,
+        "mma_pv_is_rs": false,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        333,
+        0
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_06_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_07_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp16",
+      "head_dim": 64,
+      "head_dim_v": 512,
+      "heads_kv": 4,
+      "heads_q": 4,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "hd=64 dv=512 → {64,64,SS}; SM90 bf16/fp16 only",
+        "files": [
+          "upstream/hopper/tile_size.h",
+          "upstream/hopper/generate_kernels.py"
+        ],
+        "observed_cluster_source": false,
+        "primary": "dv512_mla",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "headdim_v == 512",
+          "MmaPV_use_RS_WG1"
+        ]
+      },
+      "mechanisms": [
+        "dv512_mla",
+        "mma_pv_ss"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "dv512_mla",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "heads_kv",
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_dv512_mla_04_cluster_sm",
+        "rationale": "MLA 极大奇数 seqlen_k=2431 外推（296 ∈{1024,1536}）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 2431,
+      "seqlen_new": null,
+      "seqlen_q": 64,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_07",
+      "source_evidence": {
+        "condition": "hd=64 dv=512 → {64,64,SS}; SM90 bf16/fp16 only",
+        "files": [
+          "upstream/hopper/tile_size.h",
+          "upstream/hopper/generate_kernels.py"
+        ],
+        "symbols": [
+          "headdim_v == 512",
+          "MmaPV_use_RS_WG1"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": false,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 64,
+        "kBlockN": 64,
+        "mma_pv_is_rs": false,
+        "n_m_tiles": 1,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_07_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_shape_08_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "SM90 && (16bit hd>=128 || fp8 hd==192) && !causal && !local && !split && !PagedKVNonTMA && !varlen && ceil(seqlen_q*gqa/kBlockM)%2==0 → ClusterM=2",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "observed_cluster_source": true,
+        "primary": "cluster_even",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "Enable_cluster",
+          "CLUSTER_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "cluster_even",
+        "cluster_m2",
+        "mma_pv_rs"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 2,
+      "primary_mechanism": "cluster_even",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_shape",
+        "diff_dims": [
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_cluster_even_04_cluster_sm",
+        "rationale": "cluster=2 路径新形状：sq=256（n_m=2 保持偶数）+ sk=3072（296 仅 2048）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 3072,
+      "seqlen_new": null,
+      "seqlen_q": 256,
+      "sm_margin": 130,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_shape_08",
+      "source_evidence": {
+        "condition": "SM90 && (16bit hd>=128 || fp8 hd==192) && !causal && !local && !split && !PagedKVNonTMA && !varlen && ceil(seqlen_q*gqa/kBlockM)%2==0 → ClusterM=2",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "symbols": [
+          "Enable_cluster",
+          "CLUSTER_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 2,
+      "trigger": {
+        "cluster_m": 2,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": true,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 176,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": true,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_shape_08_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_with_kvcache",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_01_r6c3_cluster_sm",
+      "causal": true,
+      "cluster_sm": true,
+      "delivery_group": 0,
+      "delivery_index": 8,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "page_table && !leftpad && !knew && page_size%kBlockN==0 && seqlen_q*(h/h_k)>kBlockM",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "paged_tma",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "get_pagedkv_tma"
+        ]
+      },
+      "mechanisms": [
+        "paged_tma",
+        "mma_pv_rs",
+        "gqa"
+      ],
+      "num_splits": 1,
+      "operation": "kvcache",
+      "pack_gqa": null,
+      "page_size": 128,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "paged_tma",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "heads_q",
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_paged_tma_03_cluster_sm",
+        "rationale": "paged TMA × causal × GQA 4:1（296 paged_tma 全 hq=1、仅 03 causal）",
+        "rev6": {
+          "admission": {
+            "cycle_window": "(0, 500000]（marker scope，296 同窗）",
+            "median_drift_percent": 0.016399533552726192,
+            "round2": "qualified",
+            "runtime_round1": "qualified",
+            "static": "pass (generator, pre-GPU)"
+          },
+          "cell_failure": "round1: status=unresolved reason=main_kernel_cycles=633730.3925770563; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=633730.3925770563 samples=9; round2: status=unresolved reason=main_kernel_cycles=633497.2915659723; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=633497.2915659723 samples=9; two-round median drift 0.04% (limit 5.0%)",
+          "replaces": "fa3_holdout_cfg_01",
+          "seed_order_candidate": "3",
+          "why_this_candidate": "同格补选：同 primary mechanism family，形状/档位按原种子顺序取下一候选（只看准入+硬件计时）"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 3072,
+      "seqlen_new": null,
+      "seqlen_q": 128,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_01_r6c3",
+      "source_evidence": {
+        "condition": "page_table && !leftpad && !knew && page_size%kBlockN==0 && seqlen_q*(h/h_k)>kBlockM",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "get_pagedkv_tma"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": true
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_01_r6c3_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_02_cluster_sm",
+      "causal": true,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 64,
+      "head_dim_v": 64,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "Split && !Varlen → SingleTileScheduler then fwd_combine",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h",
+          "upstream/hopper/heuristics.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "split_kv_fixed",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "UsePersistentScheduler",
+          "SingleTileScheduler",
+          "num_splits"
+        ]
+      },
+      "mechanisms": [
+        "split_kv_fixed",
+        "mma_pv_rs",
+        "split_kv"
+      ],
+      "num_splits": 2,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "split_kv_fixed",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "causal",
+          "dtype",
+          "seqlen_k",
+          "seqlen_q"
+        ],
+        "nearest_296_case_id": "fa3_split_kv_fixed_02_cluster_sm",
+        "rationale": "split_kv × causal（296 split_kv_fixed 全 causal=False）",
+        "rev6": {
+          "action": "harness_fix_retest",
+          "attribution": "harness: FA3 marker 二进制链接了 188 个 pre-marker 时代对象 (fa3_full_gpu_100_20260920/objects，见 ext/relink_marker_full.rsp)，本例主核实例 flash_fwd_hdim64_bf16_split_sm90（fixed/varlen 共用，VARLEN_SWITCH 在 run_mha_fwd_ 内部）无 SR_CLOCKLO 插桩 → 主核不写 marker 槽，签名匹配失败。",
+          "binary": "near_holdout/fa3_marker_r6 (build_manifest.json)",
+          "fix": "重编译 flash_fwd_hdim64_bf16_split_sm90 实例（override 头）并从 relink 中剔除旧对象；SASS 验证 SR_CLOCKLO 在位后原例重测，不换例。",
+          "identification_logic": "marker_timing.select_main_kernel_launches 的签名识别本身不窄：期望签名来自同一次运行的 Kineto 捕获；错在二进制对主核实例未插桩（观察到的唯一签名是 combine 核）。"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 3072,
+      "seqlen_new": null,
+      "seqlen_q": 8,
+      "sm_margin": 130,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_02",
+      "source_evidence": {
+        "condition": "Split && !Varlen → SingleTileScheduler then fwd_combine",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h",
+          "upstream/hopper/heuristics.h"
+        ],
+        "symbols": [
+          "UsePersistentScheduler",
+          "SingleTileScheduler",
+          "num_splits"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 2,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": true,
+        "is_varlen": false,
+        "kBlockM": 192,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": true,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_02_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_varlen_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 2,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_03_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "cu_seqlens/seqused/leftpad → Varlen persistent scheduler",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "varlen_fwd",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "VarlenDynamicPersistentTileScheduler",
+          "VARLEN_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "varlen_fwd",
+        "mma_pv_rs"
+      ],
+      "num_splits": 1,
+      "operation": "varlen_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "varlen_fwd",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "dtype",
+          "seqlen_q",
+          "seqlens_q",
+          "softcap"
+        ],
+        "nearest_296_case_id": "fa3_varlen_fwd_01_cluster_sm",
+        "rationale": "varlen × softcap=30（296 varlen softcap 全 0）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1024,
+      "seqlen_new": null,
+      "seqlen_q": 192,
+      "seqlens_k": [
+        1024,
+        512
+      ],
+      "seqlens_q": [
+        192,
+        96
+      ],
+      "sm_margin": 131,
+      "softcap": 30.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_03",
+      "source_evidence": {
+        "condition": "cu_seqlens/seqused/leftpad → Varlen persistent scheduler",
+        "files": [
+          "upstream/hopper/flash_fwd_launch_template.h"
+        ],
+        "symbols": [
+          "VarlenDynamicPersistentTileScheduler",
+          "VARLEN_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": true,
+        "kBlockM": 128,
+        "kBlockN": 176,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_03_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_varlen_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 2,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_04_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 64,
+      "head_dim_v": 64,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "varlen+split; 2*ceil(total_q/kBlockM) >= B*ceil(max_q/kBlockM) → STANDARD",
+        "files": [
+          "upstream/hopper/flash_fwd_combine_kernel.h",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "split_varlen_dense_combine",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "choose_scheduling_algo",
+          "STANDARD",
+          "run_mha_fwd_combine"
+        ]
+      },
+      "mechanisms": [
+        "split_varlen_dense_combine",
+        "mma_pv_ss",
+        "split_kv",
+        "combine_dense",
+        "gqa"
+      ],
+      "num_splits": 4,
+      "operation": "varlen_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "split_varlen_dense_combine",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "head_dim",
+          "head_dim_v",
+          "heads_q"
+        ],
+        "nearest_296_case_id": "fa3_split_varlen_dense_combine_01_cluster_sm",
+        "rationale": "split varlen dense combine × GQA 4:1（296 dense_combine 全 hq=1）",
+        "rev6": {
+          "action": "harness_fix_retest",
+          "attribution": "harness: 同 cfg_02 —— varlen+split 走同一 flash_fwd_hdim64_bf16_split_sm90 实例，未插桩；观察到的 (32,1,2) 签名为 combine 核（marker_probe 侧已插桩）。",
+          "binary": "near_holdout/fa3_marker_r6 (build_manifest.json)",
+          "fix": "同 cfg_02（同一重建二进制），原例重测。",
+          "identification_logic": "同 cfg_02：识别逻辑正常，插桩覆盖缺口。"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1024,
+      "seqlen_new": null,
+      "seqlen_q": 128,
+      "seqlens_k": [
+        1024,
+        1024
+      ],
+      "seqlens_q": [
+        128,
+        128
+      ],
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_04",
+      "source_evidence": {
+        "condition": "varlen+split; 2*ceil(total_q/kBlockM) >= B*ceil(max_q/kBlockM) → STANDARD",
+        "files": [
+          "upstream/hopper/flash_fwd_combine_kernel.h",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "choose_scheduling_algo",
+          "STANDARD",
+          "run_mha_fwd_combine"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": true,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": true,
+        "is_varlen": true,
+        "kBlockM": 192,
+        "kBlockN": 192,
+        "mma_pv_is_rs": false,
+        "n_m_tiles": 3,
+        "pack_gqa": true,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_04_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_varlen_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 4,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_05_r6c2_cluster_sm",
+      "causal": true,
+      "cluster_sm": true,
+      "delivery_group": 4,
+      "delivery_index": 12,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "varlen+split; grid >50% empty → linearize M and batch",
+        "files": [
+          "upstream/hopper/flash_fwd_combine_kernel.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "split_varlen_sparse_combine",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "LINEARIZE_M_AND_BATCH",
+          "choose_scheduling_algo"
+        ]
+      },
+      "mechanisms": [
+        "split_varlen_sparse_combine",
+        "mma_pv_rs",
+        "split_kv",
+        "combine_sparse"
+      ],
+      "num_splits": 4,
+      "operation": "varlen_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "split_varlen_sparse_combine",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "batch",
+          "causal",
+          "seqlens_k",
+          "seqlens_q"
+        ],
+        "nearest_296_case_id": "fa3_split_varlen_sparse_combine_01_cluster_sm",
+        "rationale": "split varlen sparse combine × causal（296 sparse 全 causal=False）",
+        "rev6": {
+          "admission": {
+            "cycle_window": "(0, 500000]（marker scope，296 同窗）",
+            "median_drift_percent": 0.12718022874957413,
+            "round2": "qualified",
+            "runtime_round1": "qualified",
+            "static": "pass (generator, pre-GPU)"
+          },
+          "cell_failure": "round1: status=unresolved reason=main_kernel_cycles=1643173.5; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=1643173.5 samples=9; round2: status=unresolved reason=main_kernel_cycles=1646359.6607977895; main_kernel=fa3_fwd grid=[[1, 1, 1]] cta_count=1 median_cycles=1646359.6607977895 samples=9; two-round median drift 0.19% (limit 5.0%)",
+          "replaces": "fa3_holdout_cfg_05",
+          "seed_order_candidate": "2",
+          "why_this_candidate": "同格补选：同 primary mechanism family，形状/档位按原种子顺序取下一候选（只看准入+硬件计时）"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 1024,
+      "seqlen_new": null,
+      "seqlen_q": 128,
+      "seqlens_k": [
+        64,
+        64,
+        64,
+        1024
+      ],
+      "seqlens_q": [
+        16,
+        16,
+        16,
+        128
+      ],
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_05_r6c2",
+      "source_evidence": {
+        "condition": "varlen+split; grid >50% empty → linearize M and batch",
+        "files": [
+          "upstream/hopper/flash_fwd_combine_kernel.h"
+        ],
+        "symbols": [
+          "LINEARIZE_M_AND_BATCH",
+          "choose_scheduling_algo"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": true,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": true,
+        "is_varlen": true,
+        "kBlockM": 128,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": true,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_05_r6c2_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_06_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "fp8_e4m3",
+      "head_dim": 192,
+      "head_dim_v": 192,
+      "heads_kv": 1,
+      "heads_q": 1,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "window_size_left/right >=0 && !causal",
+        "files": [
+          "upstream/hopper/flash_api.cpp",
+          "upstream/hopper/static_switch.h"
+        ],
+        "observed_cluster_source": false,
+        "primary": "local_window",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "is_local",
+          "CAUSAL_LOCAL_SWITCH"
+        ]
+      },
+      "mechanisms": [
+        "local_window",
+        "mma_pv_rs",
+        "fp8_transpose_v"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "local_window",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "dtype",
+          "head_dim",
+          "head_dim_v",
+          "seqlen_q",
+          "window_size"
+        ],
+        "nearest_296_case_id": "fa3_local_window_03_cluster_sm",
+        "rationale": "fp8 e4m3 × local window（296 fp8 全非 local；hd192 fp8 本地窗口走 v 转置路径）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 2048,
+      "seqlen_new": null,
+      "seqlen_q": 256,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_06",
+      "source_evidence": {
+        "condition": "window_size_left/right >=0 && !causal",
+        "files": [
+          "upstream/hopper/flash_api.cpp",
+          "upstream/hopper/static_switch.h"
+        ],
+        "symbols": [
+          "is_local",
+          "CAUSAL_LOCAL_SWITCH"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 1,
+        "enable_cluster": false,
+        "fp8_transpose_v": true,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": true,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 160,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 2,
+        "pack_gqa": false,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        512,
+        512
+      ],
+      "excluded_admission_exhausted": true,
+      "admission_exhausted_note": "rev8: 9 candidates all ~571k > 500k window by ~14% (insensitive to sk/window/sq; v-transpose path fixed cost); permanent gap, near set counts 47",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_06_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_func",
+      "append_kv": false,
+      "attention_chunk": 256,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_07_r6c2_cluster_sm",
+      "causal": false,
+      "cluster_sm": true,
+      "delivery_group": 6,
+      "delivery_index": 14,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "attention_chunk>=1 forces local window clamp",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "attention_chunk",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "attention_chunk",
+          "is_local"
+        ]
+      },
+      "mechanisms": [
+        "attention_chunk",
+        "mma_pv_rs",
+        "split_kv",
+        "gqa"
+      ],
+      "num_splits": 1,
+      "operation": "fixed_fwd",
+      "pack_gqa": null,
+      "page_size": null,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "attention_chunk",
+      "qv": false,
+      "reuse_scheduler_metadata": false,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "head_dim",
+          "head_dim_v",
+          "heads_q",
+          "num_splits",
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_attention_chunk_01_cluster_sm",
+        "rationale": "attention_chunk × GQA 8:1 × split=2（296 chunk 全 hq=1/split=1）",
+        "rev6": {
+          "admission": {
+            "cycle_window": "(0, 500000]（marker scope，296 同窗）",
+            "median_drift_percent": 1.013838411651705,
+            "round2": "qualified",
+            "runtime_round1": "qualified",
+            "static": "pass (generator, pre-GPU)"
+          },
+          "cell_failure": "round1: status=unresolved reason=main kernel launch grid product is not 1 or 2: grid=[[16, 2, 1]] cta_count=32; main_kernel=fa3_fwd grid=[[16, 2, 1]] cta_count=32 median_cycles=56641.59875932507 samples=9; round2: status=unresolved reason=main kernel launch grid product is not 1 or 2: grid=[[16, 2, 1]] cta_count=32; main_kernel=fa3_fwd grid=[[16, 2, 1]] cta_count=32 median_cycles=56653.99923413691",
+          "replaces": "fa3_holdout_cfg_07",
+          "seed_order_candidate": "2",
+          "why_this_candidate": "同格补选：同 primary mechanism family，形状/档位按原种子顺序取下一候选（只看准入+硬件计时）"
+        },
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 2048,
+      "seqlen_new": null,
+      "seqlen_q": 64,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_07_r6c2",
+      "source_evidence": {
+        "condition": "attention_chunk>=1 forces local window clamp",
+        "files": [
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "attention_chunk",
+          "is_local"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": true,
+        "is_split": true,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 16,
+        "pack_gqa": true,
+        "pagedkv_nontma": false,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_07_r6c2_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "api": "flash_attn_with_kvcache",
+      "append_kv": false,
+      "attention_chunk": 0,
+      "batch": 1,
+      "cache_batch_idx": false,
+      "cache_leftpad": false,
+      "case_id": "fa3_holdout_cfg_08_cluster_sm",
+      "causal": true,
+      "cluster_sm": true,
+      "deterministic": false,
+      "dtype": "bf16",
+      "head_dim": 128,
+      "head_dim_v": 128,
+      "heads_kv": 4,
+      "heads_q": 4,
+      "implementation": "FA3",
+      "input_seed": 0,
+      "mechanism_evidence": {
+        "condition": "kvcache reuse_scheduler_metadata reuses prepared varlen/split metadata",
+        "files": [
+          "upstream/hopper/flash_attn_interface.py",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "observed_cluster_source": false,
+        "primary": "reuse_scheduler_metadata",
+        "sm_margin": "official flash_attn_* sm_margin → params.num_sm = multiProcessorCount - sm_margin",
+        "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+        "symbols": [
+          "scheduler_metadata",
+          "skip_scheduler_metadata_computation"
+        ]
+      },
+      "mechanisms": [
+        "reuse_scheduler_metadata",
+        "mma_pv_rs",
+        "paged_nontma"
+      ],
+      "num_splits": 1,
+      "operation": "kvcache",
+      "pack_gqa": null,
+      "page_size": 256,
+      "predicted_cluster_m": 1,
+      "primary_mechanism": "reuse_scheduler_metadata",
+      "qv": false,
+      "reuse_scheduler_metadata": true,
+      "rotary_dim": 0,
+      "rotary_interleaved": true,
+      "seed_index": 0,
+      "selection": {
+        "bucket": "new_config",
+        "diff_dims": [
+          "heads_kv",
+          "page_size",
+          "seqlen_k"
+        ],
+        "nearest_296_case_id": "fa3_reuse_scheduler_metadata_01_cluster_sm",
+        "rationale": "reuse_scheduler_metadata × paged(ps=256) × GQA 4:1（296 reuse 全无 page）",
+        "rule": "T0005 hand-curated table + seeded tie-break; PRIMARY_OK verified via full_gpu_cases.derive_traits",
+        "seed": 20260929
+      },
+      "seqlen_k": 4096,
+      "seqlen_new": null,
+      "seqlen_q": 16,
+      "sm_margin": 131,
+      "softcap": 0.0,
+      "source": "upstream/hopper/flash_attn_interface.py",
+      "source_case_id": "fa3_holdout_cfg_08",
+      "source_evidence": {
+        "condition": "kvcache reuse_scheduler_metadata reuses prepared varlen/split metadata",
+        "files": [
+          "upstream/hopper/flash_attn_interface.py",
+          "upstream/hopper/flash_api.cpp"
+        ],
+        "symbols": [
+          "scheduler_metadata",
+          "skip_scheduler_metadata_computation"
+        ]
+      },
+      "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "suite": "flashattention3",
+      "target_ctas": 1,
+      "trigger": {
+        "cluster_m": 1,
+        "combine_dense": false,
+        "combine_sparse": false,
+        "dqacc_atomic_d256": false,
+        "dqacc_bulk_tma": false,
+        "element_size": 2,
+        "enable_cluster": false,
+        "fp8_transpose_v": false,
+        "has_qv": false,
+        "intra_wg_overlap": true,
+        "is_local": false,
+        "is_split": false,
+        "is_varlen": false,
+        "kBlockM": 128,
+        "kBlockN": 128,
+        "mma_pv_is_rs": true,
+        "n_m_tiles": 1,
+        "pack_gqa": true,
+        "pagedkv_nontma": true,
+        "pagedkv_tma": false
+      },
+      "uses_cluster": false,
+      "window_size": [
+        -1,
+        -1
+      ],
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/manifests/holdout_near.json",
+          "--case-id",
+          "fa3_holdout_cfg_08_cluster_sm",
+          "--mode",
+          "capture",
+          "--build-root",
+          "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3/harness/run_full_gpu.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashattention3",
+        "env": {},
+        "kernel_range": "",
+        "carveout": "auto",
+        "allow_missing_lineinfo": true,
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    }
+  ],
+  "cluster_sm": {
+    "cluster_policy": "observed ClusterShape>1 → one 2CTA cluster via sm_margin; else 1CTA",
+    "h100_sms": 132,
+    "sm_margin": "official FA3 sm_margin; params.num_sm = H100_SMs - target_ctas",
+    "target_cycle_range": [
+      100000,
+      500000
+    ],
+    "timing": "queued device globaltimer whole-operation span"
+  },
+  "delivery": {
+    "group_assignment": "index modulo 8",
+    "groups": 8,
+    "runner": "scripts/run_cluster_sm.sh"
+  },
+  "implementation": "FA3",
+  "name": "FlashAttention-3 near-holdout 16 (8 new shapes + 8 new config combos, T0005, rev6 补选)",
+  "not_historical_dual_sm": true,
+  "schema_version": "hopper.delivery.cases.v1",
+  "selected_count": 16,
+  "selection": {
+    "identity": "operation/dtype/shape/mask/split/paged/GQA tuple + (uses_cluster,target_ctas)",
+    "mode": "near_holdout_new_shape_new_config",
+    "rev6": {
+      "date": "2026-09-29",
+      "exhausted_slots": [
+        "fa3_holdout_cfg_06"
+      ],
+      "harness_fixed_slots": [
+        "fa3_holdout_cfg_02",
+        "fa3_holdout_cfg_04"
+      ],
+      "rejection_list": "artifacts/tasks/T0005/rev6/rejection_list.json",
+      "replaced_slots": [],
+      "revision": "rev6-reselect",
+      "rule": "27 个 needs_marker_remeasure 槽位：同格（同 suite×同 bucket×同 family）按原种子顺序取下一候选，静态+运行时准入到过，两轮 marker 计时合格者入选；原 21 例不动；FA3 cfg_02/04 为 harness 插桩修复原例重测（不换例）",
+      "seed": 20260929
+    },
+    "rev6_admission": {
+      "can_implement": "CUTLASS can_implement 拒绝/无 summary → 准入拒绝；DG vendor get_best_config 崩溃（GemmDesc even-SM assert）→ 静态拒绝；FA3 PRIMARY_OK + traits 合法",
+      "cluster_sm_contract": "主核/launched cta_count == target_ctas；2CTA = 一个 2-CTA cluster（cluster_dim 积 2、两个不同 smid）或两个普通 CTA（cluster_dim 1x1x1、grid 积 2）；1CTA = grid 积 1、cluster 1x1x1",
+      "cycle_window": {
+        "cutlass": "[100000, 500000]（marker 主核区间，296 同窗）",
+        "deepgemm": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+        "flashattention3": "(0, 500000]（marker scope，296 同窗）"
+      },
+      "marker_instrumentation": "FA3 候选的主核实例必须在 marker 二进制中带 SR_CLOCKLO（链接对象级静态检查 + 本轮动态证据），否则拒绝",
+      "no_simulation": "补选只看准入检查与硬件计时结果，不看模拟结果（修订 6-3）",
+      "order": "静态准入（生成器，硬件计时前）→ 运行时探针/首轮计时准入 → 两轮 marker 计时（两轮均 qualified 且 drift<=5.0%）",
+      "target_cta_count": "逐 suite 判据同 296 qualification（DG cluster_mechanism_probe 观测 cluster cta counts；CU runner 实测 cta_count；FA3 主核 grid product）",
+      "vendor_heuristic_num_sms": "DG：num_sms=1（1CTA）或 num_sms=2（2CTA/cluster）下 vendor 启发式必须可选中目标配置（GemmDesc even-SM 静态规则 + cluster_mechanism_probe 运行时探针）；kgroup num_groups<=4 静态拒绝"
+    },
+    "seed": 20260929,
+    "rev8_exhausted_permanent_gap": [
+      "fa3_holdout_cfg_06_cluster_sm"
+    ]
+  },
+  "source_case_set": "fa3_cluster_sm100",
+  "source_manifest": "/path/to/hopper-prototype/suites/flashattention3/manifests/fa3_cluster_sm100.json",
+  "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+  "suite": "flashattention3",
+  "supported_gpu_profiles": [
+    "h100"
+  ],
+  "version": "rev6-reselect-20260929"
+}

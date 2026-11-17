@@ -1,0 +1,205 @@
+{
+ "doc": "imported from legacy mechanism storage.shared.visibility",
+ "program": {
+  "event": "barrier_release",
+  "operation_classes": [
+   "LDS",
+   "STS",
+   "STSM",
+   "LD",
+   "ST"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "shared_store_visibility"
+ },
+ "root": {
+  "children": [
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LDS"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STS"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STSM"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LD"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "ST"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "LDS",
+   "STS",
+   "STSM",
+   "LD",
+   "ST"
+  ]
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

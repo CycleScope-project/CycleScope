@@ -1,0 +1,15 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "control_word",
+ "version": 1,
+ "frozen_before_data": true,
+ "date": "2026-11-06",
+ "mechanisms": ["instruction.service (result_latency_cycles / completion_latency_cycles of fixed-latency classes without a PTX single-instruction form)"],
+ "purpose": "High-volume classes stay placeholder because PTX has no single-instruction form for them (v3 no_form): UMOV 5.9 % of h100 / 3.0 % of b300 executed warp instructions, R2UR 1.3 / 2.8 %, MOV 0.8 / 1.7 %, VIADD 1.5 / 1.0 %, ULEA, PLOP3, CS2R.ZERO, ELECT, VOTEU, P2R, R2P, IADD, IABS, UP2UR, UPLOP3 ($A/diag/mb4/classcount-{hp,bw}.tsv). Opcode patching cannot measure them: fixed-latency instructions carry no scoreboard, so a patched chain's timing is whatever stall count the control word holds. The same fact makes the compiler's schedule informative: for a fixed-latency producer, ptxas must place at least its latency in stall cycles before the first dependent consumer.",
+ "data": "no GPU run: the SASS (with 128-bit encodings) of every traced function of the 450 x 2 single-cluster captures ($A/captures/cold4/{hp-sc,bw-sc}/<case>/functions/<id>.tsv) plus the service_latency probe builds; control words decoded with tools/microbench/shared/sass_ctrl.py (stall, yield, write / read barrier, wait mask).",
+ "derivation": "for each producer instruction P of class X that sets no write barrier, writes register R (or UR / predicate) and is followed in the same basic block (no branch target, BRA, BSSY / BSYNC, EXIT, WARPSYNC, barrier or yield between) by a consumer C reading R before any other write of R: distance(P) = sum of the stall counts of P and of every instruction after P up to C (C excluded). L_ptx(X) = minimum of distance over all such pairs in the corpus of that device; n(X) = number of pairs.",
+ "validation": "the same derivation on classes whose result latency is installed measured by a cyclescope protocol on that device (at least IADD3, IMAD, LOP3, SHF, ISETP, FFMA, FADD, FMUL, SEL, PRMT, UIADD3, USEL, UISETP and on b300 FFMA2 / FADD2 once v6 reproduces them): the method passes on a device if L_ptx equals the installed result within 1 cycle for at least 90 % of the control classes with n >= 20. If it fails, nothing is installed and the per-class table is reported.",
+ "install": "only on a device whose validation passed, only for classes with n >= 20 and whose installed result is placeholder: result_latency_cycles = completion_latency_cycles = L_ptx(X), status experimental (a compiler-schedule bound, not a timing measurement), source control_word.<device>.v1 citing n and the validation table. issue_interval_cycles is not derived (stall counts between independent instructions also encode dual-issue and scheduling choices); classes whose result is already measured are reported, not changed. A/B 500 x 2.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no change of the pair rule, the 1-cycle / 90 % validation bound or n >= 20 after looking at the table",
+ "addenda": []
+}

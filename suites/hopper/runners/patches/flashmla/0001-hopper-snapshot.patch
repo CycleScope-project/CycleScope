@@ -1,0 +1,1229 @@
+--- a/.gitignore
++++ b/.gitignore
+@@ -10,3 +10,6 @@
+ .cache
+ /dev
+ /.clangd
++
++# T0005 rev3: CUTLASS is fetched at build time (tool_cache) and symlinked here.
++/csrc/cutlass
+--- a/setup.py
++++ b/setup.py
+@@ -1,7 +1,5 @@
+ import os
+ from pathlib import Path
+-from datetime import datetime
+-import subprocess
+ 
+ from setuptools import setup, find_packages
+ 
+@@ -20,41 +18,42 @@
+     features_args = []
+     if is_flag_set("FLASH_MLA_DISABLE_FP16"):
+         features_args.append("-DFLASH_MLA_DISABLE_FP16")
++    if is_flag_set("FLASHMLA_DELIVERY_MARKER_TIMING"):
++        # T0005 rev3-②/rev5: measurement-only in-kernel clock markers for the sm90 dense
++        # decode kernels (see ../harness/override/flashmla_marker.h).  Kernel sources include
++        # that header under the same macro, so builds without the flag compile the pinned
++        # upstream sources unchanged.  The header directory is also only added to the include
++        # path when the flag is set, keeping no-marker build inputs bit-identical to upstream.
++        features_args.append("-DFLASHMLA_DELIVERY_MARKER_TIMING")
+     return features_args
+ 
++
++def get_marker_include_dirs():
++    if is_flag_set("FLASHMLA_DELIVERY_MARKER_TIMING"):
++        # harness/override sits next to upstream/ in the delivery suite layout; the
++        # delivery build (scripts/build_cluster_sm.sh) always runs from that layout.
++        return [Path(this_dir).parent / "harness" / "override"]
++    return []
++
+ def get_arch_flags():
+-    # Check NVCC Version
+-    # NOTE The "CUDA_HOME" here is not necessarily from the `CUDA_HOME` environment variable. For more details, see `torch/utils/cpp_extension.py`
+-    assert CUDA_HOME is not None, "PyTorch must be compiled with CUDA support"
+-    nvcc_version = subprocess.check_output(
+-        [os.path.join(CUDA_HOME, "bin", "nvcc"), '--version'], stderr=subprocess.STDOUT
+-    ).decode('utf-8')
+-    nvcc_version_number = nvcc_version.split('release ')[1].split(',')[0].strip()
+-    major, minor = map(int, nvcc_version_number.split('.'))
+-    print(f'Compiling using NVCC {major}.{minor}')
+-
+-    DISABLE_SM100 = is_flag_set("FLASH_MLA_DISABLE_SM100")
+-    DISABLE_SM90 = is_flag_set("FLASH_MLA_DISABLE_SM90")
+-    if major < 12 or (major == 12 and minor <= 8):
+-        assert DISABLE_SM100, "sm100 compilation for Flash MLA requires NVCC 12.9 or higher. Please set FLASH_MLA_DISABLE_SM100=1 to disable sm100 compilation, or update your environment."    # TODO Implement this
+-
+-    arch_flags = []
+-    if not DISABLE_SM100:
+-        # We use architecture-specific (sm_100a / sm_103a) targets instead of the family-specific one (sm_100f) for better SASS code generation
+-        arch_flags.extend(["-gencode", "arch=compute_100a,code=sm_100a"])
+-        arch_flags.extend(["-gencode", "arch=compute_103a,code=sm_103a"])
+-    if not DISABLE_SM90:
+-        arch_flags.extend(["-gencode", "arch=compute_90a,code=sm_90a"])
+-    return arch_flags
++    # This delivery tree contains only the selected SM90 dense and sparse paths.
++    return ["-gencode", "arch=compute_90a,code=sm_90a"]
+ 
+ def get_nvcc_thread_args():
+     nvcc_threads = os.getenv("NVCC_THREADS") or "32"
+     return ["--threads", nvcc_threads]
+ 
+-subprocess.run(["git", "submodule", "update", "--init", "csrc/cutlass"])
+-
+ this_dir = os.path.dirname(os.path.abspath(__file__))
+ 
++# T0005 rev3: CUTLASS is NOT vendored. scripts/build_cluster_sm.sh fetches the
++# pinned commit (see PINNED.md) into $HOPPER_ARTIFACT_ROOT/tool_cache/cutlass/
++# and symlinks it to csrc/cutlass before invoking pip. Fail fast otherwise.
++if not (Path(this_dir) / "csrc" / "cutlass" / "include" / "cutlass" / "version.h").is_file():
++    raise RuntimeError(
++        "csrc/cutlass is not present: FlashMLA's CUTLASS pin is fetched at build time by "
++        "suites/flashmla/scripts/build_cluster_sm.sh (see PINNED.md)."
++    )
++
+ if IS_WINDOWS:
+     cxx_args = ["/O2", "/std:c++20", "/DNDEBUG", "/W0"]
+ else:
+@@ -67,12 +66,9 @@
+         sources=[
+             # API
+             "csrc/api/api.cpp",
+-            "csrc/api/sparse_prefill.cpp",
+-            "csrc/api/sparse_decode.cpp",
+-            "csrc/api/dense_fwd.cpp",
+-            "csrc/api/dense_bwd.cpp",
+             "csrc/api/dense_decode.cpp",
+-            "csrc/api/fused_norm_rope_attn_rope_cast_fwd.cpp",
++            "csrc/api/sparse_decode.cpp",
++            "csrc/api/sparse_prefill.cpp",
+ 
+             # Misc kernels for decoding
+             "csrc/kernels/smxx/decode/get_decoding_sched_meta/get_decoding_sched_meta.cu",
+@@ -83,63 +79,16 @@
+             "csrc/kernels/sm90/decode/dense/instantiations/bf16.cu",
+ 
+             # sm90 sparse decode
+-            "csrc/kernels/sm90/decode/sparse/instantiations/v4_persistent_h64.cu",
+-            "csrc/kernels/sm90/decode/sparse/instantiations/v4_persistent_h128.cu",
+             "csrc/kernels/sm90/decode/sparse/instantiations/v32_persistent_h64.cu",
+             "csrc/kernels/sm90/decode/sparse/instantiations/v32_persistent_h128.cu",
++            "csrc/kernels/sm90/decode/sparse/instantiations/v4_persistent_h64.cu",
++            "csrc/kernels/sm90/decode/sparse/instantiations/v4_persistent_h128.cu",
+ 
+             # sm90 sparse prefill
+             "csrc/kernels/sm90/prefill/sparse/instantiations/phase1_k512.cu",
+             "csrc/kernels/sm90/prefill/sparse/instantiations/phase1_k512_topklen.cu",
+             "csrc/kernels/sm90/prefill/sparse/instantiations/phase1_k576.cu",
+             "csrc/kernels/sm90/prefill/sparse/instantiations/phase1_k576_topklen.cu",
+-
+-            # sm100 dense prefill & backward
+-            "csrc/kernels/sm100/prefill/dense/fmha_cutlass_fwd_sm100.cu",
+-            "csrc/kernels/sm100/prefill/dense/fmha_cutlass_bwd_sm100.cu",
+-
+-            # sm100 sparse prefill
+-            "csrc/kernels/sm100/prefill/sparse/fwd/head64/instantiations/phase1_h64_k512.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd/head64/instantiations/phase1_h64_k576.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd/head128/instantiations/phase1_k512.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd/head128/instantiations/phase1_k576.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_k512.cu",
+-
+-            # sm100 fused norm + rope + attn + rope + cast
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h64_prefill_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h64_prefill_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h128_prefill_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h128_prefill_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h64_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h64_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h128_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v4_h128_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41_h64_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41_h64_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41_h128_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41_h128_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41fp4_h64_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41fp4_h64_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41fp4_h128_decode_norm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/instantiations/v41fp4_h128_decode_nonorm.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/permute_q_b_proj/kernel.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/permute_wv_proj/kernel.cu",
+-
+-            # sm100 sparse decode
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v32_h64.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v32_h64_no_split.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v4_h64.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v4_h64_no_split.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v41_h64.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v41_h64_no_split.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v41fp4_h64.cu",
+-            "csrc/kernels/sm100/decode/sparse/head64/instantiations/v41fp4_h64_no_split.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512_splitkv.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512_v41.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512_v41_splitkv.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512_v41fp4.cu",
+-            "csrc/kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/instantiations/phase1_decode_k512_v41fp4_splitkv.cu",
+         ],
+         extra_compile_args={
+             "cxx": cxx_args + get_features_args(),
+@@ -166,24 +115,18 @@
+             Path(this_dir) / "csrc" / "kerutils" / "include",
+             Path(this_dir) / "csrc" / "cutlass" / "include",
+             Path(this_dir) / "csrc" / "cutlass" / "tools" / "util" / "include",
++        ] + get_marker_include_dirs() + [
+             Path(CUDA_HOME) / "targets" / "x86_64-linux" / "include" / "cccl",   # for cuda/std headers in CUDA 13+
+             Path(CUDA_HOME) / "targets" / "sbsa-linux" / "include" / "cccl",
+         ],
+     )
+ )
+ 
+-try:
+-    cmd = ['git', 'rev-parse', '--short', 'HEAD']
+-    rev = '+' + subprocess.check_output(cmd).decode('ascii').rstrip()
+-except Exception as _:
+-    now = datetime.now()
+-    date_time_str = now.strftime("%Y-%m-%d-%H-%M-%S")
+-    rev = '+' + date_time_str
+-
+-
+ setup(
+     name="flash_mla",
+-    version="1.0.0" + rev,
++    # Fixed at the pin (upstream derives it from `git rev-parse`, which has no
++    # meaning inside this delivery tree).
++    version="1.0.0+ba89a34",
+     packages=find_packages(include=['flash_mla']),
+     ext_modules=ext_modules,
+     cmdclass={"build_ext": BuildExtension},
+--- a/csrc/api/api.cpp
++++ b/csrc/api/api.cpp
+@@ -1,18 +1,27 @@
+ #include <pybind11/pybind11.h>
+ 
+-void register_sparse_prefill(pybind11::module_& m);
+-void register_sparse_decode(pybind11::module_& m);
+-void register_dense_fwd(pybind11::module_& m);
+-void register_dense_bwd(pybind11::module_& m);
+ void register_dense_decode(pybind11::module_& m);
+-void register_fused_norm_rope_attn_rope_cast_fwd(pybind11::module_& m);
++void register_sparse_decode(pybind11::module_& m);
++void register_sparse_prefill(pybind11::module_& m);
++
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++#include "flashmla_marker.h"
++
++// Harness entry points (called via ctypes on this .so): point every TU's static __device__
++// marker symbols at the shared device buffers, and report how many TUs enrolled.
++extern "C" void flash_mla_delivery_marker_set(const void* main_ptr, const void* combine_ptr,
++                                              const void* sched_ptr) {
++    flashmla_marker::set_all_tu_buffers(main_ptr, combine_ptr, sched_ptr);
++}
++
++extern "C" int flash_mla_delivery_marker_tu_count() {
++    return flashmla_marker::registry_size();
++}
++#endif
+ 
+ PYBIND11_MODULE(TORCH_EXTENSION_NAME, m) {
+     m.doc() = "FlashMLA";
+-    register_sparse_prefill(m);
+-    register_sparse_decode(m);
+-    register_dense_fwd(m);
+-    register_dense_bwd(m);
+     register_dense_decode(m);
+-    register_fused_norm_rope_attn_rope_cast_fwd(m);
++    register_sparse_decode(m);
++    register_sparse_prefill(m);
+ }
+--- a/csrc/api/dense_decode.cpp
++++ b/csrc/api/dense_decode.cpp
+@@ -1,6 +1,8 @@
+ #include <cutlass/half.h>
+ #include <cutlass/fast_math.h>
+ 
++#include <cstdlib>
++
+ #include "common.h"
+ #include "kernels/params.h"
+ 
+@@ -8,6 +10,36 @@
+ #include "kernels/smxx/decode/get_decoding_sched_meta/get_decoding_sched_meta.h"
+ #include "kernels/smxx/decode/combine/combine.h"
+ 
++// T0011.b build-time scaling patch (uniform rule; see
++// suites/flashmla/SCALING.md).  The persistent split-KV decode grid is
++// dim3(num_m_block, h_k, num_sm_parts)
++// (kernels/sm90/decode/dense/splitkv_mla.cuh), so every CTA-count floor except
++// num_sm_parts is shape-derived and the stock formula sizes num_sm_parts from
++// the full device SM count.  A unified effective-SM-count cap — env
++// FLASHMLA_EFFECTIVE_SM_COUNT, falling back to the compile-time
++// FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT (0 = disabled) — replaces arch.num_sms
++// in that one formula.  One rule for every launch, no per-case branching;
++// when the cap is unset/0/>=num_sms the behavior is identical to stock.  The
++// kernel TU is untouched, so the main-kernel SASS is bit-identical pre/post
++// patch (verified statically; compile diff = api host code only).
++#ifndef FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
++#define FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT 0
++#endif  // FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
++namespace flashmla_scaling {
++static inline int effective_sm_count(const Arch &arch) {
++    long long cap = FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT;
++    if (const char *env = std::getenv("FLASHMLA_EFFECTIVE_SM_COUNT");
++        env != nullptr && *env != '\0') {
++        cap = std::atoll(env);
++    }
++    if (cap <= 0 || cap >= static_cast<long long>(arch.num_sms)) {
++        return arch.num_sms;
++    }
++    return static_cast<int>(cap);
++}
++}  // namespace flashmla_scaling
++
++
+ static std::tuple<at::Tensor, at::Tensor, std::optional<at::Tensor>, std::optional<at::Tensor>>
+ dense_attn_decode_interface(
+     at::Tensor &q,                               // batch_size x seqlen_q x num_heads x head_size
+@@ -73,7 +105,7 @@
+     const int num_heads = num_heads_k;
+     q = q.view({batch_size, seqlen_q_ori, num_heads_k, num_q_heads_per_hk, head_size_k}).transpose(2, 3)
+         .reshape({batch_size, q_seq_per_hk, num_heads, head_size_k});
+-    int num_sm_parts = std::max(arch.num_sms / num_heads_k / cutlass::ceil_div(seqlen_q_ori*num_heads_q/num_heads_k, 64), 1);
++    int num_sm_parts = std::max(flashmla_scaling::effective_sm_count(arch) / num_heads_k / cutlass::ceil_div(seqlen_q_ori*num_heads_q/num_heads_k, 64), 1);
+ 
+     KU_CHECK_SHAPE(q, batch_size, q_seq_per_hk, num_heads, head_size_k);
+     KU_CHECK_SHAPE(kcache, num_blocks, page_block_size, num_heads_k, head_size_k);
+--- a/csrc/api/sparse_decode.cpp
++++ b/csrc/api/sparse_decode.cpp
+@@ -3,20 +3,9 @@
+ #include "kernels/params.h"
+ 
+ #include "kernels/sm90/decode/sparse/splitkv_mla.h"
+-#include "kernels/sm100/decode/sparse/head64/kernel.h"
+-#include "kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.h"
+ #include "kernels/smxx/decode/get_decoding_sched_meta/get_decoding_sched_meta.h"
+ #include "kernels/smxx/decode/combine/combine.h"
+ 
+-template<bool ENABLE_SPLIT_KV>
+-static constexpr SparseAttnFwdMode get_decode_fwd_mode() {
+-    if constexpr (ENABLE_SPLIT_KV) {
+-        return SparseAttnFwdMode::DecodeWithSplitKV;
+-    } else {
+-        return SparseAttnFwdMode::Decode;
+-    }
+-}
+-
+ // Feature set of sparse decoding kernels
+ enum class DecodeFeatures : int {
+     HEAD_64,
+@@ -36,6 +25,23 @@
+     EXTRA_TOPK_LENGTH
+ };
+ 
++#ifndef FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
++#define FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT 0
++#endif  // FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
++namespace flashmla_scaling {
++static inline int effective_sm_count(const Arch &arch) {
++    long long cap = FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT;
++    if (const char *env = std::getenv("FLASHMLA_EFFECTIVE_SM_COUNT");
++        env != nullptr && *env != '\0') {
++        cap = std::atoll(env);
++    }
++    if (cap <= 0 || cap >= static_cast<long long>(arch.num_sms)) {
++        return arch.num_sms;
++    }
++    return static_cast<int>(cap);
++}
++}  // namespace flashmla_scaling
++
+ struct DecodeImplMeta {
+     int num_sm_parts;
+     int fixed_overhead_num_blocks;
+@@ -68,7 +74,7 @@
+     DecodeImplMeta get_meta(int h_q, int s_q) override {
+         Arch arch = Arch();
+         return {
+-            std::max(arch.num_sms / s_q / (h_q/64), 1),
++            std::max(flashmla_scaling::effective_sm_count(arch) / s_q / (h_q/64), 1),
+             5,
+             64
+         };
+@@ -84,139 +90,6 @@
+     }
+ };
+ 
+-class Decode_Sm100_Head64_Impl : public DecodeImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        DecodeFeatures::HEAD_64,
+-        DecodeFeatures::HEAD_DIM_512,
+-        DecodeFeatures::HEAD_DIM_576,
+-        DecodeFeatures::V32_KVCACHE_FORMAT,
+-        DecodeFeatures::V4_KVCACHE_FORMAT,
+-        DecodeFeatures::V41_KVCACHE_FORMAT,
+-        DecodeFeatures::V41_FP4_KVCACHE_FORMAT,
+-        DecodeFeatures::ATTN_SINK,
+-        DecodeFeatures::TOPK_LENGTH,
+-        DecodeFeatures::EXTRA_KVCACHE,
+-        DecodeFeatures::EXTRA_TOPK_LENGTH
+-    )
+-    using SupportedKVFormats = KVFormatPairs<KVFormatPair<ModelType::V32>, KVFormatPair<ModelType::V4>, KVFormatPair<ModelType::V41>,
+-                                             KVFormatPair<ModelType::V41, ModelType::V41_FP4>>;
+-
+-public:
+-    DecodeImplMeta get_meta(int h_q, int s_q) override {
+-        Arch arch = Arch();
+-        return {
+-            std::max(arch.num_sms / s_q, 1),
+-            5,
+-            64
+-        };
+-    }
+-
+-protected:
+-    void run_(const SparseAttnDecodeParams &params, const std::vector<FeatureT> &required_features) override {
+-        dispatch_kv_formats(SupportedKVFormats{}, params.model_type, params.extra_model_type, [&]<ModelType MODEL_TYPE, ModelType EXTRA_MODEL_TYPE>() {
+-            DISPATCH_BOOLEAN_FLAG(params.enable_split_kv, ENABLE_SPLIT_KV, ([&]() {
+-                TORCH_CHECK(params.h_q == 64, "Unsupported h_q: ", params.h_q);
+-                using sm100::decode::sparse::head64::Config;
+-                sm100::decode::sparse::head64::run_flash_splitkv_mla_fp8_sparse_kernel<Config{MODEL_TYPE, EXTRA_MODEL_TYPE, ENABLE_SPLIT_KV}>(params);
+-            }));
+-        });
+-    }
+-};
+-
+-
+-// An implementation that calls the head64 kernel twice to process head128
+-// Necessary for running V3.2 shape (i.e. h = 128, d_qk = 576) on SM100f
+-class Decode_Sm100_Head64x2_Impl : public DecodeImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        DecodeFeatures::HEAD_128,
+-        DecodeFeatures::HEAD_DIM_512,
+-        DecodeFeatures::HEAD_DIM_576,
+-        DecodeFeatures::V32_KVCACHE_FORMAT,
+-        DecodeFeatures::V4_KVCACHE_FORMAT,
+-        DecodeFeatures::ATTN_SINK,
+-        DecodeFeatures::TOPK_LENGTH,
+-        DecodeFeatures::EXTRA_KVCACHE,
+-        DecodeFeatures::EXTRA_TOPK_LENGTH
+-    )
+-    using SupportedKVFormats = KVFormatPairs<KVFormatPair<ModelType::V32>, KVFormatPair<ModelType::V4>>;
+-
+-public:
+-    DecodeImplMeta get_meta(int h_q, int s_q) override {
+-        Arch arch = Arch();
+-        return {
+-            std::max(arch.num_sms / s_q, 1),
+-            5,
+-            64
+-        };
+-    }
+-
+-protected:
+-    void run_(const SparseAttnDecodeParams &params, const std::vector<FeatureT> &required_features) override {
+-        dispatch_kv_formats(SupportedKVFormats{}, params.model_type, params.extra_model_type, [&]<ModelType MODEL_TYPE, ModelType EXTRA_MODEL_TYPE>() {
+-            DISPATCH_BOOLEAN_FLAG(params.enable_split_kv, ENABLE_SPLIT_KV, ([&]() {
+-                for (int start_head_idx = 0; start_head_idx < 128; start_head_idx += 64) {
+-                    SparseAttnDecodeParams cur_params = params;
+-                    cur_params.q += start_head_idx * params.stride_q_h_q;
+-                    if (cur_params.attn_sink) {
+-                        cur_params.attn_sink += start_head_idx;
+-                    }
+-                    cur_params.lse += start_head_idx;
+-                    cur_params.out += start_head_idx * params.stride_o_h_q;
+-                    if (cur_params.enable_split_kv) {
+-                        cur_params.lse_accum += start_head_idx;
+-                        cur_params.o_accum += start_head_idx * params.stride_o_accum_h_q;
+-                    }
+-                    cur_params.h_q = 64;
+-                    using sm100::decode::sparse::head64::Config;
+-                    sm100::decode::sparse::head64::run_flash_splitkv_mla_fp8_sparse_kernel<Config{MODEL_TYPE, EXTRA_MODEL_TYPE, ENABLE_SPLIT_KV}>(cur_params);
+-                }
+-            }));
+-        });
+-    }
+-};
+-
+-
+-class Decode_Sm100_Head128_Impl : public DecodeImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        DecodeFeatures::HEAD_128,
+-        DecodeFeatures::HEAD_DIM_512,
+-        DecodeFeatures::V4_KVCACHE_FORMAT,
+-        DecodeFeatures::V41_KVCACHE_FORMAT,
+-        DecodeFeatures::V41_FP4_KVCACHE_FORMAT,
+-        DecodeFeatures::ATTN_SINK,
+-        DecodeFeatures::TOPK_LENGTH,
+-        DecodeFeatures::EXTRA_KVCACHE,
+-        DecodeFeatures::EXTRA_TOPK_LENGTH
+-    )
+-    using SupportedKVFormats = KVFormatPairs<KVFormatPair<ModelType::V4>, KVFormatPair<ModelType::V41>,
+-                                             KVFormatPair<ModelType::V41, ModelType::V41_FP4>>;
+-
+-public:
+-    DecodeImplMeta get_meta(int h_q, int s_q) override {
+-        Arch arch = Arch();
+-        return {
+-            std::max(arch.num_sms / s_q / 2, 1),
+-            3,
+-            64
+-        };
+-    }
+-
+-protected:
+-    void run_(const SparseAttnDecodeParams &params, const std::vector<FeatureT> &required_features) override {
+-        SparseAttnDecodeParams hotfixed_params = params;
+-        if (params.s_q == 1 && params.b > 1) {
+-            // For this kernel, we require `params.stride_q_b % params.stride_q_s_q == 0`, since we "squeeze" the batch size dimention and the sequence length q dimension together during tensormap creation
+-            hotfixed_params.stride_q_s_q = hotfixed_params.stride_q_b;
+-        }
+-        dispatch_kv_formats(SupportedKVFormats{}, params.model_type, params.extra_model_type, [&]<ModelType MODEL_TYPE, ModelType EXTRA_MODEL_TYPE>() {
+-            DISPATCH_BOOLEAN_FLAG(params.enable_split_kv, ENABLE_SPLIT_KV, ([&]() {
+-                sm100::prefill::sparse_fwd_for_small_topk::head128::run_sparse_fwd_for_small_topk_phase1_kernel<get_decode_fwd_mode<ENABLE_SPLIT_KV>(), 512, MODEL_TYPE, EXTRA_MODEL_TYPE>(hotfixed_params);
+-            }));
+-        });
+-    }
+-};
+-
+-
+ static std::tuple<at::Tensor, at::Tensor, std::optional<at::Tensor>, std::optional<at::Tensor>>
+ sparse_attn_decode_interface(
+     const at::Tensor &q,   // [b, s_q, h_q, d_qk]
+@@ -396,28 +269,9 @@
+         }
+     }
+ 
+-    DecodeImplBase* impl;
+-    if (arch.is_sm100f()) {
+-        if (h_q == 64) {
+-            impl = new Decode_Sm100_Head64_Impl();
+-        } else if (h_q == 128) {
+-            if (d_qk == 576) {
+-                impl = new Decode_Sm100_Head64x2_Impl();
+-            } else if (d_qk == 512) {
+-                impl = new Decode_Sm100_Head128_Impl();
+-            } else {
+-                TORCH_CHECK(false, "Unsupported d_qk: ", d_qk);
+-            }
+-        } else {
+-            TORCH_CHECK(false, "Unsupported h_q: ", h_q);
+-        }
+-    } else if (arch.is_sm90a()) {
+-        impl = new Decode_Sm90_Impl();
+-    } else {
+-        TORCH_CHECK(false, "Unsupported architecture for sparse decode fwd");
+-    }
+-
+-    DecodeImplMeta impl_meta = impl->get_meta(h_q, s_q);
++    TORCH_CHECK(arch.is_sm90a(), "Sparse decode is only supported on SM90a");
++    Decode_Sm90_Impl impl;
++    DecodeImplMeta impl_meta = impl.get_meta(h_q, s_q);
+ 
+     SparseAttnDecodeParams params = {
+         b, s_q, h_q, h_kv, d_qk, d_v,
+@@ -505,7 +359,7 @@
+         params.stride_o_accum_h_q = int64_stride_to_int(o_accum.stride(2));
+     }
+ 
+-    impl->run(params, features);
++    impl.run(params, features);
+     if (enable_split_kv) {
+         CombineParams combine_params = {
+             b, s_q, h_q, d_v,
+@@ -530,8 +384,6 @@
+         smxx::decode::run_flash_mla_combine_kernel<bf16>(combine_params);
+     }
+ 
+-    delete impl;
+-
+     return {out, lse.transpose(1, 2), tile_scheduler_metadata, num_splits};
+ }
+ 
+--- a/csrc/api/sparse_prefill.cpp
++++ b/csrc/api/sparse_prefill.cpp
+@@ -3,9 +3,6 @@
+ #include "kernels/params.h"
+ 
+ #include "kernels/sm90/prefill/sparse/phase1.h"
+-#include "kernels/sm100/prefill/sparse/fwd/head128/phase1.h"
+-#include "kernels/sm100/prefill/sparse/fwd/head64/phase1.h"
+-#include "kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.h"
+ 
+ enum class FwdFeatures : int {
+     HEAD_64,
+@@ -43,55 +40,6 @@
+     }
+ };
+ 
+-class Fwd_Sm100_Head64_Impl : public FwdImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        FwdFeatures::HEAD_64,
+-        FwdFeatures::HEAD_DIM_512,
+-        FwdFeatures::HEAD_DIM_576,
+-        FwdFeatures::ATTN_SINK,
+-        FwdFeatures::TOPK_LENGTH
+-    )
+-
+-protected:
+-    void run_(const SparseAttnFwdParams &params, const std::vector<FeatureT> &required_features) override {
+-        DISPATCH_HEAD_DIM(params.d_qk, HEAD_DIM_QK, [&]() {
+-            TORCH_CHECK(params.h_q == 64, "Unsupported h_q: ", params.h_q);
+-            sm100::prefill::sparse_fwd::head64::run_sparse_fwd_phase1_kernel<SparseAttnFwdMode::Prefill, HEAD_DIM_QK>(params);
+-        });
+-    }
+-};
+-
+-class Fwd_Sm100_Head128_Impl : public FwdImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        FwdFeatures::HEAD_128,
+-        FwdFeatures::HEAD_DIM_512,
+-        FwdFeatures::HEAD_DIM_576,
+-        FwdFeatures::ATTN_SINK,
+-        FwdFeatures::TOPK_LENGTH
+-    )
+-
+-protected:
+-    void run_(const SparseAttnFwdParams &params, const std::vector<FeatureT> &required_features) override {
+-        DISPATCH_HEAD_DIM(params.d_qk, HEAD_DIM_QK, [&]() {
+-            sm100::prefill::sparse_fwd::head128::run_sparse_fwd_phase1_kernel<HEAD_DIM_QK>(params);
+-        });
+-    }
+-};
+-
+-class Fwd_Sm100_Head128_Small_TopK_Impl : public FwdImplBase {
+-    DECLARE_SUPPORTED_FEATURES(
+-        FwdFeatures::HEAD_128,
+-        FwdFeatures::HEAD_DIM_512,
+-        FwdFeatures::ATTN_SINK,
+-        FwdFeatures::TOPK_LENGTH
+-    )
+-
+-protected:
+-    void run_(const SparseAttnFwdParams &params, const std::vector<FeatureT> &required_features) override {
+-        sm100::prefill::sparse_fwd_for_small_topk::head128::run_sparse_fwd_for_small_topk_phase1_kernel<SparseAttnFwdMode::Prefill, 512>(params);
+-    }
+-};
+-
+ static std::vector<at::Tensor> sparse_attn_prefill_interface(
+     const at::Tensor &q,
+     const at::Tensor &kv,
+@@ -104,9 +52,7 @@
+     using bf16 = cutlass::bfloat16_t;
+     
+     Arch arch = Arch();
+-    bool is_sm90a = arch.is_sm90a();
+-    bool is_sm100f = arch.is_sm100f();
+-    TORCH_CHECK(is_sm90a || is_sm100f, "Sparse Attention Forward Kernel is only supported on SM90a and SM100f architectures.");
++    TORCH_CHECK(arch.is_sm90a(), "Sparse Attention Forward Kernel is only supported on SM90a.");
+ 
+     KU_CHECK_NDIM(q, 3);
+     KU_CHECK_NDIM(kv, 3);
+@@ -204,34 +150,8 @@
+         required_features.push_back(FwdFeatures::TOPK_LENGTH);
+     }
+ 
+-    if (is_sm90a) {
+-        Fwd_Sm90_Impl fwd_impl;
+-        fwd_impl.run(params, required_features);
+-    } else if (is_sm100f) {
+-        if (h_q == 64) {
+-            Fwd_Sm100_Head64_Impl fwd_impl;
+-            fwd_impl.run(params, required_features);
+-        } else if (h_q == 128) {
+-            Fwd_Sm100_Head128_Small_TopK_Impl small_topk_impl;
+-            Fwd_Sm100_Head128_Impl regular_impl;
+-            bool use_small_topk_impl = false;
+-            if (
+-                (topk <= 1280 && small_topk_impl.check_if_all_features_are_supported(required_features)) ||
+-                !regular_impl.check_if_all_features_are_supported(required_features)
+-            ) {
+-                use_small_topk_impl = true;
+-            }
+-            if (use_small_topk_impl) {
+-                small_topk_impl.run(params, required_features);
+-            } else {
+-                regular_impl.run(params, required_features);
+-            }
+-        } else {
+-            TORCH_CHECK(false, "Unsupported h_q: ", h_q);
+-        }
+-    } else {
+-        TORCH_CHECK(false, "Unsupported architecture");
+-    }
++    Fwd_Sm90_Impl fwd_impl;
++    fwd_impl.run(params, required_features);
+ 
+     return {out, max_logits, lse};
+ }
+--- a/csrc/kernels/sm90/decode/dense/splitkv_mla.cuh
++++ b/csrc/kernels/sm90/decode/dense/splitkv_mla.cuh
+@@ -6,6 +6,10 @@
+ #include "config.h"
+ #include "traits.h"
+ 
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++#include "flashmla_marker.h"
++#endif
++
+ using namespace cute;
+ using cutlass::arch::NamedBarrier;
+ 
+@@ -975,6 +979,15 @@
+     const int warpgroup_idx = threadIdx.x / 128;
+     const int idx_in_warpgroup = threadIdx.x % 128;
+ 
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Delivery measurement-only outermost clock-marker entry (before any TMA prologue).
++    // One row per (cta, warp); see harness/override/flashmla_marker.h.
++    const unsigned long long flashmla_marker_row = flashmla_marker_row_index();
++    if ((threadIdx.x & 31) == 0) {
++        flashmla_marker_entry(flashmla_marker_main_ptr, flashmla_marker_row);
++    }
++#endif
++
+     // Define shared tensors
+     extern __shared__ char wksp_buf[];
+     using SharedMemoryPlan = typename T::SharedMemoryPlan;
+@@ -1018,7 +1031,18 @@
+ 
+     
+     DecodingSchedMeta sched_meta = params.tile_scheduler_metadata_ptr[partition_idx];
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    if (sched_meta.begin_req_idx >= params.b) {
++        // Empty schedule part: close the marker pair before returning so every warp
++        // records one outermost (entry, exit) pair.
++        if ((threadIdx.x & 31) == 0) {
++            flashmla_marker_exit(flashmla_marker_main_ptr, flashmla_marker_row);
++        }
++        return;
++    }
++#else
+     if (sched_meta.begin_req_idx >= params.b) return;
++#endif
+ 
+     // Copy the first Q
+     launch_q_copy<T>(tma_params, sched_meta.begin_req_idx, m_block_idx, k_head_idx, sQ, barrier_Q);
+@@ -1264,6 +1288,14 @@
+         if (batch_idx != sched_meta.end_req_idx)
+             __syncthreads();
+     }
++
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Outermost clock-marker exit: after the last batch iteration's stores/barriers,
++    // on the kernel's single return path.
++    if ((threadIdx.x & 31) == 0) {
++        flashmla_marker_exit(flashmla_marker_main_ptr, flashmla_marker_row);
++    }
++#endif
+ #else
+     if (cute::thread0()) {
+         CUTE_INVALID_CONTROL_PATH("This kernel only supports sm90");
+--- a/csrc/kernels/smxx/decode/combine/combine.cu
++++ b/csrc/kernels/smxx/decode/combine/combine.cu
+@@ -11,6 +11,10 @@
+ #include "kernels/params.h"
+ #include "kernels/utils.h"
+ 
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++#include "flashmla_marker.h"
++#endif
++
+ using namespace cute;
+ 
+ namespace smxx::decode {
+@@ -28,8 +32,22 @@
+     const int warp_idx = threadIdx.x / 32;
+     const int lane_idx = threadIdx.x % 32;
+ 
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Delivery measurement-only outermost clock-marker entry (kernel-body start; the
++    // cudaGridDependencySynchronize() PDL wait below is part of the measured body).
++    const unsigned long long flashmla_marker_row = flashmla_marker_row_index();
++    if (lane_idx == 0) {
++        flashmla_marker_entry(flashmla_marker_combine_ptr, flashmla_marker_row);
++    }
++#endif
++
+     int num_valid_heads = std::min(BLOCK_SIZE_M, params.h_q - BLOCK_SIZE_M*h_block_idx);
+     if (warp_idx >= num_valid_heads) {
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++        if (lane_idx == 0) {
++            flashmla_marker_exit(flashmla_marker_combine_ptr, flashmla_marker_row);
++        }
++#endif
+         return;
+     }
+ 
+@@ -37,6 +55,11 @@
+     const int end_split_idx = __ldg(params.num_splits_ptr + batch_idx + 1);
+     const int my_num_splits = end_split_idx - start_split_idx;
+     if (my_num_splits == 1) {
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++        if (lane_idx == 0) {
++            flashmla_marker_exit(flashmla_marker_combine_ptr, flashmla_marker_row);
++        }
++#endif
+         return;
+     }
+     
+@@ -159,6 +182,13 @@
+             *(uint64_t*)(o_ptr + lane_idx*4 + i*128) = *(uint64_t*)data_converted;
+         }
+     }
++
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Outermost clock-marker exit on the kernel's single return path.
++    if (lane_idx == 0) {
++        flashmla_marker_exit(flashmla_marker_combine_ptr, flashmla_marker_row);
++    }
++#endif
+ }
+ 
+ 
+--- a/csrc/kernels/smxx/decode/get_decoding_sched_meta/get_decoding_sched_meta.cu
++++ b/csrc/kernels/smxx/decode/get_decoding_sched_meta/get_decoding_sched_meta.cu
+@@ -6,10 +6,22 @@
+ 
+ #include "kernels/utils.h"
+ 
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++#include "flashmla_marker.h"
++#endif
++
+ namespace smxx::decode {
+ 
+ __global__ void __launch_bounds__(32, 1, 1)
+ get_mla_metadata_kernel(__grid_constant__ const GetDecodeSchedMetaParams params) {
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Delivery measurement-only outermost clock-marker entry (kernel-body start).
++    // One CTA, one warp -> row 0 of the sched-meta region.
++    const unsigned long long flashmla_marker_row = flashmla_marker_row_index();
++    if ((threadIdx.x & 31) == 0) {
++        flashmla_marker_entry(flashmla_marker_sched_ptr, flashmla_marker_row);
++    }
++#endif
+     int *seqlens_k_ptr = params.seqlens_k_ptr;
+     DecodingSchedMeta *tile_scheduler_metadata_ptr = params.tile_scheduler_metadata_ptr;
+     int *num_splits_ptr = params.num_splits_ptr;
+@@ -104,6 +116,13 @@
+     for (int i = threadIdx.x; i <= batch_size; i += 32) {
+         num_splits_ptr[i] = num_splits_shared[i];
+     }
++
++#ifdef FLASHMLA_DELIVERY_MARKER_TIMING
++    // Outermost clock-marker exit on the kernel's single return path.
++    if ((threadIdx.x & 31) == 0) {
++        flashmla_marker_exit(flashmla_marker_sched_ptr, flashmla_marker_row);
++    }
++#endif
+ }
+ 
+ void run_get_decoding_sched_meta_kernel(GetDecodeSchedMetaParams &params) {
+--- a/flash_mla/__init__.py
++++ b/flash_mla/__init__.py
+@@ -3,20 +3,11 @@
+ from flash_mla.flash_mla_interface import (
+     get_mla_metadata,
+     flash_mla_with_kvcache,
+-    flash_attn_varlen_func,
+-    flash_attn_varlen_qkvpacked_func,
+-    flash_attn_varlen_kvpacked_func,
+-    flash_mla_sparse_fwd
++    flash_mla_sparse_fwd,
+ )
+ 
+-from . import fused_norm_rope_attn_rope_cast
+-
+ __all__ = [
+     "get_mla_metadata",
+     "flash_mla_with_kvcache",
+-    "flash_attn_varlen_func",
+-    "flash_attn_varlen_qkvpacked_func",
+-    "flash_attn_varlen_kvpacked_func",
+     "flash_mla_sparse_fwd",
+-    "fused_norm_rope_attn_rope_cast"
+ ]
+--- a/flash_mla/flash_mla_interface.py
++++ b/flash_mla/flash_mla_interface.py
+@@ -66,45 +66,28 @@
+     extra_k_cache: Optional[torch.Tensor] = None,
+     extra_indices_in_kvcache: Optional[torch.Tensor] = None,
+     topk_length: Optional[torch.Tensor] = None,
+-    extra_topk_length: Optional[torch.Tensor] = None
++    extra_topk_length: Optional[torch.Tensor] = None,
+ ) -> Tuple[torch.Tensor, torch.Tensor]:
+     """
++    Dense or sparse MLA decode against a paged KV cache.
++
+     Arguments:
+         q: (batch_size, seq_len_q, num_heads_q, head_dim).
+         k_cache: (num_blocks, page_block_size, num_heads_k, head_dim).
+-                Different modes (including fp8/bf16, and sparsity) has different KV cache layouts. See comments below for details.
+-                The KV cache must be contiguously valid for sparse attention on sm100. Here "contiguously valid" means that every byte, from the very beginning of the KV cache, till the last byte in the KV cache, is valid memory address to visit (i.e. won't IMA). In other words, the KV cache could be a slice of a larger array, but cannot be a list of disjoint memory blocks.
+-        block_table: (batch_size, max_num_blocks_per_seq), torch.int32. Can be None when sparse attention is used.
+-        cache_seqlens: (batch_size), torch.int32. Can be None when sparse attention is used.
+-        head_dim_v: Head_dim of v. Must be 512
+-        sched_meta: FlashMLASchedMeta, return by get_mla_metadata. You may reuse the same sched_meta across different invocations, but only when the tensor shapes and the values of cache_seqlens, topk_length, and extra_topk_length remain the same.
+-        num_splits_placeholder: must be "None" (to be compatible with the old interface).
++        block_table: (batch_size, max_num_blocks_per_seq), torch.int32. Can be None for sparse attention.
++        cache_seqlens: (batch_size), torch.int32. Can be None for sparse attention.
++        head_dim_v: Head_dim of v. Must be 512.
++        tile_scheduler_metadata: FlashMLASchedMeta, returned by get_mla_metadata. You may reuse the same sched_meta across different invocations, but only when the tensor shapes and the values of cache_seqlens remain the same.
++        num_splits: must be "None" (to be compatible with the old interface).
+         softmax_scale: float. The scaling of QK^T before applying softmax. Default to 1 / sqrt(head_dim_k).
+-        causal: bool. Whether to apply causal attention mask. Only valid for dense attention
+-        is_fp8_kvcache: bool.
+-        indices: (batch_size, seq_len_q, topk). KV indices when sparse attention is enabled.
+-                    Pay attention that indices_in_kvcache[i][j][k] = (the index of the page block where token t resides) * block_size + (the offset of token t among the page block),
+-                    where t is the k-th token of the j-th q-sequence in the i-th batch.
+-        attn_sink: Optional[torch.Tensor], (num_heads_q, ), torch.float32. If presented, the final output will be scaled by exp(lse) / (exp(lse) + exp(attn_sink)). Have no affect on the returned softmax_lse. +inf will cause the result to become 0.
+-        extra_k_cache and extra_indices_in_kvcache: If provided, will attend to these extra tokens in addition to those in k_cache and indices_in_kvcache. Their format requirements are the same as k_cache and indices_in_kvcache respectively.
+-        topk_length/extra_topk_length: (batch_size, ), torch.int32. If provided, only the leftmost topk_length indices will be processed. Useful when the actual topk for different queries are different so that we can save some computation, compared to masking.
+-    
++        causal: bool. Whether to apply causal attention mask. The kernel forces causal=false when seq_len_q == 1.
++        is_fp8_kvcache: Enable the sparse FP8 KV-cache path.
++        indices: Optional (batch_size, seq_len_q, topk) token offsets for sparse attention.
++        attn_sink: Optional (num_heads_q,) float32 sink values.
++        topk_length: Optional (batch_size, seq_len_q) valid-prefix lengths for sparse indices.
++
+     For DeepSeek V3, DeepSeek V3.1, and DeepSeek V3.2:
+         head_dim should be 576 while head_dim_v should be 512.
+-        In FP8+sparse mode, each token's KV cache is 656 Bytes, structured as:
+-            - The shape of the tensor `k_cache` is (num_blocks, page_block_size, num_heads_k, head_dim), and num_heads_k must be 1.
+-            - First 512 bytes: The "quantized NoPE" part, containing 512 float8_e4m3 values.
+-            - Next 16 bytes: Scale factors, containing 4 float32 values. The first float32 is the scale for the first 128 float8_e4m3 values, the second for the next 128, and so on.
+-            - Last 128 bytes: The "RoPE" part, containing 64 bfloat16 values. This part is not quantized for accuracy.
+-
+-    For DeepSeek V4 and DeepSeek V4.1:
+-        head_dim should be 512 while head_dim_v should be 512.
+-        In FP8+sparse mode, the format is detected from the last dimension of `k_cache` (i.e. the bytes per token): 584 (V4), 528 (V4.1) or 288 (V4.1 with an fp4 extra cache).
+-        In all three, a page block stores `page_block_size` data rows first and `page_block_size` scale rows afterwards, so the scale factors are not interleaved into the data rows:
+-            - V4 (584 Bytes per token): the data row is 448 float8_e4m3 NoPE values followed by 64 bfloat16 RoPE values (not quantized); the scale row is 8 Bytes, of which the first 7 are float8_e8m0 scales (the 8th byte is padding), each covering 64 consecutive float8_e4m3 values of the NoPE part.
+-            - V4.1 (528 Bytes per token): the data row is 512 float8_e4m3 values (the 64 RoPE dimensions are quantized as well, so there is no bfloat16 part); the scale row is 16 Bytes of float8_e8m0 scales, each covering 32 consecutive float8_e4m3 values.
+-            - V4.1 fp4 (288 Bytes per token): only valid for `extra_k_cache`, and only when `k_cache` is in the V4.1 format; the data row is 256 Bytes containing 512 e2m1 values (2 values per byte, the even-indexed one in the low nibble), and the scale row is 32 Bytes of float8_e4m3 scales, each covering 16 consecutive e2m1 values.
+-        See tests/quant.py for quantization and dequantization details.
+ 
+     Return:
+         out: (batch_size, seq_len_q, num_heads_q, head_dim_v).
+@@ -112,20 +95,21 @@
+     """
+     sched_meta = tile_scheduler_metadata
+     indices_in_kvcache = indices
++    topk = indices_in_kvcache.shape[-1] if indices_in_kvcache is not None else None
++    extra_k_page_block_size = (
++        extra_k_cache.shape[1] if extra_k_cache is not None else None
++    )
++    extra_topk = (
++        extra_indices_in_kvcache.shape[-1]
++        if extra_indices_in_kvcache is not None else None
++    )
+     assert isinstance(sched_meta, FlashMLASchedMeta), "tile_scheduler_metadata must be of type FlashMLASchedMeta"
+     assert num_splits is None, "num_splits must be None"
+ 
+-    topk = indices_in_kvcache.shape[-1] if indices_in_kvcache is not None else None
+-    extra_k_page_block_size = extra_k_cache.shape[1] if extra_k_cache is not None else None
+-    extra_topk = extra_indices_in_kvcache.shape[-1] if extra_indices_in_kvcache is not None else None
+     if softmax_scale is None:
+         softmax_scale = q.shape[-1] ** (-0.5)
+ 
+     if not sched_meta.have_initialized:
+-        # Sanity check. We only perform sanity check during the first invocation to save CPU time.
+-        if indices_in_kvcache is not None:
+-            assert not causal, "causal must be False when indices_in_kvcache is not None (i.e. sparse attention is enabled)"
+-            
+         # Initialize the tile scheduler metadata during the first invocation.
+         sched_meta.have_initialized = True
+         sched_meta.config = FlashMLASchedMeta.Config(
+@@ -153,23 +137,27 @@
+         assert sched_meta.config.h_k == k_cache.shape[2], "sched_meta.config.h_k must be equal to num_heads_k." + helper_msg
+         assert sched_meta.config.causal == causal, "sched_meta.config.causal must be equal to causal." + helper_msg
+         assert sched_meta.config.is_fp8_kvcache == is_fp8_kvcache, "sched_meta.config.is_fp8_kvcache must be equal to is_fp8_kvcache." + helper_msg
+-        assert sched_meta.config.topk == topk, "sched_meta.config.topk must be equal to the last dim of indices_in_kvcache." + helper_msg
++        assert sched_meta.config.topk == topk, "sched_meta.config.topk must be equal to the last dim of indices." + helper_msg
+         assert sched_meta.config.extra_page_block_size == extra_k_page_block_size, "sched_meta.config.extra_page_block_size must be equal to the page_block_size of extra_k_cache." + helper_msg
+         assert sched_meta.config.extra_topk == extra_topk, "sched_meta.config.extra_topk must be equal to the last dim of extra_indices_in_kvcache." + helper_msg
+ 
+     if topk is not None:
+-        # Sparse attention
+         assert not causal, "causal must be False when sparse attention is enabled"
+         assert is_fp8_kvcache, "is_fp8_kvcache must be True when sparse attention is enabled"
+-        out, lse, new_tile_scheduler_metadata, new_num_splits = flash_mla_cuda.sparse_decode_fwd(
+-            q, k_cache, indices_in_kvcache, topk_length, attn_sink,
+-            sched_meta.tile_scheduler_metadata, sched_meta.num_splits,
+-            extra_k_cache, extra_indices_in_kvcache, extra_topk_length,
+-            head_dim_v, softmax_scale
++        out, lse, new_tile_scheduler_metadata, new_num_splits = (
++            flash_mla_cuda.sparse_decode_fwd(
++                q, k_cache, indices_in_kvcache, topk_length, attn_sink,
++                sched_meta.tile_scheduler_metadata, sched_meta.num_splits,
++                extra_k_cache, extra_indices_in_kvcache, extra_topk_length,
++                head_dim_v, softmax_scale,
++            )
+         )
+     else:
+-        # Dense attention
+-        assert indices_in_kvcache is None and attn_sink is None and extra_k_cache is None and extra_indices_in_kvcache is None and topk_length is None and extra_topk_length is None, "indices_in_kvcache, attn_sink, extra_k_cache, extra_indices_in_kvcache, topk_length and extra_topk_length must be None when dense attention is used."
++        assert (
++            attn_sink is None and extra_k_cache is None
++            and extra_indices_in_kvcache is None and topk_length is None
++            and extra_topk_length is None
++        ), "sparse-only arguments must be None when dense attention is used"
+         assert block_table is not None and cache_seqlens is not None, "block_table and cache_seqlens must be provided when dense attention is used."
+         out, lse, new_tile_scheduler_metadata, new_num_splits = flash_mla_cuda.dense_decode_fwd(
+             q, k_cache, head_dim_v,
+@@ -191,254 +179,7 @@
+     attn_sink: Optional[torch.Tensor] = None,
+     topk_length: Optional[torch.Tensor] = None,
+ ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+-    """
+-    Sparse attention prefill kernel
+-
+-    Args:
+-        q: [s_q, h_q, d_qk], bfloat16
+-        kv: [s_kv, h_kv, d_qk], bfloat16
+-        indices: [s_q, h_kv, topk], int32. Invalid indices should be set to -1 or numbers >= s_kv
+-        sm_scale: float
+-        d_v: The dimension of value vectors. Can only be 512
+-        attn_sink: optional, [h_q], float32.
+-            If attn_sink is provided, when computing output, output will be additionally multiplied by exp(lse) / (exp(lse) + exp(attn_sink)).
+-            +-inf in attn_sink will be handled normally (i.e., -inf has no effect, +inf will make corresponding output all zeros).
+-            This argument has no effect on lse and max_logits.
+-        topk_length: optional, [s_q], int32. If provided, the i-th q token will only attend to k tokens specified by indices[i, :, :topk_length[i]], ignoring later k/v tokens (even if provided in indices).
+-            In extremely rare cases (topk_length provided, there is a valid topk index between topk_length[i] ~ s_kv, and that topk index points to a k token containing NaN), operator output will contain NaN, so please avoid this situation.
+-
+-    Returns:
+-        (output, max_logits, lse)
+-        Please refer to tests/ref.py for the precise definitions of these parameters.
+-        - output: [s_q, h_q, d_v], bfloat16
+-        - max_logits:  [s_q, h_q], float
+-        - lse: [s_q, h_q], float, log-sum-exp of attention scores
+-    """
+-    results = flash_mla_cuda.sparse_prefill_fwd(
++    """Run SM90 sparse attention prefill."""
++    return flash_mla_cuda.sparse_prefill_fwd(
+         q, kv, indices, sm_scale, d_v, attn_sink, topk_length
+     )
+-    return results
+-
+-
+-def _flash_attn_varlen_forward(
+-    q: torch.Tensor,
+-    k: torch.Tensor,
+-    v: torch.Tensor,
+-    cu_seqlens_qo: torch.Tensor,
+-    cu_seqlens_kv: torch.Tensor,
+-    max_seqlen_qo: int,
+-    max_seqlen_kv: int,
+-    out: Optional[torch.Tensor] = None,
+-    lse: Optional[torch.Tensor] = None,
+-    causal: bool = False,
+-    softmax_scale: Optional[float] = None,
+-    is_varlen: bool = True,
+-) -> Tuple[torch.Tensor, torch.Tensor]:
+-    qo_total_len, num_qo_heads, head_dim_qk = q.shape
+-    kv_total_len, num_kv_heads, head_dim_vo = v.shape
+-
+-    mask_mode_code = 1 if causal else 0
+-    if softmax_scale is None:
+-        softmax_scale = head_dim_qk ** (-0.5)
+-
+-    if out is None:
+-        out = torch.empty(qo_total_len, num_qo_heads, head_dim_vo, device=q.device, dtype=q.dtype)
+-    if lse is None:
+-        # Make lse contiguous on seqlen dim
+-        lse = torch.empty(num_qo_heads, qo_total_len, device=q.device, dtype=torch.float32).T
+-
+-    workspace_buffer = torch.empty(32 * 1024 * 1024, dtype=torch.uint8, device=q.device)
+-    flash_mla_cuda.dense_prefill_fwd(
+-        workspace_buffer,
+-        q,
+-        k,
+-        v,
+-        cu_seqlens_qo,
+-        cu_seqlens_kv,
+-        out,
+-        lse,
+-        mask_mode_code,
+-        softmax_scale,
+-        max_seqlen_qo,
+-        max_seqlen_kv,
+-        is_varlen,
+-    )
+-
+-    return out, lse
+-
+-
+-def _flash_attn_varlen_backward(
+-    do: torch.Tensor,
+-    q: torch.Tensor,
+-    k: torch.Tensor,
+-    v: torch.Tensor,
+-    out: torch.Tensor,
+-    lse: torch.Tensor,
+-    cu_seqlens_qo: torch.Tensor,
+-    cu_seqlens_kv: torch.Tensor,
+-    max_seqlen_qo: int,
+-    max_seqlen_kv: int,
+-    dq: Optional[torch.Tensor] = None,
+-    dk: Optional[torch.Tensor] = None,
+-    dv: Optional[torch.Tensor] = None,
+-    causal: bool = False,
+-    softmax_scale: Optional[float] = None,
+-    is_varlen: bool = True,
+-) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+-    qo_total_len, num_qo_heads, head_dim_qk = q.shape
+-    kv_total_len, num_kv_heads, head_dim_vo = v.shape
+-
+-    # TODO: fix bwd GQA
+-    if num_qo_heads != num_kv_heads:
+-        raise ValueError(f"SM100 bwd doesn't support GQA now. num_qo_heads: {num_qo_heads}, num_kv_heads: {num_kv_heads}.")
+-
+-    mask_mode_code = 1 if causal else 0
+-    if softmax_scale is None:
+-        softmax_scale = head_dim_qk ** (-0.5)
+-
+-    if dq is None:
+-        dq = torch.empty(qo_total_len, num_qo_heads, head_dim_qk, device=q.device, dtype=q.dtype)
+-    if dk is None:
+-        dk = torch.empty(kv_total_len, num_kv_heads, head_dim_qk, device=q.device, dtype=q.dtype)
+-    if dv is None:
+-        dv = torch.empty(kv_total_len, num_kv_heads, head_dim_vo, device=q.device, dtype=q.dtype)
+-
+-    max_seqlen_qo_aligned = (max_seqlen_qo + 7) // 8 * 8
+-    bs = cu_seqlens_qo.shape[0] - 1
+-    workspace_bytes = 0
+-    workspace_bytes += 4 * bs * max_seqlen_qo_aligned * num_qo_heads * head_dim_qk  # dQ_acc
+-    workspace_bytes += 4 * max_seqlen_qo_aligned * bs * num_qo_heads * 2  # sum_OdO and scaled_lse
+-    if num_qo_heads != num_kv_heads:
+-        workspace_bytes += 2 * kv_total_len * num_qo_heads * (head_dim_qk + head_dim_vo)  # dKV_acc
+-    workspace_buffer = torch.empty(workspace_bytes, dtype=torch.uint8, device=q.device)
+-    flash_mla_cuda.dense_prefill_bwd(
+-        workspace_buffer,
+-        do,
+-        q,
+-        k,
+-        v,
+-        out,
+-        lse,
+-        cu_seqlens_qo,
+-        cu_seqlens_kv,
+-        dq,
+-        dk,
+-        dv,
+-        mask_mode_code,
+-        softmax_scale,
+-        max_seqlen_qo,
+-        max_seqlen_kv,
+-        is_varlen,
+-    )
+-
+-    return dq, dk, dv
+-
+-
+-class FlashAttnVarlenFunc(torch.autograd.Function):
+-    def forward(
+-        ctx,
+-        q: torch.Tensor,
+-        k: torch.Tensor,
+-        v: torch.Tensor,
+-        cu_seqlens_qo: torch.Tensor,
+-        cu_seqlens_kv: torch.Tensor,
+-        max_seqlen_qo: int,
+-        max_seqlen_kv: int,
+-        causal: bool = False,
+-        softmax_scale: Optional[float] = None,
+-        is_varlen: bool = True,
+-    ) -> Tuple[torch.Tensor, torch.Tensor]:
+-        out, lse = _flash_attn_varlen_forward(
+-            q, k, v,
+-            cu_seqlens_qo, cu_seqlens_kv, max_seqlen_qo, max_seqlen_kv,
+-            causal=causal, softmax_scale=softmax_scale,
+-            is_varlen=is_varlen,
+-        )
+-        ctx.save_for_backward(q, k, v, out, lse, cu_seqlens_qo, cu_seqlens_kv)
+-        ctx.max_seqlen_qo = max_seqlen_qo
+-        ctx.max_seqlen_kv = max_seqlen_kv
+-        ctx.causal = causal
+-        ctx.softmax_scale = softmax_scale
+-        ctx.is_varlen = is_varlen
+-        return out, lse
+-
+-    def backward(
+-        ctx,
+-        do: torch.Tensor,
+-        dlse: torch.Tensor,
+-    ):
+-        del dlse  # LSE doesn't support backward currently
+-        q, k, v, out, lse, cu_seqlens_qo, cu_seqlens_kv = ctx.saved_tensors
+-        dq, dk, dv = _flash_attn_varlen_backward(
+-            do, q, k, v, out, lse,
+-            cu_seqlens_qo, cu_seqlens_kv, ctx.max_seqlen_qo, ctx.max_seqlen_kv,
+-            causal=ctx.causal, softmax_scale=ctx.softmax_scale,
+-            is_varlen=ctx.is_varlen,
+-        )
+-        return dq, dk, dv, None, None, None, None, None, None, None
+-
+-
+-def flash_attn_varlen_func(
+-    q: torch.Tensor,
+-    k: torch.Tensor,
+-    v: torch.Tensor,
+-    cu_seqlens_qo: torch.Tensor,
+-    cu_seqlens_kv: torch.Tensor,
+-    max_seqlen_qo: int,
+-    max_seqlen_kv: int,
+-    dropout_p: float = 0.0,
+-    softmax_scale: Optional[float] = None,
+-    causal: bool = False,
+-    deterministic: bool = False,
+-    is_varlen: bool = True,
+-) -> Tuple[torch.Tensor, torch.Tensor]:
+-    assert dropout_p == 0.0
+-    assert not deterministic
+-    return FlashAttnVarlenFunc.apply(
+-        q, k, v,
+-        cu_seqlens_qo, cu_seqlens_kv, max_seqlen_qo, max_seqlen_kv,
+-        causal, softmax_scale, is_varlen,
+-    )
+-
+-
+-def flash_attn_varlen_qkvpacked_func(
+-    qkv: torch.Tensor,
+-    cu_seqlens: torch.Tensor,
+-    max_seqlen: int,
+-    head_dim_qk: int,
+-    dropout_p: float = 0.0,
+-    softmax_scale: Optional[float] = None,
+-    causal: bool = False,
+-    deterministic: bool = False,
+-    is_varlen: bool = True,
+-) -> Tuple[torch.Tensor, torch.Tensor]:
+-    assert dropout_p == 0.0
+-    assert not deterministic
+-    return FlashAttnVarlenFunc.apply(
+-        qkv[:, :, :head_dim_qk], qkv[:, :, head_dim_qk:head_dim_qk * 2], qkv[:, :, head_dim_qk * 2:],
+-        cu_seqlens, cu_seqlens, max_seqlen, max_seqlen,
+-        causal, softmax_scale, is_varlen,
+-    )
+-
+-
+-def flash_attn_varlen_kvpacked_func(
+-    q: torch.Tensor,
+-    kv: torch.Tensor,
+-    cu_seqlens_qo: torch.Tensor,
+-    cu_seqlens_kv: torch.Tensor,
+-    max_seqlen_qo: int,
+-    max_seqlen_kv: int,
+-    head_dim_qk: int,
+-    dropout_p: float = 0.0,
+-    softmax_scale: Optional[float] = None,
+-    causal: bool = False,
+-    deterministic: bool = False,
+-    is_varlen: bool = True,
+-) -> Tuple[torch.Tensor, torch.Tensor]:
+-    assert dropout_p == 0.0
+-    assert not deterministic
+-    return FlashAttnVarlenFunc.apply(
+-        q, kv[:, :, :head_dim_qk], kv[:, :, head_dim_qk:],
+-        cu_seqlens_qo, cu_seqlens_kv, max_seqlen_qo, max_seqlen_kv,
+-        causal, softmax_scale, is_varlen,
+-    )

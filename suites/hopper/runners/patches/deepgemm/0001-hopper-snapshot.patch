@@ -1,0 +1,199 @@
+--- a/csrc/jit/handle.hpp
++++ b/csrc/jit/handle.hpp
+@@ -4,6 +4,7 @@
+ #include <cuda_runtime.h>
+ #include <dlfcn.h>
+ #include <filesystem>
++#include <cstdlib>
+ 
+ #include "../utils/exception.hpp"
+ #include "../utils/compatibility.hpp"
+@@ -29,6 +30,14 @@
+     if (func == nullptr) { \
+         func = reinterpret_cast<FuncType>(dlsym(get_driver_handle(), #name)); \
+         DG_HOST_ASSERT(func != nullptr and "Failed to load CUDA driver API"); \
++        using Wrap = unsigned int (*)(const char*, void**); \
++        const auto wrap = reinterpret_cast<Wrap>(dlsym(RTLD_DEFAULT, "fi_wrap_driver_symbol")); \
++        DG_HOST_ASSERT(getenv("DEEPGEMM_ACTUAL_BINDING_REQUIRED") == nullptr or wrap != nullptr); \
++        if (wrap != nullptr) { \
++            void* pfn = reinterpret_cast<void*>(func); \
++            wrap(#name, &pfn); \
++            func = reinterpret_cast<FuncType>(pfn); \
++        } \
+     } \
+     return func(std::forward<decltype(args)>(args)...); \
+ }
+@@ -59,6 +68,8 @@
+                                 LibraryHandle *library_opt = nullptr) {
+     LibraryHandle library;
+     KernelHandle kernel{};
++    DG_HOST_ASSERT(getenv("DEEPGEMM_ACTUAL_BINDING_REQUIRED") == nullptr and
++                   "runtime cudaKernel_t cannot be attested as a driver CUfunction");
+     DG_CUDA_RUNTIME_CHECK(cudaLibraryLoadFromFile(&library, cubin_path.c_str(), nullptr, nullptr, 0, nullptr, nullptr, 0));
+     DG_CUDA_RUNTIME_CHECK(cudaLibraryGetKernel(&kernel, library, func_name.c_str()));
+ 
+@@ -125,6 +136,7 @@
+     #define DG_JIT_USE_LIBRARY_ENUM_KERNELS
+     DECL_LAZY_CUDA_DRIVER_FUNCTION(cuLibraryGetKernelCount);
+     DECL_LAZY_CUDA_DRIVER_FUNCTION(cuLibraryEnumerateKernels);
++    DECL_LAZY_CUDA_DRIVER_FUNCTION(cuLibraryGetModule);
+     using LibraryHandle = CUlibrary;
+ #else
+     using LibraryHandle = CUmodule;
+@@ -156,6 +168,21 @@
+     DG_CUDA_DRIVER_CHECK(lazy_cuModuleLoad(&library, cubin_path.c_str()));
+     DG_CUDA_DRIVER_CHECK(lazy_cuModuleGetFunction(&kernel, library, func_name.c_str()));
+ #endif
++    using ObserveBind = int (*)(const char*, void*, void*, void*, const char*);
++    static const auto observe_bind = reinterpret_cast<ObserveBind>(dlsym(RTLD_DEFAULT, "fi_deepgemm_bind"));
++    DG_HOST_ASSERT(getenv("DEEPGEMM_ACTUAL_BINDING_REQUIRED") == nullptr or observe_bind != nullptr);
++    if (observe_bind != nullptr) {
++#ifdef DG_JIT_USE_LIBRARY_ENUM_KERNELS
++        CUmodule module{};
++        DG_CUDA_DRIVER_CHECK(lazy_cuLibraryGetModule(&module, library));
++        const char* api = "cuLibraryLoadFromFile/EnumerateKernels/KernelGetFunction";
++#else
++        const auto module = library;
++        const char* api = "cuModuleLoad/ModuleGetFunction";
++#endif
++        DG_HOST_ASSERT(observe_bind(cubin_path.c_str(), reinterpret_cast<void*>(library),
++                                   reinterpret_cast<void*>(module), reinterpret_cast<void*>(kernel), api) == 0);
++    }
+ 
+     if (library_opt != nullptr)
+         *library_opt = library;
+@@ -169,6 +196,10 @@
+     const auto error = lazy_cuModuleUnload(library);
+ #endif
+     DG_HOST_ASSERT(error == CUDA_SUCCESS or error == CUDA_ERROR_DEINITIALIZED);
++    using ObserveUnload = void (*)(void*, int);
++    static const auto observe_unload = reinterpret_cast<ObserveUnload>(dlsym(RTLD_DEFAULT, "fi_deepgemm_unload"));
++    if (observe_unload != nullptr)
++        observe_unload(reinterpret_cast<void*>(library), static_cast<int>(error));
+ }
+ 
+ static LaunchConfigHandle construct_launch_config(const KernelHandle& kernel,
+--- a/csrc/jit_kernels/heuristics/config.hpp
++++ b/csrc/jit_kernels/heuristics/config.hpp
+@@ -5,6 +5,7 @@
+ #include <deep_gemm/common/types.cuh>
+ 
+ #include "../../utils/math.hpp"
++#include "../../utils/system.hpp"
+ 
+ namespace deep_gemm {
+ 
+@@ -44,7 +45,12 @@
+             DG_HOST_ASSERT(b_dtype == torch::kFloat8_e4m3fn or b_dtype == kPackedFP4);
+         }
+         DG_HOST_ASSERT(cd_dtype == torch::kBFloat16 or cd_dtype == torch::kFloat);
+-        DG_HOST_ASSERT(num_sms % 2 == 0);
++        // Delivery harness only: allow an odd SM budget (e.g. a single
++        // cluster) when DG_DELIVERY_ALLOW_ODD_SMS=1.  Vendor default
++        // unchanged (env unset -> strict even-SM requirement).
++        if (get_env<int>("DG_DELIVERY_ALLOW_ODD_SMS") != 1) {
++            DG_HOST_ASSERT(num_sms % 2 == 0);
++        }
+     }
+ 
+     friend std::ostream& operator << (std::ostream& os, const GemmDesc& desc) {
+--- a/csrc/jit_kernels/heuristics/sm90.hpp
++++ b/csrc/jit_kernels/heuristics/sm90.hpp
+@@ -10,6 +10,38 @@
+ 
+ namespace deep_gemm {
+ 
++// Delivery measurement override for the cluster-SM rescue suite. When
++// DG_DELIVERY_FORCE_MULTICAST=1 is set in the environment, the SM90 heuristic
++// is allowed to select 2CTA cluster (TMA multicast) launches even where the
++// vendor cost model would reject them (e.g. the single-wave heuristic below).
++// Every legality check (cluster divisibility, masked-tile divisibility, block
++// sizes, swizzling, stage counts) stays active. The default build never sets
++// this env and behaves byte-identically to the vendor heuristic.
++static bool delivery_force_multicast() {
++    static const bool enabled = get_env<int>("DG_DELIVERY_FORCE_MULTICAST") == 1;
++    return enabled;
++}
++
++// DG_DELIVERY_FORCE_LAYOUT=block_m,block_n,block_k,cluster_m,cluster_n pins
++// the SM90 heuristic to exactly that layout: candidates keep every legality
++// filter below, and a pinned layout that fails them is a hard error, never
++// a silent fallback.  Env unset keeps the vendor heuristic unchanged.
++static bool delivery_force_layout(Layout& out) {
++    static std::vector<int> fields = [] {
++        std::vector<int> out;
++        const auto spec = get_env<std::string>("DG_DELIVERY_FORCE_LAYOUT");
++        std::stringstream ss(spec);
++        std::string item;
++        while (std::getline(ss, item, ','))
++            out.push_back(std::stoi(item));
++        return out;
++    }();
++    if (fields.size() != 5)
++        return false;
++    out = Layout{0, fields[0], fields[1], fields[2], fields[3], fields[4]};
++    return true;
++}
++
+ struct SM90ArchSpec {
+     static constexpr int smem_capacity = 232448;
+ 
+@@ -114,6 +146,44 @@
+         }
+ 
+         DG_HOST_ASSERT(not candidates.empty());
++
++        // Delivery measurement override: restrict to legal 2CTA cluster
++        // candidates so the cost model below still freely chooses
++        // block/swizzle/stages, but only inside the cluster family. All
++        // legality filters above have already been applied to every element
++        // of `candidates`; never silently fall back to a non-cluster launch.
++        if (delivery_force_multicast()) {
++            std::vector<Layout> cluster_candidates;
++            for (const auto& candidate: candidates)
++                if (candidate.cluster_m * candidate.cluster_n == 2)
++                    cluster_candidates.push_back(candidate);
++            if (cluster_candidates.empty()) {
++                std::ostringstream reason;
++                reason << "DG_DELIVERY_FORCE_MULTICAST=1 but no legal 2CTA cluster candidate for desc: " << desc;
++                DG_HOST_UNREACHABLE(reason.str());
++            }
++            return cluster_candidates;
++        }
++
++        Layout forced;
++        if (delivery_force_layout(forced)) {
++            std::vector<Layout> pinned;
++            for (const auto& candidate: candidates)
++                if (candidate.block_m == forced.block_m
++                    and candidate.block_n == forced.block_n
++                    and candidate.block_k == forced.block_k
++                    and candidate.cluster_m == forced.cluster_m
++                    and candidate.cluster_n == forced.cluster_n)
++                    pinned.push_back(candidate);
++            if (pinned.empty()) {
++                std::ostringstream reason;
++                reason << "DG_DELIVERY_FORCE_LAYOUT=" << forced
++                       << " is not a legal candidate for desc: " << desc;
++                DG_HOST_UNREACHABLE(reason.str());
++            }
++            return pinned;
++        }
++
+         return candidates;
+     }
+ 
+@@ -230,8 +300,11 @@
+         float wave_efficiency = static_cast<float>(num_blocks) / (num_waves * desc.num_sms);
+         int64_t num_cycles = std::max(num_l1_cycles, num_l2_cycles) / wave_efficiency;
+ 
+-        // Disable multicasting if only one wave exists
+-        if (layout.cluster_n * layout.cluster_m > 1 and num_waves <= 1)
++        // Disable multicasting if only one wave exists. Delivery measurement
++        // mode (DG_DELIVERY_FORCE_MULTICAST=1) skips this performance
++        // heuristic so a single-wave cluster launch can still be selected and
++        // measured; the choice itself is gated in get_layout_candidates.
++        if (not delivery_force_multicast() and layout.cluster_n * layout.cluster_m > 1 and num_waves <= 1)
+             num_cycles = std::numeric_limits<int64_t>::max();
+ 
+         return {num_waves, last_wave_util, num_cycles, layout};

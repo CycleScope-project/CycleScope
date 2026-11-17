@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-RMSNORM-R02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 29097984,
+ "completed": 29097984,
+ "cycles": 143439,
+ "hard": 0,
+ "walls": {
+  "convert": 38.2,
+  "segments": 0.5,
+  "build": 7.7,
+  "sim": 117.0,
+  "total": 163.4
+ },
+ "rss_kb": {
+  "convert": 494884,
+  "segments": 494884,
+  "build": 494884,
+  "sim": 6278056
+ },
+ "hw_cycles": 150575.0,
+ "reference_cache_control": "all",
+ "placement_digest": "c1f8dde8bae6da51",
+ "shards": 16
+}

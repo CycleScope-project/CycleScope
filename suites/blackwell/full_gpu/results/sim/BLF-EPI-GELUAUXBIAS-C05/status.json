@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-EPI-GELUAUXBIAS-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 495381,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3104198,
+ "completed": 3104198,
+ "cycles": 58403,
+ "hard": 0,
+ "walls": {
+  "convert": 7.2,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 12.3,
+  "total": 20.2
+ },
+ "rss_kb": {
+  "convert": 418264,
+  "segments": 418264,
+  "build": 418264,
+  "sim": 1032268
+ },
+ "hw_cycles": 59969.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

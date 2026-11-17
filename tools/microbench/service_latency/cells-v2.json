@@ -1,0 +1,1929 @@
+{
+ "protocol": "tools/microbench/service_latency/protocol-v2.json",
+ "cells": {
+  "hopper": {
+   "ACQBULK": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ARRIVES": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ATOM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "ATOMG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "ATOMS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "BAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "BMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.BMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "BMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.BMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "BMSK": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.BMSK",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "BRA": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BREAK": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BREV": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.BREV",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "BRX": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BRXU": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BSSY": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BSYNC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "CALL": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "CCTL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "CCTL.IVALL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "CGAERRBAR": {
+    "kind": "unrealised",
+    "cell": "errbar_single",
+    "derivation": "experimental from addendum: barrier_release cluster release-relaxed diff minus svc MEMBAR.ALL.GPU result"
+   },
+   "CREDUX": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.credux",
+    "derivation": "single-shot"
+   },
+   "CS2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.CLOCK": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.GLOBALTIMER": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.ZERO": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "DADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DEPBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "DEPBAR.FIFO": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "DFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DMUL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DMUL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DSETP": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.DSETP",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "ELECT": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.elect",
+    "derivation": "single-shot"
+   },
+   "ENDCOLLECTIVE": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ERRBAR": {
+    "kind": "unrealised",
+    "cell": "errbar_single",
+    "derivation": "experimental from addendum: barrier_release cluster release-relaxed diff minus svc MEMBAR.ALL.GPU result"
+   },
+   "EXIT": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "F2F": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.F2F",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "F2FP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.F2FP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "F2I": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.F2I",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FADD2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FADD2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FCHK": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FCHK",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FENCE": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FENCE.VIEW.ASYNC.G": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence.view.async.g",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FENCE.VIEW.ASYNC.S": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence.view.async.s",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FFMA2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FFMA2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FHADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FHADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FHFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FHFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FLO": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FLO",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMNMX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMNMX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMNMX3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMNMX3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMUL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMUL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMUL2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMUL2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FRND": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FRND",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FSEL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FSEL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FSETP": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.FSETP",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "HADD2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HADD2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HADD2.F32": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.HADD2.F32",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "HFMA2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HFMA2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "HMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.HMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)"
+   },
+   "HMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.HMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "HMNMX2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HMNMX2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HMUL2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HMUL2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HSETP2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HSETP2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "I2F": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.I2F",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "I2FP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.I2FP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IABS": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IABS",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IADD3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IADD3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IDP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IDP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "IMAD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IMAD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IMAD.HI": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.IMAD.HI",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "IMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.IMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)"
+   },
+   "IMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.IMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "ISETP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.ISETP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "LD": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDC": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "LDCU": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "LDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDGDEPBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "LDGSTS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDSM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDTM": {
+    "kind": "unsupported_on_device"
+   },
+   "LEA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.LEA",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "LEPC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "LOP3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.LOP3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "MATCH": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.match",
+    "derivation": "single-shot"
+   },
+   "MBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "MEMBAR": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.CTA": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.cta",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.GPU": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.gpu",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.SYS": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.sys",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.CTA": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.cta",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.GPU": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.gpu",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.SYS": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.sys",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MOV": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.MOV",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "MUFU": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.MUFU",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "MUFU.EX2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.MUFU.EX2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "NANOSLEEP": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "NOP": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "P2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.p2r",
+    "derivation": "single-shot"
+   },
+   "PLOP3": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.PLOP3",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "POPC": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.POPC",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "PREEXIT": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "PRMT": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.PRMT",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "QGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "R2P": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.r2p",
+    "derivation": "single-shot"
+   },
+   "R2UR": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.r2ur",
+    "derivation": "single-shot"
+   },
+   "RED": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDUX": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.redux",
+    "derivation": "single-shot"
+   },
+   "RET": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "RPCMOV": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "S2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "S2UR": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2ur",
+    "derivation": "single-shot"
+   },
+   "SEL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SEL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SGXT": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SGXT",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHF": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHF",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.BFLY": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.BFLY",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.DOWN": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.DOWN",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.IDX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.IDX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.UP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.UP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "ST": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STAS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STSM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STTM": {
+    "kind": "unsupported_on_device"
+   },
+   "SYNCS": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UBLKCP": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UBLKRED": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UCGABAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UCGABAR_ARV": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UCGABAR_WAIT": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UFLO": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.UFLO",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "UGETNEXTWORKID": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UIADD3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UIADD3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UIMAD": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UIMAD",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UISETP": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UISETP",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "ULDC": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "ULEA": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.ULEA",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "ULOP3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.ULOP3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UMOV": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UMOV",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UP2UR": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UP2UR",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPLOP3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPLOP3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPOPC": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPOPC",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPRMT": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPRMT",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USEL": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USEL",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USETMAXREG": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "USETSHMSZ": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USETSHMSZ",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USETSHMSZ.FLUSH": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USETSHMSZ.FLUSH",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USGXT": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USGXT",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USHF": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USHF",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UTCATOMSWS": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCCP": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCHMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTCOMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTCQMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTMACCTL": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTMACMDFLUSH": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTMALDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMAPF": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMAREDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMASTG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UVIRTCOUNT": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.uvirtcount",
+    "derivation": "single-shot"
+   },
+   "VHMNMX": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VHMNMX",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIADD": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VIADD",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIADDMNMX": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VIADDMNMX",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIMNMX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.VIMNMX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "VIMNMX3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.VIMNMX3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "VOTE": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.vote",
+    "derivation": "single-shot"
+   },
+   "VOTEU": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.voteu",
+    "derivation": "single-shot"
+   },
+   "WARPGROUP": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "WARPSYNC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "WGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "YIELD": {
+    "kind": "bucket",
+    "bucket": "control"
+   }
+  },
+  "blackwell": {
+   "ACQBULK": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ARRIVES": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ATOM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "ATOMG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "ATOMS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "BAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "BMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.BMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "BMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.BMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "BMSK": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.BMSK",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "BRA": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BREAK": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BREV": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.BREV",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "BRX": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BRXU": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BSSY": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "BSYNC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "CALL": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "CCTL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "CCTL.IVALL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "CGAERRBAR": {
+    "kind": "unrealised",
+    "cell": "errbar_single",
+    "derivation": "experimental from addendum: barrier_release cluster release-relaxed diff minus svc MEMBAR.ALL.GPU result"
+   },
+   "CREDUX": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.credux",
+    "derivation": "single-shot"
+   },
+   "CS2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.CLOCK": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.GLOBALTIMER": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "CS2R.ZERO": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "DADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DEPBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "DEPBAR.FIFO": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "DFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DMUL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.DMUL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "DSETP": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.DSETP",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "ELECT": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.elect",
+    "derivation": "single-shot"
+   },
+   "ENDCOLLECTIVE": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "ERRBAR": {
+    "kind": "unrealised",
+    "cell": "errbar_single",
+    "derivation": "experimental from addendum: barrier_release cluster release-relaxed diff minus svc MEMBAR.ALL.GPU result"
+   },
+   "EXIT": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "F2F": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.F2F",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "F2FP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.F2FP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "F2I": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.F2I",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FADD2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FADD2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FCHK": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FCHK",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FENCE": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FENCE.VIEW.ASYNC.G": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence.view.async.g",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FENCE.VIEW.ASYNC.S": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.fence.view.async.s",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "FFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FFMA2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FFMA2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FHADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FHADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FHFMA": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FHFMA",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FLO": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FLO",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMNMX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMNMX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMNMX3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMNMX3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMUL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMUL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FMUL2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FMUL2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FRND": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FRND",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FSEL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.FSEL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "FSETP": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.FSETP",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "HADD2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HADD2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HADD2.F32": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.HADD2.F32",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "HFMA2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HFMA2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "HMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.HMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)"
+   },
+   "HMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.HMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "HMNMX2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HMNMX2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HMUL2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HMUL2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "HSETP2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.HSETP2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "I2F": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.I2F",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "I2FP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.I2FP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IABS": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IABS",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IADD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IADD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IADD3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IADD3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IDP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IDP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "IMAD": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.IMAD",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "IMAD.HI": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.IMAD.HI",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "IMMA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.IMMA",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)"
+   },
+   "IMMA.SPARSE": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.mma.IMMA.SPARSE",
+    "derivation": "mma.sync dependent chain lat + thr (m16n8k16 f16, m16n8k32 s8, bf16/tf32 common shapes; sparse/BMMA only where ISA allows)",
+    "note": "alu3 emits only lat/thr.mma.HMMA (m16n8k16 f16) and lat.mma.IMMA (m16n8k32 s8); this class has no cell in the probe -> listed, leaf keeps its evidence (acceptance.unrealised)"
+   },
+   "ISETP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.ISETP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "LD": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDC": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "LDCU": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "LDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDGDEPBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "LDGSTS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDSM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "LDTM": {
+    "kind": "bucket",
+    "bucket": "tmem"
+   },
+   "LEA": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.LEA",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "LEPC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "LOP3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.LOP3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "MATCH": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.match",
+    "derivation": "single-shot"
+   },
+   "MBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "MEMBAR": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.CTA": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.cta",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.GPU": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.gpu",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.ALL.SYS": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.all.sys",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.CTA": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.cta",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.GPU": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.gpu",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MEMBAR.SC.SYS": {
+    "kind": "probe",
+    "probe": "svc",
+    "cell": "k_fence.membar.sc.sys",
+    "derivation": "svc93: issue->next issue of dependent marker = result; poff 4x1/4s0 thr = issue_interval"
+   },
+   "MOV": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.MOV",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "MUFU": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.MUFU",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "MUFU.EX2": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.MUFU.EX2",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "NANOSLEEP": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "NOP": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "P2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.p2r",
+    "derivation": "single-shot"
+   },
+   "PLOP3": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.PLOP3",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "POPC": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.POPC",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "PREEXIT": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "PRMT": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.PRMT",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "QGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "R2P": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.r2p",
+    "derivation": "single-shot"
+   },
+   "R2UR": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.r2ur",
+    "derivation": "single-shot"
+   },
+   "RED": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "REDUX": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.redux",
+    "derivation": "single-shot"
+   },
+   "RET": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "RPCMOV": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "S2R": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2r",
+    "derivation": "single-shot"
+   },
+   "S2UR": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.s2ur",
+    "derivation": "single-shot"
+   },
+   "SEL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SEL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SGXT": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SGXT",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHF": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHF",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.BFLY": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.BFLY",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.DOWN": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.DOWN",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.IDX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.IDX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "SHFL.UP": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.SHFL.UP",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "ST": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STAS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STL": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STS": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STSM": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "STTM": {
+    "kind": "bucket",
+    "bucket": "tmem"
+   },
+   "SYNCS": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UBLKCP": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UBLKRED": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UCGABAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UCGABAR_ARV": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UCGABAR_WAIT": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UFLO": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.UFLO",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "UGETNEXTWORKID": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UIADD3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UIADD3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UIMAD": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UIMAD",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UISETP": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UISETP",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "ULDC": {
+    "kind": "bucket",
+    "bucket": "memory",
+    "note": "moved from the alu3 ldc_chain cell on 2026-11-05 before the first valid run: memory.constant_cache carries crossings v2 protocol values on both devices (f2a000f), so the ownership rule applies (1 / 1 / 0, latency in memory.constant_cache)"
+   },
+   "ULEA": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.ULEA",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "ULOP3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.ULOP3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UMOV": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UMOV",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UP2UR": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UP2UR",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPLOP3": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPLOP3",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPOPC": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPOPC",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UPRMT": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.UPRMT",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USEL": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USEL",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USETMAXREG": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "USETSHMSZ": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USETSHMSZ",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USETSHMSZ.FLUSH": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USETSHMSZ.FLUSH",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USGXT": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USGXT",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "USHF": {
+    "kind": "probe",
+    "probe": "alu2",
+    "cell": "U.USHF",
+    "derivation": "uniform lat chain slope; thr K/wps"
+   },
+   "UTCATOMSWS": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCBAR": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCCP": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTCHMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTCOMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTCQMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "UTMACCTL": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTMACMDFLUSH": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "UTMALDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMAPF": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMAREDG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UTMASTG": {
+    "kind": "bucket",
+    "bucket": "memory"
+   },
+   "UVIRTCOUNT": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.uvirtcount",
+    "derivation": "single-shot"
+   },
+   "VHMNMX": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VHMNMX",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIADD": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VIADD",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIADDMNMX": {
+    "kind": "probe",
+    "probe": "alu3",
+    "cell": "lat.VIADDMNMX",
+    "derivation": "NEW CELL: alu3 lat/thr scheme needed"
+   },
+   "VIMNMX": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.VIMNMX",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "VIMNMX3": {
+    "kind": "probe",
+    "probe": "alu",
+    "cell": "lat.VIMNMX3",
+    "derivation": "OLS slope over U of lat medians (pair chains: partner slope subtracted); issue_interval = thr slope K/(chains*wps)"
+   },
+   "VOTE": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.vote",
+    "derivation": "single-shot"
+   },
+   "VOTEU": {
+    "kind": "probe",
+    "probe": "misc",
+    "cell": "shot.voteu",
+    "derivation": "single-shot"
+   },
+   "WARPGROUP": {
+    "kind": "bucket",
+    "bucket": "synchronization_and_async_control"
+   },
+   "WARPSYNC": {
+    "kind": "bucket",
+    "bucket": "control"
+   },
+   "WGMMA": {
+    "kind": "bucket",
+    "bucket": "tensor"
+   },
+   "YIELD": {
+    "kind": "bucket",
+    "bucket": "control"
+   }
+  }
+ }
+}

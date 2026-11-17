@@ -1,0 +1,21 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "dsmem",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": ["storage.shared.visibility / storage.shared.issue / storage.shared.acceptance_sm (remote_smem = 1 children)"],
+ "devices": {"h100": "sm_90a", "b300": "sm_103a"},
+ "purpose": "The remote_smem = 1 children disagree across devices: h100 visibility 290.03 (hopper.cluster.dsmem.remote_load.latency, a hopper-prototype remote dependent-load fit, experimental), issue / acceptance 41.24 (hopper.derived.shared_steady_cells); b300 visibility 24 / issue 16 / acceptance 12 recorded as unreachable sentinels (structural.v10.lds_sts_cta_window: on sm_103a LDS / STS address only the executing CTA's window; ld / st.shared::cluster to a peer compile to generic LD.E / ST.E through the cluster shared window). Corpus (executed warp instructions, $A/diag/mb4/dyncount-{hp,bw}.tsv): no LDS / STS / STSM and no LD / ST with a peer rank on either device; peer DSMEM data traffic exists only as STAS (hp 8416, bw 483) and remote SYNCS arrives, which have their own leaves.",
+ "cells": {
+  "sass_form": "compile-only, both devices: a kernel with mapa.shared::cluster + ld.shared::cluster.u32 and st.shared::cluster.u32 to the peer rank of a 2-CTA cluster, and the same to the own rank; record the SASS opcode of each access (expected generic LD / ST through the shared window, as on sm_103a).",
+  "peer_load_latency": "timed, both devices, report only: cluster 2, rank 0 warp 0 lane 0 runs a dependent chain of U ld.shared::cluster.u32 where the next address is mapa(base + (v & mask), target) with v the loaded value (pointer chase inside a 4 KiB table the target CTA wrote before a cluster barrier), U in {16, 32, 64}; target = peer rank (peer cell), own rank through the cluster window (own_window cell), and plain ld.shared (lds cell, the shared v2 lds_chain form). latency = OLS slope over U. --launches 8 --reps 33, two runs.",
+  "peer_store_visibility": "timed, both devices, report only: rank 0 lane 0 issues S st.shared::cluster.u32 into the peer CTA (S in {0, 1, 4}) then barrier.cluster.arrive.release / wait; rank 1 lane 0 reads the stored words after its wait; E(S) = rank 0 t(after wait) - t(before the stores). visibility excess = E(S) - E(0) - S x (per-store issue from the S = 1 / 4 difference); recorded, not installed."
+ },
+ "sass_gate": "peer / own_window / lds chain windows hold exactly U loads of the recorded form and nothing that scales with U; the visibility window holds exactly S stores of the recorded form before the cluster barrier.",
+ "acceptance": "values reported with two-run agreement; nothing is installed from the timed cells (no leaf the engine reads applies to these accesses).",
+ "install": "decision from sass_form + corpus only: if on sm_90a the peer accesses compile to generic LD / ST (as on sm_103a), the hopper remote_smem = 1 children of storage.shared.{visibility, issue, acceptance_sm} get a structural unreachable source (values unchanged, as on b300; the source cites the h100 SASS and the corpus count) - a source-only change, 500 x 2 A/B expected byte-identical. If sm_90a compiles a peer access to LDS / STS / STSM, nothing is changed and a converter item is opened (remote rank on LDS / STS). The measured peer / own-window latencies are recorded in docs/en/microbench.md for the engine item below.",
+ "engine_item": "recorded, not done here (another line's scope): the converter marks own-CTA generic LD / ST that fall in the cluster shared window as space shared_cluster, and the segment builder maps that space code (6) to generic, so the engine sends them through the global memory hierarchy (hp 3987, bw 7424 executed warp instructions in the corpus, all own-CTA).",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+ "addenda": []
+}

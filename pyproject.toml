@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cyclescope"
+version = "0.1.0"
+description = "Cycle-level GPU timing simulator (Hopper H100 / Blackwell B300)"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "The CycleScope authors"}]
+requires-python = ">=3.10"
+dependencies = []
+
+[project.optional-dependencies]
+microbench = ["numpy"]
+dev = ["pytest"]
+
+[project.scripts]
+cyclescope = "cyclescope.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "python"}
+
+[tool.setuptools.packages.find]
+where = ["python"]

@@ -1,0 +1,39 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "descriptor_visibility",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "synchronization.descriptor.visibility"
+  ],
+  "engine_semantics": "cpp/core/simulator.cpp: an acquire row (descriptor_visibility operation 4, from UTMACCTL.IV on blackwell) whose descriptor address has a recorded publish (8 one-lane 16 B STG covering one 128 B tensor map followed by MEMBAR.ALL.GPU, python/cyclescope/convert/semantics_common.py) becomes ready at publish cycle + cycles; the acquire is not delayed otherwise. The hopper route table has no publish / acquire classes, so the h100 leaf (724, predecessor copy, measurement_verified false) is never read; the b300 leaf is cycles 0 / enabled 0 (placeholder.p0).",
+  "purpose": "measure the publish -> acquire visibility delay that the engine charges, on the SASS forms the converter recognises.",
+  "probe": "new tools/microbench/descriptor_visibility/probe/descvis.cu, one CTA, warp 0 lane 0 (the publishing / acquiring warp of device-side tensor-map kernels): a valid 2-D bf16 tensor map (SW128, box 64 x 128 B) is encoded on the host into global memory; per rep: delay jitter; t_s; publish = the 128 B map rewritten in place by 8 one-lane 16 B st.global (same bytes, so the map stays valid) + fence.proxy.tensormap::generic.release.gpu; spin D cycles (clock64); t_a; fence.proxy.tensormap::generic.acquire.gpu [map], 128; one cp.async.bulk.tensor.2d load of an L2-hot box into shared memory, mbarrier test_wait spin by warp 1; t_w. Control: same without the publish (the acquire long after the last publish). D in {0, 128, 256, 512, 1024, 2048, 4096, 8192}. --launches 8 --reps 33, two runs.",
+  "sass_gate": "the publish window holds exactly 8 STG.E.128 and one MEMBAR.ALL.GPU (b300: the converter's publish pattern); the acquire is UTMACCTL.IV on b300; record the h100 SASS of the same PTX (if it lowers to forms the hopper route table does not map, the h100 cell is reported and the leaf is not touched).",
+  "derivation": "E(D) = median over launches of median(t_w - t_a) at delay D; E_c = control. Excess X(D) = E(D) - E_c. Model X(D) = max(0, V - D) with V = visibility cycles: V = X(0) when X(D) decreases with slope -1 +/- 15 % over the D points with X(D) > 0 and X(D) <= 5 % of E_c for every D >= V; otherwise no V.",
+  "acceptance": "V from both runs within 10 % and the slope test above passes -> experimental (one device, one map size; the engine applies one constant); X(D) within noise (|X(0)| <= 2 se) on a device -> V = 0 measured (no visibility delay beyond the acquire's own latency, which instruction.service owns) and the leaf stays disabled with a measured source.",
+  "install": "b300: cycles = V and enabled = 1 if V > 0, else cycles 0 / enabled 0 with source descriptor_visibility.b300.r1; h100: source changed to a structural record stating the leaf is unreachable with the hopper route table (value unchanged) unless the h100 SASS matches the publish / acquire pattern, in which case a converter item is opened and the value is reported, not installed. A/B 500 x 2 single-cluster.",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "item": "h100 run r3: every k_descvis launch fails cudaErrorIllegalInstruction (cause not established; h100 SASS records 8x STG.E.128 + MEMBAR + UTMACCTL). Per spec the h100 cell is report-only and the hopper leaf is unreachable with the hopper route table -> source changed to a structural unreachable record, value 724 unchanged. b300 r2r1: same cudaErrorIllegalInstruction on all cells -> unrealised, b300 leaf untouched."
+    },
+    {
+      "date": "2026-11-05",
+      "before_run": "r4 (written after the r1-r3 failures, before any new GPU run; no timing data exists)",
+      "item": "Cause of the cudaErrorIllegalInstruction on both devices, read from probe/descvis.cu and the run logs, and the corrections for r4.",
+      "observed": "b300-r2r1 / h100-r3 run-a.stdout: the first launch of the first cell (D = 0) fails with cudaErrorIllegalInstruction at cudaDeviceSynchronize; every later cell, the control (D = ~0) last, fails at its first launch with the same error.",
+      "cause": "(1) The publish writes st.global.v4.u32 {p[0], 0, 0, 0} into each 16 B chunk of the map: the map bytes are not rewritten with their own values (the protocol's 'same bytes'), 15 of every 16 bytes become zero, so the tensor map the following cp.async.bulk.tensor reads is invalid; (2) the bulk-tensor destination is dynamic smem + 64 B, while a SWIZZLE_128B box needs a 1024 B aligned shared destination; (3) the control cell runs last, after the first illegal instruction has made the context unusable (sticky error), so 'the control also fails' carries no information; the earlier addendum's suspicion of the acquire fence / tensor load stage is withdrawn (not shown either way).",
+      "corrections": "(a) the 128 map bytes are loaded into registers once, before the rep loop (outside every timed window); the publish stores exactly those registers back with 8 one-lane st.global.v4.u32 (same bytes, so the map stays valid); (b) the shared destination is aligned to 1024 B (dynamic smem sized with the padding); (c) descvis takes --cell <name> and run.sh starts one process per cell, control first, then D ascending; every failed launch prints the cell, launch index and cudaGetErrorName and the row is written as unrealised:<error>; (d) a cell whose control fails stops the device's install.",
+      "derivation_and_acceptance": "unchanged.",
+      "h100": "the protocol's h100 rule stands: the h100 SASS of this probe holds 8 STG.E.128 + MEMBAR + UTMACCTL (h100-r3 sass), i.e. the publish / acquire pattern, so the h100 value is reported and not installed, and a converter item is opened: the hopper route table has no publish / acquire classes although the hopper corpus contains UTMACCTL.IV (65 static occurrences in the traced kernels of $A/captures/cold4/hp-sc), so the h100 leaf is unreachable for a converter reason, not a hardware one."
+    },
+    {
+      "date": "2026-11-05",
+      "after_run": "h100-r4b (GPU-765e9826)",
+      "item": "h100 install. The h100 rule ('reported, not installed; converter item opened') rested on the hopper route table lacking publish / acquire classes. task/memory-sync-gaps 6b5e3ac routes UTMACCTL.IV -> acquire, MEMBAR.ALL.GPU -> publish, STG -> store, ERRBAR / CGAERRBAR -> error_check on hopper (py == cpp), so the leaf is read on H100. h100-r4b: E_c = 819 cycles, X(D) = 0 at every D in both runs -> V = 0 measured (acceptance rule unchanged); installed as cycles 0 / enabled 0 with source descriptor_visibility.h100.r4b, the predecessor copy 724 (descriptor_visibility.h100.unreachable) removed. Derivation and acceptance unchanged."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "cutlass_fp8_dense_03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 67407,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 15267117,
+ "completed": 15267117,
+ "cycles": 88836,
+ "hard": 0,
+ "walls": {
+  "convert": 18.9,
+  "segments": 0.0,
+  "build": 1.9,
+  "sim": 22.8,
+  "total": 43.6
+ },
+ "rss_kb": {
+  "convert": 367720,
+  "segments": 367720,
+  "build": 367720,
+  "sim": 1666776
+ },
+ "hw_cycles": 88380.0,
+ "reference_cache_control": "all",
+ "placement_digest": "673865ae2f0a6ce1",
+ "shards": 12
+}

@@ -1,0 +1,530 @@
+{
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=store/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2048,
+       140.0
+      ],
+      [
+       8192,
+       332.0
+      ],
+      [
+       16384,
+       588.0
+      ],
+      [
+       32768,
+       1100.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.1f8751af81e19d334d34da1f",
+     "hopper.8f014e1645dacca95958b779",
+     "hopper.bc0eceb60481c6fcf81421eb",
+     "hopper.placeholder.44424fa57d1cc53d94199e46"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=load/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1024,
+       309.5
+      ],
+      [
+       4096,
+       358.0
+      ],
+      [
+       16384,
+       554.5
+      ],
+      [
+       32768,
+       807.8
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r4",
+     "tma_forms.h100.r5"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.1f8751af81e19d334d34da1f",
+     "hopper.8f014e1645dacca95958b779",
+     "hopper.bc0eceb60481c6fcf81421eb",
+     "hopper.placeholder.44424fa57d1cc53d94199e46"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=load/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       4096,
+       435.2
+      ],
+      [
+       16384,
+       580.66
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r5"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.1f8751af81e19d334d34da1f",
+     "hopper.8f014e1645dacca95958b779",
+     "hopper.bc0eceb60481c6fcf81421eb",
+     "hopper.placeholder.44424fa57d1cc53d94199e46"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKRED/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1024,
+       140.0
+      ],
+      [
+       4096,
+       260.0
+      ],
+      [
+       16384,
+       740.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.030c16e614568eb1ac30eeae",
+     "hopper.placeholder.44424fa57d1cc53d94199e46"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=tile/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       16384,
+       496.154296875
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.05fb62c134214ac7e6e4e7dc",
+     "hopper.0d5a1dbf5061dbbf2ee2242c",
+     "hopper.153ae55ad6dd892978c895f5",
+     "hopper.155d0dc300660400a6d8cb31",
+     "hopper.24d6193985605f06330fc0dd",
+     "hopper.300e93f36814319241f0f012",
+     "hopper.3a3e74ff4ceb7f4d1389edf1",
+     "hopper.420ecd46ce71d8de4d8be91e",
+     "hopper.425d575a25f11f8942c643f7",
+     "hopper.4415f0bd460308cdf2c2116e",
+     "hopper.49976975373ade4f38987c0f",
+     "hopper.53063229b311b7923c6f755d",
+     "hopper.5d504c940940f662dbc6e13c",
+     "hopper.6b98781b969dd4c7586a27de",
+     "hopper.73ea453114fed3545101f24b",
+     "hopper.791afaed97cf7dffa20e6b24",
+     "hopper.7b87929e15975305ba1193bc",
+     "hopper.7bf761650554d78a24b8e81d",
+     "hopper.813a064633f2558586a0195b",
+     "hopper.8ed27c764a5495ae731814a6",
+     "hopper.9aec02890fc9ee54500234bc",
+     "hopper.9dfa0da9f79340074b582b0e",
+     "hopper.a0c0386645aa3a4b430111e3",
+     "hopper.a41444220f51a6e8a779baf1",
+     "hopper.a589374015fa35768402432f",
+     "hopper.a5c0e93e261f97e060c6a3cf",
+     "hopper.a9fd755f9b2b61c324a284a9",
+     "hopper.b2712293e86eadb22bdad7f4",
+     "hopper.b49254cb8a03e0eb566c2aea",
+     "hopper.bd5f15f395089be33be39833",
+     "hopper.c364b3e373dacab2c8b5c805",
+     "hopper.c3c1dd041b1fb926cd0d51e9",
+     "hopper.c3cf5846377ada4f4a8a2363",
+     "hopper.d6f380ed1984e3d1491e8b47",
+     "hopper.db0103ef25e3d62096eedee6",
+     "hopper.db8190ef41633d9e186fee66",
+     "hopper.ec4ddf78b5f1250c28810ecf",
+     "hopper.f4a2a66e274e3ee7b96ff821",
+     "hopper.f667575a225280eb919f560f",
+     "hopper.fae999d71c338348c7bdb48c",
+     "hopper.ff3a27ad45a762c176207f84",
+     "hopper.placeholder.44424fa57d1cc53d94199e46",
+     "hopper.derived.tma_rank2_linear"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       446.112
+      ],
+      [
+       256,
+       237.513
+      ],
+      [
+       512,
+       246.082
+      ],
+      [
+       1024,
+       232.457
+      ],
+      [
+       2048,
+       260.697
+      ],
+      [
+       4096,
+       278.222
+      ],
+      [
+       8192,
+       311.846
+      ],
+      [
+       16384,
+       321.817
+      ],
+      [
+       32768,
+       332.154
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.h100.r1"
+    ]
+   },
+   "cut_extra_cycles": {
+    "model": {
+     "axis": "cut_rows",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       178
+      ],
+      [
+       4096,
+       178
+      ]
+     ]
+    },
+    "sources": [
+     "tma_oob.h100.v2r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=gather4/destination_count=0-1": {
+  "unsupported": true
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=im2col/destination_count=0-1": {
+  "unsupported": true
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=tile/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       16384,
+       500.6328125
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.cluster.tma_multicast.completion",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       446.112
+      ],
+      [
+       256,
+       237.513
+      ],
+      [
+       512,
+       246.082
+      ],
+      [
+       1024,
+       232.457
+      ],
+      [
+       2048,
+       260.697
+      ],
+      [
+       4096,
+       278.222
+      ],
+      [
+       8192,
+       311.846
+      ],
+      [
+       16384,
+       321.817
+      ],
+      [
+       32768,
+       332.154
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.h100.r1.prior"
+    ]
+   },
+   "cut_extra_cycles": {
+    "model": {
+     "axis": "cut_rows",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       178
+      ],
+      [
+       4096,
+       178
+      ]
+     ]
+    },
+    "sources": [
+     "tma_oob.h100.v2r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=gather4/destination_count=2-4294967295": {
+  "unsupported": true
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=im2col/destination_count=2-4294967295": {
+  "unsupported": true
+ },
+ "storage.tma.completion.root/operation_class=UTMAREDG/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2048,
+       144.0
+      ],
+      [
+       8192,
+       384.0
+      ],
+      [
+       16384,
+       704.0
+      ],
+      [
+       32768,
+       1344.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.23a90694e6d6ed7f6136883b",
+     "hopper.4f8e9bb58e128000d7813f8c",
+     "hopper.5d4a1456890d2ad2b4895e62",
+     "hopper.a925f9c11d8c9880c7dfe06a",
+     "hopper.c434f5b82515f789d311eff5",
+     "hopper.placeholder.44424fa57d1cc53d94199e46",
+     "hopper.derived.tma_rank2_linear"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=tile/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2048,
+       126.0
+      ],
+      [
+       8192,
+       322.0
+      ],
+      [
+       16384,
+       574.0
+      ],
+      [
+       32768,
+       1086.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.h100.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.11273e9aa0760dd4498be878",
+     "hopper.1151536e1ca94621471caaf2",
+     "hopper.1d5fe1d5f1523db85e3463a2",
+     "hopper.282b3e016bd0826aeb08f141",
+     "hopper.2f6c0737fbbf008c9df22a6c",
+     "hopper.4f6738524fb4447bc8dfb3aa",
+     "hopper.5369b64856652347e92060b3",
+     "hopper.709da9170f63e7088f413992",
+     "hopper.72722948d9d7b9a19e73b2c5",
+     "hopper.779885d0001ba2b8faed39b0",
+     "hopper.81816b8c6ea9e419304a3cc5",
+     "hopper.875a84e4baf380abf4d05e11",
+     "hopper.882e53c910baa246b95e54ed",
+     "hopper.96bf15d780983209df9d31be",
+     "hopper.9854fa40fcf6c7e38849967b",
+     "hopper.c0c8a3ccdffaace68a1df0fe",
+     "hopper.d2bf16fbd7288f78c1d4e3a8",
+     "hopper.placeholder.44424fa57d1cc53d94199e46",
+     "hopper.derived.tma_rank2_linear"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=scatter4/destination_count=0-1": {
+  "unsupported": true
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=im2col/destination_count=0-1": {
+  "unsupported": true
+ }
+}

@@ -1,0 +1,23 @@
+split	1.7	25576	0	3.0
+convert-shard6	2.5	271236	0	5.4
+convert-shard7	2.5	276532	0	7.7
+convert-shard2	2.5	281456	0	10.1
+convert-shard4	2.5	281456	0	12.5
+convert-shard0	2.5	285832	0	22.0
+convert-shard1	2.5	285832	0	22.0
+convert-shard3	2.5	285832	0	22.0
+convert-shard5	2.5	285832	0	22.0
+segments-shard4	6.1	285832	0	28.1
+segments-shard5	6.2	285832	0	34.3
+segments-shard6	6.3	285832	0	40.6
+segments-shard7	6.3	285832	0	46.9
+segments-shard0	6.4	285832	0	53.2
+segments-shard2	6.7	285832	0	59.8
+segments-shard1	6.7	285832	0	66.5
+segments-shard3	6.7	285832	0	73.2
+convert-shard8	2.1	285832	0	75.2
+segments-shard8	3.8	285832	0	79.1
+convert	2.5	285832	0
+segments	6.7	285832	0
+build	1.0	285832	0	80.0
+sim	14.5	985688	0	94.5

@@ -1,0 +1,28 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "control_yield",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "instruction.service YIELD (control bucket 1/1/0 today): result_latency_cycles as the warp's next-issue floor"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a (queued; per-device install)"
+ },
+ "question": "Round 30 attribution (cutlass_stream_k_splitk_01, fp8_dense_08): the `YIELD; @P BRA` pair at the head of try_wait spin loops costs 40-64 cycles per execution on H100 (ncu reason branch_resolving) against 1 + branch leaf in the engine; ptxas emits YIELD only at the head of loops that spin on mbarrier try_wait. What does one YIELD cost the issuing warp, and does it depend on the number of warps on the SMSP?",
+ "engine_rule_declared_before_data": "YIELD's instruction.service result_latency_cycles becomes the issuing warp's next-issue floor (the no-destination floor rule the engine already applies to MEMBAR / FENCE is extended to the YIELD class); the yield bit's scheduler rotation is unchanged. Leaf value = measured cost below; constant if it does not depend on W.",
+ "probe": "tools/microbench/control_yield/probe/yield.cu: one CTA of 4*W warps (W in {1,2,4}; warp w on SMSP w%4), one mbarrier in shared memory initialised with count 1 and completed (arrive) before the window so every try_wait succeeds at once; bar.sync before each rep; per warp t_s / t_w around a loop of K iterations (K in {64,128,256}, `.pragma nounroll`): variant `spin`: body = `mbarrier.try_wait.parity.shared.b64 p, [bar], phase` inside a `@!p bra` spin (the loop head gets YIELD) + one dependent FFMA step; variant `nospin`: identical loop whose exit predicate comes from an ISETP on the loop counter instead of try_wait (no YIELD expected) + the same FFMA step; variant `spin_nowait`: the spin loop but the try_wait replaced by `mbarrier.test_wait` (no suspension semantics, YIELD presence recorded). --launches 16 --reps 65, two runs.",
+ "sass_gate": "tools/microbench/control_yield/sass_check.py: per kernel the loop body between the two SR_CLOCKLO reads: `spin` must contain exactly one YIELD, one SYNCS.PHASECHK.TRANS64.TRYWAIT, the FFMA and the BRA(s); `nospin` must contain no YIELD; control words recorded (stall of the YIELD and of the BRA). A variant without the expected YIELD presence is unrealised.",
+ "derivation": "T(variant, W, K) median per warp; slope over K = cycles per iteration; cost_yield(W) = slope(spin, W) - slope(nospin, W) - (installed SYNCS.PHASECHK result_latency_cycles 37.93 - the ISETP result 4 that nospin pays) ; i.e. the spin iteration's extra over nospin beyond the try_wait result latency difference. Acceptance: residual <= 5 %, runs <= 5 %; cost_yield(W) within 20 % across W = 1 / 2 / 4 -> constant, install result_latency_cycles = mean (measured); if it grows with W -> report only (scheduler effect, not a leaf); if cost_yield <= 2 cycles -> YIELD is free, nothing installed.",
+ "install": "<arch>/leaves/instruction.service.json YIELD result_latency_cycles = completion = cost (source control_yield.<dev>.r<n>); engine: YIELD added to the no-destination floor family; CTest fixture (YIELD with result 40 -> next issue at +40); A/B 500 x 2 vs the current baseline.",
+ "not_allowed": "no case tuning; no change after data; b300 installed only when its run exists.",
+ "addenda": [
+  {
+   "date": "2026-11-06",
+   "written": "after h100-r2 (installed 113.15) and b300-r3",
+   "text": "(b300-r3 reading) On sm_103a ptxas emits no YIELD at all in the try_wait spin loop (window = 16 copies of SYNCS.PHASECHK.TRANS64.TRYWAIT + BRA + FFMA, yield count 0, same source as the sm_90a build that carries one YIELD per copy); the spin variant is therefore unrealised on b300 by the gate rule and nothing is installed there. Consistent with the data: spin 44.2 / 45.4 / 64.2 cycles per iteration (W = 1 / 2 / 4) against nospin 25-27, i.e. try_wait result latency 37.9 + FFMA + BRA with no extra; cost_yield = -14.6 / -13.5 / +2.8 -> 'free'. The blackwell YIELD leaf stays the control bucket 1 / 1 / 0; blackwell code rarely contains YIELD (the corpus count is the converter's to report)."
+  }
+ ]
+}

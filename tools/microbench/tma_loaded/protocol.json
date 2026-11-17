@@ -1,0 +1,55 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "tma_loaded",
+ "version": 5,
+ "frozen_before_gpu": true,
+ "date": "2026-11-09",
+ "mechanisms": [
+  "memory.l2.service",
+  "memory.shared_service",
+  "storage.tma.completion"
+ ],
+ "fields": [
+  "l2.tma_sector_bytes_per_cycle (per-SM TMA delivery cap, cluster-local)",
+  "memory.shared_service.l2_read_bytes_per_ns_tma (aggregate TMA L2-hit delivery, gpu-shared)"
+ ],
+ "question": "bw CUF-DSL dense GEMMs (1 CTA per SM, 148 CTAs, 16 KB UTMALDG tiles, 93 % L2 hits) deliver 220 MB L2->SM in both HW and sim (l1 sectors identical), but HW takes 19.7 us (11.2 TB/s, lts 41 %, 48 % of warp samples in the MMA-ready / TMA-full try_wait loops) and the sim 10.2 us, sitting at the installed aggregate L2 read rate 20.1 TB/s; the sim's UTMALDG issue->complete p50 is 603 cycles (L2 hits) while Little's law on the sim's in-flight bytes at the HW rate implies ~1800 (full-gpu-chain-report 25.5). cublas nvjet (BLF) reaches 14.2 TB/s on the same path and matches the sim. What is the TMA tile-load delivery rate of one SM when it alone keeps S boxes in flight, and of N SMs at once, and how does the per-box completion latency grow with N and S?",
+ "probe": "tools/microbench/tma_loaded/probe/tma_loaded.cu: grid N CTAs (one per SM, 135 KB dynamic smem), v2: warp s < S, lane 0, owns slot s (16 KB SWIZZLE_128B bf16 box, one mbarrier) over a 24 MiB hot tensor (first launch warms it; each CTA cycles inside its own region of rows / N rows, >= S boxes, warp s takes boxes s, s+S, ...); it issues one UTMALDG, spins on mbarrier.test_wait (no try_wait suspend) until complete_tx lands, records issue -> complete clock64 and re-issues; 2048 / S rounds per warp so S boxes stay in flight per CTA; all CTAs meet on an arrival counter first. Per CTA: bytes, clock64 window, globaltimer window, first 512 latencies. Cells: N in {1, 16, 64, 128, SMs} x S in {1, 2, 4, 8}, 8 repetitions each after a discarded warm launch, two runs (a, b) in one job.",
+ "derivation": "tools/microbench/tma_loaded/model.py: per cell: per-CTA bytes/cycle median, aggregate B/ns median (sum of bytes / span of globaltimer windows), latency p50 / p90 (all CTAs pooled). (1) per-SM cap = per-CTA bytes/cycle at N = 1, S = 8 (if S = 4 is within 5 % of S = 8 the pipeline is saturated; else report unsaturated). (2) aggregate TMA cap = aggregate B/ns at N = SMs, S = 8; divided by the SM count gives the per-SM share under full load. (3) latency: p50 at N = 1 / S = 1 is the unloaded box completion; the table (aggregate B/ns / l2_read_bytes_per_ns, p50 - unloaded) over all cells is reported for comparison with memlat_loaded (not installed by this protocol).",
+ "acceptance": "per cell (P90 - P10) / median of per-CTA bytes/cycle < 10 % (N >= 16) and runs a / b agree within 5 % on the aggregate B/ns; the N = 1 / S = 1 latency must be within 15 % of storage.tma.completion for the 16 KiB hot tile (tma_cold leaf) of the device, else the probe is not measuring the same path -> stop and report.",
+ "engine_rules_declared_before_data": {
+  "A_per_sm": "if the N = 1 saturated per-CTA rate is below 0.9 x l2.sector_bytes_per_cycle (124.6 b300 / 122.3 h100): new field memory_level l2.tma_sector_bytes_per_cycle (cluster-local); MemoryHierarchy::load for TMA / bulk requests acquires the per-SM L2 port at that rate instead of l2.sector_bytes_per_cycle (same port, different occupancy per sector). Otherwise no per-SM leaf.",
+  "B_aggregate": "if the N = SMs aggregate is below 0.9 x l2_read_bytes_per_ns (20130.9 b300 / 7602.0 h100): new field memory.shared_service l2_read_bytes_per_ns_tma (gpu-shared); TMA / bulk sectors are charged to the shared L2 read service with bytes x (l2_read_bytes_per_ns / l2_read_bytes_per_ns_tma) so the one queue carries the lower TMA delivery rate while LDG traffic keeps the installed rate. Otherwise no aggregate leaf.",
+  "C_latency": "the loaded-latency table from (3) is compared with the installed memlat_loaded l2 extra; it is not installed (same physics as the queue in B; installing both would double count). If after A/B the sim's UTMALDG completion p50 on CUF-DSL-DENSE-PERSIST-C04 is still below half the Little-law estimate, a v2 decides.",
+  "gate": "single cluster 500x2 MAPE within 0.2 pt (A is cluster-local and single-cluster cases with TMA pipelines will move; the sc gate is the accuracy, not bit-identity); full-gpu 500x2 against full-r3."
+ },
+ "install": "schema_registry memory_level field l2.tma_sector_bytes_per_cycle (float64 bytes/cycle) and memory.shared_service field l2_read_bytes_per_ns_tma (float64 bytes/ns); leaves per device as the data says; source keys tma_loaded.<device>.<run>; tree validate --strict five classes 0.",
+ "not_allowed": "no case tuning; cells, derivation and the A/B/C rules are fixed above; a device failing acceptance gets no leaf and is reported.",
+ "addenda": [
+  {
+   "date": "2026-11-09",
+   "written": "after h100-r1 / b300-r1 (models $A/fg-fix5/r1/{h100,b300}-tma-model.json), before the engine gate",
+   "text": "(reading) Both devices: the per-CTA TMA delivery saturates at S >= 2 at 43.9 (h100) / 44.65 (b300) B/cycle, independent of N until the aggregate binds (h100 only, N >= 128: per-CTA drops to ~30 and the aggregate sits at 7.5-7.9 TB/s = the installed l2_read_bytes_per_ns); completion latency is S x 16 KiB / cap (550 / 800 / 1600 / 3000 cycles for S = 1 / 2 / 4 / 8), i.e. the box queue of one SM serialises -- the sim's single-CTA UTMALDG completion (~600 at S ~4) is what the per-SM port at 122 B/cycle gives. Rule A applies on both devices (cap < 0.9 x port). Rule B: h100 aggregate = installed (not applicable); b300 the N = 148 aggregate 13.35 TB/s is 148 x the per-SM cap, the aggregate L2 rate is never reached from one CTA per SM, so B is undetermined and nothing is installed. Acceptance deviation: the h100 N = 128 / 132, S = 8 cells fail the 10 % spread (0.34 / 0.42, saturation jitter); they do not feed the installed value, so h100 is installed as experimental instead of 'no leaf'. Rule A refinement decided before the gate: the TMA rate is the SM-side delivery limit, so TMA / bulk sectors occupy the per-SM L2 port *and* the per-SM DRAM port at l2.tma_sector_bytes_per_cycle (the probe measured L2 hits only; DRAM-served boxes cannot exceed the same SM-side rate)."
+  },
+  {
+   "date": "2026-11-09",
+   "written": "after the r1 engine gate ($A/fg-fix5/full-r4, sc-r4)",
+   "text": "(reading) v1 is withdrawn: its single issuing thread handled completions one at a time through mbarrier.try_wait, whose suspend grid is ~400 cycles, so the measured plateau (43.9 / 44.65 B/cycle, latency = S x ~406) is the handler's serialisation, not TMA delivery; the installed l2.tma_sector_bytes_per_cycle leaves and the engine rule moved none of the target cases (CUF-DSL-DENSE-PERSIST-C04 0.635 -> 0.635, cutlass tma_ws_06 0.730 -> 0.730) and slowed single-cluster TMA kernels by up to +77 % (sc MAPE hp 7.7 -> 8.1, bw 8.2 -> 9.0) -> uninstalled, engine rule reverted. v2 probe: one warp per slot with a test_wait spin (the tma_cold / umma probes' waiter shape); same cells, same derivation and rules A/B/C, same acceptance plus: the N = 1, S = 8 cell must also agree within 10 % with the tma_forms kind-21 slope for 16 KiB (147.5 h100) when converted to bytes/cycle, or the difference is reported before any install."
+  },
+  {
+   "date": "2026-11-09",
+   "written": "before the v3 run",
+   "text": "v3 adds the shared_cold cells (question: HW tensor pipe is only 18-41 % active on the full-gpu CUF-DSL / FIF-BS GEMMs vs 70 % for the same kernels as a single cluster and 89 % for nvjet, long_sb on the TMA-full / accumulator waits dominates, xbar only 11 TB/s of a 19 TB/s-capable path -- so the per-k-step turnaround of 148 lock-stepped CTAs that all touch each A / B tile for the first time at the same moment is suspected: followers of one DRAM fill). Cells: --mode shared_cold, every CTA walks the same box sequence from row 0 of a 2 GiB tensor, L2 evicted (512 MiB memset) before every launch, N in {1, 16, 64, SMs} x S in {1, 4}, 512 rounds. Reading rule (declared): N = 1 gives the cold box latency (DRAM); if the N = SMs p50 is within 15 % of N = 1, followers pay the full fill latency (the engine's in-flight-hit rule, memory_hierarchy.cpp 'held = min(ready, own_miss)', is the right shape and the gap is elsewhere, e.g. in how synchronised the CTAs stay); if it is well below, the hardware serves followers early and the engine's rule is too pessimistic for TMA followers; if it is well above (queueing behind 147 identical requests at one slice), a per-slice / per-line request serialisation is missing. Nothing is installed from v3 directly."
+  },
+  {
+   "date": "2026-11-09",
+   "written": "before the v4 run",
+   "text": "v4 adds the TPC-pair cells (question: single-cluster cutlass / DSL GEMMs sit at 0.83-0.97 while the same kernels full-gpu sit at 0.55-0.82 after rounds 1-6 ruled out the DRAM / L2 / TMA / LDGSTS paths; a single cluster leaves its TPC partner SM idle, full-gpu fills both SMs of every TPC). Cells: --pair same (participants on SM 0 and SM 1, the two SMs of one TPC on both devices per configs/hardware/<dev>/sm_topology.json) and --pair diff (SM 0 and SM 2), S in {2, 8}, hot mode; grid = all SMs, non-participants exit before the arrival counter. Reading rule (declared): if per-CTA bytes/cycle for pair_same is below 0.85 x pair_diff, the L2 -> SM delivery port is shared per TPC: field memory_level l2.port_scope_tpc (flag) with the per-TPC rate = l2.sector_bytes_per_cycle and the engine keys port_l2_ / port_dram_ by TPC (sm_topology) instead of SM for the two SMs of a TPC; otherwise nothing."
+  },
+  {
+   "date": "2026-11-09",
+   "written": "after v4 (TPC pair cells identical within 3 %: no TPC-shared delivery), before the v5 run",
+   "text": "v5 adds shared_hot cells: every CTA walks the same L2-resident box sequence (the GEMM pattern: all CTAs of a row read the same A tile at the same k step). Question: are concurrent reads of the same lines by N SMs served at the aggregate L2 rate (the sim: l2_merge window 240 cycles merges up to 4 requests, the rest are independent hits at the shared rate) or serialised per line / slice? Reading rule (declared): compare per-CTA bytes/cycle of shared_hot with the private hot cell at the same N and S (v2 / r4b data); at N = 64 (h100 u ~0.75, b300 u ~0.6) a shared_hot rate below 0.8 x private means same-line reads are serialised at the slice: candidate field memory.l2_merge same_line_bytes_per_cycle (gpu-shared) with the engine serving concurrent same-sector requests beyond the merge window through a per-line service at that rate; equal rates -> nothing."
+  }
+ ]
+}

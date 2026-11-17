@@ -1,0 +1,51 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "lifecycle",
+ "version": 3,
+ "supersedes": "tools/microbench/lifecycle/protocol-v2.json (installed h100-r3 / b300-r4): v2 subtracts only the marker span and a modelled prologue fetch from sm__cycles_active.max, so the envelope still contains work the engine simulates itself (the probe's cold first fetch line, S2R / CS2R, the post-marker global stores and their drain). Small kernels (reference < 6 k cycles) show it: body / reference median hp 0.92, bw 1.11 with the 1.55 k envelope added on top (report section on small-kernel attribution).",
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "kernel.lifecycle"
+ ],
+ "fields": [
+  "envelope_cycles linear(launch_warps_per_cta)"
+ ],
+ "devices": {
+  "h100": "sm_90a, CYCLESCOPE_NCU",
+  "b300": "sm_103a, image ncu"
+ },
+ "definition": "envelope = the part of a launch's hardware sm__cycles_active.max that the engine does not simulate. It is measured on the probe as hardware time minus the engine's own core timeline for the same probe launch (captured with the main tracer and run through the main convert / build / engine), so whatever the engine already charges (instruction fetch, S2R / CS2R, stores, end-of-kernel drain) is excluded by construction.",
+ "engine_rule_declared_before_data": "unchanged from v2: cycles(job) = core timeline + envelope_cycles(launch_warps_per_cta); the core timeline is result cycles minus the TELE lifecycle_envelope the engine applied.",
+ "probe": "tools/microbench/lifecycle/probe/lifecyc.cu and build.sh unchanged (verbatim).",
+ "hardware_runs": "run_ncu.sh with the metric list of the case reference (python/cyclescope/capture/driver.py NCU_LAUNCH_METRICS) plus sm__cycles_elapsed.max and smsp__inst_executed.sum, --print-units base, --cache-control all, --clock-control none, --replay-mode kernel, 64 launches per variant, launches 0 and 1 of every variant dropped; two runs per device: $A/microbench/lifecycle/<device>-v3r1/run-{a,b}.",
+ "engine_runs": {
+  "cells": "C = 1, S = 0, W in {1, 4, 8, 16, 32}, L in {0, 1024, 4096} (15 cells per device).",
+  "capture": "per cell one traced run on the same device type of `lifecyc --only =life.c1.w<W>.s0.l<L> --launches 3 --reps 1` with the main tracer (tracer-072fa0a.so, the corpus tracer), selection = the mangled k_life<L> at occurrence 2 (third launch; mirrors dropping launches 0 and 1), trace and placement modes, trace_check --quick must pass; capture dir $A/microbench/lifecycle/<device>-v3r1/capture/life.c1.w<W>.s0.l<L>/.",
+  "convert_and_simulate": "scripts/pipeline/convert_capture_batch.sh with the device tree and engine / cyclescope-convert of the branch point (main tree + matching build), PLACEMENT=1, SIM_LEDGERS=1, cache_control all; reference clock sm_clock_khz of a cell = median over kept launches of run-a sm__cycles_elapsed.avg.per_second / 1000 for that cell; issued == completed required.",
+  "per_cell_quantities": "core_sim = result cycles - TELE lifecycle_envelope; span_sim = max over warps of the issue cycle of the second CS2R SR_CLOCKLO - min over warps of the issue cycle of the first (journal, by PC from the segment CODE table)."
+ },
+ "derivation": "per hardware launch: out_hw = sm__cycles_active.max - marker span (max t1 - min t0 over the CTA's warps, as v2; no fetch term). per cell and run: env = mean(out_hw) - (core_sim - span_sim). envelope(W) = mean over the two runs of env(c1.w<W>.s0.l0): L = 0 is the install cell because its body leaves the least simulated work inside the difference.",
+ "acceptance": {
+  "hardware": "per install cell and run: se(mean out_hw) / mean(out_hw) <= 3 %; run agreement |mean_a - mean_b| / mean <= 5 % of mean(out_hw).",
+  "body_independence": "|env(L = 1024) - env(L = 0)| <= max(0.10 x env(L = 0), 64 cycles) for the same W (both runs averaged). L = 4096 (64 KiB body, at or beyond the launch prefetch window) is reported only.",
+  "verdict": "hardware and body_independence pass -> measured; hardware passes, body_independence fails -> experimental (installed, both values recorded); hardware fails -> unrealised for that W (not installed); env(L = 0) < 0 for any W -> nothing installed on that device, recorded as a finding (the engine over-charges the probe's own instructions; attribute that first).",
+  "report": "per cell: hardware launch distribution (deciles, two-mode split, as v2), core_sim, span_sim, sim journal summary of the probe (which instructions make up core_sim), C = 2 / S = 204800 hardware cells (no engine run)."
+ },
+ "dependence": "the envelope is defined against an engine and tree; model.json records the tree content digest and engine build used. It must be re-derived when the engine's end-of-kernel rule, instruction.fetch, the store path or the S2R / CS2R / STG service leaves change.",
+ "install": "kernel.lifecycle envelope_cycles linear points over launch_warps_per_cta from the L = 0 cells (source lifecycle.<device>.v3r1, protocol tools/microbench/lifecycle/protocol-v3.json); one two-architecture 500-case single-cluster A/B round against the branch point.",
+ "out_of_scope": "b300 memory.dram latency (memlat r2 cell spread 6.2 %, installed 874.9) is not touched by this protocol; small-kernel residuals after the A/B decide whether a memlat revision is needed.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, cell or derivation change after data; the v2 runs (h100-r3, b300-r4) are reported for comparison only and are not inputs.",
+ "addenda": [
+  {
+   "date": "2026-11-06",
+   "written_before": "any envelope install (hardware v3r1 runs and the first engine run of the 15 cells against $A/merge/build-scs exist; first derivation recorded in $A/microbench/lifecycle-model/<device>-v3r1/model.json, not installed)",
+   "text": "(1) Transcription: the tracer's regex@N is 1-based (tools/tracer/tracer.cu launch_selected), so 'occurrence 2 (third launch)' is selection_for(mangled, 3); the capture traced launch=3 = launch index 2 as intended. (2) The first engine run exposed an engine defect, not a probe property: MemoryHierarchy::constant() makes a missed line resident at issue time, so other warps reading that line while the fill is in flight get the hit latency (b300 W=4 warp 0 LDC.64 c[0x380] waits 78 instead of the miss 475; engine core W=1 1294 vs W=4 897, h100 713 vs 558, while hardware out_hw is flat over W: b300 1563 vs 1586). The engine is fixed first (in-flight constant line: an access returns no earlier than the fill), the 15 cells per device are re-simulated with the fixed build, and the derivation (unchanged) is re-run on the same hardware runs; that result is the install candidate (model.json under <device>-v3r2). Cells, thresholds and the derivation are unchanged."
+  },
+  {
+   "date": "2026-11-06",
+   "written_before": "any envelope install",
+   "text": "v3r2 (engine with the in-flight constant fix, $A/merge/build-cif; same hardware runs): b300 env(L = 0) = -168 / -145 / -145 / -107 / +21 for W = 1 / 4 / 8 / 16 / 32 -> negative-envelope clause: nothing installed on b300. h100 env(L = 0) = 602 / 642 / 660 / 723 / 873, body_independence fails at every W (env(L = 1024) 1017-1037) -> experimental by the verdict rule; its install is deferred under the dependence clause because the attribution of the negative b300 value names a leaf inside the L = 0 cell on both devices: the engine's post-marker tail at L = 0 is two dependent bank-0 constant misses (c[0x0][0x380], c[0x0][R + 0x2ac]) charged the cold bank-3 miss leaf (sim_outside L = 0 minus L = 1024: h100 377, b300 803; hardware out_hw: h100 -41, b300 288). Next: tools/microbench/constant_launch/protocol.json (bank-0 first access at kernel start), then re-simulate the 15 cells and re-derive (v3r3) with this derivation unchanged."
+  }
+ ]
+}

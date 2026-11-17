@@ -1,0 +1,232 @@
+{
+ "protocol": "service_latency protocol-v6.json",
+ "cells": {
+  "FFMA2": {
+   "kind": "single",
+   "composition": {
+    "FFMA2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "fma.rn.f32x2 x2 pair chain",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "FADD2": {
+   "kind": "single",
+   "composition": {
+    "FADD2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "add.rn.f32x2",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "FMUL2": {
+   "kind": "single",
+   "composition": {
+    "FMUL2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "mul.rn.f32x2",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "MUFU_EX2": {
+   "kind": "single",
+   "composition": {
+    "MUFU.EX2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "ex2.approx.ftz.f32 unary",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "FMNMX3": {
+   "kind": "single",
+   "composition": {
+    "FMNMX3": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "max.f32 three-input",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "HADD2_F32": {
+   "kind": "single",
+   "composition": {
+    "HADD2": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "add.rn.f32.f16 mixed",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "LEA_SHLADD": {
+   "kind": "single",
+   "composition": {
+    "LEA": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "shl.b32 t,a,3; add.s32 d,t,b",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "ULEA_SHLADD": {
+   "kind": "single",
+   "composition": {
+    "ULEA": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "shl.b32+add.s32 on kernel params (uniform)",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   }
+  },
+  "DADD_RN": {
+   "kind": "single",
+   "composition": {
+    "DADD": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "DADD_RN dthr rerun (v5 body)",
+   "n_unit": {
+    "fp64_sm": 64
+   },
+   "fp64": true
+  },
+  "DMUL_RN": {
+   "kind": "single",
+   "composition": {
+    "DMUL": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "DMUL_RN dthr rerun (v5 body)",
+   "n_unit": {
+    "fp64_sm": 64
+   },
+   "fp64": true
+  },
+  "DADD_RZ": {
+   "kind": "single",
+   "composition": {
+    "DADD": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "DADD_RZ dthr rerun (v5 body)",
+   "n_unit": {
+    "fp64_sm": 64
+   },
+   "fp64": true
+  },
+  "DMUL_RZ": {
+   "kind": "single",
+   "composition": {
+    "DMUL": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "DMUL_RZ dthr rerun (v5 body)",
+   "n_unit": {
+    "fp64_sm": 64
+   },
+   "fp64": true
+  },
+  "MATCH_d16": {
+   "kind": "single",
+   "composition": {
+    "MATCH": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "b300"
+   ],
+   "idiom": "thr 8-chain d=16 full K",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   },
+   "match_d": 16
+  },
+  "MATCH_d32": {
+   "kind": "single",
+   "composition": {
+    "MATCH": 1
+   },
+   "partners": [],
+   "critical_path_partners": [],
+   "devices": [
+    "h100",
+    "b300"
+   ],
+   "idiom": "thr 8-chain d=32 full K",
+   "n_unit": {
+    "smsp": 32,
+    "sm": 128
+   },
+   "match_d": 32
+  }
+ }
+}

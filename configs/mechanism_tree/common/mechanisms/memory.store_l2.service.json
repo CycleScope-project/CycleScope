@@ -1,0 +1,39 @@
+{
+ "doc": "imported from legacy mechanism memory.store_l2.service",
+ "field_models": {
+  "store_l2.issue_interval_cycles": {
+   "kind": "constant"
+  },
+  "store_l2.latency_cycles": {
+   "kind": "constant"
+  },
+  "store_l2.orders_loads": {
+   "kind": "constant"
+  },
+  "store_l2.partial_granule_bytes": {
+   "kind": "constant"
+  },
+  "store_l2.partial_line_cycles": {
+   "kind": "constant"
+  },
+  "store_l2.sector_bytes_per_cycle": {
+   "kind": "constant"
+  },
+  "store_l2.shared_store_shares_fill_port": {
+   "kind": "constant"
+  },
+  "store_l2.shares_fill_port": {
+   "kind": "constant"
+  }
+ },
+ "program": {
+  "event": "memory_issue",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ }
+}

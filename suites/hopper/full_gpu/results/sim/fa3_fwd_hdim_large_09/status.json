@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "fa3_fwd_hdim_large_09",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 78762,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 14492028,
+ "completed": 14492028,
+ "cycles": 173087,
+ "hard": 0,
+ "walls": {
+  "convert": 16.0,
+  "segments": 0.0,
+  "build": 1.5,
+  "sim": 26.5,
+  "total": 44.0
+ },
+ "rss_kb": {
+  "convert": 325412,
+  "segments": 325412,
+  "build": 325412,
+  "sim": 1542568
+ },
+ "hw_cycles": 178754.0,
+ "reference_cache_control": "all",
+ "placement_digest": "97c98d7005be3167",
+ "shards": 15
+}

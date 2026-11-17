@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-DENSE-F16-2CTA-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 247613,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 876468,
+ "completed": 876468,
+ "cycles": 36822,
+ "hard": 0,
+ "walls": {
+  "convert": 3.9,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 3.3,
+  "total": 7.7
+ },
+ "rss_kb": {
+  "convert": 300932,
+  "segments": 300932,
+  "build": 300932,
+  "sim": 386928
+ },
+ "hw_cycles": 37487.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 3
+}

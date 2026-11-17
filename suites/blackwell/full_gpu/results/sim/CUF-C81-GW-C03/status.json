@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C81-GW-C03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 111111,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3470785,
+ "completed": 3470785,
+ "cycles": 21482,
+ "hard": 0,
+ "walls": {
+  "convert": 6.4,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 6.5,
+  "total": 13.4
+ },
+ "rss_kb": {
+  "convert": 317284,
+  "segments": 317284,
+  "build": 317284,
+  "sim": 429748
+ },
+ "hw_cycles": 21753.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 5
+}

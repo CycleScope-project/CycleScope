@@ -1,0 +1,67 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "service_latency",
+ "version": 2,
+ "supersedes": "tools/microbench/service_latency/protocol.json (version 1: 47 register classes on both devices, installed at r17)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "instruction.service"
+ ],
+ "fields": [
+  "result_latency_cycles",
+  "completion_latency_cycles",
+  "issue_interval_cycles",
+  "resource (class_resource.json, unchanged)"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "purpose": "After version 1 every instruction.service leaf that is neither protocol-measured nor an ownership structural value is a predecessor number or a placeholder: h100 59 placeholder classes (hash sources), 11 'table collapse' experimental classes, 15 classes with a placeholder issue interval (v1 build gate dropped the thr cells of 8-byte ops and the k_mix cells on sm_90a); b300 99 placeholder classes, 15 experimental. This version (1) states the ownership rule for every class whose time is owned by another mechanism, (2) measures every remaining register-producing class on both devices with one definition, (3) re-enables the thr cells version 1 could not build on sm_90a.",
+ "ownership_rule": {
+  "memory": "LD ST LDG STG LDS STS LDSM STSM LDL STL LDC ULDC LDCU ATOM ATOMG ATOMS RED REDG REDS LDGSTS STAS UTMALDG UTMASTG UTMAREDG UBLKCP UBLKRED UTMAPF CCTL CCTL.IVALL: result = completion = 1, issue_interval = 0 (structural; latency in memory.* / storage.* / memory.constant_cache, issue in storage.shared.* / storage.atomic.issue / storage.async.service_start). LDC / ULDC / LDCU switch to this rule on a device only when memory.constant_cache is enabled there with protocol values (crossings v2)",
+  "tensor": "HGMMA QGMMA IGMMA WGMMA UTCHMMA UTCQMMA UTCOMMA: 1 / 1 / 0 (tensor.pipe / tensor.completion)",
+  "synchronization_and_async_control": "BAR SYNCS MBAR DEPBAR DEPBAR.FIFO LDGDEPBAR ARRIVES ACQBULK UCGABAR UCGABAR_ARV UCGABAR_WAIT CGAERRBAR ERRBAR ENDCOLLECTIVE UTMACCTL UTMACMDFLUSH WARPGROUP USETMAXREG UTCBAR UTCCP UTCATOMSWS UGETNEXTWORKID: 1 / 1 / 0 (synchronization.* / blackwell.* / hopper.* own the waits); exception: classes with a register result the warp consumes (ELECT, VOTE, VOTEU, MATCH, REDUX, CREDUX, S2R, S2UR, CS2R*) are measured below",
+  "control": "BRA BRX BRXU BREAK BSSY BSYNC CALL RET EXIT PREEXIT WARPSYNC YIELD NOP NANOSLEEP LEPC RPCMOV: 1 / 1 / 0 (control.reconvergence, control.nanosleep, instruction.fetch own the time; no register result)",
+  "fences": "FENCE FENCE.VIEW.ASYNC.* MEMBAR MEMBAR.* are measured below (the b300 svc.cu k_fence cells), not structural",
+  "tmem": "LDTM STTM: 1 / 1 / 0 (blackwell.tmem.load / blackwell.tmem.store own the time; unsupported on H100)"
+ },
+ "probe": "the version-1 build (alu.cu / alu2.cu, sm_90a gate) with the 8-byte thr cells built from a dynamic-shared-memory copy of the k_thr pin buffer on sm_90a (documented build-time change, the window is unchanged) + blackwell-prototype tools/microbench/probes/misc.cu (special-register / uniform / predicate / vote / match / redux / elect / f2f / fchk cells) and svc.cu (k_fence / k_poff / k_mix / k_act: fence and membar service) copied verbatim into tools/microbench/service_latency/probe/; classes none of these probes emit get cells added to a new probe tools/microbench/service_latency/probe/alu3.cu written with the alu.cu lat / thr scheme (lat OP U: one warp, U dependent instances between two clock reads; thr OP K: 4 x wps warps x 8 independent chains x K steps). Before the GPU run a frozen table tools/microbench/service_latency/cells-v2.json maps every class in the two trees' instruction.service to exactly one of: ownership_rule bucket, or (probe, cell, derivation); the table is committed before any run and reviewed against this file.",
+ "derivation": "version-1 definitions: result_latency = OLS slope over U of the lat medians (pair chains: partner slope subtracted); completion = result for fixed-latency classes; issue_interval = thr slope over K / (chains x wps) at wps = 1; svc.cu fences: the blackwell-prototype svc93 definitions quoted in the b300 source records (k_fence one warp: issue -> next issue of the dependent marker = result; 4x1 / 4s0 throughput = issue_interval)",
+ "acceptance": {
+  "cell": "version-1 rules (lat fit residual <= 5 %, runs within 5 % -> measured, else experimental and listed)",
+  "b300_control": "classes with an installed measured b300 leaf: within 10 % -> kept, cited as reproduction; beyond 10 % with the cell passing -> replaced by the in-repo protocol value (old value in the source description); this replaces the version-1 rule 'b300 leaf not changed', because a value without an in-repo probe is not kept over one with it",
+  "unrealised": "a class with no realisation on a device (ISA absent) stays unsupported; a class realisable but not emitted by any probe is listed and keeps its leaf with its existing evidence"
+ },
+ "install": "both devices' instruction.service leaves per cells-v2.json (source keys service_latency.<device>.<run> for measured cells, structural.service_owner for ownership buckets); one two-architecture 450 A/B round (after the engine resource fix the issue intervals are live, so this round is expected to move issue-bound kernels)",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+ "addenda": [
+  {
+   "date": "2026-11-05",
+   "before_gpu_run": true,
+   "text": "Information from the barrier_release v2 runs (microbench execution line): barrier.cluster.arrive.release costs ~650 (H100) / ~250 (B300) cycles more than the .relaxed form, entirely in the MEMBAR.ALL.GPU + ERRBAR the compiler places before the arrive; synchronization.cluster.release was installed from the relaxed form, so this fence cost must be owned by instruction.service. Changes before any run of this protocol: (1) ERRBAR (and CGAERRBAR) move from the synchronization_and_async_control ownership bucket to the measured fence group (svc.cu k_fence cells where they exist, otherwise alu3.cu cells: one warp, MEMBAR.ALL.GPU + ERRBAR pair and ERRBAR alone between clock reads, issue -> next dependent issue); (2) consistency check, reported not gating: result_latency(MEMBAR.ALL.GPU) + result_latency(ERRBAR) must reproduce the barrier_release v2 release-minus-relaxed difference on each device within 10 %; a failure is recorded as an open ownership question."
+  },
+  {
+   "date": "2026-11-05",
+   "before_gpu_run": true,
+   "text": "cells-v2 review corrections: (1) ERRBAR and CGAERRBAR are measured, not in the synchronization bucket: svc.cu has no matching variant, so alu3 gets k_errbar cells — one warp, between two clock reads, a single ERRBAR and a MEMBAR.ALL.GPU+ERRBAR pair; result = issue -> next dependent issue. Consistency check (reported only, does not gate install): MEMBAR.ALL.GPU result + ERRBAR result should reproduce within 10% the cluster release-minus-relaxed difference measured by barrier_release v2 (values from $A/microbench/barrier_release-model). (2) HMMA / HMMA.SPARSE / IMMA / IMMA.SPARSE / BMMA / BMMA.SPARSE are warp-level mma.sync, not covered by tensor.pipe (which only owns GMMA and UTC*MMA): they become probe cells in alu3 — dependent-chain lat plus thr for mma.sync m16n8k16 f16, m16n8k32 s8, and common bf16/tf32 shapes; sparse and BMMA forms are measured only where the ISA allows. (3) LDTM / STTM are owned by blackwell.tmem.load/store (already measured dedicated mechanisms): new ownership bucket 'tmem' with rule 1/1/0; on H100 they are unsupported_on_device and do not appear in alu3."
+  },
+  {
+   "date": "2026-11-05",
+   "before_install": true,
+   "text": "ERRBAR / CGAERRBAR have no PTX form; the compiler emits ERRBAR only after MEMBAR.ALL.GPU in front of barrier.cluster.arrive.release. The single-instruction cell is unrealised. ERRBAR result latency is derived as (barrier_release v2 cluster arrive.release minus arrive.relaxed release difference on the same device, from $A/microbench/barrier_release-model) minus result(MEMBAR.ALL.GPU) from this protocol's svc k_fence cell on the same device, installed as experimental; issue_interval 0; CGAERRBAR takes the ERRBAR value (same unit, experimental). The consistency check of the earlier addendum is replaced by this derivation."
+  },
+  {
+   "date": "2026-11-05",
+   "before_install": true,
+   "written": "before the first valid GPU run (the first attempt, h100-r3p run 1, aborted in svc_p* / alu3 at launch time and produced no usable svc / alu3 rows)",
+   "text": "Build-time changes, none touching a measurement window: (1) svc.cu pin buffers moved from static __shared__ arrays (64-128 KiB, over the 48 KiB static limit on both targets) to one extern dynamic buffer with a 128 KiB opt-in; the kernels that do not pin (k_syncs, k_tpoff, k_tact) are launched without dynamic shared memory as in blackwell-prototype; (2) sm_100-only cells are selected by a host-visible build macro SVC_SM100 (sm_103a) instead of __CUDA_ARCH__ guards; (3) svc.cu links libcuda as blackwell-prototype did; the guard-patched cubin path (sass_patch.py) is not ported, so the ppoff/ppoff0 (pk*) rows are written with ipk 0 and are not cells of this protocol; (4) alu3.cu: the thr kernel pins through a static 512 x 16 u32 buffer exactly like alu.cu (the first build indexed a 128 KiB layout into a 66 KiB buffer), operand seeds are deterministic per lane, the sink is sized for 512 threads, mma thr kernels have their own launch path; HADD2.F32 is unrealised on sm_90a (the first build aliased it to a MOV chain); (5) LDC / ULDC / LDCU move to the memory ownership bucket on both devices because memory.constant_cache now carries crossings v2 protocol values on both (f2a000f), as the ownership_rule text already provides; the alu3 ldc_chain cells are removed. Classes cells-v2 assigned to alu3 mma cells that the probe does not emit (BMMA, BMMA.SPARSE, HMMA.SPARSE, IMMA.SPARSE, bf16 / tf32 shapes) are listed as unrealised and keep their leaves."
+  },
+  {
+   "date": "2026-11-05",
+   "written": "after the h100-r3r / b300-r3q data (install-time decisions; every item is recorded in model_v2.py / install_v2.py and in the model.json of each device)",
+   "text": "(1) Ownership buckets are not applied to LDS / LDSM / STSM (the shared protocol v2 installs result = chain slope - acceptance into these service leaves on both devices; the earlier plan row stating 'service = 1/1/0 for shared classes' is superseded by that protocol) nor to LDL / STL (the engine's local-memory latency path through memory.* is not verified); partitioned leaves (b300 LDTM / STTM per tmem_shape) keep their per-shape values. (2) The hopper converter emits the generic classes MEMBAR and FENCE (no scope suffix), so the per-scope k_fence cells (MEMBAR.ALL.CTA 8, MEMBAR.ALL/SC.GPU 655, MEMBAR.ALL.SYS 3234, FENCE.VIEW.ASYNC.S 9 / .G 4 on H100) cannot be installed on h100 without a class split of the hopper route table; they are reported in the model. On b300 they are installed. (3) k_fence issue_interval rule, fixed after the data because 'poff 4x1 / 4s0 throughput' was underspecified: issue_interval = slope(w4s0) / 4 when four warps on one SMSP take > 5 % longer per step than one warp (serialisation observed), else 0 and the /4 value is reported as the unresolved upper bound; these cells are experimental. (4) alu3: every cell fails the SASS gate on both devices (the PTX realisations compile to multi-instruction sequences: cvt + setp + selp, vadd -> IMAD + PRMT, bfind -> FLO, min.f16x2 -> HMNMX2, lop3.b32 -> LOP3, mov -> nothing, LEA -> LEA + IMAD; mma windows hold UIADD3 / IMAD.MOV operand moves); all alu3 classes keep their leaves (unrealised). (5) misc shots exist only for S2R / S2UR (plus LEA64 / ULEA chains); CS2R*, ELECT, VOTE*, MATCH, REDUX, CREDUX, P2R, R2P, R2UR, UVIRTCOUNT have no cell in misc.cu and keep their leaves. (6) ERRBAR / CGAERRBAR: result(MEMBAR.ALL.GPU) from k_fence (the fence.acq_rel.gpu expansion MEMBAR + ERRBAR + CGAERRBAR + CCTL.IVALL) already reproduces the barrier_release v2 release-minus-relaxed difference (H100 655 vs 653, B300 269 vs 250), so the subtraction leaves nothing to attribute to ERRBAR alone; leaves unchanged, recorded as the ownership answer: the whole fence cost is the MEMBAR.ALL.GPU service. (7) Engine note: on both predecessors a MEMBAR stalls the warp's next issue; in cyclescope result_latency only gates destination registers and the write barrier, and MEMBAR has neither, so the installed b300 MEMBAR / FENCE results are inert until the engine applies a no-destination result as the warp's next-issue floor (engine line follow-up)."
+  }
+ ]
+}

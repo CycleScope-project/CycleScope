@@ -1,0 +1,2 @@
+case	kernel	launch_ordinal	grid	block	cluster	cycles_median	cycles_min	cycles_max	cycles_active_avg	sm_clock_khz	sm_clock_source	cache_control	clock_control	repeats	status	source
+FIF-CLASSIC-APPLY-ROPE-P01	_ZN10flashinfer24BatchQKApplyRotaryKernelILb0ELj128ELj8ELj16E13__nv_bfloat16iEEvPT3_S3_S3_S3_PT4_S5_jjjjmmmmmmmmffff	8	224x1x1	16x8x1	0x0x0	54318	53665	54944		2027710	ncu	all	none	3	success	cyclescope reference

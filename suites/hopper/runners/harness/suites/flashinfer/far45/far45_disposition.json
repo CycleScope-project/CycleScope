@@ -1,0 +1,512 @@
+{
+  "flashinfer_append_paged_kv_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "append_len": 8192
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "T0011 修订4 放大（cap 内 batch 并行 / 非 cap KV 每例 ×8） param_overrides: {'append_len': 8192}"
+    ]
+  },
+  "flashinfer_batch_decode_paged_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "batch": 1,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "kv_len": 2048
+    },
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)",
+      "GQA probe (advisory): decode grid dim3(1, num_kv_heads) -> 1 CTA with h_kv=1",
+      "T0011 修订4 放大（cap 内 batch 并行 / 非 cap KV 每例 ×8） gqa_probe: {'kv_len': 2048}"
+    ]
+  },
+  "flashinfer_batch_decode_paged_03_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 4,
+      "kv_len": 2048
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "GQA probe: decode grid dim3(1, num_kv_heads) -> 1 CTA",
+      "T0011 修订4 放大（cap 内 batch 并行 / 非 cap KV 每例 ×8） gqa_probe: {'kv_len': 2048}"
+    ]
+  },
+  "flashinfer_batch_decode_paged_06_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "batch": 1,
+      "heads_kv": 1,
+      "heads_q": 8,
+      "kv_len": 2048
+    },
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)",
+      "GQA probe (advisory): decode grid dim3(1, num_kv_heads) -> 1 CTA with h_kv=1",
+      "T0011 修订4 放大（cap 内 batch 并行 / 非 cap KV 每例 ×8） gqa_probe: {'kv_len': 2048}"
+    ]
+  },
+  "flashinfer_batch_decode_paged_07_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)"
+    ]
+  },
+  "flashinfer_batch_decode_paged_10_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "batch": 1,
+      "heads_kv": 1,
+      "heads_q": 4,
+      "kv_len": 2048
+    },
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)",
+      "GQA probe (advisory): decode grid dim3(1, num_kv_heads) -> 1 CTA with h_kv=1",
+      "T0011 修订4 放大（cap 内 batch 并行 / 非 cap KV 每例 ×8） gqa_probe: {'kv_len': 2048}"
+    ]
+  },
+  "flashinfer_batch_mla_paged_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "kv_len": 512
+    },
+    "sm_cap": 2,
+    "wave_check": [
+      "MLA fa3 grid = (cluster_size, min(num_sm, 2)); correctness check must pass with the capped plan"
+    ]
+  },
+  "flashinfer_batch_mla_paged_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "kv_len": 512
+    },
+    "sm_cap": 2,
+    "wave_check": [
+      "MLA fa3 grid = (cluster_size, min(num_sm, 2)); correctness check must pass with the capped plan"
+    ]
+  },
+  "flashinfer_batch_mla_paged_07_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)"
+    ]
+  },
+  "flashinfer_batch_mla_paged_08_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "kv_len": 512
+    },
+    "sm_cap": 2,
+    "wave_check": [
+      "MLA fa3 grid = (cluster_size, min(num_sm, 2)); correctness check must pass with the capped plan"
+    ]
+  },
+  "flashinfer_batch_prefill_paged_03_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "seqlen_k": 256
+    },
+    "sm_cap": 2,
+    "wave_check": [
+      "FA3 persistent grid = {2} (host SM cap, -DFI_DELIVERY_SM_CAP=2); correctness must pass with the capped plan; if marker median > 500k cycles OR guard > 10% at this scale, record unmeasurable with the measured numbers"
+    ]
+  },
+  "flashinfer_batch_prefill_paged_05_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "batch": 8
+    },
+    "sm_cap": 1,
+    "wave_check": [
+      "scale-up x8 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "sm_cap=1 approved for fa2 plan bucketing (scheduler.cuh Decode/DecodeMLA/MlaCuteSM80/PrefillPlanImpl/TwoStageHolisticPlan): with the xN scale-up the guard offset amortizes; correctness must pass with the capped plan; SASS audit unchanged (host-only)"
+    ]
+  },
+  "flashinfer_batch_prefill_ragged_04_cluster_sm": {
+    "expected_state": "expected_pass",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "unified marker window 0 < median <= 500000: qualifies without re-measurement-rule changes"
+    ]
+  },
+  "flashinfer_batch_prefill_ragged_05_cluster_sm": {
+    "expected_state": "expected_pass",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "unified marker window 0 < median <= 500000: qualifies without re-measurement-rule changes"
+    ]
+  },
+  "flashinfer_batch_prefill_ragged_07_cluster_sm": {
+    "expected_state": "expected_pass",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 4
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "unified marker window 0 < median <= 500000: qualifies without re-measurement-rule changes"
+    ]
+  },
+  "flashinfer_cutlass_fused_moe_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "fused_moe marker-state JIT build completes under MAX_JOBS=8; if it still fails (2h+/ninja), record unmeasurable with the build log as the attempt trail",
+      "primary selection stays a G0 runtime-list item (multi-kernel op); expected_state downgrades to unmeasurable only on build failure"
+    ]
+  },
+  "flashinfer_cutlass_fused_moe_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "fused_moe marker-state JIT build completes under MAX_JOBS=8; if it still fails (2h+/ninja), record unmeasurable with the build log as the attempt trail",
+      "primary selection stays a G0 runtime-list item (multi-kernel op); expected_state downgrades to unmeasurable only on build failure"
+    ]
+  },
+  "flashinfer_cutlass_fused_moe_06_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "fused_moe marker-state JIT build completes under MAX_JOBS=8; if it still fails (2h+/ninja), record unmeasurable with the build log as the attempt trail",
+      "primary selection stays a G0 runtime-list item (multi-kernel op); expected_state downgrades to unmeasurable only on build failure"
+    ]
+  },
+  "flashinfer_cutlass_fused_moe_08_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "fused_moe marker-state JIT build completes under MAX_JOBS=8; if it still fails (2h+/ninja), record unmeasurable with the build log as the attempt trail",
+      "primary selection stays a G0 runtime-list item (multi-kernel op); expected_state downgrades to unmeasurable only on build failure"
+    ]
+  },
+  "flashinfer_fp8_blockscale_gemm_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "cuLibraryGetGlobal finds _ZN18fi_delivery_marker##ptr symbols in the fp8_gemm_kernel cubin; rows land in the module's registered entry; duration guard applies as usual",
+      "fallback: if the symbol lookup fails (internal-linkage symbol spelling), record unmeasurable with this trail"
+    ]
+  },
+  "flashinfer_fp8_blockscale_gemm_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "cuLibraryGetGlobal finds _ZN18fi_delivery_marker##ptr symbols in the fp8_gemm_kernel cubin; rows land in the module's registered entry; duration guard applies as usual",
+      "fallback: if the symbol lookup fails (internal-linkage symbol spelling), record unmeasurable with this trail"
+    ]
+  },
+  "flashinfer_fused_add_rmsnorm_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "registry non-empty at install after gate (registrar present)"
+    ]
+  },
+  "flashinfer_gdn_decode_02_cluster_sm": {
+    "expected_state": "unmeasurable",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "none (unmeasurable; attempt trail below)"
+    ]
+  },
+  "flashinfer_gdn_prefill_02_cluster_sm": {
+    "expected_state": "unmeasurable",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "none (unmeasurable; attempt trail below)"
+    ]
+  },
+  "flashinfer_mamba_state_update_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "freshness gate passes (no stale .so) and the dynamic candidate list resolves a region with valid rows; resolved primary recorded in the container and used by the duration guard"
+    ]
+  },
+  "flashinfer_mamba_state_update_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "mamba_stp module builds under MAX_JOBS=8; variant resolution from regions 0/1/2 as before"
+    ]
+  },
+  "flashinfer_merge_state_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "seqlen": 8
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "scale-up x8 via ['seqlen']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000"
+    ]
+  },
+  "flashinfer_merge_states_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "resolved primary recorded in the container; guard runs on the resolved kernel"
+    ]
+  },
+  "flashinfer_packbits_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "elements": 16384
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "scale-up x8 via ['elements']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000"
+    ]
+  },
+  "flashinfer_rmsnorm_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "registry non-empty at install after gate (registrar present)"
+    ]
+  },
+  "flashinfer_rope_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "seqlen": 2048
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "median 610362.116734114 -> expect ~305181.0 cycles after halving ['seqlen']"
+    ]
+  },
+  "flashinfer_sample_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "scale-up x2 via ['batch']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000"
+    ]
+  },
+  "flashinfer_segment_gemm_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "tokens_per_group": 256
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "scale-up x2 via ['tokens_per_group']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "segment_gemm sm90 target_ctas=2 (compile-time ClusterShape <_2,_2,_1>): keep target 2 CTAs, do not force 1"
+    ]
+  },
+  "flashinfer_segment_gemm_05_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "tokens_per_group": 256
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "scale-up x2 via ['tokens_per_group']: guard |marker-activity|/activity <= 10% and marker median cycles <= 500000",
+      "segment_gemm sm90 target_ctas=2 (compile-time ClusterShape <_2,_2,_1>): keep target 2 CTAs, do not force 1"
+    ]
+  },
+  "flashinfer_single_decode_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 4
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "GQA probe: decode grid dim3(1, num_kv_heads) -> 1 CTA"
+    ]
+  },
+  "flashinfer_single_decode_03_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 8
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "GQA probe: decode grid dim3(1, num_kv_heads) -> 1 CTA"
+    ]
+  },
+  "flashinfer_single_decode_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 8
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "GQA probe: decode grid dim3(1, num_kv_heads) -> 1 CTA"
+    ]
+  },
+  "flashinfer_single_prefill_03_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "freshness gate passes (no stale .so) and the dynamic candidate list resolves a region with valid rows; resolved primary recorded in the container and used by the duration guard"
+    ]
+  },
+  "flashinfer_single_prefill_04_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "freshness gate passes (no stale .so) and the dynamic candidate list resolves a region with valid rows; resolved primary recorded in the container and used by the duration guard"
+    ]
+  },
+  "flashinfer_single_prefill_05_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "freshness gate passes (no stale .so) and the dynamic candidate list resolves a region with valid rows; resolved primary recorded in the container and used by the duration guard"
+    ]
+  },
+  "flashinfer_single_prefill_06_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 2
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "GQA probe: FA3 SingleTileScheduler grid=(2) -> 2 CTAs"
+    ]
+  },
+  "flashinfer_single_prefill_07_cluster_sm": {
+    "expected_state": "expected_pass",
+    "gqa_probe": {
+      "heads_kv": 1,
+      "heads_q": 4
+    },
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "unified marker window 0 < median <= 500000: qualifies without re-measurement-rule changes"
+    ]
+  },
+  "flashinfer_top_k_sample_02_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {
+      "vocab": 64128
+    },
+    "sm_cap": null,
+    "wave_check": [
+      "median 534584.3385093168 -> expect ~267292.0 cycles after halving ['vocab']"
+    ]
+  },
+  "flashinfer_top_p_sample_02_cluster_sm": {
+    "expected_state": "expected_pass",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "unified marker window 0 < median <= 500000: qualifies without re-measurement-rule changes"
+    ]
+  },
+  "flashinfer_xqa_batch_decode_01_cluster_sm": {
+    "expected_state": "measurable_pending_gpu",
+    "gqa_probe": null,
+    "param_overrides": {},
+    "sm_cap": null,
+    "wave_check": [
+      "freshness gate passes (no stale .so) and the dynamic candidate list resolves a region with valid rows; resolved primary recorded in the container and used by the duration guard"
+    ]
+  },
+  "_rules": {
+    "revision": "T0011 修订4 (714dd8fb) + 299517c7 fa2 plan 分桶 sm_cap 增补",
+    "guard_amplification": [
+      "sm_cap 条目（fa2 cap=1 / persistent cap=2）：batch ×8 允许——cap 钳制 grid，batch 并行缩放不展开 CTA 数（.d 设计，299517c7）",
+      "非 sm_cap 条目：只加每 CTA 工作量——decode/mla=kv_len ×8、prefill=seqlen_k ×8（q 分块不增）、append=append_len ×8、逐元素/归一化=行宽 ×8（行数不变）；禁止改 batch",
+      "只有加 batch 才能变长且无 sm_cap 的操作类：记 duration_guard_blocked，不改 batch"
+    ],
+    "hard_requirements": [
+      "每例放大后必须有实测 launch 证据（grid/CTA 数仍 1–2）写进 manifest 与分母行，无证据不算合格",
+      "规则按操作类写本段，不逐例调",
+      "guard 仍不过者记 duration_guard_blocked，不算合格"
+    ]
+  }
+}

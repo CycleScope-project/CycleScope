@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-ASIN-P01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 10682368,
+ "completed": 10682368,
+ "cycles": 33064,
+ "hard": 0,
+ "walls": {
+  "convert": 12.3,
+  "segments": 0.5,
+  "build": 3.5,
+  "sim": 33.5,
+  "total": 49.8
+ },
+ "rss_kb": {
+  "convert": 201420,
+  "segments": 201420,
+  "build": 201420,
+  "sim": 1892420
+ },
+ "hw_cycles": 30656.0,
+ "reference_cache_control": "all",
+ "placement_digest": "c37d98761568346b",
+ "shards": 14
+}

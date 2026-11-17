@@ -1,0 +1,17 @@
+cuda_bindings==13.4.1 --hash=sha256:f444d7e488cbc47e79b7be0d1cfe97201f3e1f186a18ee10f2e4da3265975b16
+cuda_core==1.2.0 --hash=sha256:cd36063535f75a88c4eb44ba9a678441491a5f67a72f62c2e3b797e8a052d438
+cuda_pathfinder==1.8.1 --hash=sha256:ae0137ff9e56ea97499bcbf54f5f2778ec25f3266715ac86da192a795af982a8
+cuda_python==13.4.1 --hash=sha256:b6b114882beb8325139a318a02bcf8feb821dfd724f6f6104c262e2d1e2035ef
+flash_attn_4==4.0.0b31 --hash=sha256:6eda5890b29e90fc46e19a47b4018effae7c042f75ee8aaaeebd3f56ccd82edf
+numpy==2.5.3 --hash=sha256:b7e18c623bb5c95acb3b3328861272816ba199fb531921c5d6d0b675f1fde9e3
+nvidia_cuda_nvdisasm==13.4.92 --hash=sha256:f35a5b6ddb64b6758c22c0b078c5b6ff6d54f7c240cd74bf131ab5bf13b6c3fe
+nvidia_cutlass_dsl==4.8.0.dev0 --hash=sha256:e1ecaa3fd23be3b3581fc79e59ae1357da90925a12085650a825841016876a84
+nvidia_cutlass_dsl_libs_base==4.8.0.dev0 --hash=sha256:673beec61a14f122c6930163e8830adecfe88044fe4998f69974b2ff882a01c7
+nvidia_cutlass_dsl_libs_core==4.8.0.dev0 --hash=sha256:8cb315fe07a9fff0005c426e7498a58634c4c4989ac158e9b9f6967c8003f894
+nvidia_cutlass_dsl_libs_cu12==4.8.0.dev0 --hash=sha256:9ecabb9ce5e4194bc180ed8ba9535fe1618e1af9b4115e4a4fbd6af854373bfd
+nvidia_cutlass_dsl_libs_cu13==4.8.0.dev0 --hash=sha256:df205429c9ac58ccc846a744ce0ab88705b460b0cb91d0ac27e408312d610009
+nvidia_nccl_cu13==2.29.7 --hash=sha256:edd81538446786ec3b73972543e53bb43bcaf0bfc8ef76cb679fcc390ffe136d
+nvidia_nvshmem_cu13==3.4.5 --hash=sha256:290f0a2ee94c9f3687a02502f3b9299a9f9fe826e6d0287ee18482e78d495b80
+protobuf==7.36.1 --hash=sha256:97198b77e369a0abd8e262b8f6c7266c55ddb796a3a12c76d7b8881188ed83aa
+quack_kernels==0.6.5 --hash=sha256:df1ddd31366c82eb9692fe087c671209189dcbde53c909c81a865d4ee66b158d
+typing_extensions==4.16.0 --hash=sha256:481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8

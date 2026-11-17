@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-GROUPED-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 66344,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1923059,
+ "completed": 1923059,
+ "cycles": 23027,
+ "hard": 0,
+ "walls": {
+  "convert": 6.9,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 5.9,
+  "total": 13.4
+ },
+ "rss_kb": {
+  "convert": 291256,
+  "segments": 291256,
+  "build": 291256,
+  "sim": 518076
+ },
+ "hw_cycles": 26260.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 3
+}

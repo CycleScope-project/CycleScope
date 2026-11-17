@@ -1,0 +1,36 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "nanosleep",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "mechanisms": [
+  "control.nanosleep (plain NANOSLEEP: cycles affine in requested_sleep_cycles; today structural slope 1 intercept 0)",
+  "control.nanosleep.syncs_wake_cycles (new field): NANOSLEEP.SYNCS wake latency after the awaited phase releases (today 0: the engine wakes the sleeper at the release)"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "Round 31 / 35: producer / consumer kernels with try_wait + NANOSLEEP.SYNCS loops overshoot (DG3-HC-PRENORM 1.16, CU3-C92-MOE 1.26, CU3-C74-STREAMK-C06 1.31) and hardware shows 50-160 cycles of long_scoreboard per NANOSLEEP; the engine wakes a sleeper exactly at the phase release and sleeps a plain NANOSLEEP for exactly its hint. How long after the awaited arrive does a NANOSLEEP.SYNCS sleeper resume, does it depend on the hint, and how long does a plain NANOSLEEP(H) actually sleep?",
+ "engine_rules_declared_before_data": {
+  "syncs": "wake = max(release, sleep start) + syncs_wake_cycles (constant per device if independent of the hint within 20 %, else knots over the hint in cycles); already-released phases keep the no-sleep rule.",
+  "plain": "cycles = intercept + slope x requested_sleep_cycles (affine fit over H); replaces the structural 1 / 0 when the fit's residual <= 10 % and runs <= 10 %.",
+  "candidate order": [
+   "baseline (0 / structural)",
+   "measured"
+  ]
+ },
+ "probe": "tools/microbench/nanosleep/probe/nanosleep.cu: one CTA, 2 warps. Cell `syncs(H, D)`: an mbarrier (count 1) in shared memory; warp 0 (consumer) enters `do { mbarrier.try_wait.parity.shared.b64 p, [bar], phase, H; } while (!p)` with the suspend-time hint H in ns (ptxas emits SYNCS.PHASECHK + NANOSLEEP.SYNCS), then reads clock64 t_x; warp 1 (producer) spins on clock64 until t_0 + D cycles (D in {2000, 20000, 200000} so the consumer is asleep when the arrive comes), reads clock64 t_a immediately before `mbarrier.arrive`; delta = t_x - t_a; H in {0, 200, 1000, 10000, 100000, 1000000} ns. Cell `plain(H)`: one warp, clock64 around `nanosleep.u32 H` for the same H set (D unused). bar.sync between reps; 16 launches x 33 reps; two runs per device. Clock-to-ns conversion from the run's reported sm_clock_khz for the leaf's cycle units.",
+ "sass_gate": "tools/microbench/nanosleep/sass_check.py: syncs loop body = SYNCS.PHASECHK.TRANS64.TRYWAIT + NANOSLEEP.SYNCS + BRA (and nothing else between the two clock reads apart from the loop); plain window = exactly one NANOSLEEP. Control words recorded.",
+ "derivation": "delta(H, D) median over launches x reps; syncs_wake_cycles = median over D of delta per H; constant if the per-H medians agree within 20 % (then value = median over H and D), else knots over H (cycles); plain: T(H) median -> OLS affine over H in cycles; usability: p10-p90 spread <= 30 % of the median per cell, runs <= 10 %.",
+ "install": "common control.nanosleep gains constant field syncs_wake_cycles (default 0 = today); <arch>/leaves: syncs_wake_cycles = measured (source nanosleep.<dev>.r<n>), cycles affine slope / intercept = measured; engine: NANOSLEEP.SYNCS wake += syncs_wake_cycles; plain path already applies the affine row; CTest fixture (release at t -> sleeper issues next at t + syncs_wake); A/B 500 x 2 vs $A/merge/lga46.",
+ "not_allowed": "no case tuning; no change after data; devices install on their own data.",
+ "addenda": [
+  {
+   "date": "2026-11-07",
+   "written": "after h100-r4 / b300-r4 (r1-r3 probe defects: an 8-byte memcpy from a 4-byte table made the producer spin forever; parity per rep; fail-fast)",
+   "text": "(reading; decision none on both devices by the declared usability gate, nothing installed) NANOSLEEP.SYNCS wake after the arrive: h100 130 cycles median, constant over H within 20 %; b300 knots 100.8 (H = 0) / 129 (200-10000 ns) / 79 (>= 1e5 ns). The per-cell distributions are quantised (two or three values ~50 cycles apart, e.g. 83 / 130 / 167 on h100), so the p10-p90 <= 30 % gate fails on several cells -- a wake granularity of the sleep timer rather than noise. Plain NANOSLEEP(H ns): h100 12083 + 4.095 x H cycles, b300 12411 + 4.314 x H (residual 4.7 %): the engine's structural slope 1 / intercept 0 in requested cycles understates a plain sleep by ~2x plus ~6 us. Version 2 should declare the quantised wake (median of the dominant quantum) and the plain affine with an appropriate gate, then install both; the corpus impact is on producer / consumer kernels that spin with NANOSLEEP (DG3-HC-PRENORM, CU3-C92-MOE, deepgemm kgrouped)."
+  }
+ ]
+}

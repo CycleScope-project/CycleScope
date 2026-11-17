@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C76-CONV-FPROP-R04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 54412,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1620851,
+ "completed": 1620851,
+ "cycles": 21308,
+ "hard": 0,
+ "walls": {
+  "convert": 6.1,
+  "segments": 0.0,
+  "build": 0.3,
+  "sim": 3.9,
+  "total": 10.3
+ },
+ "rss_kb": {
+  "convert": 325620,
+  "segments": 325620,
+  "build": 325620,
+  "sim": 368988
+ },
+ "hw_cycles": 22072.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

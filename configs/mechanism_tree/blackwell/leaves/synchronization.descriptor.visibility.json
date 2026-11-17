@@ -1,0 +1,25 @@
+{
+ "synchronization.descriptor.visibility.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "descriptor_visibility.b300.r4"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "descriptor_visibility.b300.r4"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

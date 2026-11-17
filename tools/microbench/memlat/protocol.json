@@ -1,0 +1,14 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "memlat",
+ "frozen_before_gpu": true,
+ "date": "2026-11-04",
+ "mechanisms": ["memory.l1.service", "memory.l2.service", "memory.dram.service", "memory.l2_partition", "memory.constant_cache"],
+ "fields": ["l1.latency_cycles", "l2.latency_cycles", "dram.latency_cycles", "far_hit_cycles", "constant hit/miss/same_line latency"],
+ "devices": {"h100": "sm_90a", "b300": "sm_103a"},
+ "purpose": "Load-to-use total latency of a hit at each level, one definition for both devices (the engine now treats every level latency as a total, mechanism-merge-plan.md section 2.1). B300 values come from blackwell-prototype stage27 memlat (38.5 / 305.4 / 874.9); H100 carries predecessor increments (59 / 287 / 588+287) under a different convention and the far-hit 159.6 from a none-reference probe. Both devices are measured with the same probe so the convention is identical.",
+ "probe": "blackwell-prototype-t0058 calibration/sm103/stage27_memlat_memory.cu + stage27_memlat_ops.cu (single-thread dependent pointer chase, clock64 brackets, SASS gate stage27_memlat_sass_check.py) copied verbatim into tools/microbench/memlat/probe/ and compiled for sm_90a / sm_103a. Cells: L1 hit (footprint 4 KiB, warm pass), L2 hit near / far partition (footprint 2 MiB resident after a warm pass; partition side from the SM's %smid vs the line's address — both sides sampled by running the chase on 8 SMs and reporting the two latency clusters), DRAM (footprint 1 GiB random cyclic order, ncu --cache-control all, pass 0), constant cache hit / same-line / miss (ld.const chain). 4 outer repetitions, 1024 dependent loads each.",
+ "derivation": "median per cell; l2.latency = the near cluster, far_hit_cycles = far cluster - near cluster; dram.latency = pass-0 chase over the 1 GiB footprint; constant_cache hit / same_line / miss as measured.",
+ "acceptance": "spread (P90 - P10) / median < 5 % per cell -> measured; b300 L1/L2/DRAM must reproduce 38.5 / 305.4 / 874.9 within 5 % (else report both, install new as experimental); the far/near split must show two clusters separated by more than 3x the within-cluster spread, otherwise far_hit_cycles stays as it is and is listed.",
+ "install": "<arch>/leaves/memory.{l1,l2,dram}.service.json latency fields, memory.l2_partition far_hit_cycles (b300 gets its first value; the mechanism moves to common), memory.constant_cache (b300 first value, mechanism moves to common); source keys memlat.<device>.<run>."
+}

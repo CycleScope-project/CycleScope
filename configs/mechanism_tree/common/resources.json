@@ -1,0 +1,185 @@
+[
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "issue_frontend_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "alu_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "fma_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "fmaheavy_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "xu_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "uniform_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "shfl_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "shfl_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "fp64_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "match_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "matrix_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "tensor_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "lsu_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 4,
+  "name": "atomic_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units",
+   "hopper.resource.inflight_caps"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 272,
+  "name": "async_copy_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units",
+   "hopper.resource.inflight_caps"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 16,
+  "name": "tma_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units",
+   "hopper.resource.inflight_caps"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "fence_view_async_sm",
+  "scope": "sm",
+  "sources": [
+   "structural.execution_units"
+  ]
+ },
+ {
+  "copy_count": 1,
+  "initiation_interval_cycles": 1,
+  "max_inflight_per_copy": 0,
+  "name": "membar_cta_smsp",
+  "scope": "smsp",
+  "sources": [
+   "structural.execution_units"
+  ]
+ }
+]

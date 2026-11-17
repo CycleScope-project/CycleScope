@@ -1,0 +1,25 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "service_latency",
+ "frozen_before_gpu": true,
+ "date": "2026-11-04",
+ "mechanisms": ["instruction.service"],
+ "fields": ["result_latency_cycles", "completion_latency_cycles", "issue_interval_cycles"],
+ "devices": {"h100": "sm_90a", "b300": "sm_103a (control)"},
+ "purpose": "One definition of the instruction.service register-class fields on both devices (mechanism-leaf-alignment-plan.md P1 / section 3). Blackwell carries alu.cu / alu2.cu measurements (dependent-chain slope = result latency, writeback = completion, per-SMSP throughput = issue interval); Hopper carries predecessor numbers of unknown derivation (IADD3 10 vs 4, ISETP 9 vs 4, S2R 5 vs 23) and 28 classes with multi-axis lookup tables. The same probes run on H100; B300 is re-run as the control.",
+ "probe": "blackwell-prototype tools/microbench/probes/alu.cu + alu2.cu + mb.cuh copied verbatim into tools/microbench/service_latency/probe/ (lat OP U: one warp, U dependent instances between two clock reads, Fibonacci form; thr OP K: 4 x wps warps x 8 independent chains x K steps between bar.sync; alu2: v/u-lat for predicate-pair and uniform classes, u-thr for uniform throughput). Built for sm_90a / sm_103a from one source; classes that do not exist on sm_90a (FFMA2 / FADD2 / FMUL2 / IMAD.HI forms absent, BMSK/SGXT ok) are skipped by the build's gate and recorded as unrealised. SASS gate: sass_check.py check_alu / check_alu2 (verbatim) -- exactly U (8K) target instructions in the window.",
+ "cells": "every (mode, op) the probes emit; U in the probe's default sets; --launches 8 --reps 33; two runs per device (run-a / run-b)",
+ "derivation": {
+  "result_latency_cycles": "OLS slope over U of the per-U medians of the lat series (issue -> dependent issue); for pair chains (ISETP+SEL, FSETP+FSEL, UISETP+USEL) the partner chain's slope is subtracted (alu2 ALU2_CLASSES rule)",
+  "completion_latency_cycles": "= result latency (register writeback releases the scoreboard at result-ready for every fixed-latency class the probe covers)",
+  "issue_interval_cycles": "thr slope over K divided by (chains per thread x wps), the wps = 1 cell (one warp per SMSP) is the per-SMSP admission interval; wps = 4 is reported as a diagnostic",
+  "class map": "probe op -> operation_class exactly as blackwell-prototype wave3_leaves.py LATENCY_CLASSES / ALU2_CLASSES (data table copied into model.py)"
+ },
+ "acceptance": {
+  "cell": "lat fit max relative residual <= 5 % and the two runs agree within 5 % -> measured; otherwise experimental and listed",
+  "b300_control": "a class whose new result latency or interval differs from the installed b300 leaf by more than 10 % is reported with both numbers; the b300 leaf is not changed from this run (the predecessor value stays), the h100 value is installed as measured when its own cell passes",
+  "h100": "install every passing class; classes the probe cannot realise on sm_90a stay as they are and are listed"
+ },
+ "install": "hopper/leaves/instruction.service.json register classes: result / completion / issue_interval from this run (source service_latency.h100.r1); the memory and tensor classes are set to the structural 1 / 1 / 0 (latency lives in memory.* / storage.* / tensor.*) and the 28 Hopper lookup-table classes lose their tables in the same change (plan section 3)",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold change after data"
+}

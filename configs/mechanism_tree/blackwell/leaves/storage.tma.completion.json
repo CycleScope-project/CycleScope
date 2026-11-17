@@ -1,0 +1,977 @@
+{
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=store/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       512,
+       53.0
+      ],
+      [
+       2048,
+       101.0
+      ],
+      [
+       8192,
+       293.0
+      ],
+      [
+       16384,
+       549.0
+      ],
+      [
+       32768,
+       1061.0
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.tma_store.completion.ublkcp",
+     "tma_forms.b300.r2",
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.tma_store.completion.ublkcp"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=load/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1024,
+       408.04
+      ],
+      [
+       4096,
+       422.65
+      ],
+      [
+       16384,
+       515.56
+      ],
+      [
+       32768,
+       594.86
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r5",
+     "tma_forms.b300.r5.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.tma_store.completion.ublkcp"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKCP/bulk_direction=load/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       4096,
+       419.83
+      ],
+      [
+       16384,
+       564.15
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r5"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "tma_forms.b300.r5"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UBLKRED/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1024,
+       121.0
+      ],
+      [
+       4096,
+       241.0
+      ],
+      [
+       16384,
+       721.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.1.shared"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=tile/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       16384,
+       466.076171875
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.tma_bytes.completion.dc1"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1"
+    ]
+   },
+   "cut_extra_cycles": {
+    "model": {
+     "axis": "cut_rows",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       178
+      ],
+      [
+       4096,
+       178
+      ]
+     ]
+    },
+    "sources": [
+     "tma_oob.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=gather4/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       277.099
+      ],
+      [
+       256,
+       278.1769
+      ],
+      [
+       512,
+       280.3326
+      ],
+      [
+       1024,
+       284.6442
+      ],
+      [
+       2048,
+       293.2672
+      ],
+      [
+       4096,
+       310.5134
+      ],
+      [
+       8192,
+       345.0057
+      ],
+      [
+       16384,
+       413.9904
+      ],
+      [
+       32768,
+       551.9597
+      ],
+      [
+       65536,
+       827.8983
+      ],
+      [
+       1048576,
+       9106.057
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1.prior"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=im2col/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       277.099
+      ],
+      [
+       256,
+       278.1769
+      ],
+      [
+       512,
+       280.3326
+      ],
+      [
+       1024,
+       284.6442
+      ],
+      [
+       2048,
+       293.2672
+      ],
+      [
+       4096,
+       310.5134
+      ],
+      [
+       8192,
+       345.0057
+      ],
+      [
+       16384,
+       413.9904
+      ],
+      [
+       32768,
+       551.9597
+      ],
+      [
+       65536,
+       827.8983
+      ],
+      [
+       1048576,
+       9106.057
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1.prior"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=tile/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       16384,
+       473.443359375
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.2"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1.prior"
+    ]
+   },
+   "cut_extra_cycles": {
+    "model": {
+     "axis": "cut_rows",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       178
+      ],
+      [
+       4096,
+       178
+      ]
+     ]
+    },
+    "sources": [
+     "tma_oob.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=gather4/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       464.02685546875
+      ],
+      [
+       1048576,
+       464.02685546875
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.2",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.2"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1.prior"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMALDG/tma_form=im2col/destination_count=2-4294967295": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       464.02685546875
+      ],
+      [
+       1048576,
+       464.02685546875
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.2",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w2.tma.completion.destination_count.2"
+    ]
+   },
+   "cold_extra_cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       605.774
+      ],
+      [
+       256,
+       310.023
+      ],
+      [
+       512,
+       332.676
+      ],
+      [
+       1024,
+       346.883
+      ],
+      [
+       2048,
+       359.368
+      ],
+      [
+       4096,
+       359.283
+      ],
+      [
+       8192,
+       494.966
+      ],
+      [
+       16384,
+       492.149
+      ],
+      [
+       32768,
+       497.72
+      ]
+     ]
+    },
+    "sources": [
+     "tma_cold.b300.r1.prior"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMAREDG/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2048,
+       103.0
+      ],
+      [
+       8192,
+       343.0
+      ],
+      [
+       16384,
+       663.0
+      ],
+      [
+       32768,
+       1303.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.tma_store.completion.utmaredg"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=tile/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2048,
+       76.0
+      ],
+      [
+       8192,
+       275.0
+      ],
+      [
+       16384,
+       524.0
+      ],
+      [
+       32768,
+       1036.0
+      ]
+     ]
+    },
+    "sources": [
+     "tma_forms.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.tma_store.completion.utmastg"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=scatter4/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       277.099
+      ],
+      [
+       256,
+       278.1769
+      ],
+      [
+       512,
+       280.3326
+      ],
+      [
+       1024,
+       284.6442
+      ],
+      [
+       2048,
+       293.2672
+      ],
+      [
+       4096,
+       310.5134
+      ],
+      [
+       8192,
+       345.0057
+      ],
+      [
+       16384,
+       413.9904
+      ],
+      [
+       32768,
+       551.9597
+      ],
+      [
+       65536,
+       827.8983
+      ],
+      [
+       1048576,
+       9106.057
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.tma.completion.root/operation_class=UTMASTG/tma_form=im2col/destination_count=0-1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "transfer_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       128,
+       277.099
+      ],
+      [
+       256,
+       278.1769
+      ],
+      [
+       512,
+       280.3326
+      ],
+      [
+       1024,
+       284.6442
+      ],
+      [
+       2048,
+       293.2672
+      ],
+      [
+       4096,
+       310.5134
+      ],
+      [
+       8192,
+       345.0057
+      ],
+      [
+       16384,
+       413.9904
+      ],
+      [
+       32768,
+       551.9597
+      ],
+      [
+       65536,
+       827.8983
+      ],
+      [
+       1048576,
+       9106.057
+      ]
+     ]
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared",
+     "form.reexpressed.2026-11-05"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w4.tma.completion.shared"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

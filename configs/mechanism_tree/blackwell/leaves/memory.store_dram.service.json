@@ -1,0 +1,17 @@
+{
+ "memory.store_dram.service.root": {
+  "fields": {
+   "store_dram.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 32.42047658835117
+    },
+    "sources": [
+     "mechtree.sm_dram_port.r1.write",
+     "crossings.store_dram_port.b300.r2"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

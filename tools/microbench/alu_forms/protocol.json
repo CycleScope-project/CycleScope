@@ -1,0 +1,53 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "alu_forms",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "mechanisms": [
+  "instruction.service issue_interval_cycles of the integer classes bound to alu_smsp / fmaheavy_smsp (IADD3, LOP3, SHF, IMAD)",
+  "register_file.operand_read"
+ ],
+ "ownership": "cluster-local; no commit of the other lines on these leaves since main 83ad9681.",
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "How many cycles per instruction does an SMSP need for independent integer instructions as a function of the number of warps on it (1, 2, 4, 8) and of the instruction's register-source form?",
+ "why": "flashinfer_segment_03 (H100 full GPU, sim / ncu 1.29; grid 8192, 16 warps per SMSP, about 100 instructions per warp): the simulation spends 1229 cycles per warp waiting for units (IADD3 / LOP3 / PRMT / ISETP / VIADD on alu_smsp, issue interval 2.0 from service_latency's one-warp throughput cell), the hardware finishes a warp in 1560 cycles of which 794 are the wait for load data: more than one integer instruction per cycle and SMSP. The ifetch bodies (add.u32 r, r, 1) run at 1.00 cycle per instruction for one warp.",
+ "probe": "probe/alu_forms.cu: kinds add_imm, add_rr, add_rrr, xor_rr, and_imm, mad_rrr, add_rs, shl_imm on eight independent registers; W = 1, 2, 4, 8 warps per SMSP; U = 64 / 128 / 256; --launches 16 --reps 65, two runs.",
+ "derivation": "OLS slope of the median window over U per (kind, W), per-warp window and CTA window; SMSP cycles per instruction = CTA slope / W.",
+ "prediction_of_the_installed_model": "alu_smsp classes (IADD3 2.011, LOP3 2.006, SHF as installed) and IMAD (2.006 on fmaheavy_smsp): CTA slope = interval x W for every source form, i.e. 2.0 / 4.0 / 8.0 / 16.0 at W = 1 / 2 / 4 / 8; forms with three distinct sources not below the operand-read rule (1.5 per instruction and warp).",
+ "reading": {
+  "usable": "OLS residual <= 2 %, runs within 3 %; SASS: the window is U instructions of one opcode class, listed with operand forms and reuse flags.",
+  "R1": "every kind within 10 % of interval x W -> the installed intervals hold with several warps; the flashinfer excess is elsewhere.",
+  "R2": "otherwise the table (kind, W) is the result; a rule (interval by source form, or an issue-slot bound instead of a unit) is proposed in an addendum (post hoc) and judged on kinds its constants do not come from."
+ },
+ "not_allowed": "no value from full-GPU error; no per-kernel rule.",
+ "addenda": [
+  {
+   "date": "2026-11-12",
+   "written": "after run 1 ($A/fg-line-cold/alu/{h100,b300}-r1; $A/fg-line-cold/tools/alu_slopes.py), before run 2",
+   "reading_of_run_1": "ptxas folded the kinds whose repeated operation on one register combines: add_imm, xor_rr, and_imm, shl_imm became 8 instructions per window (slope 0) and add_rr / add_rs 32 IADD3 with the source doubled; on b300 add_rrr was folded as well. What survived: h100 add_rrr (64 IADD3 with three distinct sources) 2.00 / 3.99 / 8.14 / 16.01 cycles per instruction at W = 1 / 2 / 4 / 8, mad_rrr (64 IMAD) 2.04 / 4.04 / 8.08 / 16.11 (b300 2.00 / 4.00 / 8.03 / 16.04), add_rr / add_rs 2.0 x W per remaining instruction on both devices. R1 holds for the forms with two or three register sources; the one-source forms were not measured.",
+   "run_2": {
+    "kinds (probe addition; visit j = I >> 3 of register k = I & 7)": "imm_ax: even j add.u32 d, d, 1, odd j xor.b32 d, d, 85; rr_ax: even j add.u32 d, d, a[k], odd j xor.b32 d, d, b[k]; imm_as: even j add.u32 d, d, 1, odd j shl.b32 d, d, 1.",
+    "cells": "W = 1, 2, 4, 8; U = 64 / 128 / 256; both devices.",
+    "prediction_of_the_installed_model": "2.0 x W per instruction for all three kinds (IADD3 / VIADD / LOP3 / SHF on alu_smsp).",
+    "reading": "SASS first: the window must hold U instructions (else the kind is void). R1 as before. If the one-source kinds are at 1.0 x W while rr_ax is at 2.0 x W, the interval of these classes depends on the number of register sources (one source: one per cycle) and that table is the result; the rule is then proposed in a further addendum."
+   }
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 2 ($A/fg-line-cold/alu/{h100,b300}-r2)",
+   "reading_of_run_2 (CTA window, cycles per instruction, W = 1 / 2 / 4 / 8)": {
+    "imm_ax": "window = 32 VIADD r, r, imm + 32 LOP3.LUT r, r, imm (one register source each): h100 1.02 / 2.04 / 4.08 / 8.27, b300 1.03 / 2.00 / 4.00 / 8.01 -> 1.0 x W; the installed model gives 2.0 x W. R1 fails for one-source forms.",
+    "imm_as": "folded by ptxas to 16 VIADD + 16 LEA (U = 64): per remaining instruction 1.04 / 2.07 / 4.10 / 8.35 (h100), 1.07 / 2.00 / 4.00 / 8.01 (b300) -> 1.0 x W.",
+    "rr_ax": "window = 30-31 IMAD.IADD r, r2, 0x1, r3 + 32 LOP3.LUT with two register sources: h100 1.54 / 2.59 / 4.90 / 9.63, b300 1.63 / 2.79 / 5.14 / 10.1 -> about 1.25 x W from two warps on; two classes on two units, not separable.",
+    "with run 1": "three register sources (IADD3, IMAD) and IADD3 with a repeated source: 2.0 x W."
+   },
+   "rule (post hoc)": "an instruction of VIADD, LOP3 or LEA that reads at most one general-purpose register occupies its SMSP unit for one cycle. The class intervals stay for the other forms.",
+   "installed": "instruction.service field single_source_issue_interval_cycles = 1.0 on the VIADD, LOP3 and LEA leaves of both devices (experimental). Not installed: two-source forms (about 1.25 measured for a two-class mix against 2.0), other classes of the same unit with one source (ISETP, SHF, PRMT, IADD3 with an immediate were folded or not in the windows).",
+   "not_allowed_reminder": "no value was chosen by case error."
+  }
+ ]
+}

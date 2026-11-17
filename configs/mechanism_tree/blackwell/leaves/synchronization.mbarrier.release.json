@@ -1,0 +1,35 @@
+{
+ "synchronization.mbarrier.release.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 87.78346192794399
+    },
+    "sources": [
+     "mechtree.w1.mbarrier.release",
+     "barrier_release.b300.r3"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.w1.mbarrier.release"
+    ]
+   },
+   "suspended_wake_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 145.6
+    },
+    "sources": [
+     "trywait_wake.b300.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-BWD-GQA-2C-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 263895,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3180545,
+ "completed": 3180545,
+ "cycles": 41603,
+ "hard": 0,
+ "walls": {
+  "convert": 6.8,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 8.3,
+  "total": 15.7
+ },
+ "rss_kb": {
+  "convert": 345828,
+  "segments": 345828,
+  "build": 345828,
+  "sim": 552208
+ },
+ "hw_cycles": 47535.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

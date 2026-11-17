@@ -1,0 +1,7 @@
+{
+  "doc": "single-leaf mechanism",
+  "program": {"event": "issue", "parameter_schema": "instruction_template", "operation_classes": []},
+  "root": {"parameter": {"scope": "instruction", "fields": {
+    "latency_cycles": {"model": {"kind": "constant", "value": 4}, "sources": ["src.measured"]},
+    "resource": {"model": {"kind": "constant", "value": "fma_smsp"}, "sources": ["src.structural"]}}}}
+}

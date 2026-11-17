@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "fa3_kvcache_decode_01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 105234,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 14729028,
+ "completed": 14729028,
+ "cycles": 72511,
+ "hard": 0,
+ "walls": {
+  "convert": 21.4,
+  "segments": 0.0,
+  "build": 1.7,
+  "sim": 32.6,
+  "total": 55.7
+ },
+ "rss_kb": {
+  "convert": 426848,
+  "segments": 426848,
+  "build": 426848,
+  "sim": 1587308
+ },
+ "hw_cycles": 76867.0,
+ "reference_cache_control": "all",
+ "placement_digest": "673865ae2f0a6ce1",
+ "shards": 16
+}

@@ -1,0 +1,24 @@
+{
+ "doc": "A TMA reduce store (UTMAREDG) occupies its SM's store port and the shared L2-write service `sector_cost_ratio` times as long per sector as a plain store. The ratio applies on the SM store port, the per-GPC and the GPU-wide L2-write service.",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "UTMAREDG"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "tma_reduce_store"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "enabled": {
+   "kind": "constant"
+  },
+  "sector_cost_ratio": {
+   "kind": "constant"
+  }
+ }
+}

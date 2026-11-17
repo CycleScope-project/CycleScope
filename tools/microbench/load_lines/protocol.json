@@ -1,0 +1,34 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "load_lines",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-10",
+ "kind": "attribution run: it fixes which of two pictures holds; no leaf value is installed from it",
+ "mechanisms": [
+  "memory.l1.service (cost of a load whose lanes touch several lines)",
+  "local (stack) memory footprint in the job"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "question": "hp cutlass_dense_cpasync_05: instructions waiting for a preceding LDL (stack reload) cost ~191 cycles per LDL on hardware and ~24 in the simulation; installing L1 allocation of LDGSTS (ldgsts_l1) moved the case by 0.003. In the job every LDL / STL of every warp and lane touches the same 3 sectors (the stack's virtual address), i.e. one line shared by all threads. ldgsts_l1 r1 showed, unintended, that one global load whose 32 lanes touch 32 different L1-resident lines takes ~260 cycles against 36 for one line. Is a stack load a 32-line access (each thread's frame in its own line), and what does a load cost as a function of the distinct lines its lanes touch?",
+ "probe": "tools/microbench/load_lines/probe/load_lines.cu (header comment): one warp, lanes in {1,2,4,8,16,32} active; family global with lane spread 0 / 32 / 128 B, family local (volatile unsigned buf[256] on each thread's stack); data loaded twice first; 8 dependent loads timed, cycles per load; 16 x 7 samples, runs a and b.",
+ "sass_gate": "run.sh: the local kernel holds >= 8 LDL, the global kernel none and >= 8 LDG; else stop.",
+ "derivation": "T(family, spread, lanes) = median cycles per load (median of runs). slope_g = OLS slope of T(global, 128, lanes) over lanes; slope_l = OLS slope of T(local, lanes) over lanes.",
+ "acceptance": "Controls: T(global, 0, 32) within 15 % of the ldgsts_l1 r2 hit latency (36.1 b300 / 36.2 h100); T(global, 128, 32) within 15 % of ldgsts_l1 r1 T(none) (269 b300 / 259 h100); runs within 5 %.",
+ "outcomes_declared_before_data": {
+  "per_thread_lines": "slope_l >= 0.5 x slope_g and slope_g >= 3 cycles per lane: a stack load touches one line per active lane; the job's single shared stack line is wrong for timing. Next step (own change, own gate): local accesses carry per-lane sectors (thread-private address = thread index, frame offset) and the engine's per-line cost of a multi-line load is measured and installed under an addendum of this protocol.",
+  "shared_line": "slope_l <= 0.15 x slope_g: stack loads of a warp behave like one line; the LDL waits stay unexplained.",
+  "other": "recorded only."
+ },
+ "not_allowed": "no case-cycle tuning; no threshold change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-10",
+   "after_run": "r1 (b300-r1, h100-r1; $A/microbench/load_lines/)",
+   "text": "Controls: T(global, 0, 32) 36.1 / 35.5 passes; T(global, 128, 32) 87.9 / 87.2 against the declared 269 / 259 fails (the ldgsts_l1 r1 kernel had 16 KiB of dynamic shared memory and gave 3x this value for the same address layout; not explained), so by the protocol nothing is read. The h100 local cell is invalid (0.8 cycles per load: the timed chain holds no dependent stack load on sm_90a although the kernel has LDLs). Recorded, not used: global, one line per lane: 36.1 -> 87.9 (b300) / 35.5 -> 87.2 (h100) from 1 to 32 lanes, 1.7 cycles per extra line; one sector per lane: 36.1 -> 47.4; local on b300: 41.8 flat from 1 to 32 lanes. On b300 a stack load does not grow with the active lanes, which is the declared shared_line picture: the per-thread stack footprint does not explain the LDL waits."
+  }
+ ]
+}

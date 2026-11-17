@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C74-STREAMK-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 337089,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2611437,
+ "completed": 2611437,
+ "cycles": 67798,
+ "hard": 0,
+ "walls": {
+  "convert": 8.0,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 6.5,
+  "total": 15.1
+ },
+ "rss_kb": {
+  "convert": 311588,
+  "segments": 311588,
+  "build": 311588,
+  "sim": 527912
+ },
+ "hw_cycles": 41752.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 7
+}

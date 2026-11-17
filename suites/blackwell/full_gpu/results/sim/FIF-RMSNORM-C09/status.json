@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FIF-RMSNORM-C09",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 29354440,
+ "completed": 29354440,
+ "cycles": 80769,
+ "hard": 0,
+ "walls": {
+  "convert": 31.5,
+  "segments": 0.4,
+  "build": 6.1,
+  "sim": 132.4,
+  "total": 170.4
+ },
+ "rss_kb": {
+  "convert": 474332,
+  "segments": 474332,
+  "build": 474332,
+  "sim": 5470116
+ },
+ "hw_cycles": 124255.0,
+ "reference_cache_control": "all",
+ "placement_digest": "72027379f5993004",
+ "shards": 16
+}

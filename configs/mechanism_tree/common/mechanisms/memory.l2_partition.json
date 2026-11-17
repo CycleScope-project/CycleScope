@@ -1,0 +1,25 @@
+{
+ "doc": "imported from legacy mechanism memory.l2_partition",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.l2_partition",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "far_hit_cycles": {
+   "kind": "constant"
+  },
+  "pool_count": {
+   "kind": "constant"
+  },
+  "replicate_read_lines": {
+   "kind": "constant"
+  }
+ }
+}

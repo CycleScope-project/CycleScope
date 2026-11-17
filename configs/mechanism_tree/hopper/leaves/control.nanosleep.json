@@ -1,0 +1,50 @@
+{
+ "control.nanosleep.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "requested_sleep_cycles",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12082.8,
+     "kind": "affine",
+     "slope": 1.044
+    },
+    "sources": [
+     "nanosleep.h100.v2r1"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.nanosleep_requested"
+    ]
+   },
+   "syncs_wake_cycles": {
+    "model": {
+     "axis": "requested_sleep_cycles",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       136.0
+      ],
+      [
+       4294967295,
+       136.0
+      ]
+     ]
+    },
+    "sources": [
+     "nanosleep.h100.v2r1"
+    ]
+   }
+  },
+  "scope": "warp"
+ }
+}

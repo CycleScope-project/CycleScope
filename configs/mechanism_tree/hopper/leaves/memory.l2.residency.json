@@ -1,0 +1,28 @@
+{
+ "memory.l2.residency.root": {
+  "fields": {
+   "l2.resident_lines": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "hopper.d7385a1275d26626d211425c"
+    ]
+   },
+   "l2.resident_lines_lower_bound": {
+    "model": {
+     "kind": "constant",
+     "value": 393216
+    },
+    "sources": [
+     "hopper.075a4269fbf2b2ff78fc0ee4",
+     "hopper.41380ab2c54be80b2fe95337",
+     "hopper.1738978f5c9b91782ba19c4f",
+     "hopper.2cc9433daf531204639409f4"
+    ]
+   }
+  },
+  "scope": "cluster"
+ }
+}

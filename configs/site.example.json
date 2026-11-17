@@ -1,0 +1,13 @@
+{
+  "_note": "Site configuration for this machine. Copy to configs/site.json (gitignored) or point CYCLESCOPE_SITE_CONFIG at a copy. Every setting can also be given by an environment variable, which wins over this file; null / {} means: use the default.",
+  "_artifact_root": "Root for tools/, build/, captures and caches. Absolute, or relative to the repository root. Env: CYCLESCOPE_ARTIFACT_ROOT. Default: <repo>/artifacts",
+  "artifact_root": "artifacts",
+  "_build_dir": "Directory holding the built binaries (cyclescope-engine, cyclescope-capture-facts, ...); prepended to PATH by `cyclescope run`. Env: CYCLESCOPE_BUILD_DIR. Default: <repo>/build",
+  "build_dir": null,
+  "_tracer": "NVBit tracer .so per SM architecture, e.g. {\"sm_90a\": \"/opt/cyclescope/tracer-sm_90a.so\"}. Env: CYCLESCOPE_TRACER (any architecture). Default: <artifact_root>/build/tracer/<sm_arch>/tracer.so",
+  "tracer": {},
+  "_ncu": "Nsight Compute binary used by `cyclescope reference`. Env: CYCLESCOPE_NCU. Default: ncu on PATH, then /usr/local/cuda/bin/ncu",
+  "ncu": null,
+  "_nvdisasm": "nvdisasm used by the tracer. Env: NVDISASM. Default: <artifact_root>/tools/cuda-toolkit-13.2/bin/nvdisasm",
+  "nvdisasm": null
+}

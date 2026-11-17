@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-GROUP-GEMM-PTR-C01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 722560,
+ "completed": 722560,
+ "cycles": 14294,
+ "hard": 0,
+ "walls": {
+  "convert": 3.5,
+  "segments": 0.0,
+  "build": 0.2,
+  "sim": 1.3,
+  "total": 5.1
+ },
+ "rss_kb": {
+  "convert": 187920,
+  "segments": 187920,
+  "build": 187920,
+  "sim": 191048
+ },
+ "hw_cycles": 16760.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

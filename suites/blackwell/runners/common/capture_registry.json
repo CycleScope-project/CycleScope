@@ -1,0 +1,203 @@
+{
+  "schema_version": "blackwell.capture-registry.v1",
+  "note": "capture v2 主核 regex 注册表 + 家族预算（DESIGN §2/§4）。三列：main_ncu=NCU demangled 侧主核选择（audit MAIN_RE 合并，按序优先）；main_nvbit=NVBit DYNAMIC_KERNEL_RANGE mangled 侧（tracer_tool.cu 用 std::regex_match 全串匹配——每个 main_nvbit 行必须自身可 full-match，即头尾都用 .* 收尾，实测缺尾 .* 时 should_trace_kernel 恒 false）；aux=辅助核黑名单（AUX_DISQUALIFY 全家族共用）。行内选择器：when_kind=spec.kind 子串、when_id_prefix=case id 前缀、when_runner=spec.runner 精确匹配；普通字符串行恒匹配。corpus_sc result.json[kernel] 推导的 regex 恒排在注册表行之前（corpus 优先、注册表降级，见 capture_adapters.derive_corpus_regex）。spool_bytes_cap=单次 S1 attempt 的 NVBit spool（TRACES_FOLDER）字节上限，超限 attempt 被中止并分类 g8_spool_volume_exceeded（driver 侧另有 df<50GB 的 g8_disk_low 守卫与 _prev_ 归档 ≥2 删最旧，见 capture_campaign_v2）。新家族=加 suites 行，不改代码。预算口径（2026-10-11 修正）：cap 只能用【已完成采集】的最终 spool/sidecar 实测值加裕量设定；watchdog 中途击杀点的字节数是下界不是测量值——8d62c81 曾把 8GiB cap 击杀点 8,846,461,416B(rc=-9) 当成 CU-75 实测值抬高到 32GiB，随后 32GiB 又在 34,621,440,742B/34,718,575,905B 两度中途击杀（r3/a4，rc=-9，~60MB/s 恒速未完成）。凡 cap 变更必须在提交信息里写明证据是 completed(rc=0) 还是 kill-point。cutlass 预算校准源（2026-10-12）：CU-75-GRP-2C-R1 首个完成样本（collect exit0，campaign/cu75-control-20261011T2157Z）：spool 终态 36,458,861,051B（spool dir 含 dynamic_mask_sidecar.csv 34,476,197,252B 单文件 + raw→xz trace 1,602,239,488B）、dyn_lines=172,927,203、wall_s=641.5。cap=完成值×裕量：spool 40GiB(1.18×)、sidecar 40GiB(1.24×，G5 逐 csv 上限)、dyn_lines 200M(1.15×，G8 硬上限)；此前 32GiB/20M 来自 r3/a4 kill-point 下界，非完成测量。 deepgemm 校准源（2026-10-12）：DG-FP8-D-2C-R01 46-launch 完成样本（w3-unified-r19-20261011T0829Z/gpu-original-dg-r2，rc=0）：dyn_lines=25,046,675 已超旧 25M cap（G8 全模式接线后必判 fail）——dyn_lines 30M(1.20×)；timeout 3600s=实测 wall 298.9s×12、spool 12GiB=完成值 8,232,080,970B×1.56——原DG rc124 旧账按资源吞吐/真实并行预算解决，46-launch 全分母不缩。 flashattention 完成样本 FA4-FWD-GQA-2C-R03（ureg r10 official-capture）：wall 122.7s/spool 2,022,309,869B/dyn 3,289,936，现默认 cap（600s/8GiB/20M）对完成值 ≥4.2× 不改。",
+  "budgets_default": {
+    "timeout_s": 600,
+    "dyn_lines_cap": 20000000,
+    "sidecar_cap_bytes": 2147483648,
+    "trace_bytes_cap": 2147483648,
+    "spool_bytes_cap": 8589934592,
+    "regex_fallback_retry": 1
+  },
+  "aux_regex": "(?i)(cub::|thrust::|reference::|nvjet|sum_?odo|fmhakernelbwdconvert|fmhakernelbwdsumodo|prepare_scheduler|cuseqlens|cublocks|postprocess|preprocess|convert_kernel|::convert|_convert<)",
+  "suites": {
+    "deepgemm": {
+      "main_ncu": [
+        "sm100_.*(gemm|impl|fp8|bf16)"
+      ],
+      "main_nvbit": [
+        ".*deep_gemm.*gemm.*impl.*"
+      ],
+      "budgets": {
+        "timeout_s": 3600,
+        "dyn_lines_cap": 30000000,
+        "sidecar_cap_bytes": 34359738368,
+        "spool_bytes_cap": 12884901888
+      }
+    },
+    "cutlass": {
+      "main_ncu": [
+        {
+          "when_id_prefix": "CU-92-MOE-REG",
+          "re": "MainloopSm100TmaUmmaWarpSpecialized",
+          "note": "92 regular launches TMA/CPASYNC/mixed 1x1/2x2/4x4 in one process; SC tile is the 1x1 TMA schedule (cta_group::1). Mixed names are MainloopSm100UmmaMixed*, so this token does not match them."
+        },
+        {
+          "when_id_prefix": "CU-92-MOE-RCGRP-FP4",
+          "re": "MainloopSm100TmaUmmaWarpSpecializedBlockScaled",
+          "note": "fp4_regular runs 12 schedules; only kernel-1 is TMA-1SM cluster 1x1 (grid 1, no .2CTA). Mixed/2SM names do not contain this token."
+        },
+        {
+          "when_id_prefix": "CU-92-MOE-RCGRP-E",
+          "re": "MainloopSm100RCGroupGemmTmaUmmaWarpSpecialized.*2x1SM",
+          "note": "rcgrouped E4M3 launches two RCGroupGemm instances with IDENTICAL measured launch topology (grid 2,1,1 block 384 cluster 2x1x1, cluster_launch_info_raw.csv 2026-09-25), so a launch signature cannot disambiguate them; the case target is the cta_group::2 256x256 2SM schedule and the .2CTA opcodes (UTCQMMA.2CTA/UTCBAR.2CTA/UTCATOMSWS.2CTA) live only in its SASS. The 2x1SM MMA-atom token is unique to that instance; the 1SM 128x128 schedule (<11,8,4>, SM100_MMA_F8F6F4_SS) is an extra kernel of the same binary."
+        },
+        {
+          "when_id_prefix": "CU-75-GRP",
+          "re": "GemmUniversal.*2x1SM",
+          "note": "grp gemm launches the 1SM instance (MainloopSm100ArrayTmaUmmaWarpSpecializedILi3E, SM100_MMA_F8F6F4_SS) BEFORE the NVBit-traced 2x1SM instance (ILi4E, SM100_MMA_F8F6F4_2x1SM_SS, T0016 v4-final-287-retry/shard_4 kernel-7) with an identical launch topology (grid 2,1,1 block 384), so the default row matches the 1SM launch first and --launch-count 1 pins it: dynamic shmem 218112 vs traced header 201728 -> g3_shmem_mismatch. The 2x1SM atom token (mirroring the CU-75-GRP main_nvbit row) selects the traced instance only."
+        },
+        {
+          "when_id_prefix": "CU-77",
+          "re": "Sm100Fmha",
+          "note": "fmha bwd runs a leading FmhaKernelBwdSumOdO aux kernel that the default row's fmha.*bwd token matches first, and --launch-count 1 pins that aux (T0031 class 2a: retry/shard_4 no_kernel_grid_block_match, window=_ZN7cutlass13device_kernelINS_4fmha6kernel19FmhaKernelBwdSumOdO...); the traced kernel is Sm100FmhaBwdKernelTmaWarpSpecialized and the aux_regex blacklist (sum_?odo) already rejects the aux on the nvbit side."
+        },
+        {
+          "when_id_prefix": "CU-83",
+          "re": "GemmUniversal",
+          "note": "sparse cases run the SM90StructuredSparseCompressor (transform::kernel) before the traced device_kernel<GemmUniversal...MainloopSm100TmaUmmaWarpSpecializedSparse...> gemm body, and the default row's cutlass.*kernel token matches the compressor first (T0031 class 2a: retry2/shard_0 no_kernel_grid_block_match, window=_ZN7cutlass13device_kernelINS_9transform6kernel30SM90StructuredSparseCompressor...)."
+        },
+        "(?i)(device_kernel|gemm_device|DenseGemmKernel|GemmUniversal|ConvUniversal|cutlass.*kernel|Blackwell.*Kernel|BlackwellFusedMultiHeadAttentionForward|FmhaSm100|fmha.*fwd|fmha.*bwd|sm100_fmha|mla|ssd|gemv|tgv|MlaDecode|PersistentDenseGemm|blockscaled.*kernel|mixed.*kernel|grouped.*kernel)",
+        "(?i)kernel"
+      ],
+      "main_nvbit": [
+        {
+          "when_runner": "dsl",
+          "re": "kernel_cutlass_kernel.*(?:DenseGemmKernel|BlockScaledPersistentDenseGemmKernel|BlockwiseGemmKernel|MixedInputGemmKernel|BlackwellFusedMultiHeadAttentionForward).*"
+        },
+        {
+          "when_id_prefix": "CU-75-GRP",
+          "re": ".*GemmUniversal.*2x1SM.*"
+        },
+        {
+          "when_id_prefix": "CU-91",
+          "re": ".*GemvBlockScaled.*"
+        },
+        {
+          "when_id_prefix": "CU-77",
+          "re": ".*Sm100Fmha.*Kernel.*"
+        },
+        {
+          "when_id_prefix": "CU-92-MOE-REG",
+          "re": ".*MainloopSm100TmaUmmaWarpSpecialized.*"
+        },
+        {
+          "when_id_prefix": "CU-92-MOE-RCGRP-FP4",
+          "re": ".*MainloopSm100TmaUmmaWarpSpecializedBlockScaled.*"
+        },
+        {
+          "when_id_prefix": "CU-92-MOE-RCGRP-E",
+          "re": ".*MainloopSm100RCGroupGemmTmaUmmaWarpSpecialized.*SM100_MMA_F8F6F4_2x1SM_SS.*",
+          "note": "see main_ncu CU-92-MOE-RCGRP-E row: identical launch topology between the two RCGroupGemm instances; full-match-safe (.* anchors both ends); the 2x1SM atom token selects the cta_group::2 2SM schedule, the 1SM <11,8,4> schedule goes to _extra_kernels."
+        },
+        {
+          "when_id_prefix": "CU-93",
+          "re": ".*gqa_device.*"
+        },
+        ".*(gemm_device|DenseGemmKernel|GemmUniversal|ConvUniversal|Sm100BlockScaledPersistentDenseGemmKernel|Sm103BlockScaledPersistentDenseGemmKernel|BlockwiseGemmKernel|MixedInputGemmKernel|BlackwellFusedMultiHeadAttentionForward).*"
+      ],
+      "budgets": {
+        "timeout_s": 1800,
+        "dyn_lines_cap": 200000000,
+        "sidecar_cap_bytes": 42949672960,
+        "spool_bytes_cap": 42949672960
+      }
+    },
+    "flashattention": {
+      "main_ncu": [
+        {
+          "when_id_prefix": "FA4-BWD-HD256",
+          "re": "(?i)fmha_backward",
+          "note": "matches the fused backward cubin filename and the dq derived kernel name; dkdv excluded from capture by main_nvbit dq row"
+        },
+        {
+          "when_id_prefix": "FA4-FWD-HD256",
+          "re": "(?i)BlackwellFusedMultiHeadAttentionForward"
+        },
+        {
+          "when_kind": "mla_bwd",
+          "re": "(?i)flash_bwd_mla_sm100"
+        },
+        {
+          "when_kind": "bwd",
+          "re": "(?i)flash_bwd_sm100"
+        },
+        {
+          "when_kind": "mla",
+          "re": "(?i)fwd_mla_sm100"
+        },
+        "(?i)flash_fwd_sm100",
+        "(?i)(flash_attncute|flash_attn_cute|BlackwellFused|FlashAttention|fa4)"
+      ],
+      "main_nvbit": [
+        {
+          "when_kind": "mla_bwd",
+          "re": ".*FlashAttentionSparseMLABackwardSm100.*"
+        },
+        {
+          "when_id_prefix": "FA4-BWD-HD256",
+          "re": ".*fmha_backward_dqkernel.*"
+        },
+        {
+          "when_id_prefix": "FA4-FWD-HD256",
+          "re": ".*BlackwellFusedMultiHeadAttentionForward.*"
+        },
+        {
+          "when_kind": "bwd",
+          "re": ".*FlashAttentionBackwardSm100.*"
+        },
+        {
+          "when_kind": "mla",
+          "re": ".*FlashAttentionMLAForwardSm100.*"
+        },
+        ".*FlashAttentionForwardSm100.*"
+      ],
+      "budgets": {
+        "timeout_s": 600,
+        "dyn_lines_cap": 20000000,
+        "sidecar_cap_bytes": 2147483648
+      }
+    },
+    "flashmla": {
+      "main_ncu": [],
+      "main_nvbit": [],
+      "budgets": {
+        "timeout_s": 900,
+        "dyn_lines_cap": 200000000,
+        "trace_bytes_cap": 8589934592
+      }
+    },
+    "flashinfer": {
+      "main_ncu": [],
+      "main_nvbit": [],
+      "budgets": {
+        "timeout_s": 900,
+        "dyn_lines_cap": 200000000,
+        "trace_bytes_cap": 8589934592
+      }
+    },
+    "triton": {
+      "main_ncu": [],
+      "main_nvbit": [],
+      "budgets": {
+        "timeout_s": 900,
+        "dyn_lines_cap": 200000000,
+        "trace_bytes_cap": 8589934592
+      }
+    },
+    "cublas": {
+      "main_ncu": [
+        ".*(nvjet|cutlass|xmma|gemm).*"
+      ],
+      "main_nvbit": [
+        ".*(nvjet|cutlass|xmma|gemm).*"
+      ],
+      "budgets": {
+        "timeout_s": 3600,
+        "dyn_lines_cap": 30000000,
+        "sidecar_cap_bytes": 34359738368,
+        "spool_bytes_cap": 12884901888
+      }
+    }
+  }
+}

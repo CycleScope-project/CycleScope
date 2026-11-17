@@ -1,0 +1,39 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "tma_oob",
+  "version": 2,
+  "frozen_before_gpu": true,
+  "kind": "functional form of the partially-out-of-bounds TMA tile load found in v1; no workload-based fitting",
+  "question": "What decides the extra latency and the per-SM serial service of a TMA tile load that is partly out of bounds: the fraction outside, whether rows are cut (overhang along dimension 0) or whole rows are outside (overhang along dimension 1), and the box size?",
+  "probe": "tma_oob.cu extended, same kernel body. New run-time axes: --x any multiple of 8 in [0, 64] (dimension-0 overhang as in v1); --rows-in R: the tensor becomes rank 3 {64 bf16, R rows, planes}, box {64, box_rows, 1}, every box reads plane (region index) at y = 0, so rows R..box_rows-1 are outside and no two boxes share memory (R = box_rows is the in-bounds control of this layout); --box-rows 128 (16 KiB, default) or 32 (4 KiB). expect_tx always the full box bytes. Cells: (a) x in {0, 16, 32, 48, 64}, box 128 rows; (b) rows-in in {128, 96, 64, 32} with x = 0, box 128 rows; (c) box 32 rows: x in {0, 32}, and rows-in in {32, 16}; each at N in {1, all SMs} x S in {1, 4, 8}; runs a and b, 8 samples, 2048 rounds. Counter pass (ncu, cache-control none) for N = all, S = 4 of: x = 16, x = 48, rows-in = 64, box-32 x = 32.",
+  "controls": {
+    "sass": "UTMALDG count of each kernel recorded (2D kernel as v1; the rank-3 kernel separately); x and rows-in are run-time arguments.",
+    "data": "slot-0 check as v1 (x = 0 and rows-in = box_rows: all 64 B set; x = 64: zero).",
+    "timing": "x = 0 / 32 / 64 box-128 cells reproduce v1 within 5 %; rows-in = 128 (rank-3 control) within 10 % of x = 0."
+  },
+  "derivation": "Per cell latency p50 and boxes per 1000 cycles and CTA. Serial service per box = 1000 / rate at S = 8, N = 1. Extra latency = latency(S = 1, N = 1) - control.",
+  "predictions_before_data": {
+    "cut_rows": "x = 16 and x = 48 behave as x = 32: +170 (+-25) cycles latency and 258 (+-15 %) cycles of serial service per 128-row box, independent of the fraction; box 32 rows at x = 32: serial service 64 (+-15 %) cycles (2 cycles per cut row) and the same +170.",
+    "whole_rows": "rows-in 96 / 64 / 32 (whole rows outside): no serial cap and latency within 15 % of the rank-3 control at every S (the slow regime needs rows that are cut).",
+    "alternative": "if whole-row overhang shows the same cap, the regime is 'any box crossing the tensor edge'; if the cap scales with box bytes rather than rows, box 32 x 64 gives 64 either way and a later cell with a different row length is needed."
+  },
+  "outcomes_before_data": {
+    "install": "If the cut-row predictions hold on both devices: new fields of storage.async.service_start / storage.tma.completion for tiled loads whose box cuts rows (capture fact from the tensor map and coordinates: cut_rows = rows of the box that are partly in bounds): serial service cycles per cut row and an added completion latency; values from this run, evidence experimental until the replay passes.",
+    "partial": "If only one device or one direction fits, install that part and state the rest.",
+    "none": "If controls fail, repair first."
+  },
+  "prediction_check": "Replay of x = 32 and x = 0 (N = 1, S = 8 and N = all, S = 4) through tracer -> convert -> engine with the rule: box rate within 15 %; then the full-gpu regression.",
+  "not_allowed": "No family / case / shape specific timing, no tuning to the full-gpu error; post-data changes of a criterion are labelled.",
+  "addenda": [
+    {
+      "when": "after h100-v2r1 (data seen); b300-v2r1 still queued",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/tma_oob/h100-v2r1 (78 + 78 rows, no error; both kernels 5 UTMALDG); reader $CYCLESCOPE_ARTIFACT_ROOT/fg-over20/tools/tmaoob2.py",
+      "text": "h100: prediction cut_rows HOLDS: x = 16 / 32 / 48 (box 128 rows) all read latency 789 against 611 in bounds (+178, independent of the fraction) and 3.86-3.87 boxes per 1000 cycles and SM at S = 4 and 8, N = 1 (258 cycles per box = 2.02 per cut row; in bounds 6.43 = 155 per box); at N = 132 they run at the in-bounds full-card rate (1.80-1.85). Box 32 rows, x = 32: latency 609 against 434 (+175); rate at S = 8 12.08 against 12.84 (82.8 against 77.9 cycles per box): the cut-row service 32 x 2.02 = 64.5 lies below the normal service interval there, so the box rate follows the normal interval -> the SM service interval of a tiled load is max(normal interval, 2.02 x cut rows). Prediction whole_rows HOLDS: rows-in 96 / 64 / 32 (whole rows outside, rank-3 map) equal the control alone and at N = 132 (latency 615, 6.4 boxes per 1000 cycles; 1.75-1.81 at N = 132): whole rows outside cost nothing extra and nothing less. Fully outside (x = 64): as v1 (alone = in bounds; slower with every SM loading on h100: 0.93 / 1.14 / 1.55 against 1.34 / 1.80 / 1.80) - not modelled. b300 v1 gave the same two numbers for x = 32 (latency 780 against 602, cap 3.88 at every N and S). Install (experimental until the replay passes; b300 values from v1 until b300-v2r1 is read): capture fact cut_rows of a tiled TMA load = number of in-bounds rows of the box when the box is partly in bounds along dimension 0, else 0; storage.tma.completion gains cut_box_extra_cycles = 178 (both devices), storage.async.service_start gains cut_row_cycles = 2.02 (h100) / 2.01 (b300) with service interval = max(normal, cut_row_cycles x cut_rows)."
+    },
+    {
+      "when": "after b300-v2r1 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/tma_oob/b300-v2r1 (exit 0, 78 + 78 rows)",
+      "text": "b300 N = 1: cut rows (x = 16 / 32 / 48) latency 792 against 614 (+178) and 3.88-3.89 boxes per 1000 cycles at S = 4 / 8: the h100 values hold on b300 (leaf sources may cite this run). Whole rows outside: equal to the control alone. N = 148 (boxes per 1000 cycles and CTA at S = 4 / 8): in bounds 4.33 / 4.29, rows-in 96 4.27 / 4.31, rows-in 64 4.92 / 5.28, rows-in 32 5.46 / 6.70, fully outside 5.27 / 6.47, cut x = 16 3.61 / 3.68. On b300 an out-of-bounds sector therefore loads the shared read path with about 0.6-1.0 of an in-bounds sector (1.0 at a quarter outside, about 0.7 at half, 0.6 at three quarters, 0.73 fully outside); on h100 it is 1.0 throughout. The installed rule charges 1.0 on both devices and so over-charges b300 boxes that are mostly outside; the law is not determined by these five points and nothing is changed."
+    }
+  ]
+}

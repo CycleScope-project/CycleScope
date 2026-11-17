@@ -1,0 +1,1111 @@
+{
+ "schema_version": "cyclescope.schema-registry.v1",
+ "schemas": {
+  "blackwell.tmem": {
+   "fields": {
+    "columns_live": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "count"
+    }
+   },
+   "id": 31,
+   "target": "BlackwellTmem"
+  },
+  "hopper.proxy_fence": {
+   "fields": {
+    "enabled": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "latency_cycles": {
+     "id": 1,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "queue_capacity_bytes": {
+     "id": 4,
+     "type": "float64",
+     "unit": "bytes"
+    },
+    "sm_drain_bytes_per_cycle": {
+     "id": 2,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "smsp_drain_bytes_per_cycle": {
+     "id": 3,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    }
+   },
+   "id": 29,
+   "target": "HopperProxyFence"
+  },
+  "instance_timing": {
+   "fields": {
+    "added_operand_pressure_cycles": {
+     "id": 0,
+     "retired": true,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "bank_conflict": {
+     "id": 3,
+     "retired": true,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "base_ready_many": {
+     "id": 1,
+     "retired": true,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "control_envelope": {
+     "id": 4,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "earliest_issue": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "unreused_additional": {
+     "id": 2,
+     "retired": true,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 5,
+   "target": "InstanceTiming"
+  },
+  "instruction.fetch": {
+   "fields": {
+    "capacity_l0_bytes": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "capacity_l1_bytes": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "enabled": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "fetch_parallelism": {
+     "id": 13,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l0_ways": {
+     "id": 14,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "launch_prefetch_bytes": {
+     "id": 11,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "line_bytes": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "prefetch_depth_lines": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "sharing": {
+     "id": 12,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "stream_cold_cycles_per_line": {
+     "id": 10,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "stream_l1_cycles_per_line": {
+     "id": 8,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "stream_l2_cycles_per_line": {
+     "id": 9,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 26,
+   "target": "InstructionFetch"
+  },
+  "instruction_template": {
+   "fields": {
+    "backend_occupancy_cycles": {
+     "id": 8,
+     "retired": true,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "completion_latency_cycles": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "issue_group_resource": {
+     "id": 11,
+     "type": "uint64",
+     "unit": "resource"
+    },
+    "issue_interval_cycles": {
+     "id": 7,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "max_inflight": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "queue_class": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "resource": {
+     "id": 10,
+     "type": "uint64",
+     "unit": "resource"
+    },
+    "result_latency_cycles": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "single_source_issue_interval_cycles": {
+     "id": 12,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 1,
+   "target": "InstructionTemplate"
+  },
+  "kernel.lifecycle": {
+   "fields": {
+    "cold_extra_cycles": {
+     "id": 1,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "dual_sm_envelope_cycles": {
+     "id": 3,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "envelope_cycles": {
+     "id": 2,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "warm_cycles": {
+     "id": 0,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 25,
+   "target": "KernelLifecycle"
+  },
+  "launch.dispatch": {
+   "fields": {
+    "enabled": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "first_wave_interval_ns": {
+     "id": 0,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "serial_ns_per_cta": {
+     "id": 3,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "slot_free_to_entry_ns": {
+     "id": 1,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "slot_free_to_entry_slow_ns": {
+     "id": 4,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "slow_gpc_mask": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "dependents_launch_serial_ns": {
+     "id": 6,
+     "type": "float64",
+     "unit": "ns"
+    }
+   },
+   "id": 24,
+   "target": "LaunchDispatch"
+  },
+  "memory.cache_hint": {
+   "fields": {
+    "l1_evict_first_share": {
+     "id": 4,
+     "type": "float64",
+     "unit": "ratio"
+    },
+    "l1_evict_unchanged_fill": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l2_dram_fill_window_0_bytes": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2_dram_fill_window_128_bytes": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2_dram_fill_window_256_bytes": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2_dram_fill_window_64_bytes": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2_evict_first_policy": {
+     "id": 8,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l2_evict_first_resident_lines": {
+     "id": 9,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2_evict_first_share": {
+     "id": 5,
+     "type": "float64",
+     "unit": "ratio"
+    },
+    "l2_load_hint_ef_mask": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "enum"
+    }
+   },
+   "id": 30,
+   "retired": true,
+   "target": "MemoryCacheHint"
+  },
+  "memory.constant_cache": {
+   "fields": {
+    "bank0_access_cycles": {
+     "id": 6,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "bank0_uniform_access_cycles": {
+     "id": 7,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "capacity_bytes": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "enabled": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "hit_latency_cycles": {
+     "id": 4,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "line_bytes": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "miss_latency_cycles": {
+     "id": 5,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "same_line_latency_cycles": {
+     "id": 3,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 27,
+   "target": "MemoryConstantCache"
+  },
+  "memory.constant_fill": {
+   "fields": {
+    "dram_extra_cycles": {
+     "id": 2,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "enabled": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "l2_extra_cycles": {
+     "id": 1,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "param_warm_min_prior_launches": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "count"
+    }
+   },
+   "id": 28,
+   "retired": true,
+   "target": "MemoryConstantFill"
+  },
+  "memory.dram_port": {
+   "fields": {
+    "max_inflight_bytes": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "bytes"
+    }
+   },
+   "id": 32,
+   "target": "MemoryDramPort"
+  },
+  "memory.dram_partition": {
+   "fields": {
+    "far_latency_extra_cycles": {
+     "id": 0,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "far_side_gpc_mask": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "home_page_bytes": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "bytes"
+    }
+   },
+   "id": 35,
+   "target": "MemoryDramPartition"
+  },
+  "memory.global_atomic": {
+   "fields": {
+    "dependent_round_trip_ns": {
+     "id": 3,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "release_to_acquire_ns": {
+     "id": 4,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "roundtrip_ns": {
+     "id": 1,
+     "type": "float64",
+     "unit": "ns"
+    },
+    "same_address_ops_per_ns": {
+     "id": 0,
+     "type": "float64",
+     "unit": "ops/ns"
+    },
+    "same_address_service_ns": {
+     "id": 2,
+     "type": "float64",
+     "unit": "ns"
+    }
+   },
+   "id": 23,
+   "target": "MemoryGlobalAtomic"
+  },
+  "memory.l2_merge": {
+   "fields": {
+    "delivered_bytes_per_cycle": {
+     "id": 1,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "max_requests_per_read": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "window_cycles": {
+     "id": 0,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "domain_sms": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "domain_gpc": {
+     "id": 4,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "async_copy_window_cycles": {
+     "id": 5,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "async_copy_window_from_service": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "boolean"
+    }
+   },
+   "id": 22,
+   "target": "MemoryL2Merge"
+  },
+  "memory.l2_partition": {
+   "fields": {
+    "dirty_lines_near_both_sides": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "far_hit_cycles": {
+     "id": 2,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "pool_count": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "replicate_read_lines": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "count"
+    }
+   },
+   "id": 20,
+   "target": "MemoryL2Partition"
+  },
+  "memory.shared_service": {
+   "fields": {
+    "dram_combined_bytes_per_ns": {
+     "id": 6,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "dram_max_inflight_bytes": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "dram_read_bytes_per_ns": {
+     "id": 3,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "dram_write_bytes_per_ns": {
+     "id": 4,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "l2_max_inflight_bytes": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2_read_bytes_per_ns": {
+     "id": 0,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "l2_write_bytes_per_ns": {
+     "id": 1,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "shared_memory_enabled": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "l2_read_gpc_bytes_per_ns": {
+     "id": 8,
+     "type": "float64",
+     "unit": "bytes/ns"
+    },
+    "l2_write_gpc_bytes_per_ns": {
+     "id": 9,
+     "type": "float64",
+     "unit": "bytes/ns"
+    }
+   },
+   "id": 21,
+   "target": "MemorySharedService"
+  },
+  "memory_level": {
+   "fields": {
+    "dram.issue_interval_cycles": {
+     "id": 19,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "dram.latency_cycles": {
+     "id": 17,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "dram.loaded_latency_extra_cycles": {
+     "id": 60,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "dram.outstanding_requests": {
+     "id": 18,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "dram.outstanding_semantics": {
+     "id": 20,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "dram.sector_bytes_per_cycle": {
+     "id": 43,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "flags": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l1.data_array_bytes": {
+     "id": 47,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.issue_interval_cycles": {
+     "id": 11,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "l1.latency_cycles": {
+     "id": 9,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "l1.outstanding_requests": {
+     "id": 10,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l1.outstanding_semantics": {
+     "id": 12,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l1.reserved_bytes": {
+     "id": 48,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.resident_lines": {
+     "id": 32,
+     "retired": true,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l1.resident_lines_lower_bound": {
+     "id": 33,
+     "retired": true,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l1.resident_lines_upper_bound_exclusive": {
+     "id": 34,
+     "retired": true,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l1.sector_bytes_per_cycle": {
+     "id": 41,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "l1.shared_configuration_0_bytes": {
+     "id": 50,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_1_bytes": {
+     "id": 51,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_2_bytes": {
+     "id": 52,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_3_bytes": {
+     "id": 53,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_4_bytes": {
+     "id": 54,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_5_bytes": {
+     "id": 55,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_6_bytes": {
+     "id": 56,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_7_bytes": {
+     "id": 57,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_8_bytes": {
+     "id": 58,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l1.shared_configuration_9_bytes": {
+     "id": 59,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "l2.issue_interval_cycles": {
+     "id": 15,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "l2.latency_cycles": {
+     "id": 13,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "l2.loaded_latency_extra_cycles": {
+     "id": 61,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "l2.outstanding_requests": {
+     "id": 14,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2.outstanding_semantics": {
+     "id": 16,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l2.replacement_policy": {
+     "id": 35,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "l2.resident_lines": {
+     "id": 38,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2.resident_lines_lower_bound": {
+     "id": 39,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2.resident_lines_upper_bound_exclusive": {
+     "id": 40,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2.sector_bytes_per_cycle": {
+     "id": 42,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "l2.sets": {
+     "id": 36,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "l2.tma_sector_bytes_per_cycle": {
+     "id": 62,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "l2.ways": {
+     "id": 37,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "launch_shared_memory_config_bytes": {
+     "id": 49,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "line_bytes": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "load_cache_policy": {
+     "id": 4,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "merge_window_cycles": {
+     "id": 7,
+     "retired": true,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "sector_bytes": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "store_capacity_credit_unit": {
+     "id": 46,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_dram.outstanding_requests": {
+     "id": 26,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "store_dram.outstanding_semantics": {
+     "id": 28,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_dram.sector_bytes_per_cycle": {
+     "id": 45,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "store_l2.issue_interval_cycles": {
+     "id": 23,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "store_l2.latency_cycles": {
+     "id": 21,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "store_l2.orders_loads": {
+     "id": 8,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_l2.partial_granule_bytes": {
+     "id": 27,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "store_l2.partial_line_cycles": {
+     "id": 29,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "store_l2.outstanding_requests": {
+     "id": 22,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "store_l2.outstanding_semantics": {
+     "id": 24,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_l2.sector_bytes_per_cycle": {
+     "id": 44,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "store_l2.shared_store_shares_fill_port": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "store_l2.shares_fill_port": {
+     "id": 63,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_path": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "version": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "store_dram.latency_cycles": {
+     "id": 25,
+     "type": "float64",
+     "unit": "cycles",
+     "retired": true
+    },
+    "l1.local_frame_interleaved": {
+     "id": 30,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "l1.local_hit_latency_cycles": {
+     "id": 31,
+     "type": "float64",
+     "unit": "cycles"
+    }
+   },
+   "id": 3,
+   "target": "MemoryLevel"
+  },
+  "operand_read": {
+   "fields": {
+    "collector": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "enabled": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "reads_per_cycle": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "count"
+    }
+   },
+   "id": 33,
+   "target": "OperandRead"
+  },
+  "resource": {
+   "fields": {
+    "copy_count": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "initiation_interval_cycles": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "max_inflight_per_copy": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "scope": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "enum"
+    }
+   },
+   "id": 2,
+   "target": "Resource"
+  },
+  "scheduler": {
+   "fields": {
+    "cursor_commit": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "eligible_policy": {
+     "id": 0,
+     "retired": true,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "issue_slots": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "try_next_on_block": {
+     "id": 3,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "unit_grant_policy": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "yield_policy": {
+     "id": 4,
+     "retired": true,
+     "type": "uint64",
+     "unit": "count"
+    }
+   },
+   "id": 7,
+   "target": "Scheduler"
+  },
+  "timing_row": {
+   "fields": {
+    "cycles": {
+     "id": 0,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "enabled": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "resource": {
+     "id": 2,
+     "type": "uint64",
+     "unit": "resource"
+    },
+    "cold_extra_cycles": {
+     "id": 3,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "syncs_wake_cycles": {
+     "id": 4,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "coresident_dependent_half_cycles": {
+     "id": 5,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "reuse_flag_floor_cycles": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "rs_extra_half_cycles": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "suspended_wake_cycles": {
+     "id": 8,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "operand_read_bytes_per_cycle": {
+     "id": 9,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "drain_bytes_per_cycle": {
+     "id": 10,
+     "type": "float64",
+     "unit": "bytes/cycle"
+    },
+    "pending_commit_groups_limit": {
+     "id": 11,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "launch_hold_blocks_memory_queue": {
+     "id": 12,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "memory_queue_hold_above_pending_ops": {
+     "id": 13,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "cut_extra_cycles": {
+     "id": 14,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "cut_service_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "sector_cost_ratio": {
+     "id": 20,
+     "type": "float64",
+     "unit": "ratio"
+    }
+   },
+   "id": 4,
+   "target": "TimingRow"
+  },
+  "memory.load_port": {
+   "fields": {
+    "line_granular": {
+     "id": 0,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "lane_order": {
+     "id": 1,
+     "type": "uint64",
+     "unit": "boolean"
+    }
+   },
+   "id": 34,
+   "target": "MemoryLoadPort"
+  }
+ }
+}

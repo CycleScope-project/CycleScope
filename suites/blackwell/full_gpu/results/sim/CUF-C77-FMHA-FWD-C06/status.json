@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C77-FMHA-FWD-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 410109,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4977693,
+ "completed": 4977693,
+ "cycles": 66208,
+ "hard": 0,
+ "walls": {
+  "convert": 7.8,
+  "segments": 0.0,
+  "build": 0.7,
+  "sim": 9.1,
+  "total": 17.6
+ },
+ "rss_kb": {
+  "convert": 327144,
+  "segments": 327144,
+  "build": 327144,
+  "sim": 675928
+ },
+ "hw_cycles": 62107.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 8
+}

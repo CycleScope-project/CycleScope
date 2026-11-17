@@ -1,0 +1,33 @@
+--- a/01_mma_sm100.cu	2026-09-16 18:21:48.000000000 -0700
++++ b/01_mma_sm100.cu	2026-10-18 06:37:21.615924222 -0700
+@@ -495,7 +495,7 @@
+     return -1;
+   }
+ 
+-  if ((props.major != 10) || (props.major == 10 && props.minor > 1)) {
++  if ((props.major != 10) || (props.major == 10 && props.minor > 3)) {
+     std::cerr << "This example requires NVIDIA's Blackwell Architecture GPU with compute capability 100a." << std::endl;
+     std::cerr << "  Found " << props.major << "." << props.minor << std::endl;
+     return -1;
+--- a/04_mma_tma_2sm_sm100.cu	2026-09-16 18:21:48.000000000 -0700
++++ b/04_mma_tma_2sm_sm100.cu	2026-10-18 06:37:48.816268807 -0700
+@@ -619,7 +619,7 @@
+     return -1;
+   }
+ 
+-  if ((props.major != 10) || (props.major == 10 && props.minor > 1)) {
++  if ((props.major != 10) || (props.major == 10 && props.minor > 3)) {
+     std::cerr << "This example requires NVIDIA's Blackwell Architecture GPU with compute capability 100a." << std::endl;
+     std::cerr << "  Found " << props.major << "." << props.minor << std::endl;
+     return -1;
+--- a/112_blackwell_ssd.cu	2026-09-16 18:21:48.000000000 -0700
++++ b/112_blackwell_ssd.cu	2026-10-18 07:29:02.851564912 -0700
+@@ -793,7 +793,7 @@
+       << "later (compute capability 100 or greater) and CUDA 12.0 or greater.\n";
+     return 0;
+   }
+-  else if (__CUDACC_VER_MAJOR__ < 12 || (props.major != 10 || props.minor != 0)) {
++  else if (__CUDACC_VER_MAJOR__ < 12 || (props.major != 10 || props.minor > 3)) {
+     std::cout
+       << "This example requires a GPU of NVIDIA's Blackwell Architecture "
+       << "(compute capability 100) and CUDA 12.0 or greater.\n";

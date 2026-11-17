@@ -1,0 +1,51 @@
+{
+ "memory.l2_merge.root": {
+  "fields": {
+   "delivered_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 14207.31
+    },
+    "sources": [
+     "l2_merge.b300.r4.delivered"
+    ]
+   },
+   "max_requests_per_read": {
+    "model": {
+     "kind": "constant",
+     "value": 3
+    },
+    "sources": [
+     "l2_merge.b300.r2"
+    ]
+   },
+   "window_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 145.21
+    },
+    "sources": [
+     "l2_merge.b300.r2"
+    ]
+   },
+   "domain_sms": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "ldgsts_loaded.b300.shared_read_domain"
+    ]
+   },
+   "domain_gpc": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "l2_merge.b300.read_domain"
+    ]
+   }
+  }
+ }
+}

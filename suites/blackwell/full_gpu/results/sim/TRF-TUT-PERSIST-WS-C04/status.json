@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-PERSIST-WS-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 445072,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1507096,
+ "completed": 1507096,
+ "cycles": 35567,
+ "hard": 0,
+ "walls": {
+  "convert": 6.2,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 7.5,
+  "total": 14.3
+ },
+ "rss_kb": {
+  "convert": 417984,
+  "segments": 417984,
+  "build": 417984,
+  "sim": 604744
+ },
+ "hw_cycles": 40969.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 4
+}

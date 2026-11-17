@@ -1,0 +1,7 @@
+{
+ "architecture": "blackwell",
+ "device": "b300",
+ "schema_version": "cyclescope.device.v1",
+ "sm_arch": "sm_103a",
+ "smsps_per_sm": 4
+}

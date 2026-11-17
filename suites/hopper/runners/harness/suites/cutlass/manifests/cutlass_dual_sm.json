@@ -1,0 +1,4397 @@
+{
+  "case_count": 133,
+  "cases": [
+    {
+      "algorithm": "collective_builder_tma_static",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_022_collective_builder_tma_static_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 0,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_022_collective_builder_tma_static",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "epilogue_swizzle",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example50_epilogue_swizzle",
+      "case_id": "cutlass_032_epilogue_swizzle_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 1,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/50_hopper_gemm_with_epilogue_swizzle/50_hopper_gemm_with_epilogue_swizzle.cu",
+      "source_case_id": "cutlass_032_epilogue_swizzle",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_bias_relu_amax_aux",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example54_fp8_fused",
+      "case_id": "cutlass_038_fp8_bias_relu_amax_aux_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 2,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/54_hopper_fp8_warp_specialized_gemm/54_hopper_fp8_warp_specialized_gemm.cu",
+      "source_case_id": "cutlass_038_fp8_bias_relu_amax_aux",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "args": [
+        "--m=64",
+        "--n=256",
+        "--k=4096",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_050_ptr_array_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 3,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "ptr_array",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        64,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_050_ptr_array_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_054_grouped_fp8_fastacc_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 4,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_054_grouped_fp8_fastacc_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example62_sparse",
+      "case_id": "cutlass_060_sparse_wgmma_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 5,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "sparse",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/62_hopper_sparse_gemm/62_hopper_sparse_gemm.cu",
+      "source_case_id": "cutlass_060_sparse_wgmma",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example67_blockwise",
+      "case_id": "cutlass_064_fp8_blockwise_dense_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 6,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling.cu",
+      "source_case_id": "cutlass_064_fp8_blockwise_dense",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_groupwise_stream_k",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example67_groupwise_streamk",
+      "case_id": "cutlass_066_fp8_groupwise_stream_k_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 7,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_groupwise_scaling.cu",
+      "source_case_id": "cutlass_066_fp8_groupwise_stream_k",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_grouped_blockwise_cooperative",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example68_grouped_blockwise_coop",
+      "case_id": "cutlass_068_fp8_grouped_blockwise_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 8,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "upstream/examples/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling.cu",
+      "source_case_id": "cutlass_068_fp8_grouped_blockwise_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 9,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_tma_static",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_023_collective_builder_tma_static_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 25,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_023_collective_builder_tma_static",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "epilogue_swizzle",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example50_epilogue_swizzle",
+      "case_id": "cutlass_033_epilogue_swizzle_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 26,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/50_hopper_gemm_with_epilogue_swizzle/50_hopper_gemm_with_epilogue_swizzle.cu",
+      "source_case_id": "cutlass_033_epilogue_swizzle",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_bias_relu_amax_aux",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example54_fp8_fused",
+      "case_id": "cutlass_039_fp8_bias_relu_amax_aux_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 27,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/54_hopper_fp8_warp_specialized_gemm/54_hopper_fp8_warp_specialized_gemm.cu",
+      "source_case_id": "cutlass_039_fp8_bias_relu_amax_aux",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "args": [
+        "--m=64",
+        "--n=256",
+        "--k=8192",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_051_ptr_array_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 28,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "ptr_array",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        64,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_051_ptr_array_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_055_grouped_fp8_fastacc_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 29,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_055_grouped_fp8_fastacc_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example62_sparse",
+      "case_id": "cutlass_061_sparse_wgmma_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 30,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "sparse",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/62_hopper_sparse_gemm/62_hopper_sparse_gemm.cu",
+      "source_case_id": "cutlass_061_sparse_wgmma",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example67_blockwise",
+      "case_id": "cutlass_065_fp8_blockwise_dense_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 31,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling.cu",
+      "source_case_id": "cutlass_065_fp8_blockwise_dense",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_groupwise_stream_k",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example67_groupwise_streamk",
+      "case_id": "cutlass_067_fp8_groupwise_stream_k_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 32,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_groupwise_scaling.cu",
+      "source_case_id": "cutlass_067_fp8_groupwise_stream_k",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_grouped_blockwise_cooperative",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example68_grouped_blockwise_coop",
+      "case_id": "cutlass_069_fp8_grouped_blockwise_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 33,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "upstream/examples/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling.cu",
+      "source_case_id": "cutlass_069_fp8_grouped_blockwise_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 34,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_tma_ws",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_024_collective_builder_tma_ws_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 50,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma_ws",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_024_collective_builder_tma_ws",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "ptr_array_cooperative",
+      "args": [
+        "--m=64",
+        "--n=256",
+        "--k=2048",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example56_ptr_array",
+      "case_id": "cutlass_082_ptr_array_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 51,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "ptr_array",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        64,
+        256,
+        2048
+      ],
+      "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+      "source_case_id": "cutlass_082_ptr_array_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_056_grouped_fp8_fastacc_pingpong_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 52,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_056_grouped_fp8_fastacc_pingpong",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "sparse_wgmma",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=2048",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example62_sparse",
+      "case_id": "cutlass_083_sparse_wgmma_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 53,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "sparse",
+      "kind": "upstream_example",
+      "post_mode": "sparse",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        2048
+      ],
+      "source": "upstream/examples/62_hopper_sparse_gemm/62_hopper_sparse_gemm.cu",
+      "source_case_id": "cutlass_083_sparse_wgmma",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "fp8_blockwise_dense",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=2048",
+        "--l=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example67_blockwise",
+      "case_id": "cutlass_089_fp8_blockwise_dense_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 54,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "blockwise",
+      "kind": "upstream_example",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        2048
+      ],
+      "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling.cu",
+      "source_case_id": "cutlass_089_fp8_blockwise_dense",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cluster2m_256x128",
+      "args": [
+        "--m=512",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_cluster2m_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cluster2m_256x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 55,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        512,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cluster2m_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_tma_ws",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_025_collective_builder_tma_ws_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 71,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma_ws",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_025_collective_builder_tma_ws",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_057_grouped_fp8_fastacc_pingpong_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 72,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_057_grouped_fp8_fastacc_pingpong",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nt_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 73,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_pingpong",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_026_collective_builder_pingpong_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 82,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma_pingpong",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_026_collective_builder_pingpong",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_cooperative",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=2048",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_094_grouped_fp8_fastacc_cooperative_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 83,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "cooperative",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        2048
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_094_grouped_fp8_fastacc_cooperative",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 84,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_pingpong",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_027_collective_builder_pingpong_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 93,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "builder",
+      "kind": "upstream_example",
+      "post_mode": "tma_pingpong",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_027_collective_builder_pingpong",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "grouped_fp8_fastacc_pingpong",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=2048",
+        "--groups=1",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example57_grouped_fastacc",
+      "case_id": "cutlass_099_grouped_fp8_fastacc_pingpong_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 6,
+      "delivery_index": 94,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "grouped_fastacc",
+      "kind": "upstream_example",
+      "post_mode": "pingpong",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        2048
+      ],
+      "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+      "source_case_id": "cutlass_099_grouped_fp8_fastacc_pingpong",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_tma_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_tma_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_tma_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 95,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_tma_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_stream_k",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_028_collective_builder_stream_k_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 6,
+      "delivery_index": 102,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "tile_scheduler",
+      "kind": "upstream_example",
+      "post_mode": "stream_k",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_028_collective_builder_stream_k",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_tma_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_tma_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_tma_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 103,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_tma_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "collective_builder_stream_k",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_029_collective_builder_stream_k_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 104,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "tile_scheduler",
+      "kind": "upstream_example",
+      "post_mode": "stream_k",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_029_collective_builder_stream_k",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tn_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_ws_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 105,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "custom_evt_epilogue",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_030_custom_evt_epilogue_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 106,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "post_mode": "custom_evt",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_030_custom_evt_epilogue",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_tn_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_ws_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 107,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "custom_evt_epilogue",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--warmup=1",
+        "--iterations=1"
+      ],
+      "binary_name": "example49_collective_builder",
+      "case_id": "cutlass_031_custom_evt_epilogue_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 108,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "epilogue_fusion",
+      "kind": "upstream_example",
+      "post_mode": "custom_evt",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+      "source_case_id": "cutlass_031_custom_evt_epilogue",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2m_64x128",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_cluster2m_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2m_64x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 109,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2m_64x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2n_64x128",
+      "args": [
+        "--m=64",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_cluster2n_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2n_64x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 110,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        64,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2n_64x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 111,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 112,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_pingpong_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 113,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 114,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tn_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_tn_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tn_ws_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 3,
+      "delivery_index": 115,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tn_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tt_pingpong_cluster2n_64x128",
+      "args": [
+        "--m=64",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_tt_pingpong_cluster2n_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tt_pingpong_cluster2n_64x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 116,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        64,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tt_pingpong_cluster2n_64x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 117,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_pingpong_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 6,
+      "delivery_index": 118,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=tf32_nt_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 119,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=tf32_nt_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 120,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 121,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_pingpong_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 122,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_pingpong_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 3,
+      "delivery_index": 123,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_standard_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_standard_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_standard_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 124,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_standard_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_standard_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=fp8_nt_standard_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_standard_coop_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 125,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_standard_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_pingpong_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 126,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_nt_cpasync_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_pingpong_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 127,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 128,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_cpasync_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 129,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tn_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_tn_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tn_ws_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 130,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tn_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tn_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_tn_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tn_ws_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 131,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tn_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tt_pingpong_cluster2m_64x128",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_tt_pingpong_cluster2m_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tt_pingpong_cluster2m_64x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 132,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tt_pingpong_cluster2m_64x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_tt_pingpong_cluster2m_64x128",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=8192",
+        "--variant=bf16_tt_pingpong_cluster2m_64x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_tt_pingpong_cluster2m_64x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 133,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_tt_pingpong_cluster2m_64x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 134,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 135,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_pingpong_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 136,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_nt_cpasync_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_pingpong_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 137,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_pingpong_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 138,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_pingpong_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 139,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_standard_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=fp8_nt_standard_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_standard_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 140,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_standard_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_standard_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=fp8_nt_standard_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_standard_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 141,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_standard_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nn_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nn_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nn_coop_cluster2m_128x256_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 6,
+      "delivery_index": 142,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nn_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nn_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_nn_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nn_coop_cluster2m_128x256_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 143,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nn_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nn_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=4096",
+        "--variant=f16_nn_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nn_coop_cluster2n_128x256_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 0,
+      "delivery_index": 144,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nn_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nn_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=8192",
+        "--variant=f16_nn_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nn_coop_cluster2n_128x256_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 1,
+      "delivery_index": 145,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nn_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nn_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nn_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nn_coop_cluster2m_128x256_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 2,
+      "delivery_index": 146,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nn_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nn_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_nn_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nn_coop_cluster2m_128x256_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 3,
+      "delivery_index": 147,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nn_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nn_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=4096",
+        "--variant=bf16_nn_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nn_coop_cluster2n_128x256_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 4,
+      "delivery_index": 148,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nn_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nn_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=8192",
+        "--variant=bf16_nn_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nn_coop_cluster2n_128x256_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 5,
+      "delivery_index": 149,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nn_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 6,
+      "delivery_index": 150,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=bf16_nt_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 7,
+      "delivery_index": 151,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_ws_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 152,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_ws_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 153,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_ws_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 154,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_ws_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 155,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=tf32_nt_cpasync_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 156,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=tf32_nt_cpasync_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_coop_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 157,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=tf32_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 158,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=tf32_nt_cpasync_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 159,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_pingpong_cluster2m_128x64",
+      "args": [
+        "--m=256",
+        "--n=64",
+        "--k=4096",
+        "--variant=tf32_nt_cpasync_pingpong_cluster2m_128x64",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_pingpong_cluster2m_128x64_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 160,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        64,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_pingpong_cluster2m_128x64",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_pingpong_cluster2m_128x64",
+      "args": [
+        "--m=256",
+        "--n=64",
+        "--k=8192",
+        "--variant=tf32_nt_cpasync_pingpong_cluster2m_128x64",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_pingpong_cluster2m_128x64_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 161,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        64,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_pingpong_cluster2m_128x64",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_pingpong_cluster2n_128x64",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=4096",
+        "--variant=tf32_nt_cpasync_pingpong_cluster2n_128x64",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_pingpong_cluster2n_128x64_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 162,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_pingpong_cluster2n_128x64",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_cpasync_pingpong_cluster2n_128x64",
+      "args": [
+        "--m=128",
+        "--n=128",
+        "--k=8192",
+        "--variant=tf32_nt_cpasync_pingpong_cluster2n_128x64",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_cpasync_pingpong_cluster2n_128x64_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 163,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_cpasync_pingpong_cluster2n_128x64",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_tma_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_tma_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_tma_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 164,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_tma_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_tma_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=bf16_nt_tma_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_tma_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 165,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_tma_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_tma_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nt_tma_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_tma_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 166,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_tma_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_tma_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_nt_tma_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_tma_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 167,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_tma_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tn_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 168,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=f16_tn_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_coop_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 169,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_tn_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 170,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tn_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_tn_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tn_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 171,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tn_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tt_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_coop_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 172,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_coop_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=f16_tt_coop_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_coop_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 173,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_coop_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_tt_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_coop_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 174,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_coop_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_tt_coop_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_coop_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 175,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_coop_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 176,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=bf16_nt_cpasync_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 177,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=bf16_nt_cpasync_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 178,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_bf16_nt_cpasync_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=bf16_nt_cpasync_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_bf16_nt_cpasync_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 179,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_cpasync",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "bf16_nt_cpasync_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=tf32_nt_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_ws_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 180,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_ws_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=tf32_nt_ws_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_ws_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 181,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_ws_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=tf32_nt_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_ws_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 182,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_tf32_nt_ws_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=tf32_nt_ws_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_tf32_nt_ws_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 183,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "tf32_nt_ws_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2m_256x128",
+      "args": [
+        "--m=512",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_nt_coop_cluster2m_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2m_256x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 184,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        512,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2m_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2m_256x128",
+      "args": [
+        "--m=512",
+        "--n=128",
+        "--k=8192",
+        "--variant=f16_nt_coop_cluster2m_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2m_256x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 185,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        512,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2m_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2n_256x128",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_coop_cluster2n_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2n_256x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 186,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2n_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2n_256x128",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_nt_coop_cluster2n_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2n_256x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 187,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2n_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_nt_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2m_128x256_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 188,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2m_128x256",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_nt_coop_cluster2m_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2m_128x256_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 189,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2m_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=4096",
+        "--variant=f16_nt_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2n_128x256_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 190,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_nt_coop_cluster2n_128x256",
+      "args": [
+        "--m=128",
+        "--n=512",
+        "--k=8192",
+        "--variant=f16_nt_coop_cluster2n_128x256",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_nt_coop_cluster2n_128x256_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 191,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        512,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_nt_coop_cluster2n_128x256",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_coop_cluster2m_256x128",
+      "args": [
+        "--m=512",
+        "--n=128",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_coop_cluster2m_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_coop_cluster2m_256x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 0,
+      "delivery_index": 192,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        512,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_coop_cluster2m_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_coop_cluster2m_256x128",
+      "args": [
+        "--m=512",
+        "--n=128",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_coop_cluster2m_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_coop_cluster2m_256x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 1,
+      "delivery_index": 193,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        512,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_coop_cluster2m_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_coop_cluster2n_256x128",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=4096",
+        "--variant=fp8_nt_fastacc_coop_cluster2n_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_coop_cluster2n_256x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 2,
+      "delivery_index": 194,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_coop_cluster2n_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_fp8_nt_fastacc_coop_cluster2n_256x128",
+      "args": [
+        "--m=256",
+        "--n=256",
+        "--k=8192",
+        "--variant=fp8_nt_fastacc_coop_cluster2n_256x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_fp8_nt_fastacc_coop_cluster2n_256x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 3,
+      "delivery_index": 195,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "fp8_fastacc",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "fp8_nt_fastacc_coop_cluster2n_256x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2m_128x128_k4096_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 4,
+      "delivery_index": 196,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2m_128x128",
+      "args": [
+        "--m=256",
+        "--n=128",
+        "--k=8192",
+        "--variant=f16_tt_pingpong_cluster2m_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2m_128x128_k8192_dual_sm",
+      "cluster": "2x1x1",
+      "delivery_group": 5,
+      "delivery_index": 197,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "2x1x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        256,
+        128,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2m_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=4096",
+        "--variant=f16_tt_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2n_128x128_k4096_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 6,
+      "delivery_index": 198,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        4096
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    },
+    {
+      "algorithm": "dense_f16_tt_pingpong_cluster2n_128x128",
+      "args": [
+        "--m=128",
+        "--n=256",
+        "--k=8192",
+        "--variant=f16_tt_pingpong_cluster2n_128x128",
+        "--warmups=1",
+        "--trials=1"
+      ],
+      "binary_name": "dense_algorithms",
+      "case_id": "cutlass_dense_f16_tt_pingpong_cluster2n_128x128_k8192_dual_sm",
+      "cluster": "1x2x1",
+      "delivery_group": 7,
+      "delivery_index": 199,
+      "dual_sm_requirements": {
+        "active_sm_count": 2,
+        "cluster": "1x2x1",
+        "cluster_cta_count": 2,
+        "cta_count": 2
+      },
+      "family": "dense_tma",
+      "kind": "dense_harness",
+      "qualification_status": "pending_h100_topology_and_timing",
+      "shape": [
+        128,
+        256,
+        8192
+      ],
+      "source": "harness/cutlass_full_gpu_runner.cu",
+      "source_case_id": "f16_tt_pingpong_cluster2n_128x128",
+      "suite": "cutlass"
+    }
+  ],
+  "schema_version": "cutlass-hopper-dual-sm-cluster-v1",
+  "selection_rule": "native 2-CTA cluster example binaries plus dense_algorithms cluster2m/cluster2n parsed from run_variant; one cluster of work",
+  "source_manifest": "manifests/cutlass_100.json"
+}

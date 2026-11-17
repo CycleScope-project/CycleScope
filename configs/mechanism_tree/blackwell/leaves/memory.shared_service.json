@@ -1,0 +1,52 @@
+{
+ "memory.shared_service.root": {
+  "fields": {
+   "dram_read_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 7324.44875
+    },
+    "sources": [
+     "mechtree.m12.l2dram"
+    ]
+   },
+   "dram_write_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 7047.8575
+    },
+    "sources": [
+     "mechtree.m12.l2dram"
+    ]
+   },
+   "l2_read_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 20130.9185
+    },
+    "sources": [
+     "mechtree.m12.l2dram"
+    ]
+   },
+   "l2_write_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 8038.439
+    },
+    "sources": [
+     "mechtree.m12.l2dram"
+    ]
+   },
+   "l2_read_gpc_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 2790
+    },
+    "sources": [
+     "tma_store_loaded.b300.gpc_scope"
+    ]
+   }
+  },
+  "scope": "gpu"
+ }
+}

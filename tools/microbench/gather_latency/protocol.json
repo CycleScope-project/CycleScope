@@ -1,0 +1,40 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "gather_latency",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "mechanisms": [
+  "memory.l2.service / memory.dram.service latency of global loads under a gather by many warps and SMs",
+  "memory.shared_service"
+ ],
+ "ownership": "gpu-shared (full-GPU loop); the other lines' clones have no commit beyond main on the L2 / DRAM latency leaves or the memlat probes.",
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "How long does a warp wait for K 128-bit global loads per lane from a row that other SMs also read, as a function of warps per SM, SMs, K and how many distinct rows there are (L2 hits against DRAM)?",
+ "why": "flashmla_sparse_decode_v32_h64_03 (H100 full GPU, sim / ncu 0.745; $A/fg-line-cold/attrib6): the producer warps' loop (three blocks of 7-9 LDG.128 with 256-B line hints per iteration, 16 iterations) takes 4820 cycles per iteration on hardware against 3750 simulated; hardware long-scoreboard wait about 1900 per iteration against about 1310 simulated. The traffic agrees (DRAM sectors 977 560 hardware, 972 126 simulated; 69 % of the sectors delivered to the SMs are L2 hits on hardware).",
+ "probe": "probe/gather.cu: one CTA per SM (or one CTA), W warps, per iteration K loads of 16 B per lane from a 16-KiB row chosen by hash(cta, warp, iteration) % rows; clock around issue .. use, lane 0. The L2 is flushed before every launch by reading another buffer. Cells: W = 1, 4, 16; K = 1, 7; rows = 64 (every row is re-read by many warps: L2 hits after the first touches) and 65536 (1 GiB table: nearly every row is new: DRAM); grid = all SMs and grid = 1; 16 iterations, 5 launches.",
+ "derivation": "per cell the median (and p10 / p90) over warps and CTAs of the wait per iteration, for iteration 0 and for iterations 8..15; the single-CTA cells are also replayed in the simulator for the engine's numbers.",
+ "prediction_from_the_installed_leaves (h100)": "a warp's K loads are issued together, so the wait is one latency plus queueing: rows = 65536: about 698 (DRAM) + up to the loaded extra, for every iteration, rising with W x SMs through the shared service; rows = 64: iteration 0 as DRAM, iterations 8..15 about 305 (L2) + 52 (L1 path), little dependence on W.",
+ "reading": {
+  "usable": "launches 1..4 agree within 5 % on the medians.",
+  "R1": "medians within 20 % of the simulator's replay (single CTA) and of the prediction's order for all-SM cells -> the load latency model holds for this pattern and the flash-MLA excess is elsewhere.",
+  "R2": "otherwise the table (rows, W, K, grid) is the result and a rule is proposed in an addendum (post hoc), judged on cells its constants do not come from."
+ },
+ "not_allowed": "no value from full-GPU error; no per-kernel rule.",
+ "addenda": [
+  {
+   "date": "2026-11-12",
+   "written": "after run 1 on both devices ($A/fg-line-cold/gather/{h100,b300}-r1; $A/fg-line-cold/tools/gather_table.py) and the replay of four single-CTA cells ($A/fg-line-cold/replay5)",
+   "probe form": "ptxas compiled the loads as 16 predicated scalar 32-bit LDG.E per lane (two per 64-byte slot), not as 128-bit loads; one compile fix (clock rate via cudaDeviceGetAttribute).",
+   "reading (R2)": {
+    "single CTA, hardware | simulator, cycles of wait per iteration": "W = 16, K = 7, rows 64: iteration 0 9022 | 2308, iterations 8-15 6795 | 1621; rows 65536: 7184 | 2363 and 6036 | 1656. W = 1, K = 7: 1514-1704 | 895 and 1530-1651 | 883. The engine is about 1.7x too fast for one warp and about 4x for sixteen warps on one SM.",
+    "hardware by warps on one SM (iterations 8-15, K = 7, grid 1)": "h100 1530-1651 (W = 1), 1985-2084 (W = 4), 6036-6795 (W = 16); b300 1604-1615, 2104-2321, 6872-7255. With K = 1 the wait does not grow with W (852-1252).",
+    "all SMs": "rows 64: W = 16, K = 7 6814 (as one CTA: the limit is inside the SM); W = 1, K = 1 499 (rows already fetched by other SMs); rows 65536, W = 16, K = 7: 15309 (h100) / 8998 (b300)."
+   },
+   "state": "the excess grows with the number of loads a single SM has outstanding (warps x loads per warp) and is present with one CTA: a per-SM mechanism (request queue or sector fan-out per instruction), not the GPU-shared service. Not yet separated; nothing installed."
+  }
+ ]
+}

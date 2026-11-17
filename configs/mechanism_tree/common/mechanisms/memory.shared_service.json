@@ -1,0 +1,34 @@
+{
+ "doc": "merged from legacy memory.l2_shared / memory.dram_shared / memory.dram_combined; l2_read_gpc_bytes_per_ns / l2_write_gpc_bytes_per_ns: rate of the L2 read / store service of one GPC (SM topology gpc), in series before the GPU-wide rate; absent or 0 = no per-GPC layer",
+ "doc_blackwell": "imported from legacy mechanism memory.shared_service",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.shared_service"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "dram_read_bytes_per_ns": {
+   "kind": "constant"
+  },
+  "dram_write_bytes_per_ns": {
+   "kind": "constant"
+  },
+  "l2_read_bytes_per_ns": {
+   "kind": "constant"
+  },
+  "l2_write_bytes_per_ns": {
+   "kind": "constant"
+  },
+  "l2_read_gpc_bytes_per_ns": {
+   "kind": "constant"
+  },
+  "l2_write_gpc_bytes_per_ns": {
+   "kind": "constant"
+  }
+ }
+}

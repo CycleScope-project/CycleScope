@@ -1,0 +1,55 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "tma_forms",
+  "version": 2,
+  "supersedes": "tools/microbench/tma_forms/protocol.json (v1; its probe scheme, derivation formulas and acceptance thresholds are kept verbatim unless an item below says otherwise)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "storage.async.service_start",
+    "storage.tma.completion"
+  ],
+  "findings_from_v1": [
+    "install.py op mapping: variant tmast.utma_redg (UTMAREDG) does not contain the substring 'utmared' and fell through to UTMASTG; on both devices the UTMASTG tile destination_count 0-1 service_start and completion knots therefore carry the UTMAREDG cells (h100 service 74.05 @2 KiB / 314.05 @8 KiB vs UTMASTG cells 57.75 / 249.75; completion 144 / 384 vs 126 / 318; b300 service 80 / 320 vs 63.85 / 255.85, completion 103 / 343 vs ~101 / ~270), while the UTMAREDG leaves kept predecessor rows (h100 hopper.* hash sources, b300 mechtree.tma_store.*). 'ublkred' was also mapped to UTMAREDG.",
+    "model.py tma.cu loop accepts only variants starting with 'tma' / 'blkseq'; the blkseq cell set writes 'k_blkseq.*', so the UBLKRED rows (r2 run-a / run-b, U 0..32, 1 / 4 / 16 KiB) were never derived. Its form test `'st' in v` would also have labelled them store.",
+    "tma_forms.cu aborted after the first im2col cell on h100 (cuTensorMapEncodeIm2col failed) and at the first gather4 cell on b300 (encode2d failed): no im2col / gather4 / scatter4 row exists on either device.",
+    "multicast (destination_count >= 2) completion: tma.cu dc>1 records t_w after the leader's ACK barrier (init DC when U > 0, 1 when U = 0), so E1 - E0 contains one remote cluster arrive that the U = 0 control does not; the issuing CTA's own destination completion is not recorded."
+  ],
+  "changes": {
+    "model": "derivation code follows the v1 formulas for every cell set, keyed by an explicit variant -> (operation_class, tma_form, direction) table instead of substring tests: tmast.utmastg / tmar.st.r* -> UTMASTG tile; tmast.utma_redg -> UTMAREDG; tmast.ublkcpgs and k_blkseq.ublkcp.*.sts0 -> UBLKCP shared->global; k_blkseq.ublkred.*.sts0 -> UBLKRED; k_blkseq.*.sts2 rows are reported only (STS-in-window variant, not a leaf cell); tma.dc* / tmar.ld.r* -> UTMALDG tile; new cells below by name. UBLKRED / UBLKCP(blkseq): completion(B) = E[t_w - t_s | U = 1] - E[t_w - t_s | U = 0]; service(B) = OLS slope over U >= 1 of E[t_w - t_s]. A variant not in the table is an error (the model exits non-zero), never a silent skip.",
+    "probe_tma_forms_cu": "fix the tensor-map encodes so every declared cell runs (build-time / host-side change only; the measured windows are unchanged): im2col on both devices, gather4 / scatter4 on sm_103a. A cell whose encode is still rejected by the driver is recorded unrealised:encode with the CUresult, and the run continues with the next cell (one failing cell must not abort the binary).",
+    "probe_tma_cu_multicast": "the dc > 1 kernels additionally record t_a = the leader's own destination mbarrier test_wait success (before it waits for the ACK barrier); U = 0 control records t_a the same way. completion_own(dc, B) = (E[t_a - t_s | U = 1] - o_s,1) - (E[t_a - t_s | U = 0] - o_s,0). The ACK-based v1 value is kept in the table as completion_ack (reported only).",
+    "probe_ublkcp_load": "new cell set in tma.cu (or tma_forms.cu): UBLKCP global->shared (cp.async.bulk.shared::cluster.global.mbarrier::complete_tx::bytes), one CTA, bytes {1, 4, 16, 32} KiB L2-hot, U {0, 1, 2, 4, 8}, observed by the issuing CTA's mbarrier test_wait spin in a second warp exactly as the tile cells: completion(B) and service(B) by the v1 tile formulas. SASS gate: exactly U UBLKCP.S.G (load-direction form) in the window."
+  },
+  "cells": "v1 cells (default / store / blkseq / rank / tma_forms) + completion_own for dc 2 / 4 / 8 / 16 at 16 KiB hot + the UBLKCP load cell set; two runs per device (run-a, run-b), --launches 16 --reps 33 as v1.",
+  "acceptance": "v1 verbatim (se / value <= 3 % in both runs and run agreement <= 3 % -> measured; otherwise experimental and listed). Controls: every v1 r2 cell that v2 re-measures is compared with its r2 value (reported; > 5 % difference is listed as a reproduction failure and that cell is installed experimental at most).",
+  "install": {
+    "UTMASTG tile dc 0-1": "service / completion knots from tmast.utmastg (rank 2) cells; tmar.st.r2..r5 reported as rank checks",
+    "UTMAREDG dc 0-1": "service / completion knots from tmast.utma_redg",
+    "UBLKRED dc 0-1": "service / completion knots from k_blkseq.ublkred sts0 (1 / 4 / 16 KiB)",
+    "UBLKCP dc 0-1": "the leaf has no direction axis. Both directions are measured; if service and completion of the two directions agree within 10 % at every common byte size, the leaf gets the shared->global knots (current source of the installed values) with the load-direction cells cited as agreement; otherwise the leaf keeps the shared->global knots and a converter item is opened to add a bulk_direction partition (SASS .S.G / .G.S modifier); the load-direction knots are reported, not installed",
+    "UTMALDG tile dc 2-4 / dc 2-max": "completion = completion_own at dc 2 (and the v1 split rule: if completion_own(16) differs from completion_own(2) by more than 10 % the multicast leaf is split into destination_count 2-3, 4-7, 8-15, 16-max)",
+    "UTMALDG im2col / gather4, UTMASTG scatter4": "as v1 install (b300; gather4 / scatter4 do not exist on sm_90a)",
+    "store / reduce classes with destination_count >= 2 (UTMASTG, UTMAREDG, UBLKRED, STAS, UBLKCP shared->global)": "not measured: the converter derives destination_count only from a multicast mask, which these forms do not have; the leaves are unreachable and are removed in a separate pure-refactor commit (result identity required)",
+    "STAS": "completion still reported only (no engine path), service as v1",
+    "sources": "tma_forms.<device>.<run>; artifact $A/microbench/tma_forms/<device>-<run>/ and $A/microbench/tma_forms-model/<device>-<run>/model.json",
+    "ab": "500 x 2 single-cluster A/B per architecture after install; attribution in mechanism-merge-report.md"
+  },
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no neighbour fill; no install of a cell whose SASS gate failed",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "before_install": true,
+      "text": "Correction of findings_from_v1 item 4 (from reading tma.cu, before any r3 data was modelled): in the dc > 1 kernels t_w (out[3 rep + 1]) is written by warp 1 of rank 0 right after its own destination mbarrier completes, and the ACK barrier is waited by warp 0 only; so the v1 completion E1 - E0 already is the issuing CTA's own-destination completion (completion_own). No t_a field is needed: completion_own(dc, B) is the v1 completion formula on t_w. The r3 probe additionally records t_ack (warp 0 after the ACK barrier, rows '<variant>.ack') which gives completion_ack, reported only. The reason v1 never installed multicast completion is in model.py: the completion emit did not carry destination_count (only service did), so install.py keyed every completion cell to dc 0 and the dc >= 2 leaves found no cell. The v2 model emits destination_count for completion cells."
+    },
+    {
+      "date": "2026-11-05",
+      "text": "build fix: UBLKCP g->s U=0 cell issued expect_tx with no copies -> mbar_wait spun forever (h100 r3h wedge; b300 run survived per-cell timeouts). U=0 now records an empty window like the other cells. Harness-only; measured windows unchanged."
+    },
+    {
+      "date": "2026-11-05",
+      "before_install": "written at review of the first install (9776e33), which is withdrawn",
+      "text": "(1) blkseq service is not an async-unit service: every blkseq element runs fence.proxy.async.shared::cta + the bulk op + cp.async.bulk.commit_group, so the slope over U of t_w carries the per-element fence / commit cost. Evidence in r3: the same instruction (UBLKCP shared->global) gives slope 188 (b300) / 198 (h100) cycles at 1 KiB in blkseq but 71 / 69 at 2 KiB in the tmast cell, which has one commit for all U. The UBLKRED service_start leaf is therefore not installed from blkseq (it keeps its current value and source; reported); UBLKRED completion = E[t_w - t_s | U=1] - E[... | U=0] stays valid because the U=0 control contains the same fence + commit. (2) UBLKCP dc 0-1 takes only the tmast.ublkcpgs knots (shared->global, the v1 definition); k_blkseq.ublkcp rows are reported as a definition cross-check, never merged into the knots. (3) SASS direction strings (b300 r3h): UBLKCP.S.G = destination shared / source global (bulk load, mbarrier completion; the new load cell), UBLKCP.G.S = destination global / source shared (bulk store, bulk group), as the converter rules state."
+    }
+  ]
+}

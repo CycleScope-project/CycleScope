@@ -1,0 +1,115 @@
+{
+ "memory.l1.residency.root": {
+  "fields": {
+   "l1.data_array_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 253952
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.reserved_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_0_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_1_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 8192
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_2_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 16384
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_3_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 32768
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_4_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 65536
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_5_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 102400
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_6_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 135168
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_7_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 167936
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_8_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 200704
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   },
+   "l1.shared_configuration_9_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 233472
+    },
+    "sources": [
+     "l1_residency.h100.r2"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

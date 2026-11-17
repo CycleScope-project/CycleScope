@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "cublas_tf32_skinny_01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 172847,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 5257332,
+ "completed": 5257332,
+ "cycles": 63234,
+ "hard": 0,
+ "walls": {
+  "convert": 8.9,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 14.0,
+  "total": 23.8
+ },
+ "rss_kb": {
+  "convert": 371828,
+  "segments": 371828,
+  "build": 371828,
+  "sim": 790192
+ },
+ "hw_cycles": 61919.0,
+ "reference_cache_control": "all",
+ "placement_digest": "fdefcf9f7a7aec5c",
+ "shards": 8
+}

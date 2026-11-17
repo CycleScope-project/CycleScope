@@ -1,0 +1,40 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "barrier_release",
+ "version": 2,
+ "supersedes": "tools/microbench/barrier_release/protocol.json (version 1; runs h100-r1/r2, b300-r1/r2; leaves installed experimental at r13 because the raw-cell spread criterion cannot pass by design)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "synchronization.mbarrier.release",
+  "synchronization.cta.release",
+  "synchronization.cluster.release",
+  "synchronization.cp_async.arrival"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "purpose": "Version 1 judged cells on the raw (P90 - P10) / median of t_w - t_s, which is ~100 % by construction (the last arriver is jittered over a window and the blocked waiter wakes on its own poll grid); the quantity is the mean, whose standard error is < 1 %. Version 2 keeps the probes, the r13 derivation (E - o_s - o_w - r_sync) and judges the derived value by its standard error and run agreement. The H100 cluster variant (timed out in version 1) is re-attempted with the sync_xw cluster cell only (barrier.cluster.arrive.release / wait.acquire, 2 CTAs).",
+ "probe": "tools/microbench/barrier_release/probe/{sync_mb,sync_bar,sync_xw,async}.cu unchanged (verbatim blackwell-prototype); runner run_probes.sh with --reps 256 (sync_bar kMaxReps limit) --launches 8, two runs per device; SASS checks barrier_release/sass_check.py (verbatim)",
+ "derivation": "version 1 / r13: value = E[t_w - t_s | waiter blocked, delay >= 4000] - o_s - o_w - r_sync (r_sync = the tw_only chain); cta.release(W) per warp count W in {4, 8, 12, 16} (W 2 / 32 report only: phase wrap, report P4b); cp_async.arrival = E[noinc] - E[plain arrive]",
+ "acceptance": {
+  "cell": "se(value) / value <= 3 % (or se <= 1 cycle) in both runs and run agreement <= 5 % -> measured; else experimental and listed",
+  "b300_control": "installed b300 leaves within 10 % -> kept and cited; beyond 10 % with the cell passing -> replaced (old value in the source description)",
+  "unrealised": "a variant failing its SASS check or timing out stays as it is and is listed"
+ },
+ "install": "synchronization.* leaves of both devices from this run (source barrier_release.<device>.<run>, protocol tools/microbench/barrier_release/protocol-v2.json); one two-architecture 450 A/B round",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+ "addenda": [
+  {
+   "date": "2026-11-05",
+   "written_before": "the H100 v2 run (h100-r3 still running); the B300 v2 run (b300-r3) had completed and its sync_bar medians had been listed when this was written (cluster release-form 384/396, relaxed-form 120/132, both deterministic)",
+   "text": "(1) synchronization.cluster.release is derived from the sync_bar bar.cluster.c{2,4,8} cells, not from sync_xw: the sync_xw c1 / c2 cells are tcgen05.commit (tensor.umma.commit), and the version-1 model.py labelled c1 as synchronization.cluster.release (the b300-r2 'cluster 79.02' was that mislabel). (2) The installed value is the .relaxed arrive form (barrier.cluster.arrive.relaxed.aligned + wait.acquire.aligned): the .release form compiles to MEMBAR.ALL.GPU + ERRBAR + CGAERRBAR before UCGABAR_ARV and the fence cost is a separate instruction class (blackwell source mechtree.w2.cluster.release), so installing it in cluster.release would attribute the fence to the barrier; the .release form is reported as a diagnostic (fence cost = release - relaxed). value(S) = E[t_w - t_s | arriver] - o_s - o_w per cluster size S with o_s / o_w from crossings/cta.release/sass_check.py (checks_bar.json); installed as linear points over actual_participant_warps at W = S in {2, 4, 8} (one warp per CTA). (3) cta.release(W) uses the bar.cta.wN.warplast rows (the first-woken warp, as the version-1 P4b derivation) with the same o_s / o_w; W in {4, 8, 12, 16} installed, W 2 / 32 reported."
+  },
+  {
+   "date": "2026-11-06",
+   "written_before": "any new GPU run; uses only the existing h100-r4 / b300-r3 tw_only chains (model.json derived/{a,b}/r_sync: chain_slope 42.932 / 42.919, points U 1-32 exactly linear) - no re-measurement",
+   "text": "(tw_only -> SYNCS.PHASECHK result latency) tw_only is the immediate try_wait on a completed phase followed by the dependent `@!P BRA` (unit SASS: SYNCS.PHASECHK.TRANS64.TRYWAIT P, [B], R ; @!P BRA; control-word stalls 2 / 5). Under the engine's issue rules (control-word stall floor, a predicate source register ready at issue + result_latency, not-taken BRA envelope 0) the unit period is result_latency + stall(BRA), so instruction.service result_latency_cycles (= completion_latency_cycles) of the new class SYNCS.PHASECHK (root SYNCS with token PHASECHK; both the TRYWAIT and the test_wait form share the SYNCS unit and the predicate write-back path; measured on the TRYWAIT form) = slope(tw_only chain medians over U) - the modal control-word stall of the unit's BRA read from the run's sync_mb SASS. Acceptance: chain fit residual <= 2 % and run a / b agreement <= 3 % -> measured; the BRA stall must be identical across the window's units except the last. Each device installs from its own run (source barrier_release.<device>.<run>.tw_only); the other SYNCS classes keep the structural 1/1/0. Consistent with the release derivation above, which subtracts r_sync (this same chain) from the blocked waiter's time: the engine's blocked path becomes release + result_latency and the unblocked path result_latency alone - neither double-counts."
+  }
+ ]
+}

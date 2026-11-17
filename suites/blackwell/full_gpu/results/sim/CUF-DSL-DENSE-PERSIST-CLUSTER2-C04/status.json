@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-DENSE-PERSIST-CLUSTER2-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 132569,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1565273,
+ "completed": 1565273,
+ "cycles": 24094,
+ "hard": 0,
+ "walls": {
+  "convert": 6.2,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 5.5,
+  "total": 12.2
+ },
+ "rss_kb": {
+  "convert": 353512,
+  "segments": 353512,
+  "build": 353512,
+  "sim": 491920
+ },
+ "hw_cycles": 27063.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 3
+}

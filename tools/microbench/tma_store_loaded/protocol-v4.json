@@ -1,0 +1,38 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "tma_store_loaded",
+ "version": 4,
+ "supersedes": "protocol-v3.json (negative control failed as written; nothing installed)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-10",
+ "mechanisms": [
+  "memory.l2.service (per-SM port)",
+  "memory.dram.service (per-SM port)",
+  "memory.store_l2.service (per-SM port)"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "kind": "confirmation of one stated rule on cells not measured in v1-v3",
+ "rule_under_test": {
+  "R1_memory_port": "One SM has one port towards the L2: the fills it receives (L2 hits and DRAM-missed fills of every load class: LDG, LDGSTS, TMA / bulk loads) and the store sectors it sends (STG / ST, TMA / bulk stores, reductions) take turns on it. A fill sector occupies it for sector_bytes / l2.sector_bytes_per_cycle (resp. dram.sector_bytes_per_cycle for a DRAM-missed sector), a store sector for sector_bytes / store_l2.sector_bytes_per_cycle: the occupancies the two installed per-SM ports already charge, on one time line instead of two. Engine form (cpp/core/memory_hierarchy): the per-direction ports keep their in-order service and outstanding-request limits; in addition every fill and store sector places its occupancy on one per-SM service (bucketed, 32-cycle buckets, capacity one port-cycle per cycle, the SharedService structure the GPU-wide services use); a sector whose per-direction port start is t starts no earlier than the time that service gives it, and the difference (the time taken by the other direction) is added to the load's return / the store's acceptance and drain; for TMA / bulk loads that difference counts in the completion the way GPU-shared queueing does. Enabled by a structural leaf field store_l2.shares_fill_port (memory.store_l2.service, cluster-local, source = this protocol); absent or 0 = today's two independent ports, results byte-identical.",
+  "R2_shared_memory_write": "recorded here, engine rule not part of this round: fills also take turns with STS wavefront acceptance on the SM (U of sts + tma / sts + ldg in v3 0.98-0.995)."
+ },
+ "probe": "tools/microbench/tma_store_loaded/probe/port_pairs.cu at this commit: v3 plus MODE bars (two named barriers per round, nothing else), 1 / 2 / 4 loader warps, tma loader region as a parameter. N = 1 unless stated, STAMPS 0, 264 rounds (8 not counted), 8 repetitions after a discarded one, runs a and b.",
+ "cells": "run.sh with V3=4 (41 cells per run). New against v3: TMA store boxes of 2 and 16 KiB; 1 and 2 loader slots; the bars-only round with each loader kind; an 8-box (128 KiB) loader region at N = 1 and at all SMs (19 MiB in total, L2 resident). Repeated from v3: store 8 KiB / stg / sts with 4 tma slots, with ldg, with ldgsts.",
+ "sass_gate": "sass_check_v3.py: 18 k_round instantiations (mode 5 added).",
+ "derivation": "model_v4.py: per run and pair slow = P(with) / P(alone), keep = R(with) / R(alone), U = 1 / slow + R(with) / l2.sector_bytes_per_cycle (b300 124.57, h100 122.31).",
+ "acceptance": "Controls (nothing is read if one fails): (C1) store 8 KiB alone within 5 % of 8192 / store_l2.sector_bytes_per_cycle; (C2) 4 tma slots alone within 15 % of tma_loaded N1.S4 (b300 92.7, h100 88.9). R1 set = store{2,8,16 KiB} + tma{1,2,4 slots}, stg + tma{1,2,4}, store 8 KiB + ldg, stg + ldg (14 pairs). A pair is informative if slow >= 1.03 on both runs; an informative pair confirms if |U - 1| <= 0.06 on both runs, else refutes. R1 is confirmed on a device if no pair refutes and at least 8 pairs confirm; it is installed only if confirmed on both devices. R2 set = sts + tma{1,2,4}, sts + ldg, same criterion with at least 2 confirming (recorded). The bars + loader cells are reported (scheduler and fence side effects of the loaders on a round without memory traffic) and do not gate. The N = NMAX cells are reported: U at all SMs is compared with U at N = 1 only if the loader-alone rate at NMAX is at least 0.8 of the N = 1 rate (loads still L2 hits and not aggregate-bound). ldgsts pairs are reported; under R1 the engine charges LDGSTS fills the same port occupancy as other fills and the measured extra interference (U < 0.9 in v3) stays open.",
+ "install": "R1 as a structural field (value 1, evidence measured, source tma_store_loaded.<device>.<run>, artifact $A/microbench/tma_store_loaded/<device>-<run>/, model $A/fg-gemm/tsl/<device>-v4-model.json) on both trees. Gate: single-cluster 500 x 2 against $A/fg-fix5/sc-r7 (MAPE must not get worse), full-gpu 500 x 2 against $A/fg-fix5/full-r7, CTest (a cell for the rule), pytest, cyclescope tree validate --strict.",
+ "not_allowed": "no case-cycle tuning; no threshold, rule or derivation change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-10",
+   "after_run": "r6 ($A/microbench/tma_store_loaded/{b300,h100}-r6, models $A/fg-gemm/tsl/{b300,h100}-v4-model.json)",
+   "criterion_changed_after_data": true,
+   "authorised_by": "user, after seeing the r6 result ('the criterion is too strict, adjust as you see fit')",
+   "text": "As written R1 is not confirmed: controls pass, 11 of the 14 pairs confirm (|U - 1| <= 0.015 on both devices, runs a / b equal to three digits), store 2 KiB + 1 / 2 tma slots are uninformative, and store 2 KiB + 4 tma slots refutes (U 1.37 / 1.39). Cause: U = 1 / slow + R / l2 port assumes the store side alone already fills the port, which holds for the 8 / 16 KiB rings and the stg round (alone: 0.99-1.01 of the port) but not for the 2 KiB ring (alone 109.5 / 112.2 cycles per 2 KiB = 0.58 of the port; its round is bound by the two barriers and the UTMASTG hold, not by the drain), so its slow understates the port time it uses. Adjusted criterion (the quantity the rule is about, no free parameter): port occupancy rho = (box bytes / store_l2.sector_bytes_per_cycle + R x P / l2.sector_bytes_per_cycle) / P with the installed rates; a pair refutes if rho > 1.03 on either run (the port would be over-subscribed) or if the round is slowed by >= 5 % while rho < 0.97 (slowed without the port being full); a slowed pair with 0.97 <= rho <= 1.03 confirms; an unslowed pair with rho <= 1.03 is consistent. At least 8 confirming, none refuting, on both devices. Result on the same r6 data: b300 12 confirm (rho 0.981-0.998), 2 consistent (store 2 KiB + 1 / 2 slots: rho 0.71 / 0.86, slow 1.02), 0 refute; h100 12 confirm (rho 0.993-1.020), 2 consistent (0.71 / 0.86), 0 refute; store 2 KiB + 4 slots is rho 0.997 / 0.992 (b300) and 1.012 / 1.013 (h100). R1 is taken as confirmed under the adjusted criterion and installed; the change of criterion after data is a deviation from the frozen-protocol rule and is reported as such in full-gpu-chain-report. R2 (sts + fills) confirms under the original criterion on both devices (U 0.980-0.995) and stays recorded only. Reported cells: bars + loaders leave the round unchanged (slow 1.000-1.006) while the loaders drop to 0.85-0.90 of their rate; ldgsts pairs U 0.75-0.90 (open); all SMs with an 8-box loader region: b300 store alone 290.1 (aggregate write share), with loads slow 1.18, rho 0.996; h100 store alone 524 (aggregate write bound, port 0.49 used), loader-alone 30.8 B/cycle < 0.8 x N1, not compared."
+  }
+ ]
+}

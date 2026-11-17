@@ -1,0 +1,44 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "l2_merge",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanism": "memory.l2_merge window_cycles, max_requests_per_read, delivered_bytes_per_cycle (GPU-shared, full-GPU loop: docs/en/design/mechanism-tree.md). Engine definition (cpp/core/memory_hierarchy.cpp load()): an L1-missing sector request that reaches L2 opens a merge entry {expiry = issue + window_cycles, completion, count 1}; a later request to the same sector from any SM issued before expiry with count < max_requests_per_read is merged: it skips the L2 / DRAM path and completes at max(the first request's completion, delivery queue), where the delivery queue charges sector_bytes / delivered_bytes_per_cycle per merged sector; the (max+1)-th request takes the normal path and reopens the entry.",
+  "installed": "h100 235 / 3 / 12743.5 from hopper-prototype full-GPU scans (M6 r2 tma_scan shift sweep 50 % crossing; M6 r2 aligned G sweep ceil(G/N)/G fit; M1 r4 lockstep SM-side maximum 25.2 TB/s at 1.98 GHz), b300 placeholder 0 / 0 / 0",
+  "probe": "tools/microbench/l2_merge/probe/tma_scan.cu = hopper-prototype tools/microbench/tma_scan_microbench.cu verbatim except: the nsm upper bound 132 becomes the device's multiProcessorCount (queried at runtime), and the device line prints the SM count. One CTA per SM (grid nsm, 32 threads, 64 KiB dynamic shared ring of 4 x 16 KiB boxes, one issuing thread), UTMALDG.2D tensor loads of a 24 MB L2-resident footprint split into nsm / G slices; the G CTAs of a slice read the same tiles. sync_start = 1: every CTA spins on one %globaltimer target published by CTA 0 (aligned start within the 32 ns timer resolution); shift_cycles = D: member m of a group starts m x D SM cycles (clock64 spin) after the aligned start. Each CTA streams 256 MB; per-CTA clock64 and %globaltimer give bytes per SM cycle and the aggregate over the union window (RESULT line). Runner tools/microbench/l2_merge/run_scan.py = hopper-prototype run_tma_scan.py set m6r2 plus the parse / run_ncu / write_summary helpers of run_l2_dram_scan.py (copied into the same file), with nsm(G) = floor(SM count / G) x G (h100: 132 except 128 at G 8 / 16 / 32 as the predecessor; b300 (148 SMs): 148 / 147 / 148 / 144 / 144 / 143 / 144 / 144 / 132 / 128 / 132 / 132 at G 2 / 3 / 4 / 6 / 8 / 11 / 12 / 16 / 22 / 32 / 44 / 132). Every config also runs once under ncu (--cache-control none --clock-control none, kernel regex tma_scan_kernel, launch-skip 1 launch-count 1, metrics lts__t_bytes.sum, lts__t_sectors_op_read.sum, l1tex__t_bytes.sum, dram__bytes_read.sum, sm__cycles_active.max, gpu__time_duration.sum; h100: $A/tools/nsight-compute/2025.1.0, b300: the image's ncu).",
+  "cells": {
+    "aligned_g": "sync_start = 1, lockstep, G in {2, 3, 4, 6, 8, 11, 12, 16, 22, 32, 44, 132}: r(G) = lts__t_bytes.sum / SM-side bytes of the ncu launch (SM-side bytes = sum over CTAs of their streamed bytes, the probe's total_bytes)",
+    "shift_g2": "G = 2, D in {64, 128, 192, 256, 384, 512, 768, 1024, 1536, 2048, 4096} SM cycles (member 1 later by D); D = 0 is the aligned_g G = 2 cell",
+    "shift_g4": "G = 4, D in {128, 256, 512, 1024, 2048} (members 1..3 later by D, 2D, 3D), reported",
+    "references": "G = 2 lockstep without the globaltimer barrier, G = 2 rotated (members on different tiles), disjoint slices nsm = SM count: reported (the rotated and disjoint cells must give r within 0.95..1.05, else the ncu accounting is wrong and the run is unrealised)"
+  },
+  "derivation": {
+    "validity": "a config is valid only if active_sms (distinct %smid values) == nsm and the start spread of the unshifted members (max start_ns over member 0 of every group) <= 64 ns (two timer ticks); invalid configs are excluded and listed",
+    "merged_fraction": "m(D) = clamp(2 x (1 - r(D)), 0, 1) for G = 2 (r = 0.5 means every tile was read once at the slice for two requesters)",
+    "window_cycles": "the D at which m(D) crosses 0.5, linear interpolation between the bracketing D values of shift_g2 (the predecessor's rule, which gave 235 on H100); if m(D) never falls below 0.5 within 4096 the cell is unrealised",
+    "max_requests_per_read": "N* = argmin over N in {1..8} of mean over the valid aligned_g G of |r(G) - ceil(G / N) / G| (the predecessor's rule: one slice read serves at most N requesters); the mean absolute error of N* and of N* +- 1 is reported",
+    "delivered_bytes_per_cycle": "max over the valid aligned_g configs with G >= 2 of agg_B_per_ns x 1000 / mhz (SM-side aggregate bytes delivered per SM cycle; the probe's RESULT line, median over trials); the config that attains it is reported",
+    "other": "the shift_g4 table and the G = 2 unaligned / rotated references are reported; the SM-side per-SM bytes per cycle of the disjoint cell is reported as the per-SM TMA stream rate"
+  },
+  "acceptance": {
+    "measured": "window: two runs within 10 %; max_requests: the same N* in both runs and its mean absolute error <= 0.06; delivered: two runs within 5 %; the references pass (rotated / disjoint r within 0.95..1.05); every ncu launch of the cells used has rc 0",
+    "experimental": "one of the three bounds exceeded (installed as experimental with both run values in the source)",
+    "unrealised": "ncu missing or failing on the cells used, validity failing on more than one aligned_g config, or the references failing: reported, leaf unchanged"
+  },
+  "devices": {
+    "h100": "sm_90a (132 SMs)",
+    "b300": "sm_103a (148 SMs)"
+  },
+  "runs": "two runs per device (run-a, run-b) in one job, --trials 5",
+  "install": "memory.l2_merge root fields on both devices (window_cycles in SM cycles, max_requests_per_read count, delivered_bytes_per_cycle bytes per SM cycle): h100 replaces 235 / 3 / 12743.5 when the cells pass, b300 placeholder -> measured; source keys l2_merge.<device>.<run> with protocol tools/microbench/l2_merge/protocol.json; A/B: single-cluster 450 both architectures recorded (this leaf belongs to the full-GPU loop and single-cluster jobs rarely merge across SMs; the full-GPU 450 round is outside this line)",
+  "engine_note": "the engine applies the merge window to L2 hits as well as misses and lets a merged follower complete at the leader's completion even when that is earlier than follower issue + L2 hit latency; the hardware quantity measured here is the slice-side request combining (bytes read at the slice per bytes delivered) and its time window. Any change of the engine's merge semantics is the engine line's; this protocol only measures the three defined quantities.",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install without the ncu cross-check",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "written": "after the h100-r1 / b300-r2 data were derived",
+      "text": "delivered_bytes_per_cycle is not installable from this probe: at every aligned G the SM-side aggregate equals nsm x the per-SM stream rate of the disjoint reference (h100 30.8 B/cycle/SM x 132 = 4065, b300 28.3 x 148 = 4189; max over G 4065 / 4160, spread over G <= 12 %), i.e. the 4-stage 16 KiB TMA ring is latency-bound per SM and the aggregate never reaches the delivery cap (hopper-prototype M1 r4 LDG lockstep reached 12743 B/cycle). model.py flags this (delivered_probe_bound) and the field keeps its installed value (h100 12743.5 hopper-prototype, b300 placeholder 0 = no cap). window_cycles and max_requests_per_read are installed as derived. Also: the two unsynchronised references (g002_lock / g002_rot) are exempt from the start-spread validity rule (they have no aligned start by construction); the rule applies to the aligned and shifted cells."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+ "doc": "imported from legacy mechanism resource.tmem.columns_live",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "blackwell.tmem",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "columns_live": {
+     "model": {
+      "kind": "constant",
+      "value": 512
+     },
+     "sources": [
+      "mechtree.w6.tmem.live_column_budget"
+     ]
+    }
+   },
+   "scope": "sm"
+  }
+ }
+}

@@ -1,0 +1,9 @@
+split	0.5	17608	0	0.7
+convert-shard1	1.7	214040	0	2.2
+convert-shard0	1.7	216548	0	3.8
+segments-shard1	2.8	216548	0	6.5
+segments-shard0	2.8	216548	0	9.4
+convert	1.7	216548	0
+segments	2.8	216548	0
+build	0.3	216548	0	9.6
+sim	2.2	222912	0	11.9

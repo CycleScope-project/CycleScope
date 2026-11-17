@@ -1,0 +1,22 @@
+{
+ "control.reconvergence.root": {
+  "fields": {
+   "control_envelope": {
+    "model": {
+     "axis": "control_path_count",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 33.0
+    },
+    "sources": [
+     "reconvergence.h100.r3"
+    ]
+   }
+  },
+  "scope": "cta"
+ }
+}

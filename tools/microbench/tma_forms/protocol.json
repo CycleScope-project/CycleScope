@@ -1,0 +1,48 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "tma_forms",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": ["storage.async.service_start", "storage.tma.completion", "hopper.ldgsts.completion (promoted to common storage.ldgsts.completion, see install)"],
+  "fields": [
+    "storage.async.service_start cycles: per-SM async unit service cadence (slope over U of back-to-back ops) per operation_class / tma_form / destination_count, linear in transfer_bytes",
+    "storage.tma.completion cycles: L2-hot issue -> complete_tx (loads) or issue -> bulk-group / wait_group completion (stores, bulk copies, reductions) of one op, minus the probe's plain-arrive (or empty-group) control, linear in transfer_bytes; cold_extra_cycles for load forms",
+    "LDGSTS group completion: issue of the first cp.async of a group -> cp.async.wait_group 0 returns, linear in copies_per_group at 32 active lanes x 16 B, L2-hot"
+  ],
+  "devices": {
+    "h100": "sm_90a (1 GPU)",
+    "b300": "sm_103a (1 GPU)"
+  },
+  "purpose": "tma_cold measured only the UTMALDG tile single-destination cell. Every other async-copy form still carries predecessor rows (h100: selector rows without derivation, UBLKRED / STAS placeholders; b300: gather4 / im2col / scatter4 priors, multicast 136.6 / 464.0 constants, LDGSTS / STAS / UBLK* service 1.0 structural) although the corpus uses them (static SASS of the 450 single-cluster captures: bw LDGSTS 7960, UTMASTG 2884, GATHER4 872, MULTICAST 638, UBLKCP 377, STAS 173, UBLKRED 132, UTMAREDG 121, IM2COL 38, SCATTER4 16; hp LDGSTS 54572, UTMASTG 2379, MULTICAST 821, UBLKCP 408, STAS 363, UBLKRED 55, UTMAREDG 16). One probe definition per form on both devices replaces them.",
+  "probe": {
+    "existing": "tools/microbench/tma_cold/probe/tma.cu (verbatim blackwell-prototype, already in the repo) run with --cells default (dc 1/2/4/8/16 tile boxes hot, dc>1 16 KiB cold, 2CTA 16 KiB on sm_103a), --cells store (k_tmast: OP 0 UTMASTG tile, 1 UTMAREDG f32 add, 2 UBLKCP.G.S shared->global), --cells blkseq (k_blkseq: UBLKCP global->shared, UBLKRED f32) and --cells rank (rank 3 tile); same build as tma_cold, two runs each",
+    "new": "tools/microbench/tma_forms/probe/tma_forms.cu written for this protocol with the tma.cu measurement scheme (mb.cuh helpers, rank 0 warp 0 lane 0: jittered delay; t_s; U ops; t_e; warp 1 lane 0 test_wait spin; t_w; U = 0 control with the plain arrive or empty commit group; one probing CTA per launch on a rotating SM; hot = same U boxes every rep, cold = fresh rows of a 512 MiB tensor): (a) UTMALDG.GATHER4 (sm_103a: cp.async.bulk.tensor.2d.tile::gather4, 4 rows x {64, 128, 256} bf16 inner elements), (b) UTMALDG.IM2COL (both devices: cp.async.bulk.tensor.3d/4d.im2col with pixels-per-column {32, 64, 128} x channels 64 bf16), (c) UTMASTG.SCATTER4 (sm_103a: tile::scatter4 4 rows x {64, 128, 256}), (d) LDGSTS (cp.async.cg.shared.global 16 B, 32 lanes, copies_per_group C in {1, 2, 4, 8, 16, 32}, group closed by cp.async.commit_group and observed by cp.async.wait_group 0 in the issuing warp: latency(C) = t_after_wait - t_s; cadence = slope over U groups of C = 8 copies), (e) STAS (st.async.shared::cluster.mbarrier::complete_tx 4/8/16 B, 32 lanes, remote CTA of a 2-CTA cluster, observed by the remote CTA's mbarrier test_wait spin). SASS gate per kernel: exactly U target ops of the expected SASS form (UTMALDG.*.GATHER4 / .IM2COL / UTMASTG.*.SCATTER4 / LDGSTS.E.BYPASS.128 / STAS.128 etc.) in the window."
+  },
+  "cells": {
+    "U": "load forms U in {0, 1, 2, 4, 8}; store / bulk forms U in {0, 1, 2, 4, 8} as tma.cu store/blkseq emit; LDGSTS U groups in {1, 2, 4, 8}",
+    "bytes": "tile / store / bulk: every box size tma.cu emits for that cell set; gather4 / scatter4: 4 rows x {128, 256, 512} B; im2col: 32 / 64 / 128 pixels x 128 B",
+    "runs": "two runs per device (run-a, run-b) per cell set"
+  },
+  "derivation": {
+    "completion(form, bytes, temp)": "(E_1 - o_s,1) - (E_0 - o_s,0) exactly as tma_cold (o_s from SASS control words, sass_ctrl.py)",
+    "cold_extra(form, bytes)": "completion(cold) - completion(hot) for load forms where the probe emits a cold cell",
+    "service(form, bytes)": "OLS slope of E_U(hot) over U >= 1",
+    "ldgsts_completion(C)": "E[t_w - t_s | C copies] - E[t_w - t_s | empty committed group]",
+    "ldgsts_service": "slope over U groups of E (C = 8) / 8 copies",
+    "stas_completion": "(E_1 - E_0) of the remote-observed complete_tx minus plain remote arrive",
+    "knots": "piecewise-linear on transfer_bytes (or copies_per_group for LDGSTS) at the accepted sizes; a rejected size drops its knot (no neighbour fill)"
+  },
+  "acceptance": {
+    "cell": "se / value <= 3 % in both runs and run agreement <= 3 % -> measured; otherwise experimental and listed; cold_extra must be positive",
+    "controls": "b300 UTMASTG / UTMAREDG / UBLKCP tile dc1 service and completion are compared with the installed measured b300 knots (blackwell-prototype tma_store protocol); within 10 % -> kept, cited as reproduction; beyond 10 % with the cell passing -> replaced (measured, old value in the source description)",
+    "unrealised": "a form the compiler cannot emit on a device (gather4 / scatter4 on sm_90a) is recorded unrealised; the leaf stays unsupported on that device (it is not in that ISA)"
+  },
+  "install": {
+    "storage.async.service_start / storage.tma.completion": "each measured (operation_class, tma_form, destination_count) leaf on each device gets the knots from this protocol (source tma_forms.<device>.<run>); multicast (destination_count >= 2) leaves get the dc 2/4/8/16 cells, keyed by the leaf's destination_count range (the leaf range 2-max takes the dc 2 cells unless the field gains a destination_count axis — declared here: if service(dc) differs by more than 10 % between dc 2 and dc 16 the multicast leaf is split into destination_count ranges 2-3, 4-7, 8-15, 16-max, values from dc 2 / 4 / 8 / 16)",
+    "ldgsts": "hopper.ldgsts.completion is renamed to common storage.ldgsts.completion in a separate pure-refactor commit (hopper results byte-identical; the core applies kind 39 as max(hierarchy finish, issue + cycles) for both architectures instead of HopperModule::adjust_async_completion); both devices then get cycles linear(copies_per_group) from this protocol; storage.async.service_start LDGSTS gets ldgsts_service",
+    "STAS": "storage.async.service_start STAS service and the STAS completion term (if the engine has no STAS completion path the value is reported and an engine item is opened, not installed)",
+    "sources": "tma_forms.<device>.<run>; artifact $A/microbench/tma_forms/<device>-<run>/ and $A/microbench/tma_forms-model/<device>-<run>/model.json",
+    "ab": "one two-architecture 450 A/B round after install; attribution in mechanism-merge-report.md"
+  },
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no neighbour fill"
+}

@@ -1,0 +1,2802 @@
+{
+    "doc": "imported from legacy mechanism instruction.service backend_occupancy_cycles was removed 2026-11-05: it duplicated issue_interval_cycles / resources.json initiation_interval (engine reads only the latter two); registry instruction_template field id 8 retired.",
+    "program": {
+        "event": "issue",
+        "operation_classes": [
+            "ACQBULK",
+            "ARRIVES",
+            "ATOM",
+            "ATOMG",
+            "ATOMS",
+            "BAR",
+            "BMMA",
+            "BMMA.SPARSE",
+            "BRA",
+            "BREAK",
+            "BREV",
+            "BRX",
+            "BRXU",
+            "BSSY",
+            "BSYNC",
+            "CALL",
+            "CCTL",
+            "CGAERRBAR",
+            "CS2R",
+            "CS2R.CLOCK",
+            "CS2R.GLOBALTIMER",
+            "CS2R.ZERO",
+            "DADD",
+            "DEPBAR",
+            "DEPBAR.FIFO",
+            "DMUL",
+            "DSETP",
+            "ELECT",
+            "ENDCOLLECTIVE",
+            "ERRBAR",
+            "EXIT",
+            "F2F",
+            "F2FP",
+            "F2I",
+            "FADD",
+            "FCHK",
+            "FENCE",
+            "FFMA",
+            "FLO",
+            "FMNMX",
+            "FMUL",
+            "FSEL",
+            "FSETP",
+            "HADD2",
+            "HFMA2",
+            "HGMMA",
+            "HMMA",
+            "HMMA.SPARSE",
+            "HMUL2",
+            "I2F",
+            "I2FP",
+            "IABS",
+            "IADD",
+            "IADD3",
+            "IDP",
+            "IGMMA",
+            "IMAD",
+            "IMMA",
+            "IMMA.SPARSE",
+            "ISETP",
+            "LD",
+            "LDC",
+            "LDG",
+            "LDGDEPBAR",
+            "LDGSTS",
+            "LDL",
+            "LDS",
+            "LDSM",
+            "LEA",
+            "LOP3",
+            "MATCH",
+            "MBAR",
+            "MEMBAR",
+            "MOV",
+            "MUFU",
+            "NANOSLEEP",
+            "NOP",
+            "P2R",
+            "PLOP3",
+            "POPC",
+            "PREEXIT",
+            "PRMT",
+            "QGMMA",
+            "R2P",
+            "R2UR",
+            "RED",
+            "REDG",
+            "REDS",
+            "REDUX",
+            "RET",
+            "S2R",
+            "S2UR",
+            "SEL",
+            "SGXT",
+            "SHF",
+            "SHFL",
+            "SHFL.BFLY",
+            "SHFL.DOWN",
+            "SHFL.IDX",
+            "SHFL.UP",
+            "ST",
+            "STAS",
+            "STG",
+            "STL",
+            "STS",
+            "STSM",
+            "SYNCS",
+            "SYNCS.ARRIVE.STATE",
+            "SYNCS.ARRIVE.STATE.COUNT",
+            "SYNCS.PHASECHK",
+            "UBLKCP",
+            "UBLKRED",
+            "UCGABAR",
+            "UCGABAR_ARV",
+            "UCGABAR_WAIT",
+            "UFLO",
+            "UIADD3",
+            "UIMAD",
+            "UISETP",
+            "ULDC",
+            "ULEA",
+            "ULOP3",
+            "UMOV",
+            "UP2UR",
+            "UPLOP3",
+            "UPOPC",
+            "UPRMT",
+            "USEL",
+            "USETMAXREG",
+            "USETSHMSZ",
+            "USETSHMSZ.FLUSH",
+            "USHF",
+            "UTMACCTL",
+            "UTMACMDFLUSH",
+            "UTMALDG",
+            "UTMAPF",
+            "UTMAREDG",
+            "UTMASTG",
+            "VIADD",
+            "VIADDMNMX",
+            "VIMNMX",
+            "VIMNMX3",
+            "VOTE",
+            "VOTEU",
+            "WARPGROUP",
+            "WARPSYNC",
+            "WGMMA",
+            "YIELD",
+            "BMSK",
+            "CCTL.IVALL",
+            "CREDUX",
+            "DFMA",
+            "FADD2",
+            "FENCE.VIEW.ASYNC.G",
+            "FENCE.VIEW.ASYNC.S",
+            "FFMA2",
+            "FHADD",
+            "FHFMA",
+            "FMNMX3",
+            "FMUL2",
+            "FRND",
+            "HADD2.F32",
+            "HMNMX2",
+            "HSETP2",
+            "IMAD.HI",
+            "LDCU",
+            "LDTM",
+            "LEPC",
+            "MEMBAR.ALL.CTA",
+            "MEMBAR.ALL.GPU",
+            "MEMBAR.ALL.SYS",
+            "MEMBAR.SC.CTA",
+            "MEMBAR.SC.GPU",
+            "MEMBAR.SC.SYS",
+            "MUFU.EX2",
+            "MUFU.RSQ",
+            "MUFU.LG2",
+            "MUFU.TANH",
+            "RPCMOV",
+            "STTM",
+            "UGETNEXTWORKID",
+            "USGXT",
+            "UTCATOMSWS",
+            "UTCBAR",
+            "UTCCP",
+            "UTCHMMA",
+            "UTCOMMA",
+            "UTCQMMA",
+            "UVIRTCOUNT",
+            "VHMNMX",
+            "tmem_load_stat",
+            "DMMA",
+            "PMTRIG"
+        ],
+        "parameter_schema": "instruction_template"
+    },
+    "root": {
+        "children": [
+            {
+                "guard": {
+                    "axis": "predicated_on",
+                    "operator": "eq",
+                    "value": 0
+                },
+                "parameter": {
+                    "fields": "device"
+                }
+            },
+            {
+                "children": [
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ACQBULK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BRA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BREAK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BRX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BSSY"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CALL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "EXIT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "NANOSLEEP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "PREEXIT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMACCTL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ARRIVES"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ENDCOLLECTIVE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "NOP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USETMAXREG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMACMDFLUSH"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMAPF"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "WARPSYNC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "YIELD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ATOM"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ATOMG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ATOMS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "RED"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "REDG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "REDS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BMMA.SPARSE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DADD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IMMA.SPARSE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ST"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VIADDMNMX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BSYNC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CCTL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UCGABAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UCGABAR_ARV"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UCGABAR_WAIT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CGAERRBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CS2R"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CS2R.CLOCK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CS2R.GLOBALTIMER"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CS2R.ZERO"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DEPBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FENCE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDGDEPBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SYNCS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SYNCS.ARRIVE.STATE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SYNCS.ARRIVE.STATE.COUNT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SYNCS.PHASECHK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DEPBAR.FIFO"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DMUL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DSETP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ELECT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ERRBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "F2F"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "F2FP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "F2I"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FADD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FCHK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FFMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FMNMX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FMUL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FSEL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FSETP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HADD2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HFMA2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HGMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HMMA.SPARSE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HMUL2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "I2F"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "I2FP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IABS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IADD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IADD3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IMAD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ISETP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDGSTS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDSM"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LEA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LOP3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MOV"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MUFU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "P2R"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "PLOP3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "PMTRIG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "POPC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "PRMT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "QGMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "R2P"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "R2UR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "REDUX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "RET"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "S2R"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "S2UR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SEL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHF"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHFL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHFL.BFLY"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHFL.DOWN"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHFL.IDX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SHFL.UP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STSM"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UBLKCP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UBLKRED"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FLO"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UFLO"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UIADD3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UIMAD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UISETP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ULDC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ULEA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "ULOP3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UMOV"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UP2UR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UPLOP3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UPOPC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UPRMT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USEL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USHF"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMALDG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMAREDG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTMASTG"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VIADD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VIMNMX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VIMNMX3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VOTE"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VOTEU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "WARPGROUP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "WGMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BREV"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IGMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "SGXT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STAS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IDP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MATCH"
+                        },
+                        "partition_axis": "match_distinct_values",
+                        "partition_domain": [
+                            1,
+                            32
+                        ],
+                        "children": [
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        1,
+                                        1
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        2,
+                                        2
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        3,
+                                        3
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        4,
+                                        4
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        5,
+                                        5
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        6,
+                                        6
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        7,
+                                        7
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        8,
+                                        8
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        9,
+                                        9
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        10,
+                                        10
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        11,
+                                        11
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        12,
+                                        12
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        13,
+                                        13
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        14,
+                                        14
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        15,
+                                        15
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        16,
+                                        16
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        17,
+                                        17
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        18,
+                                        18
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        19,
+                                        19
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        20,
+                                        20
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        21,
+                                        21
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        22,
+                                        22
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        23,
+                                        23
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        24,
+                                        24
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        25,
+                                        25
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        26,
+                                        26
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        27,
+                                        27
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        28,
+                                        28
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        29,
+                                        29
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        30,
+                                        30
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        31,
+                                        31
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            },
+                            {
+                                "guard": {
+                                    "axis": "match_distinct_values",
+                                    "operator": "range",
+                                    "value": [
+                                        32,
+                                        32
+                                    ]
+                                },
+                                "parameter": {
+                                    "fields": "device"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USETSHMSZ"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USETSHMSZ.FLUSH"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BRXU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CREDUX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LEPC"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.SC.SYS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "RPCMOV"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UGETNEXTWORKID"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "USGXT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCATOMSWS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCBAR"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCCP"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UVIRTCOUNT"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "VHMNMX"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "tmem_load_stat"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "BMSK"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "CCTL.IVALL"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "DFMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FADD2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FENCE.VIEW.ASYNC.G"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FENCE.VIEW.ASYNC.S"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FFMA2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FMUL2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FHADD"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FHFMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FMNMX3"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "FRND"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HADD2.F32"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HMNMX2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "HSETP2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "IMAD.HI"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDCU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "LDTM"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.ALL.CTA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.SC.CTA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.ALL.GPU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.ALL.SYS"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MEMBAR.SC.GPU"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MUFU.EX2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MUFU.RSQ"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MUFU.LG2"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "MUFU.TANH"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "STTM"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCHMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCOMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    },
+                    {
+                        "guard": {
+                            "axis": "operation_class",
+                            "operator": "eq",
+                            "value": "UTCQMMA"
+                        },
+                        "parameter": {
+                            "fields": "device"
+                        }
+                    }
+                ],
+                "guard": {
+                    "axis": "predicated_on",
+                    "operator": "eq",
+                    "value": 1
+                },
+                "partition_axis": "operation_class",
+                "partition_domain": [
+                    "ACQBULK",
+                    "ARRIVES",
+                    "ATOM",
+                    "ATOMG",
+                    "ATOMS",
+                    "BAR",
+                    "BMMA",
+                    "BMMA.SPARSE",
+                    "BMSK",
+                    "BRA",
+                    "BREAK",
+                    "BREV",
+                    "BRX",
+                    "BRXU",
+                    "BSSY",
+                    "BSYNC",
+                    "CALL",
+                    "CCTL",
+                    "CCTL.IVALL",
+                    "CGAERRBAR",
+                    "CREDUX",
+                    "CS2R",
+                    "CS2R.CLOCK",
+                    "CS2R.GLOBALTIMER",
+                    "CS2R.ZERO",
+                    "DADD",
+                    "DEPBAR",
+                    "DEPBAR.FIFO",
+                    "DFMA",
+                    "DMMA",
+                    "DMUL",
+                    "DSETP",
+                    "ELECT",
+                    "ENDCOLLECTIVE",
+                    "ERRBAR",
+                    "EXIT",
+                    "F2F",
+                    "F2FP",
+                    "F2I",
+                    "FADD",
+                    "FADD2",
+                    "FCHK",
+                    "FENCE",
+                    "FENCE.VIEW.ASYNC.G",
+                    "FENCE.VIEW.ASYNC.S",
+                    "FFMA",
+                    "FFMA2",
+                    "FHADD",
+                    "FHFMA",
+                    "FLO",
+                    "FMNMX",
+                    "FMNMX3",
+                    "FMUL",
+                    "FMUL2",
+                    "FRND",
+                    "FSEL",
+                    "FSETP",
+                    "HADD2",
+                    "HADD2.F32",
+                    "HFMA2",
+                    "HGMMA",
+                    "HMMA",
+                    "HMMA.SPARSE",
+                    "HMNMX2",
+                    "HMUL2",
+                    "HSETP2",
+                    "I2F",
+                    "I2FP",
+                    "IABS",
+                    "IADD",
+                    "IADD3",
+                    "IDP",
+                    "IGMMA",
+                    "IMAD",
+                    "IMAD.HI",
+                    "IMMA",
+                    "IMMA.SPARSE",
+                    "ISETP",
+                    "LD",
+                    "LDC",
+                    "LDCU",
+                    "LDG",
+                    "LDGDEPBAR",
+                    "LDGSTS",
+                    "LDL",
+                    "LDS",
+                    "LDSM",
+                    "LDTM",
+                    "LEA",
+                    "LEPC",
+                    "LOP3",
+                    "MATCH",
+                    "MBAR",
+                    "MEMBAR",
+                    "MEMBAR.ALL.CTA",
+                    "MEMBAR.ALL.GPU",
+                    "MEMBAR.ALL.SYS",
+                    "MEMBAR.SC.CTA",
+                    "MEMBAR.SC.GPU",
+                    "MEMBAR.SC.SYS",
+                    "MOV",
+                    "MUFU",
+                    "MUFU.EX2",
+                    "MUFU.RSQ",
+                    "MUFU.LG2",
+                    "MUFU.TANH",
+                    "NANOSLEEP",
+                    "NOP",
+                    "P2R",
+                    "PLOP3",
+                    "PMTRIG",
+                    "POPC",
+                    "PREEXIT",
+                    "PRMT",
+                    "QGMMA",
+                    "R2P",
+                    "R2UR",
+                    "RED",
+                    "REDG",
+                    "REDS",
+                    "REDUX",
+                    "RET",
+                    "RPCMOV",
+                    "S2R",
+                    "S2UR",
+                    "SEL",
+                    "SGXT",
+                    "SHF",
+                    "SHFL",
+                    "SHFL.BFLY",
+                    "SHFL.DOWN",
+                    "SHFL.IDX",
+                    "SHFL.UP",
+                    "ST",
+                    "STAS",
+                    "STG",
+                    "STL",
+                    "STS",
+                    "STSM",
+                    "STTM",
+                    "SYNCS",
+                    "SYNCS.ARRIVE.STATE",
+                    "SYNCS.ARRIVE.STATE.COUNT",
+                    "SYNCS.PHASECHK",
+                    "UBLKCP",
+                    "UBLKRED",
+                    "UCGABAR",
+                    "UCGABAR_ARV",
+                    "UCGABAR_WAIT",
+                    "UFLO",
+                    "UGETNEXTWORKID",
+                    "UIADD3",
+                    "UIMAD",
+                    "UISETP",
+                    "ULDC",
+                    "ULEA",
+                    "ULOP3",
+                    "UMOV",
+                    "UP2UR",
+                    "UPLOP3",
+                    "UPOPC",
+                    "UPRMT",
+                    "USEL",
+                    "USETMAXREG",
+                    "USETSHMSZ",
+                    "USETSHMSZ.FLUSH",
+                    "USGXT",
+                    "USHF",
+                    "UTCATOMSWS",
+                    "UTCBAR",
+                    "UTCCP",
+                    "UTCHMMA",
+                    "UTCOMMA",
+                    "UTCQMMA",
+                    "UTMACCTL",
+                    "UTMACMDFLUSH",
+                    "UTMALDG",
+                    "UTMAPF",
+                    "UTMAREDG",
+                    "UTMASTG",
+                    "UVIRTCOUNT",
+                    "VHMNMX",
+                    "VIADD",
+                    "VIADDMNMX",
+                    "VIMNMX",
+                    "VIMNMX3",
+                    "VOTE",
+                    "VOTEU",
+                    "WARPGROUP",
+                    "WARPSYNC",
+                    "WGMMA",
+                    "YIELD",
+                    "tmem_load_stat"
+                ]
+            }
+        ],
+        "partition_axis": "predicated_on",
+        "partition_domain": [
+            0,
+            1
+        ]
+    },
+    "field_models": {
+        "completion_latency_cycles": {
+            "kind": "constant"
+        },
+        "issue_group_resource": {
+            "kind": "constant"
+        },
+        "issue_interval_cycles": {
+            "kind": "constant"
+        },
+        "max_inflight": {
+            "kind": "constant"
+        },
+        "queue_class": {
+            "kind": "constant"
+        },
+        "resource": {
+            "kind": "constant"
+        },
+        "result_latency_cycles": {
+            "kind": "constant"
+        },
+        "single_source_issue_interval_cycles": {
+            "kind": "constant"
+        }
+    }
+}

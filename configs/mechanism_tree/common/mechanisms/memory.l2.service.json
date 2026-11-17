@@ -1,0 +1,31 @@
+{
+ "doc": "imported from legacy mechanism memory.l2.service; loaded_latency_extra_cycles: load-dependent latency extra (memlat_loaded protocol, gpu-shared), linear over shared_utilization in permille; l2.tma_sector_bytes_per_cycle: per-SM delivery rate of TMA / bulk tile data (tma_loaded protocol, cluster-local), used for the per-SM port occupancy of TMA requests instead of l2.sector_bytes_per_cycle",
+ "program": {
+  "event": "memory_issue",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "l2.issue_interval_cycles": {
+   "kind": "constant"
+  },
+  "l2.latency_cycles": {
+   "kind": "constant"
+  },
+  "l2.sector_bytes_per_cycle": {
+   "kind": "constant"
+  },
+  "l2.loaded_latency_extra_cycles": {
+   "kind": "linear",
+   "axis": "shared_utilization"
+  },
+  "l2.tma_sector_bytes_per_cycle": {
+   "kind": "constant"
+  }
+ }
+}

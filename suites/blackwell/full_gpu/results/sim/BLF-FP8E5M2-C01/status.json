@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-FP8E5M2-C01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 521355,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2953734,
+ "completed": 2953734,
+ "cycles": 64175,
+ "hard": 0,
+ "walls": {
+  "convert": 6.6,
+  "segments": 0.0,
+  "build": 1.6,
+  "sim": 14.8,
+  "total": 23.0
+ },
+ "rss_kb": {
+  "convert": 430432,
+  "segments": 430432,
+  "build": 430432,
+  "sim": 1053036
+ },
+ "hw_cycles": 64712.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

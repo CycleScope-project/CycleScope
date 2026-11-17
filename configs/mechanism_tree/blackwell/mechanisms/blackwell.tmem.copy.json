@@ -1,0 +1,130 @@
+{
+ "doc": "Complete per-SM tensor-pipe service of tcgen05.cp, not an extra completion tail. The Blackwell module reserves this duration on the per-SM operand path shared with MMA shared-memory operand reads (tensor.pipe operand_read_bytes_per_cycle) and includes copy completion in UTCBAR's tracked operations. Distinct native SASS forms are facts of tmem_shape; the bare UTCCP.T.S encoding is copy_default (compiler mapping: PTX 128x256b), never a missing-shape fallback. Evidence and the failed predecessor control are in tmem_pipeline/protocol.json.",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "UTCCP"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "blackwell_tmem_copy"
+ },
+ "root": {
+  "children": [
+   {
+    "guard": {
+     "axis": "cta_group",
+     "operator": "eq",
+     "value": 1
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "discrete",
+        "axes": [
+         "tmem_shape"
+        ],
+        "fail_closed": true,
+        "points": [
+         [
+          "copy_default",
+          64.01543598790323
+         ],
+         [
+          "4dp256bit",
+          4.33863289125504
+         ],
+         [
+          "128dp128bit",
+          32.30434097782258
+         ],
+         [
+          "2x64dp128bit_lw02_lw13",
+          16.225177067582326
+         ],
+         [
+          "4x32dp128bit",
+          8.372779309368337
+         ]
+        ]
+       },
+       "sources": [
+        "tmem_pipeline.b300.r5.cg1"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "tmem_pipeline.b300.r5.cg1"
+       ]
+      }
+     },
+     "scope": "sm"
+    }
+   },
+   {
+    "guard": {
+     "axis": "cta_group",
+     "operator": "eq",
+     "value": 2
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "discrete",
+        "axes": [
+         "tmem_shape"
+        ],
+        "fail_closed": true,
+        "points": [
+         [
+          "copy_default",
+          63.48742478893649
+         ],
+         [
+          "4dp256bit",
+          4.41934827578965
+         ],
+         [
+          "128dp128bit",
+          31.71375430527554
+         ],
+         [
+          "2x64dp128bit_lw02_lw13",
+          16.069841282342068
+         ],
+         [
+          "4x32dp128bit",
+          8.259262074116027
+         ]
+        ]
+       },
+       "sources": [
+        "tmem_pipeline.b300.r5.cg2"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "tmem_pipeline.b300.r5.cg2"
+       ]
+      }
+     },
+     "scope": "sm"
+    }
+   }
+  ],
+  "partition_axis": "cta_group",
+  "partition_domain": [
+   1,
+   2
+  ]
+ }
+}

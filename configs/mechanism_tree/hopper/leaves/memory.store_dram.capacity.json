@@ -1,0 +1,16 @@
+{
+ "memory.store_dram.capacity.root": {
+  "fields": {
+   "store_dram.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 43
+    },
+    "sources": [
+     "hopper.fbf19c939903fc8a2005997c"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

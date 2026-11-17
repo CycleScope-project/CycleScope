@@ -1,0 +1,28 @@
+{
+ "doc": "imported from legacy mechanism memory.dram.service; loaded_latency_extra_cycles: load-dependent latency extra (memlat_loaded protocol, gpu-shared), linear over shared_utilization in permille",
+ "program": {
+  "event": "memory_issue",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "dram.issue_interval_cycles": {
+   "kind": "constant"
+  },
+  "dram.latency_cycles": {
+   "kind": "constant"
+  },
+  "dram.sector_bytes_per_cycle": {
+   "kind": "constant"
+  },
+  "dram.loaded_latency_extra_cycles": {
+   "kind": "linear",
+   "axis": "shared_utilization"
+  }
+ }
+}

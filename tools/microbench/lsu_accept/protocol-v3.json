@@ -1,0 +1,39 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "lsu_accept",
+ "version": 3,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "supersedes": "protocol-v2.json (h100-v2r1 / b300-v2r1: T2 fits every 16 B-per-lane cell and the 4 / 8 B LDGSTS cells up to W = 4, misses ldg4 at W = 4 and all small-request W = 8 cells)",
+ "mechanisms": [
+  "storage.global.acceptance (new): per-SMSP request stage r, per-SM wavefront stage c, and for loads a per-SM write-back stage c_wb"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "v2 left two misfits: a 4 B-per-lane LOAD at W = 4 costs 10.8 per request (the 4 B LDGSTS 5.0): the load's register write-back (128 B per warp-request) is a per-SM stage the global-to-shared copy does not pass; and at W = 8 (two warps per SMSP) the small requests cost 26 per request against 8 predicted. Does a per-SM write-back stage for loads complete the model at W <= 4, and what is the W = 8 structure?",
+ "engine_rules_declared_before_data": {
+  "baseline": "present engine (round 46).",
+  "T3": "T2 of v2 (start1 = max(issue, smsp_next), smsp_next = start1 + r; start2 = max(start1, sm_next), sm_next = start2 + wf x c; read barrier and hierarchy entry at start2) plus, for loads with a register destination (LDG / LD non-shared / ATOMG with destination): the returning data enters a per-SM write-back stage at its hierarchy return: wb_start = max(return, wb_next), wb_next = wb_start + wf_ret x c_wb with wf_ret = ceil(returned bytes / 128); data_ready = wb_start + wf_ret x c_wb. Leaves: request_cycles_smsp r, wavefront_cycles_sm c, writeback_cycles_sm c_wb.",
+  "T2": "v2's T2 (no write-back stage).",
+  "candidate order": [
+   "baseline",
+   "T3",
+   "T2"
+  ],
+  "prediction": "chain windows, W <= 4 warps on distinct SMSPs: slope_T2(W) = max(r, W x wf x c); slope_T3 for loads = max(r, W x wf x c, W x wf_ret x c_wb) with wf_ret = 1 for 4 B per lane (128 B), 4 for 16 B; for LDGSTS / STG slope_T3 = slope_T2. Parameters from the data: r = mean W = 1 slope of ldgsts4 and ldgsts8; c = median over ldgsts16 W in {2, 4} of slope / (W x 4); c_wb = median over ldg4 W in {2, 4} of (slope - predicted T2 part when the load term dominates) / (W x 1), i.e. c_wb = slope(ldg4, W = 4) / 4 when that slope exceeds r by > 15 %, else c_wb = 0 (no write-back stage, T3 = T2). Acceptance: every usable cell of ldgsts4 / 8 / 16, ldg4 / 16 at W in {1, 2, 4} within 15 % or 1 cycle; W = 8 cells, stg16, mix are record only (reported next to the predictions). First passing candidate in order is installed; none -> report, unrealised."
+ },
+ "probe": "lsu_accept.cu v2 build unchanged (same cells; lds control dropped from the gating -- it never survives ptxas); two runs per device.",
+ "sass_gate": "sass_check.py unchanged.",
+ "derivation": "model.py --v3 as above; model.json + table.",
+ "install": "T3 / T2: common mechanism storage.global.acceptance (event issue, timing kind global_acceptance, bound to LDG / STG / LDGSTS / ATOMG / REDG / LD / ST with the LD / ST non-shared veto as kinds 5 / 6 use); per-device leaves r, c, c_wb (measured); engine: the queues as declared (per-SMSP smsp_next, per-SM sm_next and wb_next in SmspState / per-SM state), accept_start and the hierarchy call's now = start2, data_ready through the write-back stage; converter binding via program_tables (py == cpp gate); CTest fixtures: one warp 8 LDGSTS -> WAR at ~8 r; four warps on distinct SMSPs 16-sector LDG -> per-request 4 x 4 x c; load write-back: 4 warps' 4 B loads -> data_ready spaced c_wb; A/B 500 x 2 vs $A/merge/lga46.",
+ "not_allowed": "no case tuning; no change after data; a device whose run fails stays disabled (enabled 0).",
+ "addenda": [
+  {
+   "date": "2026-11-07",
+   "written": "after h100-v3r1 / b300-v3r1",
+   "text": "(reading; decision none on both devices, nothing installed) h100 r 4.00 / c 0.58 / c_wb 2.70, b300 4.00 / 0.52 / 2.97. The write-back stage reproduces ldg4 at W = 4 exactly (10.81 / 11.90) but the same per-wavefront c_wb applied to ldg16's four return wavefronts predicts 21-43 against the measured 5.2-10.6: a load's write-back cost does not scale with its returned bytes, so neither T3 nor T2 passes (T3 10 / 15, T2 12 / 15 gating cells on h100; 7 / 8 of 15 on b300, where ldgsts16 W = 1 also shows an outlier slope 45.7). What is established across v1-v3 on both devices: per request ~4 cycles at W = 1 regardless of bytes; 16 B-per-lane requests scale per SM at ~0.55-0.6 cycles per 128 B; 4 B loads pay a further per-SM cost at W >= 4 that 16 B loads do not; W = 8 small requests cost ~26. No declared single structure fits all; left for a version that measures the W = 8 and small-load behaviour directly (e.g. write-back as a per-request, not per-byte, SM stage)."
+  }
+ ]
+}

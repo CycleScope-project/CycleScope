@@ -1,0 +1,78 @@
+--- /dev/null
++++ b/include/flashinfer/fi_smid_obs.cuh
+@@ -0,0 +1,75 @@
++#pragma once
++
++// Same-run CTA SM probe for ordinary (non-cluster) 1/2 CTA launches.
++// Measurement only: does not change grid, GQA, or the compute kernel.
++
++#include <cstdio>
++#include <cstdlib>
++#include <cuda_runtime.h>
++
++__device__ unsigned long long* fi_smid_obs_ptr = nullptr;
++
++__device__ __forceinline__ void fi_note_cta_smid() {
++#if defined(__CUDA_ARCH__)
++  unsigned long long* p = fi_smid_obs_ptr;
++  if (p == nullptr) return;
++  if (threadIdx.x != 0 || threadIdx.y != 0 || threadIdx.z != 0) return;
++  unsigned sm = 0;
++  asm volatile("mov.u32 %0, %%smid;" : "=r"(sm));
++  unsigned idx = blockIdx.x + gridDim.x * (blockIdx.y + gridDim.y * blockIdx.z);
++  if (idx < 16) {
++    p[idx * 2] = sm;
++    p[idx * 2 + 1] = 1ull;
++  }
++#endif
++}
++
++inline void fi_smid_bind() {
++#ifndef __CUDA_ARCH__
++  const char* log = std::getenv("FLASHINFER_CLUSTER_SMID_LOG");
++  if (!log || !log[0]) return;
++  static unsigned long long* obs = nullptr;
++  if (!obs) {
++    cudaMalloc(&obs, 32 * sizeof(unsigned long long));
++    cudaMemset(obs, 0, 32 * sizeof(unsigned long long));
++    cudaMemcpyToSymbol(fi_smid_obs_ptr, &obs, sizeof(obs));
++  } else {
++    cudaMemset(obs, 0, 32 * sizeof(unsigned long long));
++  }
++#endif
++}
++
++inline void fi_smid_dump(const char* method) {
++#ifndef __CUDA_ARCH__
++  const char* log = std::getenv("FLASHINFER_CLUSTER_SMID_LOG");
++  if (!log || !log[0]) return;
++  unsigned long long* obs = nullptr;
++  cudaMemcpyFromSymbol(&obs, fi_smid_obs_ptr, sizeof(obs));
++  if (!obs) return;
++  unsigned long long host[32] = {};
++  cudaMemcpy(host, obs, sizeof(host), cudaMemcpyDeviceToHost);
++  FILE* fp = fopen(log, "w");
++  if (!fp) return;
++  fprintf(fp, "{\"smids\":[");
++  int n = 0;
++  int seen[16];
++  int nseen = 0;
++  for (int i = 0; i < 16; ++i) {
++    if (host[i * 2 + 1] == 0) continue;
++    unsigned sm = static_cast<unsigned>(host[i * 2]);
++    int dup = 0;
++    for (int j = 0; j < nseen; ++j) {
++      if (seen[j] == static_cast<int>(sm)) dup = 1;
++    }
++    if (dup) continue;
++    if (n) fprintf(fp, ",");
++    fprintf(fp, "%u", sm);
++    if (nseen < 16) seen[nseen++] = static_cast<int>(sm);
++    ++n;
++  }
++  fprintf(fp,
++          "],\"cluster_nctaid\":[1,1,1],\"method\":\"%s\"}\n",
++          method ? method : "device %%smid in target kernel");
++  fclose(fp);
++#endif
++}

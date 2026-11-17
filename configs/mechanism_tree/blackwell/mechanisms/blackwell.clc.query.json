@@ -1,0 +1,36 @@
+{
+ "doc": "imported from legacy mechanism instruction.clc.query",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "UGETNEXTWORKID"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "blackwell_clc_query"
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 266.402099609375
+     },
+     "sources": [
+      "mechtree.w2.instruction.clc.query"
+     ]
+    },
+    "enabled": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "mechtree.w2.instruction.clc.query"
+     ]
+    }
+   },
+   "scope": "cluster"
+  }
+ }
+}

@@ -1,0 +1,61 @@
+{
+ "memory.shared_service.root": {
+  "fields": {
+   "dram_read_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 3230.964
+    },
+    "sources": [
+     "hopper.692d38d51cb465ced73206dc"
+    ]
+   },
+   "dram_write_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 3224.034
+    },
+    "sources": [
+     "hopper.b0006c6522987d2884b0a882"
+    ]
+   },
+   "l2_read_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 7602.012
+    },
+    "sources": [
+     "hopper.e5e8b622af0819cd7f5d845f"
+    ]
+   },
+   "l2_write_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 3964.95
+    },
+    "sources": [
+     "hopper.d5ff3a16197b99b1bbf1ac2f"
+    ]
+   },
+   "l2_read_gpc_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 1060
+    },
+    "sources": [
+     "tma_store_loaded.h100.gpc_scope"
+    ]
+   },
+   "l2_write_gpc_bytes_per_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 663
+    },
+    "sources": [
+     "tma_store_loaded.h100.gpc_scope"
+    ]
+   }
+  },
+  "scope": "device"
+ }
+}

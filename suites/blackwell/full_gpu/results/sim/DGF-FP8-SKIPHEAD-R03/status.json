@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-FP8-SKIPHEAD-R03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 163415,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 591731,
+ "completed": 591731,
+ "cycles": 16680,
+ "hard": 0,
+ "walls": {
+  "convert": 5.2,
+  "segments": 0.0,
+  "build": 0.2,
+  "sim": 3.0,
+  "total": 8.5
+ },
+ "rss_kb": {
+  "convert": 381060,
+  "segments": 381060,
+  "build": 381060,
+  "sim": 381060
+ },
+ "hw_cycles": 17537.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 2
+}

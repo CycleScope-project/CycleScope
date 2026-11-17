@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-SOFTCAP-1C-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 324448,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 6725466,
+ "completed": 6725466,
+ "cycles": 51329,
+ "hard": 0,
+ "walls": {
+  "convert": 12.1,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 12.5,
+  "total": 25.6
+ },
+ "rss_kb": {
+  "convert": 344452,
+  "segments": 344452,
+  "build": 344452,
+  "sim": 760752
+ },
+ "hw_cycles": 47599.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 9
+}

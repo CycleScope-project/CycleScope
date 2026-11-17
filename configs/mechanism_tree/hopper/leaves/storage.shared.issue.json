@@ -1,0 +1,178 @@
+{
+ "storage.shared.issue.root/operation_class=LDS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.3138294219970703
+    },
+    "sources": [
+     "hopper.derived.shared_steady_cells"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=LDS/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 41.24080659412203
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=STS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4.415
+    },
+    "sources": [
+     "shared.h100.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=STS/remote_smem=1": {
+  "unsupported": true
+ },
+ "storage.shared.issue.root/operation_class=STSM/remote_smem=0": {
+  "unsupported": true,
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4.211660921890518
+    },
+    "sources": [
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r2"
+    ]
+   }
+  }
+ },
+ "storage.shared.issue.root/operation_class=STSM/remote_smem=1": {
+  "unsupported": true
+ },
+ "storage.shared.issue.root/operation_class=LD/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.3138294219970703
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "hopper.derived.shared_steady_cells"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=LD/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 41.24080659412203
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=ST/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4.415
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ },
+ "storage.shared.issue.root/operation_class=ST/remote_smem=1": {
+  "unsupported": true
+ }
+}

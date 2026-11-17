@@ -1,0 +1,2 @@
+case	kernel	launch_ordinal	grid	block	cluster	cycles_median	cycles_min	cycles_max	cycles_active_avg	sm_clock_khz	sm_clock_source	cache_control	clock_control	repeats	status	source
+triton_p9_matmul_tma_02	matmul_kernel_tma	5	256x1x1	256x1x1	0x0x0	30808	29348	31021		1758753	ncu	all	none	3	success	cyclescope reference

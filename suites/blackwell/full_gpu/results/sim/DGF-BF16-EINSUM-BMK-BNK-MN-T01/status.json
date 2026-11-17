@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-BF16-EINSUM-BMK-BNK-MN-T01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 58227,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 328988,
+ "completed": 328988,
+ "cycles": 23417,
+ "hard": 0,
+ "walls": {
+  "convert": 1.6,
+  "segments": 2.6,
+  "build": 0.3,
+  "sim": 3.3,
+  "total": 7.7
+ },
+ "rss_kb": {
+  "convert": 412432,
+  "segments": 412432,
+  "build": 412432,
+  "sim": 412432
+ },
+ "hw_cycles": 25291.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 1
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-BF16-C13",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 512020,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3033426,
+ "completed": 3033426,
+ "cycles": 64585,
+ "hard": 0,
+ "walls": {
+  "convert": 8.9,
+  "segments": 0.0,
+  "build": 0.9,
+  "sim": 14.6,
+  "total": 24.4
+ },
+ "rss_kb": {
+  "convert": 436920,
+  "segments": 436920,
+  "build": 436920,
+  "sim": 1059204
+ },
+ "hw_cycles": 65490.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

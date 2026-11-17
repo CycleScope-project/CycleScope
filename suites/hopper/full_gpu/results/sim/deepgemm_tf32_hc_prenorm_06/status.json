@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "deepgemm_tf32_hc_prenorm_06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 653697,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 12305610,
+ "completed": 12305610,
+ "cycles": 86104,
+ "hard": 0,
+ "walls": {
+  "convert": 19.2,
+  "segments": 0.0,
+  "build": 1.8,
+  "sim": 20.6,
+  "total": 41.7
+ },
+ "rss_kb": {
+  "convert": 350520,
+  "segments": 350520,
+  "build": 350520,
+  "sim": 2037100
+ },
+ "hw_cycles": 91795.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6c25e71b777249fb",
+ "shards": 16
+}

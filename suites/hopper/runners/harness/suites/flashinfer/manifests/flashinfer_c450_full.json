@@ -1,0 +1,969 @@
+{
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_0_t1",
+   "category": "serving_aux",
+   "delivery_index": 43,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 49517,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_0_t2",
+   "category": "serving_aux",
+   "delivery_index": 43,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 82529,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t1",
+   "category": "serving_aux",
+   "delivery_index": 44,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 98402,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t2",
+   "category": "serving_aux",
+   "delivery_index": 44,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 164004,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t0",
+   "category": "serving_aux",
+   "delivery_index": 44,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 49201,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_2_t0",
+   "category": "serving_aux",
+   "delivery_index": 45,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 99035,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_3_t0",
+   "category": "serving_aux",
+   "delivery_index": 46,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 198132,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_1_t2",
+   "category": "serving_aux",
+   "delivery_index": 86,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 90359,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t1",
+   "category": "serving_aux",
+   "delivery_index": 87,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 107007,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_3_t0",
+   "category": "serving_aux",
+   "delivery_index": 88,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 110852,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_sample_3_t3",
+   "category": "sampling_quant",
+   "delivery_index": 100,
+   "operation": "sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 111973
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_top_p_sample_3_t2",
+   "category": "sampling_quant",
+   "delivery_index": 136,
+   "operation": "top_p_sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 132471
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_top_p_sample_3_t3_v1",
+   "category": "sampling_quant",
+   "delivery_index": 532,
+   "operation": "top_p_sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 158965
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_top_p_sample_4_t0_v2",
+   "category": "sampling_quant",
+   "delivery_index": 545,
+   "operation": "top_p_sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 655360
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_top_p_sample_3_t2_v4",
+   "category": "sampling_quant",
+   "delivery_index": 559,
+   "operation": "top_p_sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 264942
+  },
+  {
+   "backend": "fa3",
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "heads_q": 256
+    }
+   },
+   "case_id": "fi_c450_single_prefill_4_t2_v0",
+   "category": "hopper_attention",
+   "causal": false,
+   "delivery_index": 561,
+   "dtype": "bf16",
+   "head_dim": 64,
+   "heads_kv": 1,
+   "heads_q": 256,
+   "kv_layout": "NHD",
+   "logits_soft_cap": null,
+   "operation": "single_prefill",
+   "pos_encoding_mode": "NONE",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "seqlen_k": 4096,
+   "seqlen_q": 1,
+   "source": "upstream/flashinfer",
+   "window_left": -1
+  },
+  {
+   "backend": "fa3",
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "heads_q": 256
+    }
+   },
+   "case_id": "fi_c450_single_prefill_4_t2_v1",
+   "category": "hopper_attention",
+   "causal": false,
+   "delivery_index": 562,
+   "dtype": "fp16",
+   "head_dim": 64,
+   "heads_kv": 1,
+   "heads_q": 256,
+   "kv_layout": "NHD",
+   "logits_soft_cap": null,
+   "operation": "single_prefill",
+   "pos_encoding_mode": "NONE",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "seqlen_k": 6144,
+   "seqlen_q": 1,
+   "source": "upstream/flashinfer",
+   "window_left": -1
+  },
+  {
+   "backend": "fa3",
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "heads_q": 256
+    }
+   },
+   "case_id": "fi_c450_single_prefill_4_t1_v0",
+   "category": "hopper_attention",
+   "causal": false,
+   "delivery_index": 579,
+   "dtype": "bf16",
+   "head_dim": 64,
+   "heads_kv": 1,
+   "heads_q": 256,
+   "kv_layout": "NHD",
+   "logits_soft_cap": null,
+   "operation": "single_prefill",
+   "pos_encoding_mode": "NONE",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "seqlen_k": 4096,
+   "seqlen_q": 1,
+   "source": "upstream/flashinfer",
+   "window_left": -1
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_2_t0_v0",
+   "category": "serving_aux",
+   "delivery_index": 585,
+   "dtype": "bf16",
+   "enable_pdl": false,
+   "hidden": 49517,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t2_v0",
+   "category": "serving_aux",
+   "delivery_index": 591,
+   "dtype": "bf16",
+   "enable_pdl": false,
+   "hidden": 82002,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t2_v4",
+   "category": "serving_aux",
+   "delivery_index": 595,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 328008,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t1_v0",
+   "category": "serving_aux",
+   "delivery_index": 603,
+   "dtype": "bf16",
+   "enable_pdl": false,
+   "hidden": 49201,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t1_v1",
+   "category": "serving_aux",
+   "delivery_index": 604,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 73801,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t1_v2",
+   "category": "serving_aux",
+   "delivery_index": 605,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 123002,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t1_v4",
+   "category": "serving_aux",
+   "delivery_index": 607,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 196804,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t0_v2",
+   "category": "serving_aux",
+   "delivery_index": 611,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 61501,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t0_v3",
+   "category": "serving_aux",
+   "delivery_index": 612,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 73801,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_1_t0_v4",
+   "category": "serving_aux",
+   "delivery_index": 613,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 98402,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_0_t1_v3",
+   "category": "serving_aux",
+   "delivery_index": 618,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 74275,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_0_t1_v4",
+   "category": "serving_aux",
+   "delivery_index": 619,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 99034,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_3_t0_v0",
+   "category": "serving_aux",
+   "delivery_index": 621,
+   "dtype": "bf16",
+   "enable_pdl": false,
+   "hidden": 99066,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_fused_add_rmsnorm_3_t0_v4",
+   "category": "serving_aux",
+   "delivery_index": 625,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 396264,
+   "operation": "fused_add_rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_sample_3_t3_v3",
+   "category": "sampling_quant",
+   "delivery_index": 630,
+   "operation": "sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 167959
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_sample_3_t3_v4",
+   "category": "sampling_quant",
+   "delivery_index": 631,
+   "operation": "sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 223946
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_sample_3_t3_v5",
+   "category": "sampling_quant",
+   "delivery_index": 632,
+   "operation": "sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 335919
+  },
+  {
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "batch": 256
+    }
+   },
+   "case_id": "fi_c450_sample_2_t1_v4",
+   "category": "sampling_quant",
+   "delivery_index": 667,
+   "operation": "sample",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "source": "upstream/flashinfer",
+   "top_k": 64,
+   "top_p": 0.9,
+   "vocab": 1048576
+  },
+  {
+   "batch": null,
+   "bitorder": "big",
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "segments": 256
+    }
+   },
+   "case_id": "fi_c450_segment_packbits_0_t0_v1",
+   "category": "sampling_quant",
+   "delivery_index": 682,
+   "elements": 786432,
+   "operation": "segment_packbits",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "segments": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "bitorder": "big",
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "segments": 256
+    }
+   },
+   "case_id": "fi_c450_segment_packbits_1_t3_v3",
+   "category": "sampling_quant",
+   "delivery_index": 696,
+   "elements": 844204,
+   "operation": "segment_packbits",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "segments": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "bitorder": "big",
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "segments": 256
+    }
+   },
+   "case_id": "fi_c450_segment_packbits_0_t1_v1",
+   "category": "sampling_quant",
+   "delivery_index": 700,
+   "elements": 786432,
+   "operation": "segment_packbits",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "segments": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_1_t2_v2",
+   "category": "serving_aux",
+   "delivery_index": 743,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 112948,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_1_t2_v4",
+   "category": "serving_aux",
+   "delivery_index": 745,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 180718,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t1_v2",
+   "category": "serving_aux",
+   "delivery_index": 749,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 133758,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t1_v4",
+   "category": "serving_aux",
+   "delivery_index": 751,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 214014,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_3_t0_v4",
+   "category": "serving_aux",
+   "delivery_index": 757,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 221704,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t3_v0",
+   "category": "serving_aux",
+   "delivery_index": 759,
+   "dtype": "bf16",
+   "enable_pdl": false,
+   "hidden": 142676,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t3_v1",
+   "category": "serving_aux",
+   "delivery_index": 760,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 214014,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_2_t3_v2",
+   "category": "serving_aux",
+   "delivery_index": 761,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 356690,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_0_t3_v2",
+   "category": "serving_aux",
+   "delivery_index": 767,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 89922,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_0_t3_v3",
+   "category": "serving_aux",
+   "delivery_index": 768,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 107907,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  },
+  {
+   "batch": null,
+   "c450_full": {
+    "rule": "I=c450; P=lead axis until grid>=132",
+    "walk_start": {
+     "rows": 256
+    }
+   },
+   "case_id": "fi_c450_rmsnorm_0_t3_v5",
+   "category": "serving_aux",
+   "delivery_index": 770,
+   "dtype": "fp16",
+   "enable_pdl": false,
+   "hidden": 215814,
+   "operation": "rmsnorm",
+   "qualification_status": "pending_h100_requalification_min20k",
+   "rows": 256,
+   "source": "upstream/flashinfer"
+  }
+ ],
+ "name": "flashinfer_c450_full",
+ "schema_version": 2
+}

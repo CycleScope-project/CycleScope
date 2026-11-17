@@ -1,0 +1,53 @@
+{
+ "memory.l2_merge.root": {
+  "fields": {
+   "delivered_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 12749.08
+    },
+    "sources": [
+     "l2_merge.h100.r3.delivered"
+    ]
+   },
+   "max_requests_per_read": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "l2_merge.h100.r1"
+    ]
+   },
+   "window_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 240.13
+    },
+    "sources": [
+     "l2_merge.h100.r1"
+    ]
+   },
+   "domain_sms": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "ldgsts_loaded.h100.shared_read_domain"
+    ]
+   },
+   "domain_gpc": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "l2_merge.h100.read_domain",
+     "l2_merge.h100.async_kernel_check"
+    ]
+   }
+  },
+  "scope": "device"
+ }
+}

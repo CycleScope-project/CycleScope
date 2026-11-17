@@ -1,0 +1,2655 @@
+{
+  "suite": "flashattention",
+  "cap": 8,
+  "families": [
+    {
+      "id": "fwd_bf16_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_bf16_2c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_fp16_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "fp16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_fp16_2c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "fp16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_fp8_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "e4m3",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.3",
+            "base": 16,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 2048
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop"
+    },
+    {
+      "id": "fwd_fp8_2c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "e4m3",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_e5m2_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "e5m2",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_e5m2_2c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "e5m2",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_hd64_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "hd": 64,
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_hd96_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "hd": 96,
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_hd192_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "hd": 192,
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_hd256_1c",
+      "stratum": "fwd_dtype_hdim",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "hd": 256,
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_causal_1c",
+      "stratum": "fwd_mask",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "causal": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; FA4 causal masking is bottom-right aligned via seqlen_k-seqlen_q (flashattention@fa4-prefix:flash_attn/cute/block_info.py:40-48,118-130); full-mode reference uses the matching explicit SDPA mask; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_window_1c",
+      "stratum": "fwd_mask",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "window_size": [
+          64,
+          0
+        ],
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; window path passes window_size to flash_attn_func and is excluded from the plain SDPA reference branch (suites/flashattention/run.py:316-323,525-538); c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_sink_1c",
+      "stratum": "fwd_mask",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "sink": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; the plain SDPA reference excludes sink attention because SDPA has no learnable-sink input; learnable_sink is not modeled by SDPA, so this path is excluded from the plain SDPA reference branch (suites/flashattention/run.py:326-328,525-538); c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_softcap_1c",
+      "stratum": "fwd_mods",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "softcap": 30.0,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_scoremod_1c",
+      "stratum": "fwd_mods",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "score_mod": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_blocksparse_1c",
+      "stratum": "fwd_mods",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "blocksparse": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_descale_1c",
+      "stratum": "fwd_mods",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "descale": true,
+        "kind": "fwd",
+        "dtype": "e4m3",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_gqa_1c",
+      "stratum": "fwd_gqa",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "gqa": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "fwd_varlen_1c",
+      "stratum": "fwd_varlen",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "varlen": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; varlen uses flash_attn_varlen_func directly; it does not use the SDPA reference path (suites/flashattention/run.py:502-515); c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "bwd_bf16_1c",
+      "stratum": "bwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_bf16_2c",
+      "stratum": "bwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_causal_1c",
+      "stratum": "bwd_features",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "causal": true,
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_det_2c",
+      "stratum": "bwd_features",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "deterministic": true,
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_hd192_2c",
+      "stratum": "bwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "hd": 192,
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_hd256_dq",
+      "stratum": "bwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "hd": 256,
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "bwd_hd256_dkdv",
+      "stratum": "bwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "hd": 256,
+        "cta_group": 2,
+        "main": "dkdv",
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "mla_dense_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mla_causal_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "causal": true,
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; causal MLA uses the direct FlashAttentionMLA path; no SDPA reference path is used (suites/flashattention/run.py:432-482); c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mla_varlen_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "varlen": true,
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; varlen MLA uses flash_attn_varlen_func directly; it does not use the SDPA reference path (suites/flashattention/run.py:432-482); c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mla_paged_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "paged": true,
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mla_qv_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "pure_qv": true,
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mla_topk_2c",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d64_dv512",
+        "topk": 128,
+        "kind": "mla",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_mla.*|.*mla.*fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "mlabwd_sparse",
+      "stratum": "mla",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          128,
+          1,
+          64,
+          512
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq128_Hkv1_d64_dv512",
+        "kind": "mla_bwd",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full",
+        "topk": 512
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * split_factor",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": "(?i).*flash_bwd_mla.*|.*FlashAttentionBackward.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; upstream does not define the c450full 3+1 loop; DSA sparse backward uses MQA-128 (Hq=128,Hkv=1), required by flashattention@fa4-prefix:flash_attn/cute/flash_fwd_mla_sm100.py:77-80 and interface.py:2813; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); the selected backward implementation is the CuTe-DSL flash_bwd_mla kernel; the regex accepts the observed `kernel_cutlass_kernel_flash_attncuteflash_bwd_mla_...` name"
+    },
+    {
+      "id": "fwd_gqa_nopack",
+      "stratum": "fwd_gqa",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "gqa": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full",
+        "pack_gqa": false
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 8192,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B * num_splits",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "public pack_gqa=False variant; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); I (seqlen_k) step 128"
+    },
+    {
+      "id": "bwd_gqa_2c",
+      "stratum": "bwd_features",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          8192,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B4_Sq4096_Sk8192_Hq16_Hkv4_d128_dv128",
+        "kind": "bwd",
+        "dtype": "bf16",
+        "cta_group": 2,
+        "suite": "flashattention",
+        "mode": "full",
+        "pack_gqa": true
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 8192,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(Sq, TileQ) * Hq * B",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-748"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_bwd_sm100FlashAttentionBackwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "public pack-GQA backward variant; upstream does not define the c450full 3+1 loop; c450full axes (lead 2026-10-23): heads pinned at the family value so the Hq/Hkv ratio and pack-GQA path stay fixed; P = batch x seqlen_q (step 128); bwd main kernel tiles over seqlen_k (probe-fa2: grid = B*Sk/128*Hq), so P = batch x seqlen_k and I = seqlen_q"
+    },
+    {
+      "id": "fwd_paged",
+      "stratum": "fwd_paged_splitkv",
+      "spec": {
+        "suite": "flashattention",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks a paged-KV FWD call builder"
+    },
+    {
+      "id": "fwd_splitkv",
+      "stratum": "fwd_paged_splitkv",
+      "spec": {
+        "shape": [
+          1,
+          16,
+          16384,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B1_Sq16_Sk16384_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "num_splits": 0,
+        "suite": "flashattention",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 16,
+            "min": 1,
+            "max": 32,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 16384,
+          "min": 4736,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "total_mblocks * num_splits; total_mblocks=B*Hkv*ceil_div(Sq*pack_gqa, q_stage*TileM), num_splits=min(num_sms//total_mblocks, 128, ceil_div(Sk,TileN))",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/interface.py:288-301,378-386; flash_attn/cute/tile_scheduler.py:283-300",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/interface.py:1120-1132; split KV disables static persistence"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [
+        ".*FlashAttentionForwardCombine.*"
+      ],
+      "status": "draft",
+      "notes": "num_splits=0 is the public auto-heuristic sentinel; it computes splits from num_sms, total_mblocks, and num_n_blocks (interface.py:288-301,378-386). At P01 B=1,Sq=32,Hq/Hkv=16/4 and Sk=16384, total_mblocks=4, num_n_blocks=128, so num_splits=37 and grid=148. SplitKV allocates partial outputs and launches the combine path at interface.py:865-868,1596-1607; the combine implementation is FlashAttentionForwardCombine (flash_fwd_combine.py:28,353)."
+    },
+    {
+      "id": "fwd_persist",
+      "stratum": "fwd_sched",
+      "spec": {
+        "suite": "flashattention",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks an explicit persistent-scheduler public switch"
+    },
+    {
+      "id": "fwd_clc",
+      "stratum": "fwd_sched",
+      "spec": {
+        "suite": "flashattention",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks the public CLC scheduler variant"
+    },
+    {
+      "id": "fwd_paged_splitkv",
+      "stratum": "fwd_paged_splitkv",
+      "spec": {
+        "shape": [
+          1,
+          16,
+          16384,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B1_Sq16_Sk16384_Hq16_Hkv4_d128_dv128",
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "num_splits": 0,
+        "suite": "flashattention",
+        "mode": "full",
+        "paged": true,
+        "page_size": 128
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 16,
+            "min": 1,
+            "max": 32,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 16384,
+          "min": 4736,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "total_mblocks * num_splits; total_mblocks=B*Hkv*ceil_div(Sq*pack_gqa, q_stage*TileM), num_splits=min(num_sms//total_mblocks, 128, ceil_div(Sk,TileN))",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/interface.py:288-301,378-386; flash_attn/cute/tile_scheduler.py:283-300",
+        "persistent": false,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/interface.py:1120-1132; split KV disables static persistence"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [
+        ".*FlashAttentionForwardCombine.*"
+      ],
+      "status": "draft",
+      "notes": "num_splits=0 is the public auto-heuristic sentinel; it computes splits from num_sms, total_mblocks, and num_n_blocks (interface.py:288-301,378-386). At P01 B=1,Sq=32,Hq/Hkv=16/4 and Sk=16384, total_mblocks=4, num_n_blocks=128, so num_splits=37 and grid=148. SplitKV allocates partial outputs and launches the combine path at interface.py:865-868,1596-1607; the combine implementation is FlashAttentionForwardCombine (flash_fwd_combine.py:28,353). Paged KV uses page_table/seqused_k with page_size=128 (interface.py:616-635; flash_fwd_sm100.py:720-724,1334-1335)."
+    },
+    {
+      "id": "fwd_clc_1c",
+      "stratum": "fwd_sched",
+      "spec": {
+        "shape": [
+          1,
+          3072,
+          4096,
+          16,
+          4,
+          128,
+          128
+        ],
+        "shape_tag": "B1_Sq3072_Sk4096_Hq16_Hkv4_d128_dv128",
+        "causal": true,
+        "kind": "fwd",
+        "dtype": "bf16",
+        "disable_2cta": true,
+        "cta_group": 1,
+        "suite": "flashattention",
+        "mode": "full",
+        "clc": true
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 3072,
+            "min": 2560,
+            "max": 6144,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 2048,
+          "max": 8192,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "round_up((ceil_div(Sq*pack_gqa, q_stage*TileM), 1, B*Hq), cluster_shape_mn); CLC uses the full work-tile grid",
+        "evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:710-749; flash_attn/cute/tile_scheduler.py:1931-1937,1968-1970",
+        "persistent": true,
+        "persistent_evidence": "flashattention@fa4-prefix:flash_attn/cute/flash_fwd_sm100.py:263-283; flash_attn/cute/tile_scheduler.py:1905-1975,2077-2118"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*flash_fwd_sm100FlashAttentionForwardSm100.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FA_CLC is enabled by the public FA_CLC=1 switch (flash_attn/cute/utils.py:64,89-90). interface.py:906-911 disables CLC for dense noncausal FWD, so this family uses bottom-right causal FWD to exercise the supported path. The base B=1,Sq=3072,Sk=4096 is guided by the probe-fa2 fwd_causal_1c fit (R01=39,495 cycles); P minima keep the causal CLC tile grid >=160. Scheduler selection is read at interface.py:785,1046 and flash_fwd_sm100.py:263-283; CLC responses are consumed at tile_scheduler.py:2077-2118. Verify UGETNEXTWORKID/CLC in the launched SASS."
+    }
+  ]
+}

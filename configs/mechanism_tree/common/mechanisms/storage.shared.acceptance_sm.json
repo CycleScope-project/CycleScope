@@ -1,0 +1,242 @@
+{
+ "doc": "imported from legacy mechanism storage.shared.acceptance_sm",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "LDS",
+   "STS",
+   "LDSM",
+   "STSM",
+   "LD",
+   "ST"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "shared_store_acceptance_sm"
+ },
+ "root": {
+  "children": [
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LDS"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STS"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LDSM"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STSM"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LD"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 1
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "ST"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     1
+    ]
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "LDS",
+   "LDSM",
+   "STS",
+   "STSM",
+   "LD",
+   "ST"
+  ]
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "affine",
+   "axis": "shared_wavefronts"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

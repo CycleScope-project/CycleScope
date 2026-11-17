@@ -1,0 +1,25 @@
+{
+ "storage.tma.descriptor_refetch.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 433.2
+    },
+    "sources": [
+     "crossings.descriptor_refetch.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "crossings.descriptor_refetch.h100.r2"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

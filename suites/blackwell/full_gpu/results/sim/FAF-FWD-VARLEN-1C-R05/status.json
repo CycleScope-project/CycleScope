@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-VARLEN-1C-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 223948,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3425978,
+ "completed": 3425978,
+ "cycles": 24996,
+ "hard": 0,
+ "walls": {
+  "convert": 6.7,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 7.4,
+  "total": 14.7
+ },
+ "rss_kb": {
+  "convert": 348548,
+  "segments": 348548,
+  "build": 348548,
+  "sim": 514792
+ },
+ "hw_cycles": 26385.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 5
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "triton_softmax_02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 18467840,
+ "completed": 18467840,
+ "cycles": 45196,
+ "hard": 0,
+ "walls": {
+  "convert": 22.4,
+  "segments": 0.1,
+  "build": 2.2,
+  "sim": 53.5,
+  "total": 78.2
+ },
+ "rss_kb": {
+  "convert": 394316,
+  "segments": 394316,
+  "build": 394316,
+  "sim": 1795816
+ },
+ "hw_cycles": 50901.0,
+ "reference_cache_control": "all",
+ "placement_digest": "75cb9fa28c5d6d60",
+ "shards": 16
+}

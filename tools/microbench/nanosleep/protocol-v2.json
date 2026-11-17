@@ -1,0 +1,30 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "nanosleep",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "supersedes": "protocol.json v1 (r4 both devices: data usable, p10-p90 gate failed on quantised wake distributions)",
+ "mechanisms": [
+  "control.nanosleep: syncs_wake_cycles (new constant / knots field) and the plain-sleep affine (slope, intercept over requested_sleep_cycles)"
+ ],
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "v1 r4 measured the NANOSLEEP.SYNCS wake after the awaited arrive as a quantised distribution (two or three values ~50 cycles apart, dominant mode h100 130, b300 ~129 for hints 200-10000 ns, 79-101 at the extremes) and plain NANOSLEEP(H ns) as 12.1 k + 4.1 H cycles (h100) / 12.4 k + 4.3 H (b300). Does a fresh pair of runs reproduce the dominant wake mode and the plain affine, so that both can be installed?",
+ "engine_rules_declared_before_data": {
+  "syncs": "wake = max(release, sleep start) + syncs_wake_cycles; the value = the dominant quantum (the modal bin of 16-cycle width) of delta over all usable (H, D) cells when H-independence holds within 20 % between the per-H modes, else knots over H in cycles (per-H modes).",
+  "plain": "cycles = intercept + slope x requested_sleep_cycles from the OLS over H (requested_sleep_cycles = H ns x sm_clock_khz / 1e6).",
+  "candidate order": [
+   "baseline",
+   "measured"
+  ]
+ },
+ "probe": "nanosleep.cu of v1 r4 unchanged (parity per rep, fail-fast); same cells; two runs per device.",
+ "sass_gate": "unchanged (12 / 12 expected).",
+ "derivation": "delta per cell: samples binned at 16 cycles; dominant mode = the bin with the most samples; cell usable when the dominant bin holds >= 40 % of the samples and the two runs' dominant bins agree within one bin; syncs_wake_cycles as above (measured when every per-H mode of a device agrees with the installed value within 20 %, else knots, experimental); plain: OLS residual <= 10 %, runs <= 10 % -> measured.",
+ "install": "common control.nanosleep gains constant field syncs_wake_cycles (default 0); <arch>/leaves: syncs_wake_cycles and the plain affine (slope / intercept in cycles) with sources nanosleep.<dev>.v2r<n>; engine: the NANOSLEEP.SYNCS sleeper's wake (release-time registration and the already-pending-release path) += syncs_wake_cycles; plain path unchanged (reads the affine row); CTest fixture: release at t -> sleeper's next issue at t + syncs_wake; A/B 500 x 2 vs $A/merge/lga46.",
+ "not_allowed": "no case tuning; no change after data; per-device install.",
+ "addenda": []
+}

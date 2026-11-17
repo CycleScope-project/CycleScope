@@ -1,0 +1,1049 @@
+{
+ "algorithm_count": 12,
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "algorithm": "dense_tma_static",
+   "args": [
+    "--m=63",
+    "--n=127",
+    "--k=24576",
+    "--variant=f16_nt_tma_128x128",
+    "--warmups=1",
+    "--trials=1"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_shape_01_r6c2_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 0,
+   "delivery_index": 0,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "grid_tiles",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; grid-limited KernelTma one cluster of tiles",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "epi.no_smem",
+    "layout.nt",
+    "schedule.tma_static",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_000_dense_tma_static_cluster_sm",
+    "rationale": "M=200/N=300 非 tile(128) 对齐；296 该 variant 仅 128x128",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.0018138605621367276,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cta_count 6 != target_ctas 1; round2: status=unresolved reason=cta_count 6 != target_ctas 1; two-round median drift 0.04% (limit 5.0%)",
+     "replaces": "cutlass_holdout_shape_01",
+     "seed_order_candidate": "2",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    63,
+    127,
+    24576
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_shape_01_r6c2",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "fp8_fastacc_warp_specialized",
+   "args": [
+    "--m=126",
+    "--n=124",
+    "--k=16384",
+    "--variant=fp8_nt_fastacc_128x128",
+    "--warmups=1",
+    "--trials=1"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_shape_02_r6c1_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 1,
+   "delivery_index": 1,
+   "delivery_mode": "cluster_sm",
+   "family": "fp8_fastacc",
+   "kind": "dense_harness",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "accum.fp8_fast",
+    "copy.tma",
+    "dtype.fp8_e4m3",
+    "epi.no_smem",
+    "layout.nt",
+    "schedule.warp_specialized",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_014_fp8_fastacc_warp_specialized_cluster_sm",
+    "rationale": "M=129/N=200 非 tile 对齐 + 极小 K=128（296 fp8 K=16384）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.19815526067755315,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cta_count 4 != target_ctas 1; round2: status=unresolved reason=cta_count 4 != target_ctas 1; two-round median drift 1.42% (limit 5.0%)",
+     "replaces": "cutlass_holdout_shape_02",
+     "seed_order_candidate": "1",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    126,
+    124,
+    16384
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_shape_02_r6c1",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    128
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "dense_tma_pingpong",
+   "args": [
+    "--m=64",
+    "--n=200",
+    "--k=24576",
+    "--variant=f16_tt_pingpong_64x128",
+    "--warmups=1",
+    "--trials=1"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_shape_03_r6c3_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 2,
+   "delivery_index": 2,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "epi.tma_ws_pingpong",
+    "layout.tt",
+    "schedule.pingpong",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_004_dense_tma_pingpong_cluster_sm",
+    "rationale": "M=68 非 64 对齐、K=32768 极大（296 同族 K∈{22144,20608}）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.023132172887037207,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=correctness failed; round2: status=unresolved reason=correctness failed",
+     "replaces": "cutlass_holdout_shape_03",
+     "seed_order_candidate": "3",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    64,
+    200,
+    24576
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_shape_03_r6c3",
+   "target_ctas": 1,
+   "tile": [
+    64,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "dense_tma_cooperative",
+   "args": [
+    "--m=264",
+    "--n=520",
+    "--k=2560",
+    "--variant=f16_nt_coop_128x128",
+    "--warmups=1",
+    "--trials=1"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_shape_04_r6c4_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 3,
+   "delivery_index": 3,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "epi.tma_ws_cooperative",
+    "layout.nt",
+    "schedule.cooperative",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_006_dense_tma_cooperative_cluster_sm",
+    "rationale": "M=264/N=520 非 tile 对齐，K=6144 未见值",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.09828883489644233,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cycles_median=1002145.464 outside [100000,500000] samples=9; round2: status=unresolved reason=cycles_median=1002146.5 outside [100000,500000] samples=9; two-round median drift 0.00% (limit 5.0%)",
+     "replaces": "cutlass_holdout_shape_04",
+     "seed_order_candidate": "4",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    264,
+    520,
+    2560
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_shape_04_r6c4",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "gather_scatter_cpasync",
+   "args": [
+    "--m=192",
+    "--n=128",
+    "--k=10240",
+    "--mode=m",
+    "--index_size=128",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example52_gather_scatter",
+   "case_id": "cutlass_holdout_shape_05_r6c5_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 4,
+   "delivery_index": 4,
+   "delivery_mode": "cluster_sm",
+   "family": "indexing_fusion",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.cpasync",
+    "dtype.f16",
+    "index.gather_m",
+    "index.scatter",
+    "schedule.warp_specialized",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_035_gather_scatter_cpasync_cluster_sm",
+    "rationale": "gather_scatter M=192 非 tile 对齐 + K=4096 缩半（296 128/8192）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.19286887791209734,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cycles_median=92424.985 outside [100000,500000] samples=9; round2: status=unresolved reason=cycles_median=93273.087 outside [100000,500000] samples=9; two-round median drift 0.91% (limit 5.0%)",
+     "replaces": "cutlass_holdout_shape_05",
+     "seed_order_candidate": "5",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    192,
+    128,
+    10240
+   ],
+   "source": "upstream/examples/52_hopper_gather_scatter_fusion/52_hopper_gather_scatter_fusion.cu",
+   "source_case_id": "cutlass_holdout_shape_05_r6c5",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "collective_builder_tma_static",
+   "args": [
+    "--m=144",
+    "--n=100",
+    "--k=16384",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example49_collective_builder",
+   "case_id": "cutlass_holdout_shape_06_r6c5_cluster_sm",
+   "cluster_sm_count": 2,
+   "compiled_cluster": "2x1x1",
+   "delivery_group": 5,
+   "delivery_index": 5,
+   "delivery_mode": "cluster_sm",
+   "family": "builder",
+   "kind": "upstream_example",
+   "limit_kind": "grid_tiles",
+   "mechanism_notes": "compiled ClusterShape 2x1x1; measured %%cluster_nctaid xyz + %%smid; grid-limited KernelTma one cluster of tiles",
+   "mechanisms": [
+    "cluster.2x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "schedule.tma_static",
+    "shape.tile_aligned"
+   ],
+   "post_mode": "tma",
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_022_collective_builder_tma_static_cluster_sm",
+    "rationale": "example49 M=320 非 2 幂 tile 倍数（296 256）+ K 减半",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.016770138239053177,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cta_count 4 != target_ctas 2; round2: status=unresolved reason=cta_count 4 != target_ctas 2; two-round median drift 0.01% (limit 5.0%)",
+     "replaces": "cutlass_holdout_shape_06",
+     "seed_order_candidate": "5",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    144,
+    100,
+    16384
+   ],
+   "source": "upstream/examples/49_hopper_gemm_with_collective_builder/49_collective_builder.cu",
+   "source_case_id": "cutlass_holdout_shape_06_r6c5",
+   "target_ctas": 2,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": true
+  },
+  {
+   "algorithm": "mixed_convert_f16_fp8",
+   "args": [
+    "--m=192",
+    "--n=128",
+    "--k=4096",
+    "--mode=0",
+    "--g=128",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example55_mixed_f16_fp8",
+   "case_id": "cutlass_holdout_shape_07_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 6,
+   "delivery_index": 6,
+   "delivery_mode": "cluster_sm",
+   "family": "mixed_input",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.mixed_f16_fp8",
+    "mixed.convert_only",
+    "schedule.cooperative",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_097_mixed_convert_f16_fp8_cluster_sm",
+    "rationale": "mixed f16↔fp8 M=192 非 tile 对齐，K=4096 新值",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    192,
+    128,
+    4096
+   ],
+   "source": "upstream/examples/55_hopper_mixed_dtype_gemm/55_hopper_mixed_dtype_gemm.cu",
+   "source_case_id": "cutlass_holdout_shape_07",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "fp8_blockwise_dense",
+   "args": [
+    "--m=200",
+    "--n=256",
+    "--k=16128",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example67_blockwise",
+   "case_id": "cutlass_holdout_shape_08_cluster_sm",
+   "cluster_sm_count": 2,
+   "compiled_cluster": "1x2x1",
+   "delivery_group": 7,
+   "delivery_index": 7,
+   "delivery_mode": "cluster_sm",
+   "family": "blockwise",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x2x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x2x1",
+    "copy.tma",
+    "dtype.fp8_e4m3",
+    "epi.bias_relu_amax_aux",
+    "scale.blockwise_tile",
+    "schedule.cooperative",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "args",
+     "shape"
+    ],
+    "nearest_296_case_id": "cutlass_065_fp8_blockwise_dense_cluster_sm",
+    "rationale": "fp8 blockwise M=200 非 tile 对齐 + K=16128（296 30336）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    200,
+    256,
+    16128
+   ],
+   "source": "upstream/examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling.cu",
+   "source_case_id": "cutlass_holdout_shape_08",
+   "target_ctas": 2,
+   "tile": [
+    128,
+    128,
+    128
+   ],
+   "uses_cluster": true
+  },
+  {
+   "algorithm": "dense_tma_static",
+   "args": [
+    "--m=128",
+    "--n=128",
+    "--k=16384",
+    "--variant=f16_nt_tma_128x128",
+    "--warmups=1",
+    "--trials=1",
+    "----alpha=0.5",
+    "----beta=1.0"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_cfg_01_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 0,
+   "delivery_index": 8,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "grid_tiles",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; grid-limited KernelTma one cluster of tiles",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "epi.no_smem",
+    "layout.nt",
+    "schedule.tma_static",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_000_dense_tma_static_cluster_sm",
+    "rationale": "epilogue alpha=0.5/beta=1.0 交叉（296 全部缺省 1.0/0.0）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    128,
+    128,
+    16384
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_cfg_01",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "dense_tma_static",
+   "args": [
+    "--m=256",
+    "--n=128",
+    "--k=16384",
+    "--variant=bf16_nt_tma_cluster2m_128x128",
+    "--warmups=1",
+    "--trials=1",
+    "----beta=1.0"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_cfg_02_cluster_sm",
+   "cluster_sm_count": 2,
+   "compiled_cluster": "2x1x1",
+   "delivery_group": 1,
+   "delivery_index": 9,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "grid_tiles",
+   "mechanism_notes": "compiled ClusterShape 2x1x1; measured %%cluster_nctaid xyz + %%smid; grid-limited KernelTma one cluster of tiles",
+   "mechanisms": [
+    "cluster.2x1x1",
+    "copy.tma",
+    "dtype.bf16",
+    "epi.no_smem",
+    "layout.nt",
+    "schedule.tma_static",
+    "shape.mnk_tail"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_001_dense_tma_static_cluster_sm",
+    "rationale": "cluster2m TMA × beta=1.0（C 累加）新组合",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    256,
+    128,
+    16384
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_cfg_02",
+   "target_ctas": 2,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": true
+  },
+  {
+   "algorithm": "dense_tma_pingpong",
+   "args": [
+    "--m=64",
+    "--n=128",
+    "--k=22144",
+    "--variant=f16_tt_pingpong_64x128",
+    "--warmups=1",
+    "--trials=1",
+    "----beta=1.0"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_cfg_03_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 2,
+   "delivery_index": 10,
+   "delivery_mode": "cluster_sm",
+   "family": "dense_tma",
+   "kind": "dense_harness",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "epi.tma_ws_pingpong",
+    "layout.tt",
+    "schedule.pingpong",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_004_dense_tma_pingpong_cluster_sm",
+    "rationale": "pingpong 调度 × beta=1.0",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    64,
+    128,
+    22144
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_cfg_03",
+   "target_ctas": 1,
+   "tile": [
+    64,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "fp8_fastacc_cooperative",
+   "args": [
+    "--m=128",
+    "--n=128",
+    "--k=41472",
+    "--variant=fp8_nt_fastacc_coop_128x128",
+    "--warmups=1",
+    "--trials=1",
+    "----beta=1.0"
+   ],
+   "binary_name": "dense_algorithms",
+   "case_id": "cutlass_holdout_cfg_04_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 3,
+   "delivery_index": 11,
+   "delivery_mode": "cluster_sm",
+   "family": "fp8_fastacc",
+   "kind": "dense_harness",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "accum.fp8_fast",
+    "copy.tma",
+    "dtype.fp8_e4m3",
+    "epi.tma_ws_cooperative",
+    "layout.nt",
+    "schedule.cooperative",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_018_fp8_fastacc_cooperative_cluster_sm",
+    "rationale": "fp8 cooperative × beta=1.0",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    128,
+    128,
+    41472
+   ],
+   "source": "harness/cutlass_full_gpu_runner.cu",
+   "source_case_id": "cutlass_holdout_cfg_04",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    128
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "gather_scatter_cpasync",
+   "args": [
+    "--m=128",
+    "--n=128",
+    "--k=8192",
+    "--mode=k",
+    "--index_size=8192",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example52_gather_scatter",
+   "case_id": "cutlass_holdout_cfg_05_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 4,
+   "delivery_index": 12,
+   "delivery_mode": "cluster_sm",
+   "family": "indexing_fusion",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.cpasync",
+    "dtype.f16",
+    "index.gather_m",
+    "index.scatter",
+    "schedule.warp_specialized",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_035_gather_scatter_cpasync_cluster_sm",
+    "rationale": "gather_scatter mode=m→k：index 作用到 K 维（296 仅 mode=m）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    128,
+    128,
+    8192
+   ],
+   "source": "upstream/examples/52_hopper_gather_scatter_fusion/52_hopper_gather_scatter_fusion.cu",
+   "source_case_id": "cutlass_holdout_cfg_05",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  },
+  {
+   "algorithm": "ptr_array_cooperative",
+   "args": [
+    "--m=256",
+    "--n=256",
+    "--k=1024",
+    "--l=6",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example56_ptr_array",
+   "case_id": "cutlass_holdout_cfg_06_cluster_sm",
+   "cluster_sm_count": 2,
+   "compiled_cluster": "1x2x1",
+   "delivery_group": 5,
+   "delivery_index": 13,
+   "delivery_mode": "cluster_sm",
+   "family": "ptr_array",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x2x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x2x1",
+    "copy.tma",
+    "dtype.f16",
+    "group.ptr_array",
+    "group.uniform",
+    "schedule.cooperative",
+    "shape.tile_aligned"
+   ],
+   "post_mode": "cooperative",
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_051_ptr_array_cooperative_cluster_sm",
+    "rationale": "ptr_array 问题数 l=4→6（296 该 binary l∈{2,4,8}）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    256,
+    256,
+    1024
+   ],
+   "source": "upstream/examples/56_hopper_ptr_array_batched_gemm/56_hopper_ptr_array_batched_gemm.cu",
+   "source_case_id": "cutlass_holdout_cfg_06",
+   "target_ctas": 2,
+   "tile": [
+    256,
+    128,
+    64
+   ],
+   "uses_cluster": true
+  },
+  {
+   "algorithm": "grouped_fp8_fastacc_pingpong",
+   "args": [
+    "--m=256",
+    "--n=128",
+    "--k=5760",
+    "--groups=6",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "example57_grouped_fastacc",
+   "case_id": "cutlass_holdout_cfg_07_cluster_sm",
+   "cluster_sm_count": 2,
+   "compiled_cluster": "2x1x1",
+   "delivery_group": 6,
+   "delivery_index": 14,
+   "delivery_mode": "cluster_sm",
+   "family": "grouped_fastacc",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 2x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.2x1x1",
+    "accum.fp8_fast",
+    "copy.tma",
+    "dtype.fp8_e4m3",
+    "group.uniform",
+    "schedule.pingpong",
+    "shape.tile_aligned"
+   ],
+   "post_mode": "pingpong",
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_056_grouped_fp8_fastacc_pingpong_cluster_sm",
+    "rationale": "grouped fastacc groups=4→6（pingpong）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    256,
+    128,
+    5760
+   ],
+   "source": "upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+   "source_case_id": "cutlass_holdout_cfg_07",
+   "target_ctas": 2,
+   "tile": [
+    128,
+    128,
+    128
+   ],
+   "uses_cluster": true
+  },
+  {
+   "algorithm": "gemm_permute",
+   "args": [
+    "--m=128",
+    "--n=256",
+    "--k=1536",
+    "--batch_size=6",
+    "--check=true",
+    "--warmup=0",
+    "--iterations=1"
+   ],
+   "binary_name": "delivery53_permute_full_gpu",
+   "case_id": "cutlass_holdout_cfg_08_r6c1_cluster_sm",
+   "cluster_sm_count": 1,
+   "compiled_cluster": "1x1x1",
+   "delivery_group": 7,
+   "delivery_index": 15,
+   "delivery_mode": "cluster_sm",
+   "family": "indexing_fusion",
+   "kind": "upstream_example",
+   "limit_kind": "persistent_sm",
+   "mechanism_notes": "compiled ClusterShape 1x1x1; measured %%cluster_nctaid xyz + %%smid; persistent occupancy capped independently of requested sm_count",
+   "mechanisms": [
+    "cluster.1x1x1",
+    "copy.tma",
+    "dtype.f16",
+    "index.permute",
+    "shape.tile_aligned"
+   ],
+   "post_mode": null,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "args"
+    ],
+    "nearest_296_case_id": "cutlass_036_gemm_permute_cluster_sm",
+    "rationale": "permute batch_size=4→8",
+    "rev6": {
+     "admission": {
+      "cycle_window": "[100000, 500000]（marker 主核区间，296 同窗）",
+      "median_drift_percent": 0.2061260937093897,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cycles_median=736516.306 outside [100000,500000] samples=9; round2: status=unresolved reason=cycles_median=735098.042 outside [100000,500000] samples=9; two-round median drift 0.19% (limit 5.0%)",
+     "replaces": "cutlass_holdout_cfg_08",
+     "seed_order_candidate": "1",
+     "why_this_candidate": "同格补选：同 binary/algorithm/契约，形状或档位按原种子顺序取下一候选"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": [
+    128,
+    256,
+    1536
+   ],
+   "source": "harness/derived_53_hopper_gemm_permute.cu",
+   "source_case_id": "cutlass_holdout_cfg_08_r6c1",
+   "target_ctas": 1,
+   "tile": [
+    128,
+    128,
+    64
+   ],
+   "uses_cluster": false
+  }
+ ],
+ "name": "CUTLASS near-holdout 16 (8 new shapes + 8 new config combos, T0005, rev6 补选)",
+ "notes": [
+  "Independent of manifests/cutlass_single_sm.json and cutlass_dual_sm.json",
+  "example49 idx 22-31 compile ClusterShape 2x1x1; mechanisms use cluster.2x1x1 not the source cluster.1x1x1 tag",
+  "cluster evidence is compiled ClusterShape + %%cluster_nctaid xyz + %%smid",
+  "persistent vs grid_tiles are occupancy vs tile-grid limits; CUTLASS_CLUSTER_SM_COUNT is not observed topology",
+  "T0005 near-holdout: same binaries as the 296 set, unseen shapes/arg combos",
+  "selection: hand-curated candidate table, seeded tie-break rng(20260929), identity dedup vs 296"
+ ],
+ "runner": "scripts/run_cluster_sm.sh",
+ "schema_version": "hopper.delivery.cluster_sm.v1",
+ "selected_count": 16,
+ "selection": {
+  "identity": "binary_name + args + compiled_cluster + target_ctas",
+  "mode": "near_holdout_new_shape_new_config",
+  "rev6": {
+   "date": "2026-09-29",
+   "exhausted_slots": [],
+   "harness_fixed_slots": [],
+   "rejection_list": "artifacts/tasks/T0005/rev6/rejection_list.json",
+   "replaced_slots": [],
+   "revision": "rev6-reselect",
+   "rule": "27 个 needs_marker_remeasure 槽位：同格（同 suite×同 bucket×同 family）按原种子顺序取下一候选，静态+运行时准入到过，两轮 marker 计时合格者入选；原 21 例不动；FA3 cfg_02/04 为 harness 插桩修复原例重测（不换例）",
+   "seed": 20260929
+  },
+  "rev6_admission": {
+   "can_implement": "CUTLASS can_implement 拒绝/无 summary → 准入拒绝；DG vendor get_best_config 崩溃（GemmDesc even-SM assert）→ 静态拒绝；FA3 PRIMARY_OK + traits 合法",
+   "cluster_sm_contract": "主核/launched cta_count == target_ctas；2CTA = 一个 2-CTA cluster（cluster_dim 积 2、两个不同 smid）或两个普通 CTA（cluster_dim 1x1x1、grid 积 2）；1CTA = grid 积 1、cluster 1x1x1",
+   "cycle_window": {
+    "cutlass": "[100000, 500000]（marker 主核区间，296 同窗）",
+    "deepgemm": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+    "flashattention3": "(0, 500000]（marker scope，296 同窗）"
+   },
+   "marker_instrumentation": "FA3 候选的主核实例必须在 marker 二进制中带 SR_CLOCKLO（链接对象级静态检查 + 本轮动态证据），否则拒绝",
+   "no_simulation": "补选只看准入检查与硬件计时结果，不看模拟结果（修订 6-3）",
+   "order": "静态准入（生成器，硬件计时前）→ 运行时探针/首轮计时准入 → 两轮 marker 计时（两轮均 qualified 且 drift<=5.0%）",
+   "target_cta_count": "逐 suite 判据同 296 qualification（DG cluster_mechanism_probe 观测 cluster cta counts；CU runner 实测 cta_count；FA3 主核 grid product）",
+   "vendor_heuristic_num_sms": "DG：num_sms=1（1CTA）或 num_sms=2（2CTA/cluster）下 vendor 启发式必须可选中目标配置（GemmDesc even-SM 静态规则 + cluster_mechanism_probe 运行时探针）；kgroup num_groups<=4 静态拒绝"
+  },
+  "seed": 20260929
+ },
+ "source_manifest": "manifests/cutlass_cluster_sm100.json",
+ "suite": "cutlass",
+ "version": "rev6-reselect-20260929"
+}

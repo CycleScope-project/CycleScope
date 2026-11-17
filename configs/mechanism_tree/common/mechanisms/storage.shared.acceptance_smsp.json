@@ -1,0 +1,164 @@
+{
+ "doc": "A synchronous shared store occupies its SMSP's acceptance for cycles(shared_wavefronts) of its operand width: max(2 cycles per wavefront, a width-dependent floor); stores of one SMSP are accepted one after another. The issuing warp is not held.",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "STS",
+   "ST"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "shared_store_acceptance_smsp"
+ },
+ "root": {
+  "children": [
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "partition_axis": "width_bytes",
+      "partition_domain": [
+       0,
+       4294967295
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          0,
+          4
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          5,
+          8
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          9,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STS"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     0
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "remote_smem",
+       "operator": "eq",
+       "value": 0
+      },
+      "partition_axis": "width_bytes",
+      "partition_domain": [
+       0,
+       4294967295
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          0,
+          4
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          5,
+          8
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "width_bytes",
+         "operator": "range",
+         "value": [
+          9,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "ST"
+    },
+    "partition_axis": "remote_smem",
+    "partition_domain": [
+     0,
+     0
+    ]
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "STS",
+   "ST"
+  ]
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "linear",
+   "axis": "shared_wavefronts"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

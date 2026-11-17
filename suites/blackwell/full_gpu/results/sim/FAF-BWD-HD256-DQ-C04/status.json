@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-BWD-HD256-DQ-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 187388,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2405618,
+ "completed": 2405618,
+ "cycles": 35543,
+ "hard": 0,
+ "walls": {
+  "convert": 5.7,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 6.0,
+  "total": 12.3
+ },
+ "rss_kb": {
+  "convert": 300676,
+  "segments": 300676,
+  "build": 300676,
+  "sim": 446520
+ },
+ "hw_cycles": 40639.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 5
+}

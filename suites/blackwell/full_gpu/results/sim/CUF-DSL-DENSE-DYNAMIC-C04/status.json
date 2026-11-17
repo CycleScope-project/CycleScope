@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-DENSE-DYNAMIC-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 305272,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1321963,
+ "completed": 1321963,
+ "cycles": 28005,
+ "hard": 0,
+ "walls": {
+  "convert": 6.8,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 6.8,
+  "total": 14.2
+ },
+ "rss_kb": {
+  "convert": 350072,
+  "segments": 350072,
+  "build": 350072,
+  "sim": 551224
+ },
+ "hw_cycles": 30893.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 4
+}

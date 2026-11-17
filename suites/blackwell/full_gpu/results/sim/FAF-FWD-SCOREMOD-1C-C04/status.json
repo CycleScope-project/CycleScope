@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-SCOREMOD-1C-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 223970,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4677189,
+ "completed": 4677189,
+ "cycles": 36477,
+ "hard": 0,
+ "walls": {
+  "convert": 6.6,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 7.5,
+  "total": 14.6
+ },
+ "rss_kb": {
+  "convert": 338728,
+  "segments": 338728,
+  "build": 338728,
+  "sim": 564600
+ },
+ "hw_cycles": 34782.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 6
+}

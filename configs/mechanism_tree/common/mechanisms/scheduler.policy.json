@@ -1,0 +1,55 @@
+{
+ "doc": "imported from legacy mechanism scheduler.policy",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "scheduler",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "cursor_commit": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "structural.scheduler.policy_switch"
+     ]
+    },
+    "issue_slots": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "hopper.00bea112bde4105e841830a1",
+      "mechtree.w9.sched.issue_slots"
+     ]
+    },
+    "try_next_on_block": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "structural.scheduler.policy_switch"
+     ]
+    }
+   },
+   "scope": "smsp"
+  }
+ },
+ "field_models": {
+  "cursor_commit": {
+   "kind": "constant"
+  },
+  "issue_slots": {
+   "kind": "constant"
+  },
+  "try_next_on_block": {
+   "kind": "constant"
+  }
+ }
+}

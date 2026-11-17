@@ -1,0 +1,25 @@
+{
+ "storage.shared.fence.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 5.0
+    },
+    "sources": [
+     "shared.b300.store_step.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.store_step.experimental"
+    ]
+   }
+  },
+  "scope": "cta"
+ }
+}

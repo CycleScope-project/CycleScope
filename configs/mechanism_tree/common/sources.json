@@ -1,0 +1,87 @@
+{
+ "hopper.00bea112bde4105e841830a1": {
+  "artifact": "/scheduler_policy/issue_slots_per_smsp",
+  "artifact_sha256": "65ea7fdd5a7fec6dc9a976aa534a450ef2bf9fbe799ee3efa46a3a55f0e35320",
+  "description": "same physical endpoint and numeric value",
+  "evidence": "experimental",
+  "value_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+ },
+ "hopper.35e1e5260af5c5df83095820": {
+  "artifact": "/native_parameter_models/storage.global.stateful_hierarchy/value/default_load_cache_policy",
+  "artifact_sha256": "65ea7fdd5a7fec6dc9a976aa534a450ef2bf9fbe799ee3efa46a3a55f0e35320",
+  "description": "same physical endpoint and numeric value",
+  "evidence": "experimental",
+  "value_sha256": "e9341c1e827aaadacc84e55676573a60a98d9c5baafdeedf07d7e8f040fe3dbd"
+ },
+ "hopper.5662cb6ebc2fb6b270317ec8": {
+  "artifact": "/native_parameter_models/storage.global.stateful_hierarchy/value/sector_bytes",
+  "artifact_sha256": "65ea7fdd5a7fec6dc9a976aa534a450ef2bf9fbe799ee3efa46a3a55f0e35320",
+  "description": "same physical endpoint and numeric value",
+  "evidence": "placeholder",
+  "value_sha256": "e29c9c180c6279b0b02abd6a1801c7c04082cf486ec027aa13515e4f3884bb6b"
+ },
+ "hopper.a49a44669eb00191a4caca97": {
+  "artifact": "/native_parameter_models/storage.global.stateful_hierarchy/value/store_path",
+  "artifact_sha256": "65ea7fdd5a7fec6dc9a976aa534a450ef2bf9fbe799ee3efa46a3a55f0e35320",
+  "description": "same physical endpoint and numeric value",
+  "evidence": "experimental",
+  "value_sha256": "254b33dc0603e27ee4c3656f3cb0567d6f6dc02d174c0d981af829c1065801db"
+ },
+ "hopper.bafa180da2b95e6d4ad726f8": {
+  "artifact": "/native_parameter_models/storage.global.stateful_hierarchy/value/line_bytes",
+  "artifact_sha256": "65ea7fdd5a7fec6dc9a976aa534a450ef2bf9fbe799ee3efa46a3a55f0e35320",
+  "description": "same physical endpoint and numeric value",
+  "evidence": "placeholder",
+  "value_sha256": "2747b7c718564ba5f066f0523b03e17f6a496b06851333d2d59ab6d863225848"
+ },
+ "hopper.placeholder.13b31106cc7ccab4a3fa0939": {
+  "description": "explicit memory layout protocol version",
+  "evidence": "placeholder",
+  "value_sha256": "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b"
+ },
+ "mechtree.w6.memory.default_load_cache_policy": {
+  "artifact": "artifacts/mechtree/analysis/cache-policy50-model.json#/default_load_cache_policy",
+  "description": "B300/SM103 default scalar ld.global.u32 matches explicit ca, native enum 0=cache_all (cpp/src/memory.cpp). cache-policy50: GPU-800b87ec-59fe-6b25-eedf-a036db9ce10c and GPU-fa241899-7f9c-9a20-9a48-45a5362c6346; B300 SXM6 AC, CC10.3, driver 580.159.03, nvcc/cuobjdump 13.2.78, NCU 2026.1.1.0. Three controls x 4 launches x 2 independent GPUs. Each launch: 8 single-warp CTAs x 128 dependent scalar loads, 1024 requests/4096 sectors. Default and ca each give 4064 hits/32 misses; cg gives 0 hits/4096 misses on every launch. SASS: LDG.E / LDG.E.STRONG.SM / LDG.E.STRONG.GPU, one load in the 128-iteration address-feedback loop, no clock reads or spills; poisoned uint64 lane outputs all validate, CUDA UUIDs match NVML. No -dlcm override. Only LSU counters used, not profiler timing; no cache-line size, residency/capacity, queue-depth or latency inference. Raw warnings and frozen counter model are retained.",
+  "evidence": "measured"
+ },
+ "mechtree.w6.memory.sector_bytes": {
+  "artifact": "artifacts/mechtree/results/wave6/cache_sector_values.json#/sector_bytes",
+  "description": "B300/SM103 LSU scalar u32 global cg load/store coalescing sector: 32 bytes. Independent load and store scans each cover 10 address strides/offsets x 4 launches x 2 GPUs (80 launches/direction), 8 single-warp CTAs x 128 instructions per launch; all request/sector counts exactly match byte-address sector partitions. SASS: one scalar LDG or STG in each loop, no clock reads, zero spills; unprofiled/profiled full-output checks pass and CUDA UUIDs match NVML. Load cache-sector44: GPU-fa241899-7f9c-9a20-9a48-45a5362c6346 and GPU-4221633a-c6ad-c451-8bb0-79ceac1bb786; store cache-sector-store47: GPU-800b87ec-59fe-6b25-eedf-a036db9ce10c and GPU-4221633a-c6ad-c451-8bb0-79ceac1bb786. B300 SXM6 AC, CC10.3, driver 580.159.03, nvcc/cuobjdump 13.2.78, NCU 2026.1.1.0. Only LSU request/sector counts are used; no profiler timing, cache-line size, policy, residency, queue depth or bandwidth is inferred. Recorded hwloc warnings remain in the evidence. The value builder reads frozen load/store models, never re-fits the raw captures.",
+  "evidence": "measured"
+ },
+ "mechtree.w9.l2cnt.line_bytes": {
+  "artifact": "artifacts/mechtree/results/wave9/l2cnt_model.json",
+  "description": "EXPERIMENTAL B300 L2 allocation granularity 128 B: probes/l2cnt.cu counter-only (ncu --cache-control none, two GPUs GPU-0380f7e8-4ce6-a5d0-7eb9-10d8c3ad9574 / GPU-bcb6d477-2441-4742-bdca-071716ceb43e, driver 580.159.03, CUDA 13.2.78, run l2cnt-113 commit f856dbd3): every SM walks F distinct 128 B lines with ld.global.cg touching one sector of each line (P1) or all four (P4), warm then measured pass. A missing 1-sector request costs four L2 read-miss sectors like a full-line request (P1 misses = 4F at F >= 2M lines), and the miss curves over F = 128K..3M lines coincide (line-level hit 1.000/0.995/0.84/0.21/0.02 at 0.4/0.5/0.66/0.79/1.0 M lines for both patterns, memq_rules.same_line_curves true on both GPUs). Experimental because lts__t_sectors_srcunit_tex_op_read_lookup_hit reads 0 on this part, so the curves use 1 - misses/(4F) instead of the hit counter the rule was written for.",
+  "evidence": "experimental"
+ },
+ "mechtree.w9.memq.store_path": {
+  "artifact": "artifacts/mechtree/results/wave9/memq_model.json#/store_path",
+  "description": "MEASURED B300 store acknowledgment path: st.global.u32 + fence.sc.gpu (MEMBAR.SC.GPU/ERRBAR/CGAERRBAR/CCTL.IVALL) on a cold line (fresh region of an 8 GiB buffer, not L2-resident) vs the same line warm right after: cold 604.98 / warm 604.12 and cold 615.80 / warm 614.53 cycles (means of 64 lines x 16 launches per GPU); memq_rules.store_path (cold within 10% of warm) -> 0: stores complete at L2, they do not wait for DRAM. probes/memq.cu ack.*; timing results kept in shared memory so no timing store is pending at the next fence. hardware NVIDIA B300 SXM6 AC GPU-0380f7e8-4ce6-a5d0-7eb9-10d8c3ad9574 and GPU-bcb6d477-2441-4742-bdca-071716ceb43e, driver 580.159.03, CUDA 13.2.78; probe commit 05e18b5e (clean tree), run memq-107.",
+  "evidence": "measured"
+ },
+ "mechtree.w9.sched.issue_slots": {
+  "artifact": "artifacts/mechtree/results/wave9/slots_memq_model.json#/issue_slots",
+  "description": "MEASURED B300 issue slots per SMSP = 1: probes/alu.cu slots.FFMA+LOP3.r6.wps4 (4 warps per SMSP, 6 FFMA + 2 LOP3 independent chains per warp step; SASS gate exact counts). The pipes alone allow 24 cycles per step-group (FFMA 1.00, LOP3 2.00 cycles per warp instruction per SMSP, same-run thr controls), one issue slot forces 32; observed 1.0089 / 1.0130 cycles per instruction (32.3 per group, IPC 0.989), stable on both GPUs; sched_rules.issue_slots_ok (IPC <= 1.03). hardware NVIDIA B300 SXM6 AC GPU-0380f7e8-4ce6-a5d0-7eb9-10d8c3ad9574 and GPU-bcb6d477-2441-4742-bdca-071716ceb43e, driver 580.159.03, CUDA 13.2.78; probe commit 6df9518e (clean tree), run slots-memq-109.",
+  "evidence": "measured"
+ },
+ "structural.execution_units": {
+  "artifact": "mechanism-merge-plan.md (design note, not shipped)",
+  "description": "Execution units shared by both architectures (mechanism-merge-plan 2.1): one copy per scope, modelled by the service leaf's issue_interval_cycles (initiation interval) and an optional measured in-flight cap (max_inflight_per_copy, 0 = none). The resource's own initiation_interval_cycles field is not read by the engine (kept 1).",
+  "evidence": "structural"
+ },
+ "structural.nanosleep_requested": {
+  "artifact": "PTX ISA nanosleep",
+  "description": "PTX nanosleep: the warp suspends for the requested duration (requested_sleep_cycles = ns folded to cycles by the converter), slope 1; both architectures.",
+  "evidence": "structural"
+ },
+ "structural.v10.memory.model_version": {
+  "artifact": "cpp/src/job.cpp",
+  "description": "V10 initialized memory configuration requires model_version=1 in job validation. This enum identifies the supported software model/serialization format, not a B300 timing or geometry measurement. Sector bytes, line bytes, cache policies and capacity fields retain their independent evidence; the validator requiring a geometry value does not measure it.",
+  "evidence": "structural"
+ },
+ "structural.scheduler.policy_switch": {
+  "artifact": "cpp/core/simulator.cpp (scheduler policy load: cursor_commit, try_next_on_block)",
+  "description": "STRUCTURAL: engine scheduling-policy switches, not timing quantities. cursor_commit = 1: the per-SMSP issue cursor advances past the warp that issued (loose round-robin); try_next_on_block = 1: a warp that cannot issue this cycle hands the slot to the next eligible warp instead of stalling the SMSP. Both are modelling choices of the issue loop (no microbenchmark can isolate them from the per-class service leaves); they replace the hopper-prototype copies ('same physical endpoint and numeric value', experimental) and placeholder.p0. The former eligible_policy / yield_policy fields had no read point in the engine and were removed.",
+  "evidence": "structural"
+ }
+}

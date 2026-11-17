@@ -1,0 +1,35 @@
+--- a/csrc/api/sparse_decode.cpp
++++ b/csrc/api/sparse_decode.cpp
+@@ -25,23 +25,6 @@
+     EXTRA_TOPK_LENGTH
+ };
+ 
+-#ifndef FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
+-#define FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT 0
+-#endif  // FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT
+-namespace flashmla_scaling {
+-static inline int effective_sm_count(const Arch &arch) {
+-    long long cap = FLASHMLA_EFFECTIVE_SM_COUNT_DEFAULT;
+-    if (const char *env = std::getenv("FLASHMLA_EFFECTIVE_SM_COUNT");
+-        env != nullptr && *env != '\0') {
+-        cap = std::atoll(env);
+-    }
+-    if (cap <= 0 || cap >= static_cast<long long>(arch.num_sms)) {
+-        return arch.num_sms;
+-    }
+-    return static_cast<int>(cap);
+-}
+-}  // namespace flashmla_scaling
+-
+ struct DecodeImplMeta {
+     int num_sm_parts;
+     int fixed_overhead_num_blocks;
+@@ -74,7 +57,7 @@
+     DecodeImplMeta get_meta(int h_q, int s_q) override {
+         Arch arch = Arch();
+         return {
+-            std::max(flashmla_scaling::effective_sm_count(arch) / s_q / (h_q/64), 1),
++            std::max(arch.num_sms / s_q / (h_q/64), 1),
+             5,
+             64
+         };

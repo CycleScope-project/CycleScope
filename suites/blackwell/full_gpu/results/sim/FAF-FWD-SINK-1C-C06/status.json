@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-SINK-1C-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 566286,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 8317843,
+ "completed": 8317843,
+ "cycles": 55618,
+ "hard": 0,
+ "walls": {
+  "convert": 15.3,
+  "segments": 0.0,
+  "build": 1.0,
+  "sim": 17.1,
+  "total": 33.5
+ },
+ "rss_kb": {
+  "convert": 386652,
+  "segments": 386652,
+  "build": 386652,
+  "sim": 972516
+ },
+ "hw_cycles": 59964.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 13
+}

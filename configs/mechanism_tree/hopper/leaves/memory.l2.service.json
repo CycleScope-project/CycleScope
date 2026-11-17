@@ -1,0 +1,34 @@
+{
+ "memory.l2.service.root": {
+  "fields": {
+   "l2.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "hopper.a6d1573fe302656d9686e4c7"
+    ]
+   },
+   "l2.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 305.5
+    },
+    "sources": [
+     "memlat.h100.r1"
+    ]
+   },
+   "l2.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 122.31
+    },
+    "sources": [
+     "crossings.memory_port.h100.r3"
+    ]
+   }
+  },
+  "scope": "cluster"
+ }
+}

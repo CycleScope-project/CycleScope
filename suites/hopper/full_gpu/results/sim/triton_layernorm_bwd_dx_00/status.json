@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "triton_layernorm_bwd_dx_00",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 15620640,
+ "completed": 15620640,
+ "cycles": 89280,
+ "hard": 0,
+ "walls": {
+  "convert": 20.1,
+  "segments": 0.2,
+  "build": 2.5,
+  "sim": 55.6,
+  "total": 78.4
+ },
+ "rss_kb": {
+  "convert": 277344,
+  "segments": 277344,
+  "build": 277344,
+  "sim": 2142248
+ },
+ "hw_cycles": 143680.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6a378f776893a484",
+ "shards": 16
+}

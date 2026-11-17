@@ -1,0 +1,869 @@
+{
+  "suite": "flashmla",
+  "cap": 8,
+  "families": [
+    {
+      "id": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "spec": {
+        "shape": [
+          4,
+          64,
+          512,
+          1024,
+          8192
+        ],
+        "shape_tag": "B4_H64_topk1024_kv8192",
+        "kind": "sparse_decode",
+        "dtype": "fp8kv",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 1024,
+          "min": 1024,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "s_q * num_sm_parts; num_sm_parts=max(num_sms/s_q,1) when topk > 640",
+        "evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:63-69,219-224; csrc/cuda_kernels/sm100/decode/sparse/head64/kernel.cuh:732",
+        "persistent": true,
+        "persistent_evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:63-69,219-224; csrc/cuda_kernels/sm100/decode/sparse/head64/kernel.cuh:732"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*splitkv_mla.*",
+      "aux_kernels": [
+        ".*flash_fwd_mla_combine_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 64 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_decode.cpp:306-311); topk P-independent I starts above the split-KV threshold (topk+extra_topk > 640; flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224); flash_fwd_mla_combine_kernel is an auxiliary split-KV reduction kernel, not the attention main kernel (flashmla@0f11e17:csrc/api/sparse_decode.cpp:431-435)"
+    },
+    {
+      "id": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "spec": {
+        "shape": [
+          296,
+          64,
+          512,
+          512,
+          8192
+        ],
+        "shape_tag": "B296_H64_topk512_kv8192",
+        "kind": "sparse_decode",
+        "dtype": "fp8kv",
+        "no_split": true,
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 296,
+            "min": 148,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "s_q * B when enable_batch_invariant disables split-KV",
+        "evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224; csrc/cuda_kernels/sm100/decode/sparse/head64/kernel.cuh:732",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*splitkv_mla.*",
+      "aux_kernels": [
+        ".*flash_fwd_mla_combine_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 64 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_decode.cpp:306-311); flash_fwd_mla_combine_kernel is an auxiliary split-KV reduction kernel, not the attention main kernel (flashmla@0f11e17:csrc/api/sparse_decode.cpp:431-435); no_split uses enable_batch_invariant to disable split-KV (flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224); the batch lower bound keeps the non-persistent grid at 148 CTAs (flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224; csrc/cuda_kernels/sm100/decode/sparse/head64/kernel.cuh:732)"
+    },
+    {
+      "id": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "spec": {
+        "shape": [
+          4,
+          128,
+          512,
+          1024,
+          8192
+        ],
+        "shape_tag": "B4_H128_topk1024_kv8192",
+        "kind": "sparse_decode_h128",
+        "dtype": "fp8kv",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 1024,
+          "min": 1024,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "2 * s_q * num_sm_parts; num_sm_parts=max(num_sms/(2*s_q),1) when topk > 640",
+        "evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:99-105,219-224; csrc/cuda_kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.cuh:1050-1058",
+        "persistent": true,
+        "persistent_evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:99-105,219-224; csrc/cuda_kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.cuh:1050-1058"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*splitkv_mla.*",
+      "aux_kernels": [
+        ".*flash_fwd_mla_combine_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 128 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_decode.cpp:306-311); topk P-independent I starts above the split-KV threshold (topk+extra_topk > 640; flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224); flash_fwd_mla_combine_kernel is an auxiliary split-KV reduction kernel, not the attention main kernel (flashmla@0f11e17:csrc/api/sparse_decode.cpp:431-435)"
+    },
+    {
+      "id": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "spec": {
+        "shape": [
+          148,
+          128,
+          512,
+          512,
+          8192
+        ],
+        "shape_tag": "B148_H128_topk512_kv8192",
+        "kind": "sparse_decode_h128",
+        "dtype": "fp8kv",
+        "no_split": true,
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 148,
+            "min": 74,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "2 * s_q * B when enable_batch_invariant disables split-KV",
+        "evidence": "flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224; csrc/cuda_kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.cuh:1050-1058",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*splitkv_mla.*",
+      "aux_kernels": [
+        ".*flash_fwd_mla_combine_kernel.*"
+      ],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 128 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_decode.cpp:306-311); flash_fwd_mla_combine_kernel is an auxiliary split-KV reduction kernel, not the attention main kernel (flashmla@0f11e17:csrc/api/sparse_decode.cpp:431-435); no_split uses enable_batch_invariant to disable split-KV (flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224); the batch lower bound keeps the non-persistent grid at 148 CTAs (flashmla@0f11e17:csrc/api/sparse_decode.cpp:219-224; csrc/cuda_kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.cuh:1050-1058)"
+    },
+    {
+      "id": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "spec": {
+        "shape": [
+          4096,
+          128,
+          512,
+          512,
+          8192
+        ],
+        "shape_tag": "Sq4096_H128_topk512_kv8192",
+        "kind": "sparse_prefill",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "2 * s_q (two-CTA cluster)",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/sparse/fwd/head128/phase1.cuh:699-708",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 128 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_prefill.cpp:179-185)"
+    },
+    {
+      "id": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "spec": {
+        "shape": [
+          4096,
+          64,
+          512,
+          512,
+          8192
+        ],
+        "shape_tag": "Sq4096_H64_topk512_kv8192",
+        "kind": "sparse_prefill_h64",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "s_q",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/sparse/fwd/head64/phase1.cuh:676",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; upstream does not define the c450full 3+1 loop; Hq is fixed at 64 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_prefill.cpp:179-185)"
+    },
+    {
+      "id": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "spec": {
+        "shape": [
+          4096,
+          128,
+          512,
+          512,
+          8192
+        ],
+        "shape_tag": "Sq4096_H128_topk512_kv8192",
+        "kind": "sparse_prefill_st",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "2 * s_q (two-CTA cluster)",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/sparse/fwd_for_small_topk/head128/phase1.cuh:1050-1058",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop; Hq is fixed at 128 (supported values are checked in flashmla@0f11e17:csrc/api/sparse_prefill.cpp:179-185)"
+    },
+    {
+      "id": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          16,
+          4,
+          128
+        ],
+        "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+        "seqlen_k": 8192,
+        "kind": "dense_fwd",
+        "params": {
+          "causal": false
+        },
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "seqlen_k",
+          "base": 8192,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "non-persistent CUTLASS variable-length FMHA grid",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/dense/fmha_cutlass_fwd_sm100.cu:20-29",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "full-grid launch and repeated-call numerics pending R=1 probes; FLASHMLA_EFFECTIVE_SM_COUNT intentionally unset; no direct upstream grid source evidence found; upstream does not define the c450full 3+1 loop; P scales batch/sequence only; fixed Hq/Hkv ratio avoids non-divisible GQA configurations; CUTLASS requires Hq % Hkv == 0 (flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/dense/fmha_cutlass_fwd_sm100.cuh:174), so P varies batch/sequence while heads remain fixed"
+    },
+    {
+      "id": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "spec": {
+        "shape": [
+          4,
+          4096,
+          16,
+          4,
+          128
+        ],
+        "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+        "seqlen_k": 8192,
+        "kind": "dense_fwd",
+        "params": {
+          "causal": true
+        },
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 1,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "seqlen_k",
+          "base": 8192,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "non-persistent CUTLASS variable-length FMHA grid",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/dense/fmha_cutlass_fwd_sm100.cu:20-29",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "screen-ml2 S01/S02/S04/S05 timed out after TIMEOUT=1200s (timing.json repeat_rc=124; NCU stayed connected; no runner result); S03 completed only with grid64 (grid_small). No sampled full-grid shape completed, so dropped. Runner path: suites/flashmla/run.py:134-148; evidence: $A/rebuild/c450full/screen-ml2/collect.tsv and shards/*/out/cases/*/timing.json"
+    },
+    {
+      "id": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "spec": {
+        "shape": [
+          1,
+          731,
+          16,
+          16,
+          128
+        ],
+        "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+        "seqlen_k": 1536,
+        "kind": "dense_bwd",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "seqlen_k",
+          "base": 1536,
+          "min": 768,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Backward calls rebuild the forward graph per call. Screen-ml2 S05 had seqlen_k=512 < seqlen_q=731 and non-finite output; I is constrained to seqlen_k>=768 with q length pinned to the successful full-grid S01 shape. S02/S03 timed out after 1200s (timing.json repeat_rc=124); S01/S04 completed. The non-finite cause is not independently confirmed. (suites/flashmla/run.py:dense_bwd; screen-ml2/shards/*/out/cases/MLF-MLDENSE-BWD-S05/app_r0.log)"
+    },
+    {
+      "id": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "spec": {
+        "shape": [
+          4096,
+          64,
+          512,
+          8192,
+          512
+        ],
+        "shape_tag": "Sq4096_H64_KV8192_topk512",
+        "kind": "norm_rope",
+        "suite": "flashmla",
+        "mode": "full"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.4",
+          "base": 512,
+          "min": 128,
+          "max": 65536,
+          "step": 512
+        }
+      },
+      "grid": {
+        "formula": "s_q * CLUSTER_SIZE (2 CTAs per query)",
+        "evidence": "flashmla@0f11e17:csrc/cuda_kernels/sm100/prefill/sparse/fused_norm_rope_attn_rope_cast_fwd/core_attn/kernel.cuh:1665-1673",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical seeded inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*fwd_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "screen-ml2 S01/S04 timed out after TIMEOUT=1200s (timing.json repeat_rc=124; NCU stayed connected; no runner result); S02 completed at grid1324 and S03 at grid128. The non-monotonic results do not establish a reliable shape constraint; dropped rather than pinning to one case. Runner path: suites/flashmla/run.py:171-197; evidence: $A/rebuild/c450full/screen-ml2/collect.tsv and shards/*/out/cases/*/timing.json; lead 2026-10-24: reinstated \u2014 screen-ml3 measured 7/9 candidates in window (C01,C05-C10); C03/C04 timed out under NCU (1200 s), timeouts are recorded per case, not a family-wide failure"
+    },
+    {
+      "id": "mldense_fwd_varlen",
+      "stratum": "dense_fwd",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner builds only uniform cumulative lengths; imbalanced varlen is not implemented"
+    },
+    {
+      "id": "mlspf_h128_sink",
+      "stratum": "sparse_prefill_h128",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner does not build the learnable-sink prefill input/keyword path"
+    },
+    {
+      "id": "mldec_h64_split_fp4",
+      "stratum": "sparse_decode_h64",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner constructs FP8 KV only; FP4 KV input path is not implemented"
+    },
+    {
+      "id": "mldec_h64_nosplit_fp4",
+      "stratum": "sparse_decode_h64",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner constructs FP8 KV only; FP4 KV input path is not implemented"
+    },
+    {
+      "id": "mldec_h128_split_fp4",
+      "stratum": "sparse_decode_h128",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner constructs FP8 KV only; FP4 KV input path is not implemented"
+    },
+    {
+      "id": "mldec_h128_nosplit_fp4",
+      "stratum": "sparse_decode_h128",
+      "spec": {
+        "suite": "flashmla",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "current runner constructs FP8 KV only; FP4 KV input path is not implemented"
+    }
+  ]
+}

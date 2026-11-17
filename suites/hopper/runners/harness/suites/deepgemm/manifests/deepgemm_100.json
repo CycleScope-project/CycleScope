@@ -1,0 +1,4463 @@
+{
+  "schema_version": "hopper.delivery.cases.v1",
+  "suite": "deepgemm",
+  "name": "DeepGEMM Hopper 100-case mechanism-first set",
+  "architecture": "sm_90a",
+  "selected_count": 100,
+  "supported_gpu_profiles": [
+    "h20",
+    "h100",
+    "h200"
+  ],
+  "validated_gpu_profiles": [],
+  "delivery": {
+    "groups": 4,
+    "group_assignment": "delivery_index modulo 4",
+    "runner": "scripts/run_100.sh",
+    "runtime_manifest": "manifests/deepgemm_core_runtime_manifest.json",
+    "selection": "mechanism_first"
+  },
+  "api_semantic_counts": {
+    "bf16_dense_nn": 1,
+    "bf16_dense_nn_acc_bf16": 1,
+    "bf16_dense_nt": 1,
+    "bf16_dense_nt_acc_bf16": 1,
+    "bf16_dense_nt_acc_fp32": 1,
+    "bf16_dense_tn": 1,
+    "bf16_dense_tn_acc_fp32": 1,
+    "bf16_dense_tt": 1,
+    "bf16_dense_tt_acc_fp32": 1,
+    "bf16_einsum_bhd_hdr_bhr": 5,
+    "bf16_einsum_bhr_hdr_bhd": 6,
+    "bf16_einsum_bmk_bnk_mn": 5,
+    "bf16_kgroup_tn_contiguous": 6,
+    "bf16_mgroup_nn_contiguous": 2,
+    "bf16_mgroup_nt_contiguous": 2,
+    "bf16_mgroup_nt_contiguous_psum": 2,
+    "bf16_mgroup_nt_masked": 6,
+    "fp8_dense_nn": 1,
+    "fp8_dense_nt": 3,
+    "fp8_dense_nt_acc_fp32": 4,
+    "fp8_dense_nt_skip_head_mid": 3,
+    "fp8_dense_tn": 1,
+    "fp8_einsum_bhr_hdr_bhd": 4,
+    "fp8_kgroup_nt_contiguous": 6,
+    "fp8_layout_transpose_fp32": 1,
+    "fp8_mgroup_nt_contiguous": 6,
+    "fp8_mgroup_nt_contiguous_psum": 1,
+    "fp8_mgroup_nt_masked": 6,
+    "fp8_paged_mqa_metadata": 1,
+    "paged": 6,
+    "prefill_clean": 6,
+    "prefill_compressed": 2,
+    "tf32_hc_prenorm": 6
+  },
+  "composition": {
+    "attention": 14,
+    "core": 86
+  },
+  "constraints": {
+    "correctness_required_each_round": true,
+    "cycle_range_inclusive": [
+      100000,
+      5000000
+    ],
+    "cycle_range_role": "collection_statistics",
+    "independent_h100_rounds": 2,
+    "maximum_cv_percent_each_round": 3.0,
+    "maximum_round_drift_percent": 3.0,
+    "minimum_active_sm_count_each_round": "observed launch CTA/SM; no 128-SM fill requirement; no artificial SM cap",
+    "per_case_qualification_fields": null,
+    "recorded_samples_per_case": 9
+  },
+  "coverage": {
+    "scope": "single_gpu_hopper",
+    "selection": "mechanism_first",
+    "mechanism_counts": {
+      "bf16.dense.acc.bf16": 2,
+      "bf16.dense.acc.fp32": 3,
+      "bf16.dense.nn": 2,
+      "bf16.dense.nt": 3,
+      "bf16.dense.tn": 2,
+      "bf16.dense.tt": 2,
+      "bf16.einsum.bhd_hdr_bhr": 5,
+      "bf16.einsum.bhr_hdr_bhd": 6,
+      "bf16.einsum.bmk_bnk_mn": 5,
+      "bf16.kgroup.tn.contiguous": 6,
+      "bf16.mgroup.nn.contiguous": 2,
+      "bf16.mgroup.nt.contiguous": 4,
+      "bf16.mgroup.nt.masked": 6,
+      "bf16.mgroup.psum": 2,
+      "fp8.dense.acc.fp32": 4,
+      "fp8.dense.nn.wrapper": 1,
+      "fp8.dense.nt": 9,
+      "fp8.dense.nt.skip_head_mid": 3,
+      "fp8.dense.tn.wrapper": 1,
+      "fp8.einsum.bhr_hdr_bhd": 4,
+      "fp8.kgroup.nt.contiguous": 6,
+      "fp8.mgroup.nt.contiguous": 7,
+      "fp8.mgroup.nt.masked": 6,
+      "fp8.mgroup.psum": 1,
+      "fp8.scale.fp32.1d1d.transpose": 10,
+      "fp8.scale.fp32.1d2d.identity": 21,
+      "grouped.k.skew": 3,
+      "layout.transpose_fp32": 1,
+      "mqa.clean_logits": 6,
+      "mqa.compressed_window": 2,
+      "mqa.logits.paged": 6,
+      "mqa.logits.prefill": 8,
+      "mqa.paged.metadata": 1,
+      "sm90.bf16_bhd_hdr_bhr": 5,
+      "sm90.bf16_bhr_hdr_bhd": 6,
+      "sm90.bf16_gemm": 9,
+      "sm90.bf16_k_grouped_gemm": 6,
+      "sm90.bf16_m_grouped_gemm_masked": 6,
+      "sm90.bmn_bnk_mn_gemm": 5,
+      "sm90.fp8_bmm": 4,
+      "sm90.fp8_gemm_1d1d": 4,
+      "sm90.fp8_gemm_1d2d": 8,
+      "sm90.fp8_m_grouped_gemm_masked_1d2d": 6,
+      "sm90.fp8_mqa_logits": 8,
+      "sm90.fp8_paged_mqa_logits": 6,
+      "sm90.k_grouped_fp8_gemm_1d1d": 6,
+      "sm90.kgroup.tma_update.small_k": 1,
+      "sm90.m_grouped_bf16_gemm_contiguous": 6,
+      "sm90.m_grouped_fp8_gemm_contiguous_1d2d": 7,
+      "sm90.paged_mqa_logits_metadata": 1,
+      "sm90.tf32_hc_prenorm_gemm": 6,
+      "smxx.clean_logits": 6,
+      "smxx.layout.transpose_fp32": 1,
+      "tf32.hc.prenorm": 6
+    },
+    "notes": [
+      "independent smxx_layout transpose_fp32 is launched via public get_mn_major_tma_aligned_tensor on contiguous non-MN-major FP32; it is a marked timed entry after packager rebuild",
+      "independent sm90_paged_mqa_logits_metadata is launched via public get_paged_mqa_logits_metadata; paged logits cases still construct schedule_meta in prepare without timing that kernel and do not count as metadata coverage",
+      "fp8 nn/tn wrappers and SM90 1d2d gran_mn=128 identity scales do not launch transpose_fp32; 1d1d may call it as a helper when SF is contiguous, but that helper is not independently timed",
+      "pack_fp32_into_ue8m0 and UE8M0 GEMM scales are SM100-only on this revision and are not counted",
+      "fp8 k_grouped tn, k-group psum, FP4, and MegaMoE are SM100 or out of single-GPU Hopper GEMM scope",
+      "fp8 public nn/tn wrappers host-transpose into NT; they are not native SM90 MMA majors",
+      "topology validates observed CTA/SM marker semantics; occupancy below 128 is valid for small launches; no artificial SM cap",
+      "the 100k-5M cycle window is collection-level statistics, not a per-case pass/fail or exemption",
+      "MQA cases are logits scoring (prefill clean/compressed and paged), not full attention",
+      "reference_cycles/cycles_round*/cv/SASS on retained cases are prior collection history, not current qualification",
+      "k-group cluster 1 or 2 is the pinned upstream SM90 heuristic result; the marker packager does not force cluster 2"
+    ]
+  },
+  "jit_entry_coverage": {
+    "covered_full_gpu_entries": 19,
+    "excluded": null,
+    "note": "entry names for new cases are expected SM90 launches, not re-traced SASS; transpose_fp32 is the independent marked smxx_layout kernel; sm90_paged_mqa_logits_metadata is independently timed via public get_paged_mqa_logits_metadata",
+    "recognized_entries": 19,
+    "triggered_case_counts": {
+      "sm90_bf16_bhd_hdr_bhr": 5,
+      "sm90_bf16_bhr_hdr_bhd": 6,
+      "sm90_bf16_gemm": 9,
+      "sm90_bf16_k_grouped_gemm": 6,
+      "sm90_bf16_m_grouped_gemm_masked": 6,
+      "sm90_bmn_bnk_mn_gemm": 5,
+      "sm90_fp8_bmm": 4,
+      "sm90_fp8_gemm_1d1d": 4,
+      "sm90_fp8_gemm_1d2d": 8,
+      "sm90_fp8_m_grouped_gemm_masked_1d2d": 6,
+      "sm90_fp8_mqa_logits": 8,
+      "sm90_fp8_paged_mqa_logits": 6,
+      "sm90_k_grouped_fp8_gemm_1d1d": 6,
+      "sm90_m_grouped_bf16_gemm_contiguous": 6,
+      "sm90_m_grouped_fp8_gemm_contiguous_1d2d": 7,
+      "sm90_paged_mqa_logits_metadata": 1,
+      "sm90_tf32_hc_prenorm_gemm": 6,
+      "smxx_clean_logits": 6,
+      "transpose_fp32": 1
+    }
+  },
+  "metrics": {
+    "active_sm_count_min": 128,
+    "cycle_band_counts": {
+      "0": 16,
+      "1": 26,
+      "2": 35,
+      "3": 23
+    },
+    "cycle_max": 1461430.416495042,
+    "cycle_mean": 572863.2758637723,
+    "cycle_median": 483494.0602948186,
+    "cycle_min": 101395.68674375024,
+    "maximum_cv_percent": 1.93502504177887,
+    "maximum_round_drift_percent": 1.3350128215784112,
+    "median_round_drift_percent": 0.3103049118645767,
+    "note": "historical aggregates from the previous 100-case collection; not a current qualified conclusion"
+  },
+  "observed_core_sass_counts_by_source_module": {
+    "sm90_bf16_gemm": 38,
+    "sm90_bmk_bnk_mn": 6,
+    "sm90_fp8_gemm_1d1d": 10,
+    "sm90_fp8_gemm_1d2d": 23,
+    "sm90_fp8_mqa_logits": 14,
+    "sm90_tf32_hc_prenorm_gemm": 4,
+    "smxx_clean_logits": 2
+  },
+  "source_module_coverage": {
+    "covered": 8,
+    "modules": [
+      "sm90_bf16_gemm",
+      "sm90_fp8_gemm_1d2d",
+      "sm90_fp8_gemm_1d1d",
+      "sm90_bmk_bnk_mn",
+      "sm90_tf32_hc_prenorm_gemm",
+      "sm90_fp8_mqa_logits",
+      "smxx_clean_logits",
+      "smxx_layout"
+    ],
+    "total": 8
+  },
+  "unique_core_sass_signatures": 91,
+  "upstream": {
+    "name": "DeepGEMM",
+    "revision": "559d79fb6994a58b8a15b4b93bf13ccc16edf247",
+    "version": "2.6.1"
+  },
+  "cases": [
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_nn_s5",
+      "class_id": "bf16_dense_nn",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "9fe1a4fc31d7551bfb52f2d6e174ea330968ed806d439791cc675026367c40e0"
+      ],
+      "cv_percent_round1": 0.05888851822280694,
+      "cv_percent_round2": 0.14043435590376194,
+      "cycle_bin": 3,
+      "cycles_round1": 1082393.6391742595,
+      "cycles_round2": 1082848.645947993,
+      "delivery_group": 0,
+      "delivery_index": 0,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.nn",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "9fe1a4fc31d7551bfb52f2d6e174ea330968ed806d439791cc675026367c40e0"
+        ]
+      },
+      "reference_cycles": 1082621.1425611263,
+      "round_drift_percent": 0.04202825493109595,
+      "shape": {
+        "k": 8192,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_nn_acc_bf16_s5",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "5e4b02d3b416f6b01e969f1594eb3728b2f45dd03d7bf0ea1fd32b8d1203d2c4"
+      ],
+      "cv_percent_round1": 0.21708392357443346,
+      "cv_percent_round2": 0.15290897050793545,
+      "cycle_bin": 3,
+      "cycles_round1": 1097942.5541194945,
+      "cycles_round2": 1097389.563498758,
+      "delivery_group": 1,
+      "delivery_index": 1,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.acc.bf16",
+        "bf16.dense.nn",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "5e4b02d3b416f6b01e969f1594eb3728b2f45dd03d7bf0ea1fd32b8d1203d2c4"
+        ]
+      },
+      "reference_cycles": 1097666.0588091263,
+      "round_drift_percent": 0.05037876650175791,
+      "shape": {
+        "k": 8192,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_nt_s8",
+      "class_id": "bf16_dense_nt",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "871ed2156018801bc355c271ffe56d781122dd763989434db5842bdd07d90976"
+      ],
+      "cv_percent_round1": 0.12774113668169879,
+      "cv_percent_round2": 0.1281714046494743,
+      "cycle_bin": 3,
+      "cycles_round1": 1096714.3375938109,
+      "cycles_round2": 1097054.7644081179,
+      "delivery_group": 2,
+      "delivery_index": 2,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.nt",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "871ed2156018801bc355c271ffe56d781122dd763989434db5842bdd07d90976"
+        ]
+      },
+      "reference_cycles": 1096884.5510009644,
+      "round_drift_percent": 0.0310357925997167,
+      "shape": {
+        "k": 4096,
+        "m": 8192,
+        "n": 8192
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_nt_acc_bf16_s8",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "9b79726b8da34eed2e1294f165d2d5a67bb768f187ce0274e402b8d9a85bf3df"
+      ],
+      "cv_percent_round1": 0.23231889308850187,
+      "cv_percent_round2": 0.15381725065200053,
+      "cycle_bin": 3,
+      "cycles_round1": 1124970.8297111709,
+      "cycles_round2": 1126176.5716995257,
+      "delivery_group": 3,
+      "delivery_index": 3,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.acc.bf16",
+        "bf16.dense.nt",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "9b79726b8da34eed2e1294f165d2d5a67bb768f187ce0274e402b8d9a85bf3df"
+        ]
+      },
+      "reference_cycles": 1125573.7007053483,
+      "round_drift_percent": 0.10712243788205446,
+      "shape": {
+        "k": 4096,
+        "m": 8192,
+        "n": 8192
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_nt_acc_fp32_s6",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "83484d70783416042eff95bd9d5dd25dd8c9ccf42ec2ba405023e131988794cd"
+      ],
+      "cv_percent_round1": 0.42644201523984804,
+      "cv_percent_round2": 0.3888851015227472,
+      "cycle_bin": 3,
+      "cycles_round1": 1315216.783939702,
+      "cycles_round2": 1315179.552354011,
+      "delivery_group": 0,
+      "delivery_index": 4,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.acc.fp32",
+        "bf16.dense.nt",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "83484d70783416042eff95bd9d5dd25dd8c9ccf42ec2ba405023e131988794cd"
+        ]
+      },
+      "reference_cycles": 1315198.1681468566,
+      "round_drift_percent": 0.0028308726846422417,
+      "shape": {
+        "k": 8192,
+        "m": 8192,
+        "n": 4096
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_tn_s6",
+      "class_id": "bf16_dense_tn",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "c1c9a87e0bcb87827e2eba9acf2b700962f77f914f472aa0c40f6e811c16ca56"
+      ],
+      "cv_percent_round1": 0.06963070347827878,
+      "cv_percent_round2": 0.08161895725173476,
+      "cycle_bin": 3,
+      "cycles_round1": 1080182.3391176302,
+      "cycles_round2": 1080011.6353963807,
+      "delivery_group": 1,
+      "delivery_index": 5,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.tn",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "c1c9a87e0bcb87827e2eba9acf2b700962f77f914f472aa0c40f6e811c16ca56"
+        ]
+      },
+      "reference_cycles": 1080096.9872570054,
+      "round_drift_percent": 0.01580448082565179,
+      "shape": {
+        "k": 8192,
+        "m": 8192,
+        "n": 4096
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_tn_acc_fp32_s7",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "a3b9eb187eebdf7183f3b8cc6e7fbd97b848f24cca3a5f1cf7e79ee121da5364"
+      ],
+      "cv_percent_round1": 0.2696242324606636,
+      "cv_percent_round2": 0.24321318766978517,
+      "cycle_bin": 3,
+      "cycles_round1": 1462857.931368625,
+      "cycles_round2": 1460002.9016214588,
+      "delivery_group": 2,
+      "delivery_index": 6,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.acc.fp32",
+        "bf16.dense.tn",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "a3b9eb187eebdf7183f3b8cc6e7fbd97b848f24cca3a5f1cf7e79ee121da5364"
+        ]
+      },
+      "reference_cycles": 1461430.416495042,
+      "round_drift_percent": 0.1953585825874243,
+      "shape": {
+        "k": 4096,
+        "m": 4096,
+        "n": 16384
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_tt_s5",
+      "class_id": "bf16_dense_tt",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "16d68c95bc62f8397c22ed578281ae8a173fc220c43d0b0ea97379c7148aa63b"
+      ],
+      "cv_percent_round1": 0.08523323335354917,
+      "cv_percent_round2": 0.07771225085222082,
+      "cycle_bin": 3,
+      "cycles_round1": 1082562.3033927775,
+      "cycles_round2": 1082890.6739370339,
+      "delivery_group": 3,
+      "delivery_index": 7,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.tt",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "16d68c95bc62f8397c22ed578281ae8a173fc220c43d0b0ea97379c7148aa63b"
+        ]
+      },
+      "reference_cycles": 1082726.4886649055,
+      "round_drift_percent": 0.030328115890220678,
+      "shape": {
+        "k": 8192,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_dense_tt_acc_fp32_s8",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "2d0824758c0d28b9bfdcd1968e2a5fb3a78eae8fcf26343455fd336033550135"
+      ],
+      "cv_percent_round1": 0.4042927281093788,
+      "cv_percent_round2": 0.3680493012883214,
+      "cycle_bin": 3,
+      "cycles_round1": 1453999.5376684982,
+      "cycles_round2": 1453078.0793433653,
+      "delivery_group": 0,
+      "delivery_index": 8,
+      "implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.dense.acc.fp32",
+        "bf16.dense.tt",
+        "sm90.bf16_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "2d0824758c0d28b9bfdcd1968e2a5fb3a78eae8fcf26343455fd336033550135"
+        ]
+      },
+      "reference_cycles": 1453538.8085059319,
+      "round_drift_percent": 0.06339413297675292,
+      "shape": {
+        "k": 4096,
+        "m": 8192,
+        "n": 8192
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nn_contiguous_s7",
+      "class_id": "bf16_mgroup_nn_contiguous",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "e64706d62019b378e7d0d085c2369836a994996b3b03682fc3c7dc9e5929b4d5"
+      ],
+      "cv_percent_round1": 0.1420880830068952,
+      "cv_percent_round2": 0.23626592375996291,
+      "cycle_bin": 2,
+      "cycles_round1": 642809.995615021,
+      "cycles_round2": 644217.6969430184,
+      "delivery_group": 1,
+      "delivery_index": 9,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nn.contiguous",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "e64706d62019b378e7d0d085c2369836a994996b3b03682fc3c7dc9e5929b4d5"
+        ]
+      },
+      "reference_cycles": 643513.8462790197,
+      "round_drift_percent": 0.21875229820416545,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 4096,
+        "num_groups": 8,
+        "tokens_per_group": 1024
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_contiguous_s5",
+      "class_id": "bf16_mgroup_nt_contiguous",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "112e40a3060f59bee2bc99f32a3b7957dbae14ec182abe89091dec6acce9cc21"
+      ],
+      "cv_percent_round1": 0.5341404432623635,
+      "cv_percent_round2": 0.4878722811211985,
+      "cycle_bin": 2,
+      "cycles_round1": 467621.7180493274,
+      "cycles_round2": 467838.40211385733,
+      "delivery_group": 2,
+      "delivery_index": 10,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.contiguous",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "112e40a3060f59bee2bc99f32a3b7957dbae14ec182abe89091dec6acce9cc21"
+        ]
+      },
+      "reference_cycles": 467730.06008159235,
+      "round_drift_percent": 0.046326734803436305,
+      "shape": {
+        "alignment": 128,
+        "k": 3072,
+        "n": 7168,
+        "num_groups": 8,
+        "tokens_per_group": 512
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_contiguous_psum_s7",
+      "class_id": "bf16_mgroup_nt_contiguous_psum",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "9bd409ca9f91c72d813663ce10a5b7d25d3bf3d92246912fcac53b2cfef9ebf0"
+      ],
+      "cv_percent_round1": 0.1936956166815974,
+      "cv_percent_round2": 0.2047090045889884,
+      "cycle_bin": 2,
+      "cycles_round1": 632233.6151225043,
+      "cycles_round2": 634052.3797469059,
+      "delivery_group": 3,
+      "delivery_index": 11,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.contiguous",
+        "bf16.mgroup.psum",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "9bd409ca9f91c72d813663ce10a5b7d25d3bf3d92246912fcac53b2cfef9ebf0"
+        ]
+      },
+      "reference_cycles": 633142.997434705,
+      "round_drift_percent": 0.28725969200806706,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 4096,
+        "num_groups": 8,
+        "tokens_per_group": 1024
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_contiguous_s8",
+      "class_id": "bf16_mgroup_nt_contiguous",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "582cf3a51aad31966e3c552a1eedbde5b7fa465e44090a2d936f158baadec4b6"
+      ],
+      "cv_percent_round1": 0.14128058136024568,
+      "cv_percent_round2": 0.2063937173154825,
+      "cycle_bin": 3,
+      "cycles_round1": 1039775.0228455592,
+      "cycles_round2": 1045163.6955995384,
+      "delivery_group": 0,
+      "delivery_index": 12,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.contiguous",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "582cf3a51aad31966e3c552a1eedbde5b7fa465e44090a2d936f158baadec4b6"
+        ]
+      },
+      "reference_cycles": 1042469.3592225488,
+      "round_drift_percent": 0.5169142580840913,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 6144,
+        "num_groups": 16,
+        "tokens_per_group": 512
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_contiguous_psum_s4",
+      "class_id": "bf16_mgroup_nt_contiguous_psum",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "2aed0b3a54649bc082f3688a16012d4e71f715bed05bcf55aabaaaee1b430cce"
+      ],
+      "cv_percent_round1": 0.3321462784110231,
+      "cv_percent_round2": 0.38900742494432783,
+      "cycle_bin": 1,
+      "cycles_round1": 340537.72046640073,
+      "cycles_round2": 342390.56673826324,
+      "delivery_group": 1,
+      "delivery_index": 13,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.contiguous",
+        "bf16.mgroup.psum",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "2aed0b3a54649bc082f3688a16012d4e71f715bed05bcf55aabaaaee1b430cce"
+        ]
+      },
+      "reference_cycles": 341464.143602332,
+      "round_drift_percent": 0.5426181069308195,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 4096,
+        "num_groups": 4,
+        "tokens_per_group": 1024
+      },
+      "shape_index": 3,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nn_contiguous_s8",
+      "class_id": "bf16_mgroup_nn_contiguous",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "58830227dd32f519fccd64e7e2d7f63983ef772cc317098d45c1b6e739a0bdf4"
+      ],
+      "cv_percent_round1": 0.21277000722204564,
+      "cv_percent_round2": 0.36050916764234664,
+      "cycle_bin": 3,
+      "cycles_round1": 1050026.564243143,
+      "cycles_round2": 1042333.7076368612,
+      "delivery_group": 2,
+      "delivery_index": 14,
+      "implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "implementation_entry": "sm90_m_grouped_bf16_gemm_contiguous",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nn.contiguous",
+        "sm90.m_grouped_bf16_gemm_contiguous"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "58830227dd32f519fccd64e7e2d7f63983ef772cc317098d45c1b6e739a0bdf4"
+        ]
+      },
+      "reference_cycles": 1046180.135940002,
+      "round_drift_percent": 0.735328108611966,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 6144,
+        "num_groups": 16,
+        "tokens_per_group": 512
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s7",
+      "class_id": "bf16_mgroup_nt_masked",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "474b25e7b5222db0965a0a087bac984917f89213a59ec95dd9bfb29591fd4056"
+      ],
+      "cv_percent_round1": 0.30681331740843815,
+      "cv_percent_round2": 0.22640180304489485,
+      "cycle_bin": 2,
+      "cycles_round1": 631133.542379816,
+      "cycles_round2": 632059.9803744605,
+      "delivery_group": 3,
+      "delivery_index": 15,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "474b25e7b5222db0965a0a087bac984917f89213a59ec95dd9bfb29591fd4056"
+        ]
+      },
+      "reference_cycles": 631596.7613771382,
+      "round_drift_percent": 0.1466818785809635,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 1024,
+        "k": 4096,
+        "max_m": 2048,
+        "n": 4096,
+        "num_groups": 8
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s4",
+      "class_id": "bf16_mgroup_nt_masked",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "f930a60b07e61b426d1d038256419c95d45f2902dc5104baef9a2d7bf0973953"
+      ],
+      "cv_percent_round1": 0.34619154942913394,
+      "cv_percent_round2": 0.47453471333416847,
+      "cycle_bin": 1,
+      "cycles_round1": 350663.48673612624,
+      "cycles_round2": 351505.7222226417,
+      "delivery_group": 0,
+      "delivery_index": 16,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "f930a60b07e61b426d1d038256419c95d45f2902dc5104baef9a2d7bf0973953"
+        ]
+      },
+      "reference_cycles": 351084.60447938397,
+      "round_drift_percent": 0.2398953060799638,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 1024,
+        "k": 4096,
+        "max_m": 2048,
+        "n": 4096,
+        "num_groups": 4
+      },
+      "shape_index": 3,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s8",
+      "class_id": "bf16_mgroup_nt_masked",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "fedb6bd3dace9dea0e8e9b407599d2af92afa66db086caa08675769202b66483"
+      ],
+      "cv_percent_round1": 0.25689159763043956,
+      "cv_percent_round2": 0.27316529506482545,
+      "cycle_bin": 3,
+      "cycles_round1": 1006675.4466397368,
+      "cycles_round2": 1011694.0600613179,
+      "delivery_group": 1,
+      "delivery_index": 17,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "fedb6bd3dace9dea0e8e9b407599d2af92afa66db086caa08675769202b66483"
+        ]
+      },
+      "reference_cycles": 1009184.7533505273,
+      "round_drift_percent": 0.4972938210688517,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 512,
+        "k": 4096,
+        "max_m": 1024,
+        "n": 6144,
+        "num_groups": 16
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s1",
+      "class_id": "bf16_mgroup_nt_masked",
+      "core_sass_signatures": [
+        "6d6f00d83980cbbfe37d2c4bc2246ac170b94d0a4195e45e2595904ff0762197"
+      ],
+      "cv_percent_round1": 0.6824829878316394,
+      "cv_percent_round2": 0.6197562234205952,
+      "cycles_round1": 132213.36206082941,
+      "cycles_round2": 131303.81711939356,
+      "delivery_group": 2,
+      "delivery_index": 18,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "6d6f00d83980cbbfe37d2c4bc2246ac170b94d0a4195e45e2595904ff0762197"
+        ]
+      },
+      "reference_cycles": 131758.5895901115,
+      "round_drift_percent": 0.6903116861415771,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 512,
+        "k": 2048,
+        "max_m": 1024,
+        "n": 4096,
+        "num_groups": 4
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s6",
+      "class_id": "bf16_mgroup_nt_masked",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "f10fbf156990d027878be0cd3e9872f76ebd6ba31336856672909e669415e7c3"
+      ],
+      "cv_percent_round1": 0.42469344556970645,
+      "cv_percent_round2": 0.44145042044767574,
+      "cycle_bin": 2,
+      "cycles_round1": 695340.6235051643,
+      "cycles_round2": 696395.9694740713,
+      "delivery_group": 3,
+      "delivery_index": 19,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "f10fbf156990d027878be0cd3e9872f76ebd6ba31336856672909e669415e7c3"
+        ]
+      },
+      "reference_cycles": 695868.2964896178,
+      "round_drift_percent": 0.15165886622954464,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 256,
+        "k": 7168,
+        "max_m": 512,
+        "n": 4096,
+        "num_groups": 16
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_mgroup_nt_masked_s3",
+      "class_id": "bf16_mgroup_nt_masked",
+      "core_sass_signatures": [
+        "932970aee6b34d4d203102a710db62823a92c7ffec6ca639fe3af08f219a1faf"
+      ],
+      "cv_percent_round1": 0.5146746706807456,
+      "cv_percent_round2": 0.9524567248380088,
+      "cycles_round1": 349623.388583675,
+      "cycles_round2": 347362.88645262335,
+      "delivery_group": 0,
+      "delivery_index": 20,
+      "implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "implementation_entry": "sm90_bf16_m_grouped_gemm_masked",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.mgroup.nt.masked",
+        "sm90.bf16_m_grouped_gemm_masked"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "932970aee6b34d4d203102a710db62823a92c7ffec6ca639fe3af08f219a1faf"
+        ]
+      },
+      "reference_cycles": 348493.1375181492,
+      "round_drift_percent": 0.648650400162887,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 128,
+        "k": 7168,
+        "max_m": 256,
+        "n": 2048,
+        "num_groups": 16
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_kgroup_tn_contiguous_s3",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "core_sass_signatures": [
+        "ea2c5e6ef5a1c78551be55ee3e3580865c40a0e6b1f3b6dd819364bca440cd9d"
+      ],
+      "cv_percent_round1": 1.1842048230422466,
+      "cv_percent_round2": 0.7837846776881942,
+      "cycles_round1": 115928.78231377159,
+      "cycles_round2": 115939.21536876663,
+      "delivery_group": 1,
+      "delivery_index": 21,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "ea2c5e6ef5a1c78551be55ee3e3580865c40a0e6b1f3b6dd819364bca440cd9d"
+        ]
+      },
+      "reference_cycles": 115933.99884126912,
+      "round_drift_percent": 0.008999133213134081,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 512,
+        "n": 512,
+        "num_groups": 16
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_kgroup_tn_contiguous_s6",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "f8a1f2c08c4097fd40da313c7c4e10fc3b486cf1f9d3c77e0ab593d265a37bc3"
+      ],
+      "cv_percent_round1": 0.6529257449961536,
+      "cv_percent_round2": 0.7356966601181795,
+      "cycle_bin": 1,
+      "cycles_round1": 376563.8326653307,
+      "cycles_round2": 374589.8538825588,
+      "delivery_group": 2,
+      "delivery_index": 22,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "f8a1f2c08c4097fd40da313c7c4e10fc3b486cf1f9d3c77e0ab593d265a37bc3"
+        ]
+      },
+      "reference_cycles": 375576.84327394475,
+      "round_drift_percent": 0.5255858602901241,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 512,
+        "n": 1024,
+        "num_groups": 16
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_kgroup_tn_contiguous_s7",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "c73c8277dd0b545382788e40bdeb147efedabf38f71758dcf68c043f5fec9383"
+      ],
+      "cv_percent_round1": 1.3265386679649689,
+      "cv_percent_round2": 1.1658158179905307,
+      "cycle_bin": 2,
+      "cycles_round1": 414950.94391900895,
+      "cycles_round2": 415097.3339516983,
+      "delivery_group": 3,
+      "delivery_index": 23,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "c73c8277dd0b545382788e40bdeb147efedabf38f71758dcf68c043f5fec9383"
+        ]
+      },
+      "reference_cycles": 415024.1389353536,
+      "round_drift_percent": 0.035272654999033835,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 2048,
+        "n": 1024,
+        "num_groups": 8
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_kgroup_tn_contiguous_s5",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "7696432ab3d258b0a064f1033e2a1d1b98e71de05b9407aa6e0ab59cb638e7fc"
+      ],
+      "cv_percent_round1": 1.069015669617969,
+      "cv_percent_round2": 1.0897900448284137,
+      "cycle_bin": 1,
+      "cycles_round1": 208459.78860707392,
+      "cycles_round2": 209835.64007772427,
+      "delivery_group": 0,
+      "delivery_index": 24,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "7696432ab3d258b0a064f1033e2a1d1b98e71de05b9407aa6e0ab59cb638e7fc"
+        ]
+      },
+      "reference_cycles": 209147.7143423991,
+      "round_drift_percent": 0.657837201317878,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 4096,
+        "m": 1024,
+        "n": 1024,
+        "num_groups": 8
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_skew_s1",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 25,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "grouped.k.skew",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "ks": [
+          2048,
+          4096,
+          6144,
+          8192
+        ],
+        "m": 512,
+        "n": 1024,
+        "num_groups": 4
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_kgroup_tn_contiguous_s8",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "3345e0d842c45658eb94f758a0bdf15fbcded38f1ac4abbea932f001cb878cca"
+      ],
+      "cv_percent_round1": 1.1602959233624346,
+      "cv_percent_round2": 1.1963132185965009,
+      "cycle_bin": 2,
+      "cycles_round1": 745673.8537539322,
+      "cycles_round2": 736945.8161087632,
+      "delivery_group": 2,
+      "delivery_index": 26,
+      "implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "implementation_entry": "sm90_bf16_k_grouped_gemm",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.kgroup.tn.contiguous",
+        "sm90.bf16_k_grouped_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "3345e0d842c45658eb94f758a0bdf15fbcded38f1ac4abbea932f001cb878cca"
+        ]
+      },
+      "reference_cycles": 741309.8349313478,
+      "round_drift_percent": 1.177380527533032,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 1024,
+        "n": 1024,
+        "num_groups": 16
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s12",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "defe8e208dcd2087c8b14ccad6319fb6c154030fc01efd6536a7ae910ef6bc08"
+      ],
+      "cv_percent_round1": 0.8260307133507564,
+      "cv_percent_round2": 0.8404167371783215,
+      "cycles_round1": 458106.8301699424,
+      "cycles_round2": 459648.15379814483,
+      "delivery_group": 3,
+      "delivery_index": 27,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "defe8e208dcd2087c8b14ccad6319fb6c154030fc01efd6536a7ae910ef6bc08"
+        ]
+      },
+      "reference_cycles": 458877.4919840436,
+      "round_drift_percent": 0.33589000444066797,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 1024,
+        "d": 256,
+        "h": 128,
+        "r": 2048
+      },
+      "shape_index": 11,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s7",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "7eeea597cf7bbd441f9b95718011d05c49b5ed3feaad15258c64bb3e7eed5113"
+      ],
+      "cv_percent_round1": 1.2554367908006858,
+      "cv_percent_round2": 0.944089493038949,
+      "cycle_bin": 0,
+      "cycles_round1": 111271.66941773047,
+      "cycles_round2": 112150.94064407893,
+      "delivery_group": 0,
+      "delivery_index": 28,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "7eeea597cf7bbd441f9b95718011d05c49b5ed3feaad15258c64bb3e7eed5113"
+        ]
+      },
+      "reference_cycles": 111711.30503090471,
+      "round_drift_percent": 0.7870924308915813,
+      "shape": {
+        "b": 1024,
+        "d": 128,
+        "h": 64,
+        "r": 1024
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s8",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "b7614854324392ea2a5aabf74216554032be37538515b6358f7db25ff19e482e"
+      ],
+      "cv_percent_round1": 1.2988139215620795,
+      "cv_percent_round2": 1.93502504177887,
+      "cycle_bin": 1,
+      "cycles_round1": 207183.71656689342,
+      "cycles_round2": 206329.06648882374,
+      "delivery_group": 1,
+      "delivery_index": 29,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "b7614854324392ea2a5aabf74216554032be37538515b6358f7db25ff19e482e"
+        ]
+      },
+      "reference_cycles": 206756.39152785856,
+      "round_drift_percent": 0.4133608986663535,
+      "shape": {
+        "b": 1024,
+        "d": 128,
+        "h": 128,
+        "r": 1024
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s15",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "1858f97d989f659f22f80e580d973ffe1dbe7462679140b50c2b3ed8e0249893"
+      ],
+      "cv_percent_round1": 1.0232637965842344,
+      "cv_percent_round2": 0.8351829826087391,
+      "cycles_round1": 430061.0950798362,
+      "cycles_round2": 431357.7492643067,
+      "delivery_group": 2,
+      "delivery_index": 30,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "1858f97d989f659f22f80e580d973ffe1dbe7462679140b50c2b3ed8e0249893"
+        ]
+      },
+      "reference_cycles": 430709.4221720714,
+      "round_drift_percent": 0.301050805420378,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 4096,
+        "d": 256,
+        "h": 64,
+        "r": 1024
+      },
+      "shape_index": 14,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s13",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "d82d5c341c7fb93dc229e267e440d3227bb9e6fa86c58280bb3919a00ed16672"
+      ],
+      "cv_percent_round1": 0.7167305446445116,
+      "cv_percent_round2": 1.0926488211397591,
+      "cycles_round1": 426960.20656837657,
+      "cycles_round2": 429255.2807021167,
+      "delivery_group": 3,
+      "delivery_index": 31,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "d82d5c341c7fb93dc229e267e440d3227bb9e6fa86c58280bb3919a00ed16672"
+        ]
+      },
+      "reference_cycles": 428107.74363524665,
+      "round_drift_percent": 0.5360973184581284,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 2048,
+        "d": 256,
+        "h": 64,
+        "r": 2048
+      },
+      "shape_index": 12,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s17",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "6f08a45ec07e35b0321090ed60c6f7ac7804259b2bbe6122d0b703dfda6437a5"
+      ],
+      "cv_percent_round1": 0.7835287368885174,
+      "cv_percent_round2": 0.7531565224386247,
+      "cycles_round1": 788276.9267477504,
+      "cycles_round2": 795577.1235167811,
+      "delivery_group": 0,
+      "delivery_index": 32,
+      "implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "implementation_entry": "sm90_bf16_bhr_hdr_bhd",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhr_hdr_bhd",
+        "sm90.bf16_bhr_hdr_bhd"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "6f08a45ec07e35b0321090ed60c6f7ac7804259b2bbe6122d0b703dfda6437a5"
+        ]
+      },
+      "reference_cycles": 791927.0251322658,
+      "round_drift_percent": 0.9218269534129744,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 2048,
+        "d": 128,
+        "h": 256,
+        "r": 1024
+      },
+      "shape_index": 16,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s20",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "core_sass_signatures": [
+        "23e47e5585c2ee881076f16c5e83048ea5fd3d514bca720840206d7c27a1b522"
+      ],
+      "cv_percent_round1": 0.5580043943672143,
+      "cv_percent_round2": 0.6425998843602756,
+      "cycles_round1": 987435.2471440126,
+      "cycles_round2": 977994.2981019152,
+      "delivery_group": 1,
+      "delivery_index": 33,
+      "implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "implementation_entry": "sm90_bf16_bhd_hdr_bhr",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhd_hdr_bhr",
+        "sm90.bf16_bhd_hdr_bhr"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "23e47e5585c2ee881076f16c5e83048ea5fd3d514bca720840206d7c27a1b522"
+        ]
+      },
+      "reference_cycles": 982714.7726229639,
+      "round_drift_percent": 0.9607008366118885,
+      "selection_source": "bhd_retry",
+      "shape": {
+        "b": 4096,
+        "d": 128,
+        "h": 128,
+        "r": 1024
+      },
+      "shape_index": 19,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s12",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "core_sass_signatures": [
+        "617d8ddda4c491a6b979364eda14344eee817db5dd17a2760773a22aaa38721e"
+      ],
+      "cv_percent_round1": 1.5433492600663457,
+      "cv_percent_round2": 1.4453551361832657,
+      "cycles_round1": 558287.1239669422,
+      "cycles_round2": 557262.0702904016,
+      "delivery_group": 2,
+      "delivery_index": 34,
+      "implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "implementation_entry": "sm90_bf16_bhd_hdr_bhr",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhd_hdr_bhr",
+        "sm90.bf16_bhd_hdr_bhr"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "617d8ddda4c491a6b979364eda14344eee817db5dd17a2760773a22aaa38721e"
+        ]
+      },
+      "reference_cycles": 557774.5971286718,
+      "round_drift_percent": 0.18377561147772148,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 1024,
+        "d": 256,
+        "h": 128,
+        "r": 2048
+      },
+      "shape_index": 11,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s19",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "core_sass_signatures": [
+        "6c1057e318d3ecb9c825720ee69e7b37651124791e2d93e9ac7023b1dbbfc6c0"
+      ],
+      "cv_percent_round1": 1.8053967604504875,
+      "cv_percent_round2": 0.9778727379653687,
+      "cycles_round1": 282815.4435517096,
+      "cycles_round2": 283734.0577858477,
+      "delivery_group": 3,
+      "delivery_index": 35,
+      "implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "implementation_entry": "sm90_bf16_bhd_hdr_bhr",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhd_hdr_bhr",
+        "sm90.bf16_bhd_hdr_bhr"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "6c1057e318d3ecb9c825720ee69e7b37651124791e2d93e9ac7023b1dbbfc6c0"
+        ]
+      },
+      "reference_cycles": 283274.75066877867,
+      "round_drift_percent": 0.32428383820632245,
+      "selection_source": "bhd_retry",
+      "shape": {
+        "b": 2048,
+        "d": 256,
+        "h": 128,
+        "r": 512
+      },
+      "shape_index": 18,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s16",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "core_sass_signatures": [
+        "8d19cfb3a67472cb78845a0d16d6e6af818a06966303cc7d00e7aaef61632c36"
+      ],
+      "cv_percent_round1": 1.4173318774980408,
+      "cv_percent_round2": 1.053137259606968,
+      "cycles_round1": 989787.0142292316,
+      "cycles_round2": 991634.4900729874,
+      "delivery_group": 0,
+      "delivery_index": 36,
+      "implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "implementation_entry": "sm90_bf16_bhd_hdr_bhr",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhd_hdr_bhr",
+        "sm90.bf16_bhd_hdr_bhr"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "8d19cfb3a67472cb78845a0d16d6e6af818a06966303cc7d00e7aaef61632c36"
+        ]
+      },
+      "reference_cycles": 990710.7521511095,
+      "round_drift_percent": 0.18647984184529898,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 1024,
+        "d": 128,
+        "h": 256,
+        "r": 2048
+      },
+      "shape_index": 15,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s21",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "core_sass_signatures": [
+        "d74984a17eb8bdfdda653f171ec6302b2a89c190de31b7c1cee1d45cbdc2bbca"
+      ],
+      "cv_percent_round1": 1.4006374685485043,
+      "cv_percent_round2": 1.0729428989924015,
+      "cycles_round1": 407262.9595406235,
+      "cycles_round2": 410214.9979843631,
+      "delivery_group": 1,
+      "delivery_index": 37,
+      "implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "implementation_entry": "sm90_bf16_bhd_hdr_bhr",
+      "implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bhd_hdr_bhr",
+        "sm90.bf16_bhd_hdr_bhr"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bf16_gemm": [
+          "d74984a17eb8bdfdda653f171ec6302b2a89c190de31b7c1cee1d45cbdc2bbca"
+        ]
+      },
+      "reference_cycles": 408738.9787624933,
+      "round_drift_percent": 0.7222307137619456,
+      "selection_source": "bhd_retry",
+      "shape": {
+        "b": 1024,
+        "d": 512,
+        "h": 128,
+        "r": 1024
+      },
+      "shape_index": 20,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_s6",
+      "class_id": "fp8_dense_nt",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "60a6c5e4fadaf79f13050d0cc38b98d7797587426514f9d9c1563d6935b14539"
+      ],
+      "cv_percent_round1": 0.16132813768039317,
+      "cv_percent_round2": 0.13594304634997345,
+      "cycle_bin": 2,
+      "cycles_round1": 726978.5326916464,
+      "cycles_round2": 726775.7078728891,
+      "delivery_group": 2,
+      "delivery_index": 38,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "60a6c5e4fadaf79f13050d0cc38b98d7797587426514f9d9c1563d6935b14539"
+        ]
+      },
+      "reference_cycles": 726877.1202822677,
+      "round_drift_percent": 0.027903591005654906,
+      "shape": {
+        "k": 8192,
+        "m": 8192,
+        "n": 4096
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_skip_head_mid_s3",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "b55e18b0799d5061a6fa958c72fae378cd5c6becc30567a9ed24d37ba92690c5"
+      ],
+      "cv_percent_round1": 0.266746238036929,
+      "cv_percent_round2": 0.10137221682773379,
+      "cycle_bin": 0,
+      "cycles_round1": 189834.3870506304,
+      "cycles_round2": 189811.90840547334,
+      "delivery_group": 3,
+      "delivery_index": 39,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt.skip_head_mid",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "b55e18b0799d5061a6fa958c72fae378cd5c6becc30567a9ed24d37ba92690c5"
+        ]
+      },
+      "reference_cycles": 189823.14772805187,
+      "round_drift_percent": 0.011841888318738008,
+      "shape": {
+        "k": 4096,
+        "m": 4096,
+        "n": 4096
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_skip_head_mid_s6",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "a138f0616a0e43c35d85dd52b0d4a85564991d5660be484320bbf9e98e04aa6f"
+      ],
+      "cv_percent_round1": 0.3332086959991226,
+      "cv_percent_round2": 0.4637083775906705,
+      "cycle_bin": 1,
+      "cycles_round1": 389777.59630309016,
+      "cycles_round2": 388534.01383272355,
+      "delivery_group": 0,
+      "delivery_index": 40,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt.skip_head_mid",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "a138f0616a0e43c35d85dd52b0d4a85564991d5660be484320bbf9e98e04aa6f"
+        ]
+      },
+      "reference_cycles": 389155.80506790685,
+      "round_drift_percent": 0.3195590183087754,
+      "shape": {
+        "k": 2048,
+        "m": 4096,
+        "n": 16384
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_s5",
+      "class_id": "fp8_dense_nt",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "d1fe5484ebc0fcacf64214562359b2dd4d4f3628737637f46b7f051695331d47"
+      ],
+      "cv_percent_round1": 0.2938635228570303,
+      "cv_percent_round2": 0.24082479104143317,
+      "cycle_bin": 2,
+      "cycles_round1": 726140.3192170515,
+      "cycles_round2": 725158.1166810781,
+      "delivery_group": 1,
+      "delivery_index": 41,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "d1fe5484ebc0fcacf64214562359b2dd4d4f3628737637f46b7f051695331d47"
+        ]
+      },
+      "reference_cycles": 725649.2179490648,
+      "round_drift_percent": 0.13535500510142348,
+      "shape": {
+        "k": 8192,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_s3",
+      "class_id": "fp8_dense_nt",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "c81165724e874932d41c0cba1977eaf99fec17dca63a3d107e0e059a5a43d410"
+      ],
+      "cv_percent_round1": 0.4338360551012161,
+      "cv_percent_round2": 0.4458283876087433,
+      "cycle_bin": 0,
+      "cycles_round1": 196753.23050044247,
+      "cycles_round2": 196352.56094484325,
+      "delivery_group": 2,
+      "delivery_index": 42,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "c81165724e874932d41c0cba1977eaf99fec17dca63a3d107e0e059a5a43d410"
+        ]
+      },
+      "reference_cycles": 196552.89572264286,
+      "round_drift_percent": 0.20384820794734398,
+      "shape": {
+        "k": 2048,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_skip_head_mid_s7",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "d3b5cd3b9a610363f02ddf3f032b761fe2ee0009c173d1681bc112552ef6f756"
+      ],
+      "cv_percent_round1": 0.43377333863496165,
+      "cv_percent_round2": 0.2506881033385885,
+      "cycle_bin": 2,
+      "cycles_round1": 743978.7983106651,
+      "cycles_round2": 741410.3906291794,
+      "delivery_group": 3,
+      "delivery_index": 43,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.nt.skip_head_mid",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "d3b5cd3b9a610363f02ddf3f032b761fe2ee0009c173d1681bc112552ef6f756"
+        ]
+      },
+      "reference_cycles": 742694.5944699222,
+      "round_drift_percent": 0.3458228591684807,
+      "shape": {
+        "k": 4096,
+        "m": 4096,
+        "n": 16384
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s3",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "core_sass_signatures": [
+        "5b2c88e77cbd1fa59d44e6d76b22055951298927bdb64ec13842a36ce785e76e"
+      ],
+      "cv_percent_round1": 1.1053360819046645,
+      "cv_percent_round2": 0.939275803254847,
+      "cycles_round1": 205015.093443976,
+      "cycles_round2": 204759.11273764248,
+      "delivery_group": 0,
+      "delivery_index": 44,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "5b2c88e77cbd1fa59d44e6d76b22055951298927bdb64ec13842a36ce785e76e"
+        ]
+      },
+      "reference_cycles": 204887.10309080925,
+      "round_drift_percent": 0.12493744236309894,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 2048,
+        "num_groups": 16,
+        "tokens_per_group": 128
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s6",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "core_sass_signatures": [
+        "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+      ],
+      "cv_percent_round1": 0.8723081114457317,
+      "cv_percent_round2": 0.392948727260779,
+      "cycles_round1": 488521.7227014941,
+      "cycles_round2": 486378.84902517276,
+      "delivery_group": 1,
+      "delivery_index": 45,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+        ]
+      },
+      "reference_cycles": 487450.28586333344,
+      "round_drift_percent": 0.43960866132759857,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 4096,
+        "num_groups": 16,
+        "tokens_per_group": 256
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s8",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "5bef673d5b10d1fd452acb42bf95a8791303e03e712e32b8c1e98b95197ed916"
+      ],
+      "cv_percent_round1": 0.765348585460391,
+      "cv_percent_round2": 0.7701931276512199,
+      "cycle_bin": 3,
+      "cycles_round1": 1136640.4440326495,
+      "cycles_round2": 1142913.6462532263,
+      "delivery_group": 2,
+      "delivery_index": 46,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "5bef673d5b10d1fd452acb42bf95a8791303e03e712e32b8c1e98b95197ed916"
+        ]
+      },
+      "reference_cycles": 1139777.045142938,
+      "round_drift_percent": 0.5503885384698286,
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 6144,
+        "num_groups": 16,
+        "tokens_per_group": 512
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s1",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "core_sass_signatures": [
+        "02035cda63660c86b82f4a5b3ff1ac9424516544a4053daa936881bf2b3fecfd"
+      ],
+      "cv_percent_round1": 1.133414277860226,
+      "cv_percent_round2": 1.0091053305895108,
+      "cycles_round1": 112400.72107528927,
+      "cycles_round2": 111965.31226729492,
+      "delivery_group": 3,
+      "delivery_index": 47,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "02035cda63660c86b82f4a5b3ff1ac9424516544a4053daa936881bf2b3fecfd"
+        ]
+      },
+      "reference_cycles": 112183.0166712921,
+      "round_drift_percent": 0.38812364020316886,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 4096,
+        "num_groups": 4,
+        "tokens_per_group": 512
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s5",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "533b236fdc088f5e809591f8564a5625fa9c4046a01edba5f8237dc5bc8bfb08"
+      ],
+      "cv_percent_round1": 0.7487307203157771,
+      "cv_percent_round2": 0.9253711372393632,
+      "cycle_bin": 1,
+      "cycles_round1": 360315.9276437848,
+      "cycles_round2": 362381.4375780041,
+      "delivery_group": 0,
+      "delivery_index": 48,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "533b236fdc088f5e809591f8564a5625fa9c4046a01edba5f8237dc5bc8bfb08"
+        ]
+      },
+      "reference_cycles": 361348.68261089444,
+      "round_drift_percent": 0.5716113088596674,
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 7168,
+        "num_groups": 8,
+        "tokens_per_group": 512
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_contiguous_s7",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+      ],
+      "cv_percent_round1": 1.1628376931244646,
+      "cv_percent_round2": 1.117720926846467,
+      "cycle_bin": 2,
+      "cycles_round1": 733142.3933176955,
+      "cycles_round2": 736819.8404661743,
+      "delivery_group": 1,
+      "delivery_index": 49,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+        ]
+      },
+      "reference_cycles": 734981.1168919349,
+      "round_drift_percent": 0.5003457999070637,
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 4096,
+        "num_groups": 8,
+        "tokens_per_group": 1024
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s8",
+      "class_id": "fp8_mgroup_nt_masked",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "d678f9dfee425080598fac50a2678449bfa6ac5aa2ac5cc7091203b7c921e343"
+      ],
+      "cv_percent_round1": 0.14086639324759653,
+      "cv_percent_round2": 0.276519742311169,
+      "cycle_bin": 3,
+      "cycles_round1": 1205068.9399095692,
+      "cycles_round2": 1202161.7708140274,
+      "delivery_group": 2,
+      "delivery_index": 50,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "d678f9dfee425080598fac50a2678449bfa6ac5aa2ac5cc7091203b7c921e343"
+        ]
+      },
+      "reference_cycles": 1203615.3553617983,
+      "round_drift_percent": 0.24153639138875405,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 512,
+        "k": 8192,
+        "max_m": 1024,
+        "n": 6144,
+        "num_groups": 16
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s7",
+      "class_id": "fp8_mgroup_nt_masked",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "06a3e2e9f06a379c57a4a2be11c0cb12a7cc38336e0acc45a8ca30eefaff3c6c"
+      ],
+      "cv_percent_round1": 0.29277141520888444,
+      "cv_percent_round2": 0.35532641338502063,
+      "cycle_bin": 2,
+      "cycles_round1": 797070.7920296479,
+      "cycles_round2": 799435.0503100401,
+      "delivery_group": 3,
+      "delivery_index": 51,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "06a3e2e9f06a379c57a4a2be11c0cb12a7cc38336e0acc45a8ca30eefaff3c6c"
+        ]
+      },
+      "reference_cycles": 798252.921169844,
+      "round_drift_percent": 0.29617909533327325,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 1024,
+        "k": 8192,
+        "max_m": 2048,
+        "n": 4096,
+        "num_groups": 8
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s5",
+      "class_id": "fp8_mgroup_nt_masked",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "dc792c3b751a6079b7cb60ed3b6257e24f258b0d136949bbfb6126f048a39d84"
+      ],
+      "cv_percent_round1": 0.22768205937947092,
+      "cv_percent_round2": 0.3179011565007114,
+      "cycle_bin": 1,
+      "cycles_round1": 389774.2913379074,
+      "cycles_round2": 388082.88139203336,
+      "delivery_group": 0,
+      "delivery_index": 52,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "dc792c3b751a6079b7cb60ed3b6257e24f258b0d136949bbfb6126f048a39d84"
+        ]
+      },
+      "reference_cycles": 388928.58636497037,
+      "round_drift_percent": 0.43488959288962914,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 512,
+        "k": 4096,
+        "max_m": 1024,
+        "n": 7168,
+        "num_groups": 8
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s6",
+      "class_id": "fp8_mgroup_nt_masked",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "c12c6207fe089ddae7385aaa7df5a907ff68f841ce459c239b7531d4b98b823a"
+      ],
+      "cv_percent_round1": 0.3914407325084636,
+      "cv_percent_round2": 0.3101242574002532,
+      "cycle_bin": 2,
+      "cycles_round1": 480167.3479483797,
+      "cycles_round2": 478908.3215042279,
+      "delivery_group": 1,
+      "delivery_index": 53,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "c12c6207fe089ddae7385aaa7df5a907ff68f841ce459c239b7531d4b98b823a"
+        ]
+      },
+      "reference_cycles": 479537.8347263038,
+      "round_drift_percent": 0.26254997061293656,
+      "shape": {
+        "alignment": 128,
+        "expected_m": 256,
+        "k": 8192,
+        "max_m": 512,
+        "n": 4096,
+        "num_groups": 16
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s4",
+      "class_id": "fp8_mgroup_nt_masked",
+      "core_sass_signatures": [
+        "20646b99b862ad8754e4e2caefc10f807b784adc414373734e833cea5dfb5b05"
+      ],
+      "cv_percent_round1": 0.37208539952328823,
+      "cv_percent_round2": 0.25466652826842523,
+      "cycles_round1": 210473.46390946975,
+      "cycles_round2": 209538.4518319833,
+      "delivery_group": 2,
+      "delivery_index": 54,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "20646b99b862ad8754e4e2caefc10f807b784adc414373734e833cea5dfb5b05"
+        ]
+      },
+      "reference_cycles": 210005.95787072653,
+      "round_drift_percent": 0.4452312148505941,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 1024,
+        "k": 4096,
+        "max_m": 2048,
+        "n": 4096,
+        "num_groups": 4
+      },
+      "shape_index": 3,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_mgroup_nt_masked_s3",
+      "class_id": "fp8_mgroup_nt_masked",
+      "core_sass_signatures": [
+        "520aa14d5b9df16d9b3bb9dffc5e0b03810dc730ea9b6eb22f799bd98f79fbf3"
+      ],
+      "cv_percent_round1": 1.559048017560906,
+      "cv_percent_round2": 1.2173960664367927,
+      "cycles_round1": 205560.96178444466,
+      "cycles_round2": 208323.66822301564,
+      "delivery_group": 3,
+      "delivery_index": 55,
+      "implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_m_grouped_gemm_masked_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.mgroup.nt.masked",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "520aa14d5b9df16d9b3bb9dffc5e0b03810dc730ea9b6eb22f799bd98f79fbf3"
+        ]
+      },
+      "reference_cycles": 206942.31500373015,
+      "round_drift_percent": 1.3350128215784112,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 128,
+        "k": 8192,
+        "max_m": 256,
+        "n": 2048,
+        "num_groups": 16
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_paged_mqa_metadata_s1",
+      "class_id": "fp8_paged_mqa_metadata",
+      "delivery_group": 0,
+      "delivery_index": 56,
+      "implementation_entries": [
+        "sm90_paged_mqa_logits_metadata"
+      ],
+      "implementation_entry": "sm90_paged_mqa_logits_metadata",
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "mqa.paged.metadata",
+        "sm90.paged_mqa_logits_metadata"
+      ],
+      "shape": {
+        "avg_kv": 8192,
+        "batch_size": 1024,
+        "next_n": 2
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s13",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "4ea6b1f9f40751bf8a8ea17969dc2d4fb2544730b3dd2b2c566299db17aad86f"
+      ],
+      "cv_percent_round1": 0.6618238483850957,
+      "cv_percent_round2": 0.6590333700937447,
+      "cycles_round1": 362370.73403054924,
+      "cycles_round2": 360582.7612196358,
+      "delivery_group": 1,
+      "delivery_index": 57,
+      "implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "implementation_entry": "sm90_fp8_bmm",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.einsum.bhr_hdr_bhd",
+        "sm90.fp8_bmm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "4ea6b1f9f40751bf8a8ea17969dc2d4fb2544730b3dd2b2c566299db17aad86f"
+        ]
+      },
+      "reference_cycles": 361476.7476250925,
+      "round_drift_percent": 0.4946301035019449,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 1024,
+        "d": 1024,
+        "h": 16,
+        "r": 8192
+      },
+      "shape_index": 12,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_tn_s2",
+      "class_id": "fp8_dense_tn",
+      "delivery_group": 2,
+      "delivery_index": 58,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "fp8.dense.nt",
+        "fp8.dense.tn.wrapper",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "shape": {
+        "k": 4096,
+        "m": 4096,
+        "n": 4096
+      },
+      "shape_index": 1,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s10",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "19007585ca9ad5651930e7ff074a4bb7ca24fb11efa11cb2666e40a4ea749a65"
+      ],
+      "cv_percent_round1": 1.0115322700621974,
+      "cv_percent_round2": 1.395856444551538,
+      "cycles_round1": 362228.9765687308,
+      "cycles_round2": 362204.95002896874,
+      "delivery_group": 3,
+      "delivery_index": 59,
+      "implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "implementation_entry": "sm90_fp8_bmm",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.einsum.bhr_hdr_bhd",
+        "sm90.fp8_bmm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "19007585ca9ad5651930e7ff074a4bb7ca24fb11efa11cb2666e40a4ea749a65"
+        ]
+      },
+      "reference_cycles": 362216.96329884976,
+      "round_drift_percent": 0.006633190103307079,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 1024,
+        "d": 1024,
+        "h": 32,
+        "r": 4096
+      },
+      "shape_index": 9,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s9",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "90faae1c683b07f52a7a76c2d3276782d1a24eb20f6b782ba180ebc5d23a2fc7"
+      ],
+      "cv_percent_round1": 0.8190824913400061,
+      "cv_percent_round2": 1.254937121037694,
+      "cycles_round1": 185619.7394928323,
+      "cycles_round2": 185089.77382043845,
+      "delivery_group": 0,
+      "delivery_index": 60,
+      "implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "implementation_entry": "sm90_fp8_bmm",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.einsum.bhr_hdr_bhd",
+        "sm90.fp8_bmm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "90faae1c683b07f52a7a76c2d3276782d1a24eb20f6b782ba180ebc5d23a2fc7"
+        ]
+      },
+      "reference_cycles": 185354.75665663538,
+      "round_drift_percent": 0.28591965048709284,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 2048,
+        "d": 1024,
+        "h": 8,
+        "r": 4096
+      },
+      "shape_index": 8,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s14",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "core_sass_signatures": [
+        "f33c36131fac9602bb22da795b92e5e84a16de72d8fbb623d77ae0f35646521a"
+      ],
+      "cv_percent_round1": 1.120684509514352,
+      "cv_percent_round2": 1.60199012983751,
+      "cycles_round1": 690288.3340017787,
+      "cycles_round2": 694242.6696512761,
+      "delivery_group": 1,
+      "delivery_index": 61,
+      "implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "implementation_entry": "sm90_fp8_bmm",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.einsum.bhr_hdr_bhd",
+        "sm90.fp8_bmm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d2d": [
+          "f33c36131fac9602bb22da795b92e5e84a16de72d8fbb623d77ae0f35646521a"
+        ]
+      },
+      "reference_cycles": 692265.5018265274,
+      "round_drift_percent": 0.5712166270114447,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "b": 2048,
+        "d": 2048,
+        "h": 16,
+        "r": 4096
+      },
+      "shape_index": 13,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_acc_fp32_s6",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "fb945f9a2806d4c4f7259c90537df557af0d1a5fd39de3b619dc6b72d81ae55a"
+      ],
+      "cv_percent_round1": 0.20125103325516325,
+      "cv_percent_round2": 0.2555421744341986,
+      "cycle_bin": 3,
+      "cycles_round1": 1165771.1567640346,
+      "cycles_round2": 1162433.4516936631,
+      "delivery_group": 2,
+      "delivery_index": 62,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.acc.fp32",
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "fb945f9a2806d4c4f7259c90537df557af0d1a5fd39de3b619dc6b72d81ae55a"
+        ]
+      },
+      "reference_cycles": 1164102.3042288488,
+      "round_drift_percent": 0.2867192220345741,
+      "shape": {
+        "k": 8192,
+        "m": 8192,
+        "n": 4096
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_layout_transpose_fp32_s1",
+      "class_id": "fp8_layout_transpose_fp32",
+      "delivery_group": 3,
+      "delivery_index": 63,
+      "implementation_entries": [
+        "transpose_fp32"
+      ],
+      "implementation_entry": "transpose_fp32",
+      "implementation_modules": [
+        "smxx_layout"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "layout.transpose_fp32",
+        "smxx.layout.transpose_fp32"
+      ],
+      "shape": {
+        "mn": 16384,
+        "sf_k": 32
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_acc_fp32_s4",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "core_sass_signatures": [
+        "dccbbc414943c41fa8d278034c3f0e9a8389253c0ce55d5363e532af56bf6558"
+      ],
+      "cv_percent_round1": 0.8266936533227538,
+      "cv_percent_round2": 1.0770270802713926,
+      "cycles_round1": 611343.9872884408,
+      "cycles_round2": 611809.4490573813,
+      "delivery_group": 0,
+      "delivery_index": 64,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.acc.fp32",
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "dccbbc414943c41fa8d278034c3f0e9a8389253c0ce55d5363e532af56bf6558"
+        ]
+      },
+      "reference_cycles": 611576.7181729111,
+      "round_drift_percent": 0.07610848403958378,
+      "selection_source": "existing_round1_repeat",
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 16384
+      },
+      "shape_index": 3,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_acc_fp32_s8",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "95f39587db7e561187b4b051f511d593b612de0cf67c085b588ec7e0a6ab5521"
+      ],
+      "cv_percent_round1": 0.4989808363317299,
+      "cv_percent_round2": 0.5539277036660264,
+      "cycle_bin": 3,
+      "cycles_round1": 1136446.7604687074,
+      "cycles_round2": 1138200.2185200274,
+      "delivery_group": 1,
+      "delivery_index": 65,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.acc.fp32",
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "95f39587db7e561187b4b051f511d593b612de0cf67c085b588ec7e0a6ab5521"
+        ]
+      },
+      "reference_cycles": 1137323.4894943675,
+      "round_drift_percent": 0.15417408217775286,
+      "shape": {
+        "k": 4096,
+        "m": 8192,
+        "n": 8192
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_dense_nt_acc_fp32_s5",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "1fb55b4f63c78344ae43224198c25fbd3a45a7dfd585e576ce007868a39a4b07"
+      ],
+      "cv_percent_round1": 0.3064300249748479,
+      "cv_percent_round2": 0.24409564720103283,
+      "cycle_bin": 3,
+      "cycles_round1": 1145897.9502770898,
+      "cycles_round2": 1141257.7538512163,
+      "delivery_group": 2,
+      "delivery_index": 66,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.dense.acc.fp32",
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "1fb55b4f63c78344ae43224198c25fbd3a45a7dfd585e576ce007868a39a4b07"
+        ]
+      },
+      "reference_cycles": 1143577.8520641532,
+      "round_drift_percent": 0.40576130584358716,
+      "shape": {
+        "k": 8192,
+        "m": 4096,
+        "n": 8192
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nn_s1",
+      "class_id": "fp8_dense_nn",
+      "delivery_group": 3,
+      "delivery_index": 67,
+      "implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "implementation_entry": "sm90_fp8_gemm_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "fp8.dense.nn.wrapper",
+        "fp8.dense.nt",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.fp8_gemm_1d2d"
+      ],
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 8192
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_kgroup_nt_contiguous_s6",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "3f173da684e3734c5f83c9436e2d0093eb352be5221121a63d6715e51c210536"
+      ],
+      "cv_percent_round1": 0.3822327740803085,
+      "cv_percent_round2": 0.3317834388373685,
+      "cycle_bin": 1,
+      "cycles_round1": 340987.23753068707,
+      "cycles_round2": 342110.31612196,
+      "delivery_group": 0,
+      "delivery_index": 68,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.k_grouped_fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "3f173da684e3734c5f83c9436e2d0093eb352be5221121a63d6715e51c210536"
+        ]
+      },
+      "reference_cycles": 341548.77682632353,
+      "round_drift_percent": 0.32881938612358586,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 512,
+        "n": 1024,
+        "num_groups": 16
+      },
+      "shape_index": 5,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_kgroup_nt_contiguous_s8",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "88268ad278c545a4fda8f94ad17f96d1cfea395cc4437869f7e2e1f13e52423c"
+      ],
+      "cv_percent_round1": 0.7156487861769845,
+      "cv_percent_round2": 0.6646183777193896,
+      "cycle_bin": 2,
+      "cycles_round1": 618753.5573103608,
+      "cycles_round2": 619450.794647559,
+      "delivery_group": 1,
+      "delivery_index": 69,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.k_grouped_fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "88268ad278c545a4fda8f94ad17f96d1cfea395cc4437869f7e2e1f13e52423c"
+        ]
+      },
+      "reference_cycles": 619102.17597896,
+      "round_drift_percent": 0.11262072146584093,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 1024,
+        "n": 1024,
+        "num_groups": 16
+      },
+      "shape_index": 7,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_smallk_s1",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 70,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "grouped.k.skew",
+        "sm90.k_grouped_fp8_gemm_1d1d",
+        "sm90.kgroup.tma_update.small_k"
+      ],
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 256,
+        "ks": [
+          128,
+          256,
+          128,
+          256,
+          128,
+          256,
+          128,
+          256
+        ],
+        "m": 768,
+        "n": 2048,
+        "num_groups": 8
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_kgroup_nt_contiguous_s7",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "e1ff0f86b033e767663f4b5d7738cfd0851c6a9b31ade090c44365c739f33457"
+      ],
+      "cv_percent_round1": 0.9025132671119115,
+      "cv_percent_round2": 0.7911274464084095,
+      "cycle_bin": 2,
+      "cycles_round1": 619886.1116764838,
+      "cycles_round2": 616490.206717116,
+      "delivery_group": 3,
+      "delivery_index": 71,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.k_grouped_fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "e1ff0f86b033e767663f4b5d7738cfd0851c6a9b31ade090c44365c739f33457"
+        ]
+      },
+      "reference_cycles": 618188.1591967999,
+      "round_drift_percent": 0.5493319321709519,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 2048,
+        "n": 1024,
+        "num_groups": 8
+      },
+      "shape_index": 6,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "fp8_kgroup_nt_contiguous_s5",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "cfd9b87da1242575260648b16a37b9807343fdd39f6165dd20377003641838da"
+      ],
+      "cv_percent_round1": 0.49987294913289043,
+      "cv_percent_round2": 0.9550651025856526,
+      "cycle_bin": 1,
+      "cycles_round1": 331318.868227289,
+      "cycles_round2": 328301.70093107835,
+      "delivery_group": 0,
+      "delivery_index": 72,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "sm90.k_grouped_fp8_gemm_1d1d"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_fp8_gemm_1d1d": [
+          "cfd9b87da1242575260648b16a37b9807343fdd39f6165dd20377003641838da"
+        ]
+      },
+      "reference_cycles": 329810.2845791837,
+      "round_drift_percent": 0.9148190451551143,
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 1024,
+        "n": 1024,
+        "num_groups": 8
+      },
+      "shape_index": 4,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_skew_s1",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 73,
+      "implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "implementation_entry": "sm90_k_grouped_fp8_gemm_1d1d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "fp8.kgroup.nt.contiguous",
+        "fp8.scale.fp32.1d1d.transpose",
+        "grouped.k.skew",
+        "sm90.k_grouped_fp8_gemm_1d1d"
+      ],
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "ks": [
+          2048,
+          4096,
+          6144,
+          8192
+        ],
+        "m": 512,
+        "n": 1024,
+        "num_groups": 4
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 128,
+      "case_id": "bf16_einsum_bmk_bnk_mn_s18",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "core_sass_signatures": [
+        "296eec844d5c9bd594f3aff815e97d065fdea695d6704b85b0db30e777f7ccb1"
+      ],
+      "cv_percent_round1": 0.3634193784719268,
+      "cv_percent_round2": 0.2616114839994654,
+      "cycles_round1": 291968.9073843187,
+      "cycles_round2": 291709.0783873587,
+      "delivery_group": 2,
+      "delivery_index": 74,
+      "implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "implementation_entry": "sm90_bmn_bnk_mn_gemm",
+      "implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bmk_bnk_mn",
+        "sm90.bmn_bnk_mn_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bmk_bnk_mn": [
+          "296eec844d5c9bd594f3aff815e97d065fdea695d6704b85b0db30e777f7ccb1"
+        ]
+      },
+      "reference_cycles": 291838.9928858387,
+      "round_drift_percent": 0.08903162472934353,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "k": 8192,
+        "m": 2048,
+        "n": 1024,
+        "s": 4
+      },
+      "shape_index": 17,
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_psum_s1",
+      "class_id": "fp8_mgroup_nt_contiguous_psum",
+      "delivery_group": 3,
+      "delivery_index": 75,
+      "implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "implementation_entry": "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+      "implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "measurement_status": "unmeasured",
+      "mechanisms": [
+        "fp8.mgroup.nt.contiguous",
+        "fp8.mgroup.psum",
+        "fp8.scale.fp32.1d2d.identity",
+        "sm90.m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "shape": {
+        "alignment": 128,
+        "k": 4096,
+        "n": 4096,
+        "num_groups": 4,
+        "tokens_per_group": 512
+      },
+      "shape_index": 0,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 128,
+      "case_id": "bf16_einsum_bmk_bnk_mn_s17",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "core_sass_signatures": [
+        "585f8cefd9b8b06c88db6779124a4e5c3db307d4049228ab4ead6b563028d303"
+      ],
+      "cv_percent_round1": 0.3410077669368057,
+      "cv_percent_round2": 0.30425812233038985,
+      "cycles_round1": 1094482.1777126961,
+      "cycles_round2": 1088476.9872755955,
+      "delivery_group": 0,
+      "delivery_index": 76,
+      "implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "implementation_entry": "sm90_bmn_bnk_mn_gemm",
+      "implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bmk_bnk_mn",
+        "sm90.bmn_bnk_mn_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bmk_bnk_mn": [
+          "585f8cefd9b8b06c88db6779124a4e5c3db307d4049228ab4ead6b563028d303"
+        ]
+      },
+      "reference_cycles": 1091479.5824941457,
+      "round_drift_percent": 0.5501880688760208,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 1024,
+        "s": 32
+      },
+      "shape_index": 16,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 128,
+      "case_id": "bf16_einsum_bmk_bnk_mn_s4",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "22f0105bd42885f125a282b0619d2a4a4dca5e989994b6c107849e5165285ebf"
+      ],
+      "cv_percent_round1": 0.3863829316150989,
+      "cv_percent_round2": 0.40664165365549504,
+      "cycle_bin": 1,
+      "cycles_round1": 291342.0714554686,
+      "cycles_round2": 292520.4130143316,
+      "delivery_group": 1,
+      "delivery_index": 77,
+      "implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "implementation_entry": "sm90_bmn_bnk_mn_gemm",
+      "implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bmk_bnk_mn",
+        "sm90.bmn_bnk_mn_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bmk_bnk_mn": [
+          "22f0105bd42885f125a282b0619d2a4a4dca5e989994b6c107849e5165285ebf"
+        ]
+      },
+      "reference_cycles": 291931.2422349001,
+      "round_drift_percent": 0.40363667480127335,
+      "shape": {
+        "k": 4096,
+        "m": 2048,
+        "n": 1024,
+        "s": 8
+      },
+      "shape_index": 3,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 128,
+      "case_id": "bf16_einsum_bmk_bnk_mn_s19",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "core_sass_signatures": [
+        "10bcc55a5c7ab16a8e9b48ff0406a11949c9fe32eaa345881e9b93b7fc09311b"
+      ],
+      "cv_percent_round1": 0.1047435401117975,
+      "cv_percent_round2": 0.5757521451391667,
+      "cycles_round1": 558036.4255877289,
+      "cycles_round2": 561082.5513741062,
+      "delivery_group": 2,
+      "delivery_index": 78,
+      "implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "implementation_entry": "sm90_bmn_bnk_mn_gemm",
+      "implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bmk_bnk_mn",
+        "sm90.bmn_bnk_mn_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bmk_bnk_mn": [
+          "10bcc55a5c7ab16a8e9b48ff0406a11949c9fe32eaa345881e9b93b7fc09311b"
+        ]
+      },
+      "reference_cycles": 559559.4884809175,
+      "round_drift_percent": 0.5443792570914882,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "k": 8192,
+        "m": 2048,
+        "n": 1024,
+        "s": 8
+      },
+      "shape_index": 18,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 128,
+      "case_id": "bf16_einsum_bmk_bnk_mn_s3",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "ce6bef29c95678b5ff26b37330d2960f1cd7e80a5f7c7162a0084fe82df6c725"
+      ],
+      "cv_percent_round1": 0.6279535441512453,
+      "cv_percent_round2": 1.8551244839490861,
+      "cycle_bin": 1,
+      "cycles_round1": 296517.94414482894,
+      "cycles_round2": 296540.83760300494,
+      "delivery_group": 3,
+      "delivery_index": 79,
+      "implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "implementation_entry": "sm90_bmn_bnk_mn_gemm",
+      "implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "bf16.einsum.bmk_bnk_mn",
+        "sm90.bmn_bnk_mn_gemm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_bmk_bnk_mn": [
+          "ce6bef29c95678b5ff26b37330d2960f1cd7e80a5f7c7162a0084fe82df6c725"
+        ]
+      },
+      "reference_cycles": 296529.3908739169,
+      "round_drift_percent": 0.007720468486623301,
+      "shape": {
+        "k": 2048,
+        "m": 1024,
+        "n": 1024,
+        "s": 32
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s11",
+      "class_id": "tf32_hc_prenorm",
+      "core_sass_signatures": [
+        "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+      ],
+      "cv_percent_round1": 0.519633536750341,
+      "cv_percent_round2": 0.6484744990604573,
+      "cycles_round1": 291081.0891677675,
+      "cycles_round2": 290380.6274038462,
+      "delivery_group": 0,
+      "delivery_index": 80,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+        ]
+      },
+      "reference_cycles": 290730.85828580684,
+      "round_drift_percent": 0.24093134387293416,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "batch_size": 1,
+        "k": 16384,
+        "m": 12288,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 12288
+      },
+      "shape_index": 10,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s13",
+      "class_id": "tf32_hc_prenorm",
+      "core_sass_signatures": [
+        "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+      ],
+      "cv_percent_round1": 0.5499272414218663,
+      "cv_percent_round2": 0.37764589220647504,
+      "cycles_round1": 547759.8105270065,
+      "cycles_round2": 551218.9090909091,
+      "delivery_group": 1,
+      "delivery_index": 81,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+        ]
+      },
+      "reference_cycles": 549489.3598089578,
+      "round_drift_percent": 0.6295114731803321,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "batch_size": 1,
+        "k": 32768,
+        "m": 12288,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 12288
+      },
+      "shape_index": 12,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s16",
+      "class_id": "tf32_hc_prenorm",
+      "core_sass_signatures": [
+        "7ab6b45902dffcdd9255b495479d0903e28a1c2576bc7ef23ac829eab5d82bdb"
+      ],
+      "cv_percent_round1": 0.5313215718243098,
+      "cv_percent_round2": 0.5357276966785105,
+      "cycles_round1": 838458.0131033463,
+      "cycles_round2": 829562.2298844848,
+      "delivery_group": 2,
+      "delivery_index": 82,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "7ab6b45902dffcdd9255b495479d0903e28a1c2576bc7ef23ac829eab5d82bdb"
+        ]
+      },
+      "reference_cycles": 834010.1214939156,
+      "round_drift_percent": 1.0666277290408706,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "batch_size": 1,
+        "k": 49152,
+        "m": 12288,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 12288
+      },
+      "shape_index": 15,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s3",
+      "class_id": "tf32_hc_prenorm",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "a9d08aebdfcea6f612db586a88830269a1d7358c501747c7a4a1af2bc28954dd"
+      ],
+      "cv_percent_round1": 1.3558295358353838,
+      "cv_percent_round2": 1.682904133682391,
+      "cycle_bin": 0,
+      "cycles_round1": 101409.97322339969,
+      "cycles_round2": 101381.4002641008,
+      "delivery_group": 3,
+      "delivery_index": 83,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "a9d08aebdfcea6f612db586a88830269a1d7358c501747c7a4a1af2bc28954dd"
+        ]
+      },
+      "reference_cycles": 101395.68674375024,
+      "round_drift_percent": 0.028179659526449092,
+      "shape": {
+        "batch_size": 1,
+        "k": 8192,
+        "m": 8448,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 8448
+      },
+      "shape_index": 2,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s14",
+      "class_id": "tf32_hc_prenorm",
+      "core_sass_signatures": [
+        "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+      ],
+      "cv_percent_round1": 0.49016261084286644,
+      "cv_percent_round2": 0.8115070708623664,
+      "cycles_round1": 652552.4107522313,
+      "cycles_round2": 649309.7352404138,
+      "delivery_group": 0,
+      "delivery_index": 84,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+        ]
+      },
+      "reference_cycles": 650931.0729963225,
+      "round_drift_percent": 0.4981595819187091,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "batch_size": 1,
+        "k": 32768,
+        "m": 16384,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 16384
+      },
+      "shape_index": 13,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "tf32_hc_prenorm_s12",
+      "class_id": "tf32_hc_prenorm",
+      "core_sass_signatures": [
+        "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+      ],
+      "cv_percent_round1": 0.8643473156850567,
+      "cv_percent_round2": 1.1256284159956937,
+      "cycles_round1": 335426.98683355004,
+      "cycles_round2": 332522.6819860502,
+      "delivery_group": 1,
+      "delivery_index": 85,
+      "implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "implementation_entry": "sm90_tf32_hc_prenorm_gemm",
+      "implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "measurement_status": "historical",
+      "mechanisms": [
+        "sm90.tf32_hc_prenorm_gemm",
+        "tf32.hc.prenorm"
+      ],
+      "module_core_sass_signatures": {
+        "sm90_tf32_hc_prenorm_gemm": [
+          "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+        ]
+      },
+      "reference_cycles": 333974.8344098001,
+      "round_drift_percent": 0.869617871847232,
+      "selection_source": "entry_rebalance",
+      "shape": {
+        "batch_size": 1,
+        "k": 16384,
+        "m": 16384,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 16384
+      },
+      "shape_index": 11,
+      "suite_part": "core"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d128_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "c4c65373f59cf74e27d35d7fab783ce3d4cd87489cdfebb263808572af505cea"
+      ],
+      "cv_percent_round1": 0.24120763061837605,
+      "cv_percent_round2": 0.2691079007022432,
+      "cycles_round1": 474707.29812963837,
+      "cycles_round2": 474475.5170789856,
+      "delivery_group": 2,
+      "delivery_index": 86,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "c4c65373f59cf74e27d35d7fab783ce3d4cd87489cdfebb263808572af505cea"
+        ],
+        "smxx_clean_logits": [
+          "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 474591.40760431194,
+      "round_drift_percent": 0.048838020861522974,
+      "seq_len": 4096,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "b849f2d4666d2efd4948742ef65435387edc144d0a38448107f0baf76d8f76c6",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.389125516601035,
+      "cv_percent_round2": 0.6240990097073501,
+      "cycles_round1": 225709.276427556,
+      "cycles_round2": 224615.37183765683,
+      "delivery_group": 3,
+      "delivery_index": 87,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "b849f2d4666d2efd4948742ef65435387edc144d0a38448107f0baf76d8f76c6"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 225162.32413260642,
+      "round_drift_percent": 0.48582932074148183,
+      "seq_len": 2048,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h32_d64_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "89baced026ce9e5fae0a0fd9d11a1a2cbd46b0f013028f2ff13e76182fb0c49d",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.425764943507116,
+      "cv_percent_round2": 0.5079355472777713,
+      "cycles_round1": 493571.911817708,
+      "cycles_round2": 492906.8553804445,
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "head_dim": 64,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "89baced026ce9e5fae0a0fd9d11a1a2cbd46b0f013028f2ff13e76182fb0c49d"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 493239.38359907625,
+      "round_drift_percent": 0.13483441496717166,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d32_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "827a9c6f5a9cc966401ecaf603f8de894a8137d37b47cec4af658c78b1a35bd6"
+      ],
+      "cv_percent_round1": 0.20806141338203027,
+      "cv_percent_round2": 0.3258684041866453,
+      "cycles_round1": 337156.73607262823,
+      "cycles_round2": 337114.6538929279,
+      "delivery_group": 1,
+      "delivery_index": 89,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "827a9c6f5a9cc966401ecaf603f8de894a8137d37b47cec4af658c78b1a35bd6"
+        ],
+        "smxx_clean_logits": [
+          "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 337135.69498277805,
+      "round_drift_percent": 0.012482267622971562,
+      "seq_len": 4096,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d32_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "1abcf60429ec77d4bb133ff4f50b6ad8107009c5abbc3c61423d18912a88740a",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.44407315041892725,
+      "cv_percent_round2": 0.1691279344363242,
+      "cycles_round1": 680227.3531945919,
+      "cycles_round2": 680390.3627821308,
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "1abcf60429ec77d4bb133ff4f50b6ad8107009c5abbc3c61423d18912a88740a"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 680308.8579883614,
+      "round_drift_percent": 0.02396111495900631,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "86d75d2aa8fa51203600928108f0f36a7accd212e089c40915378f61a2122828",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.26738612278951057,
+      "cv_percent_round2": 0.2145253443096528,
+      "cycles_round1": 953690.3265355598,
+      "cycles_round2": 951619.282413665,
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "86d75d2aa8fa51203600928108f0f36a7accd212e089c40915378f61a2122828"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 952654.8044746125,
+      "round_drift_percent": 0.21739712140926495,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_compressed_sq4096_sk16384_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "4bbf79e992edfb47102511a1d67bc5d040d45379bb9bc1e083a1efd222bb32fa"
+      ],
+      "cv_percent_round1": 0.19048179640205182,
+      "cv_percent_round2": 0.17469078888660022,
+      "cycles_round1": 902190.5484814656,
+      "cycles_round2": 901953.569392644,
+      "delivery_group": 0,
+      "delivery_index": 92,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.compressed_window",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits"
+      ],
+      "mode": "prefill_compressed",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "4bbf79e992edfb47102511a1d67bc5d040d45379bb9bc1e083a1efd222bb32fa"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 902072.0589370548,
+      "round_drift_percent": 0.026270527556391237,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_compressed_sq2048_sk8192_h32_d32_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "f345e76064a32d5b21394fd9dc7c9224f914d80d862ecef31572939581b3e5ce"
+      ],
+      "cv_percent_round1": 0.3295709908974499,
+      "cv_percent_round2": 0.24325567580141555,
+      "cycles_round1": 108079.68334370406,
+      "cycles_round2": 108230.13593032619,
+      "delivery_group": 1,
+      "delivery_index": 93,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.compressed_window",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits"
+      ],
+      "mode": "prefill_compressed",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "f345e76064a32d5b21394fd9dc7c9224f914d80d862ecef31572939581b3e5ce"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 108154.90963701512,
+      "round_drift_percent": 0.13910842062285053,
+      "seq_len": 2048,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q1_kv8192_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "9a2676bc700e49c2f5bfe53cadd49c4f8780c92dd873d849e982e1fbb072ff8a"
+      ],
+      "cv_percent_round1": 0.1817288668928662,
+      "cv_percent_round2": 0.16419152971688744,
+      "cycles_round1": 701878.9991588743,
+      "cycles_round2": 701202.3906668901,
+      "delivery_group": 2,
+      "delivery_index": 94,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "9a2676bc700e49c2f5bfe53cadd49c4f8780c92dd873d849e982e1fbb072ff8a"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 64,
+      "reference_cycles": 701540.6949128822,
+      "round_drift_percent": 0.0964460788790332,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h32_d128_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "a36044c3b52e3a2220ce417c37c158817cb02a79b47587f94e7323b4bc18d584"
+      ],
+      "cv_percent_round1": 0.2882807823796354,
+      "cv_percent_round2": 0.3109079276301912,
+      "cycles_round1": 187188.35150676448,
+      "cycles_round2": 188800.2942024747,
+      "delivery_group": 3,
+      "delivery_index": 95,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "a36044c3b52e3a2220ce417c37c158817cb02a79b47587f94e7323b4bc18d584"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 32,
+      "reference_cycles": 187994.3228546196,
+      "round_drift_percent": 0.8574422201870314,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h32_d128_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "893313ea71c7b4851c25826d76f9ae852ea31d7c56162593cd0f32aa15f746f8"
+      ],
+      "cv_percent_round1": 0.3475406588082945,
+      "cv_percent_round2": 0.23045239683358926,
+      "cycles_round1": 719400.3685296007,
+      "cycles_round2": 713354.418040593,
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "893313ea71c7b4851c25826d76f9ae852ea31d7c56162593cd0f32aa15f746f8"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 32,
+      "reference_cycles": 716377.3932850969,
+      "round_drift_percent": 0.8439616528493001,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q2_kv8192_h32_d128_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "317a63ddb46d7448ef7945863232874f001b7d57828d45adce49f801df94b8d1"
+      ],
+      "cv_percent_round1": 0.3546373344152203,
+      "cv_percent_round2": 0.310176090918417,
+      "cycles_round1": 192175.1592106752,
+      "cycles_round2": 194238.72880841105,
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "317a63ddb46d7448ef7945863232874f001b7d57828d45adce49f801df94b8d1"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 32,
+      "reference_cycles": 193206.9440095431,
+      "round_drift_percent": 1.06806181750586,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h64_d128_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "216a3487f4b72582c74dfbf697df3f779f3e8745ef6aa532f0d8595f90f0e46b"
+      ],
+      "cv_percent_round1": 0.6869071465396638,
+      "cv_percent_round2": 0.5087363177772566,
+      "cycles_round1": 189618.02475755292,
+      "cycles_round2": 188096.2630037134,
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "216a3487f4b72582c74dfbf697df3f779f3e8745ef6aa532f0d8595f90f0e46b"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 64,
+      "reference_cycles": 188857.14388063317,
+      "round_drift_percent": 0.8057739953969414,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "794f5e89b75e785caee6ac1e7aff7002dd5aa1d460fb09ac2aa3b168a69de8d1"
+      ],
+      "cv_percent_round1": 0.29866054153969085,
+      "cv_percent_round2": 0.18751366324288873,
+      "cycles_round1": 723580.6490910334,
+      "cycles_round2": 732797.4752726177,
+      "delivery_group": 3,
+      "delivery_index": 99,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "794f5e89b75e785caee6ac1e7aff7002dd5aa1d460fb09ac2aa3b168a69de8d1"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 64,
+      "reference_cycles": 728189.0621818255,
+      "round_drift_percent": 1.2657188442200016,
+      "suite_part": "attention"
+    }
+  ]
+}

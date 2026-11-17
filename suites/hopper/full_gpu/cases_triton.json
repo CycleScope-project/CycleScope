@@ -1,0 +1,1325 @@
+[
+ {
+  "id": "triton_vecadd_02",
+  "stratum": "vecadd",
+  "kind": "tutorial01_vector_add",
+  "kernel": "add_kernel",
+  "params": {
+   "n": 8388608,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 4096
+   },
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_vecadd_03",
+  "stratum": "vecadd",
+  "kind": "tutorial01_vector_add",
+  "kernel": "add_kernel",
+  "params": {
+   "n": 16777216,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 4096
+   },
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_vecadd_pdl_00",
+  "stratum": "vecadd_pdl",
+  "kind": "tutorial11_pdl_add",
+  "kernel": "add_kernel",
+  "params": {
+   "n": 8388608,
+   "dtype": "fp32",
+   "launch_pdl": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_vecadd_pdl_01",
+  "stratum": "vecadd_pdl",
+  "kind": "tutorial11_pdl_add",
+  "kernel": "add_kernel",
+  "params": {
+   "n": 16777216,
+   "dtype": "fp32",
+   "launch_pdl": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_softmax_02",
+  "stratum": "softmax",
+  "kind": "tutorial02_fused_softmax",
+  "kernel": "softmax_kernel",
+  "params": {
+   "rows": 16384,
+   "cols": 1024,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {},
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_softmax_06",
+  "stratum": "softmax",
+  "kind": "tutorial02_fused_softmax",
+  "kernel": "softmax_kernel",
+  "params": {
+   "rows": 32768,
+   "cols": 512,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {},
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_dropout_00",
+  "stratum": "dropout",
+  "kind": "tutorial04_dropout",
+  "kernel": "_dropout",
+  "params": {
+   "n": 8388608,
+   "p": 0.5,
+   "seed": 123,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_dropout_01",
+  "stratum": "dropout",
+  "kind": "tutorial04_dropout",
+  "kernel": "_dropout",
+  "params": {
+   "n": 16777216,
+   "p": 0.5,
+   "seed": 123,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 2048
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_seeded_dropout_00",
+  "stratum": "seeded_dropout",
+  "kind": "tutorial04_seeded_dropout",
+  "kernel": "_seeded_dropout",
+  "params": {
+   "n": 8388608,
+   "p": 0.5,
+   "seed": 123,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_seeded_dropout_01",
+  "stratum": "seeded_dropout",
+  "kind": "tutorial04_seeded_dropout",
+  "kernel": "_seeded_dropout",
+  "params": {
+   "n": 16777216,
+   "p": 0.5,
+   "seed": 123,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_layernorm_fwd_00",
+  "stratum": "layernorm_fwd",
+  "kind": "tutorial05_layer_norm_fwd",
+  "kernel": "_layer_norm_fwd_fused",
+  "params": {
+   "m": 4096,
+   "n": 4096,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {},
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_layernorm_fwd_03",
+  "stratum": "layernorm_fwd",
+  "kind": "tutorial05_layer_norm_fwd",
+  "kernel": "_layer_norm_fwd_fused",
+  "params": {
+   "m": 16384,
+   "n": 1024,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {},
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_layernorm_bwd_dx_00",
+  "stratum": "layernorm_bwd_dx",
+  "kind": "tutorial05_layer_norm_bwd",
+  "kernel": "_layer_norm_bwd_dx_fused",
+  "params": {
+   "m": 4096,
+   "n": 4096,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "GROUP_SIZE_M": 64
+   },
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_fp16_12",
+  "stratum": "matmul_fp16",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp16",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 64,
+    "BLOCK_SIZE_N": 32,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 2,
+   "num_stages": 5
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_fp16_13",
+  "stratum": "matmul_fp16",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp16",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 32,
+    "BLOCK_SIZE_N": 64,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 2,
+   "num_stages": 5
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_bf16_01",
+  "stratum": "matmul_bf16",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    2048,
+    2048
+   ],
+   "dtype": "bf16",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 64,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_bf16_02",
+  "stratum": "matmul_bf16",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    2048,
+    2048
+   ],
+   "dtype": "bf16",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_bf16_03",
+  "stratum": "matmul_bf16",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    2048,
+    2048
+   ],
+   "dtype": "bf16",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 64,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_leaky_01",
+  "stratum": "matmul_leaky",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "activation": "leaky_relu"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_leaky_02",
+  "stratum": "matmul_leaky",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "activation": "leaky_relu"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 64,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 32,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_00",
+  "stratum": "p9_matmul",
+  "kind": "tutorial09_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_02",
+  "stratum": "p9_matmul",
+  "kind": "tutorial09_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp8e4m3"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 128,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_persistent_01",
+  "stratum": "p9_matmul_persistent",
+  "kind": "tutorial09_matmul_persistent",
+  "kernel": "matmul_kernel_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_tma_01",
+  "stratum": "p9_matmul_tma",
+  "kind": "tutorial09_matmul_tma",
+  "kernel": "matmul_kernel_tma",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3,
+   "pre_hook": "matmul_tma_set_block_size_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_tma_02",
+  "stratum": "p9_matmul_tma",
+  "kind": "tutorial09_matmul_tma",
+  "kernel": "matmul_kernel_tma",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp8e4m3",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 128,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3,
+   "pre_hook": "matmul_tma_set_block_size_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_tma_persistent_00",
+  "stratum": "p9_matmul_tma_persistent",
+  "kind": "tutorial09_matmul_tma_persistent",
+  "kernel": "matmul_kernel_tma_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": false
+   },
+   "num_warps": 4,
+   "num_stages": 3,
+   "pre_hook": "matmul_tma_set_block_size_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_tma_persistent_01",
+  "stratum": "p9_matmul_tma_persistent",
+  "kind": "tutorial09_matmul_tma_persistent",
+  "kernel": "matmul_kernel_tma_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": true
+   },
+   "num_warps": 8,
+   "num_stages": 3,
+   "pre_hook": "matmul_tma_set_block_size_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_descriptor_persistent_00",
+  "stratum": "p9_matmul_descriptor_persistent",
+  "kind": "tutorial09_matmul_descriptor_persistent",
+  "kernel": "matmul_kernel_descriptor_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": true
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_descriptor_persistent_02",
+  "stratum": "p9_matmul_descriptor_persistent",
+  "kind": "tutorial09_matmul_descriptor_persistent",
+  "kernel": "matmul_kernel_descriptor_persistent",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp8e4m3",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 128,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": true
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_descriptor_persistent_ws_00",
+  "stratum": "p9_matmul_descriptor_persistent_ws",
+  "kind": "tutorial09_matmul_descriptor_persistent",
+  "kernel": "matmul_kernel_descriptor_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": true
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_descriptor_persistent_ws_01",
+  "stratum": "p9_matmul_descriptor_persistent_ws",
+  "kind": "tutorial09_matmul_descriptor_persistent",
+  "kernel": "matmul_kernel_descriptor_persistent",
+  "params": {
+   "shape": [
+    4096,
+    4096,
+    1024
+   ],
+   "dtype": "fp16",
+   "warp_specialize": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8,
+    "EPILOGUE_SUBTILE": false
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_attn_fwd_06",
+  "stratum": "attn_fwd",
+  "kind": "tutorial06_attention_fwd",
+  "kernel": "_attn_fwd",
+  "params": {
+   "z": 1,
+   "h": 4,
+   "n_ctx": 4096,
+   "head_dim": 128,
+   "causal": true,
+   "dtype": "fp16",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M": 128,
+    "BLOCK_N": 64
+   },
+   "num_warps": 4,
+   "num_stages": 3,
+   "pre_hook": "_host_descriptor_pre_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_attn_fwd_08",
+  "stratum": "attn_fwd",
+  "kind": "tutorial06_attention_fwd",
+  "kernel": "_attn_fwd",
+  "params": {
+   "z": 2,
+   "h": 32,
+   "n_ctx": 1024,
+   "head_dim": 128,
+   "causal": false,
+   "dtype": "fp8e5m2",
+   "warp_specialize": false
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M": 128,
+    "BLOCK_N": 64
+   },
+   "num_warps": 4,
+   "num_stages": 3,
+   "pre_hook": "_host_descriptor_pre_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_attn_bwd_01",
+  "stratum": "attn_bwd",
+  "kind": "tutorial06_attention_bwd",
+  "kernel": "_attn_bwd",
+  "params": {
+   "z": 1,
+   "h": 8,
+   "n_ctx": 2048,
+   "head_dim": 64,
+   "causal": true,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M1": 32,
+    "BLOCK_N1": 128,
+    "BLOCK_M2": 128,
+    "BLOCK_N2": 32,
+    "BLK_SLICE_FACTOR": 2
+   },
+   "num_warps": 4,
+   "num_stages": 5
+  },
+  "warmups": 3,
+  "note": "",
+  "pins": {
+   "_attn_fwd": {
+    "kwargs": {
+     "BLOCK_M": 128,
+     "BLOCK_N": 64
+    },
+    "num_warps": 4,
+    "num_stages": 3,
+    "pre_hook": "_host_descriptor_pre_hook"
+   }
+  }
+ },
+ {
+  "id": "triton_attn_bwd_04",
+  "stratum": "attn_bwd",
+  "kind": "tutorial06_attention_bwd",
+  "kernel": "_attn_bwd",
+  "params": {
+   "z": 1,
+   "h": 4,
+   "n_ctx": 2048,
+   "head_dim": 64,
+   "causal": false,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M1": 32,
+    "BLOCK_N1": 128,
+    "BLOCK_M2": 128,
+    "BLOCK_N2": 32,
+    "BLK_SLICE_FACTOR": 2
+   },
+   "num_warps": 4,
+   "num_stages": 5
+  },
+  "warmups": 3,
+  "note": "",
+  "pins": {
+   "_attn_fwd": {
+    "kwargs": {
+     "BLOCK_M": 128,
+     "BLOCK_N": 64
+    },
+    "num_warps": 4,
+    "num_stages": 3,
+    "pre_hook": "_host_descriptor_pre_hook"
+   }
+  }
+ },
+ {
+  "id": "triton_attn_bwd_pre_00",
+  "stratum": "attn_bwd_pre",
+  "kind": "tutorial06_attention_bwd",
+  "kernel": "_attn_bwd_preprocess",
+  "params": {
+   "z": 4,
+   "h": 32,
+   "n_ctx": 4096,
+   "head_dim": 128,
+   "causal": false,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M": 128
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": "",
+  "pins": {
+   "_attn_fwd": {
+    "kwargs": {
+     "BLOCK_M": 128,
+     "BLOCK_N": 64
+    },
+    "num_warps": 4,
+    "num_stages": 3,
+    "pre_hook": "_host_descriptor_pre_hook"
+   }
+  }
+ },
+ {
+  "id": "triton_extern_asin_01",
+  "stratum": "extern_asin",
+  "kind": "tutorial07_extern_asin",
+  "kernel": "asin_kernel",
+  "params": {
+   "n": 16777216,
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE": 1024
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_grouped_gemm_02",
+  "stratum": "grouped_gemm",
+  "kind": "tutorial08_grouped_gemm",
+  "kernel": "grouped_matmul_kernel",
+  "params": {
+   "group_mnk": [
+    2048,
+    1024,
+    512,
+    256,
+    2048,
+    1024,
+    512,
+    256
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "NUM_SM": 132
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_grouped_gemm_03",
+  "stratum": "grouped_gemm",
+  "kind": "tutorial08_grouped_gemm",
+  "kernel": "grouped_matmul_kernel",
+  "params": {
+   "group_mnk": [
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 64,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "NUM_SM": 132
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_grouped_gemm_tma_02",
+  "stratum": "grouped_gemm_tma",
+  "kind": "tutorial08_grouped_gemm_tma",
+  "kernel": "grouped_matmul_tma_kernel",
+  "params": {
+   "group_mnk": [
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024,
+    1024
+   ],
+   "dtype": "fp8e4m3"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 128
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_grouped_gemm_tma_03",
+  "stratum": "grouped_gemm_tma",
+  "kind": "tutorial08_grouped_gemm_tma",
+  "kernel": "grouped_matmul_tma_kernel",
+  "params": {
+   "group_mnk": [
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512,
+    512
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_attn_fwd_ws_00",
+  "stratum": "attn_fwd_ws",
+  "kind": "tutorial06_attention_fwd",
+  "kernel": "_attn_fwd",
+  "params": {
+   "z": 2,
+   "h": 32,
+   "n_ctx": 1024,
+   "head_dim": 64,
+   "causal": false,
+   "dtype": "fp16",
+   "warp_specialize": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M": 128,
+    "BLOCK_N": 64
+   },
+   "num_warps": 4,
+   "num_stages": 3,
+   "pre_hook": "_host_descriptor_pre_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_attn_fwd_ws_01",
+  "stratum": "attn_fwd_ws",
+  "kind": "tutorial06_attention_fwd",
+  "kernel": "_attn_fwd",
+  "params": {
+   "z": 1,
+   "h": 32,
+   "n_ctx": 1024,
+   "head_dim": 128,
+   "causal": false,
+   "dtype": "fp16",
+   "warp_specialize": true
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_M": 128,
+    "BLOCK_N": 128
+   },
+   "num_warps": 8,
+   "num_stages": 3,
+   "pre_hook": "_host_descriptor_pre_hook"
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_fp8_12",
+  "stratum": "matmul_fp8",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    512
+   ],
+   "dtype": "fp8e5m2",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 256,
+    "BLOCK_SIZE_K": 128,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_fp8_14",
+  "stratum": "matmul_fp8",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    2048,
+    2048,
+    1024
+   ],
+   "dtype": "fp8e5m2",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 256,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 128,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 8,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_matmul_fp8_23",
+  "stratum": "matmul_fp8",
+  "kind": "tutorial03_matmul",
+  "kernel": "matmul_kernel",
+  "params": {
+   "shape": [
+    4096,
+    2048,
+    1024
+   ],
+   "dtype": "fp8e5m2",
+   "activation": ""
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 64,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 4
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_layernorm_bwd_dx_03",
+  "stratum": "layernorm_bwd_dx",
+  "kind": "tutorial05_layer_norm_bwd",
+  "kernel": "_layer_norm_bwd_dx_fused",
+  "params": {
+   "m": 4096,
+   "n": 2048,
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "GROUP_SIZE_M": 64
+   },
+   "num_warps": 8,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_p9_matmul_persistent_03",
+  "stratum": "p9_matmul_persistent",
+  "kind": "tutorial09_matmul_persistent",
+  "kernel": "matmul_kernel_persistent",
+  "params": {
+   "shape": [
+    4096,
+    2048,
+    1024
+   ],
+   "dtype": "fp16"
+  },
+  "config": {
+   "kwargs": {
+    "BLOCK_SIZE_M": 128,
+    "BLOCK_SIZE_N": 128,
+    "BLOCK_SIZE_K": 64,
+    "GROUP_SIZE_M": 8
+   },
+   "num_warps": 4,
+   "num_stages": 3
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_gluon_ws_add_03",
+  "stratum": "gluon_ws_add",
+  "kind": "gluon08_elementwise_add_ws",
+  "kernel": "elementwise_add_warp_specialized_kernel",
+  "params": {
+   "shape": [
+    4096,
+    2048
+   ],
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "XBLOCK": 32,
+    "YBLOCK": 64
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ },
+ {
+  "id": "triton_gluon_ws_add_05",
+  "stratum": "gluon_ws_add",
+  "kind": "gluon08_elementwise_add_ws",
+  "kernel": "elementwise_add_warp_specialized_kernel",
+  "params": {
+   "shape": [
+    4096,
+    4096
+   ],
+   "dtype": "fp32"
+  },
+  "config": {
+   "kwargs": {
+    "XBLOCK": 32,
+    "YBLOCK": 128
+   },
+   "num_warps": 4,
+   "num_stages": 1
+  },
+  "warmups": 3,
+  "note": ""
+ }
+]

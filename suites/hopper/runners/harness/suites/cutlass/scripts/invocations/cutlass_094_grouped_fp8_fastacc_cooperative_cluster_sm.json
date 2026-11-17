@@ -1,0 +1,32 @@
+{
+  "case_id": "cutlass_094_grouped_fp8_fastacc_cooperative_cluster_sm",
+  "invocation": {
+    "argv": [
+      "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example57_grouped_fastacc",
+      "--benchmark=/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/harness/group_problems/cluster_sm/empty_8_k1024.txt",
+      "--iterations=1"
+    ],
+    "carveout": "auto",
+    "env": {
+      "CUTLASS_CLUSTER_SHAPE": "1x2x1",
+      "CUTLASS_CLUSTER_SM_COUNT": "2",
+      "CUTLASS_DELIVERY_ALGORITHM": "grouped_fp8_fastacc_cooperative",
+      "CUTLASS_DELIVERY_CASE_ID": "cutlass_094_grouped_fp8_fastacc_cooperative_cluster_sm",
+      "CUTLASS_DELIVERY_MODE": "cluster_sm",
+      "CUTLASS_DELIVERY_POST_MODE": "cooperative",
+      "CUTLASS_DELIVERY_SAMPLE_COUNT": "1",
+      "CUTLASS_DELIVERY_TRACE": "1",
+      "CUTLASS_DELIVERY_TRACE_ONLY": "1",
+      "GEMM_DELIVERY_GPU": "h100"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+      "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example57_grouped_fastacc",
+    "source_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/upstream/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+  },
+  "schema_version": "hopper.capture-case-invocation.v1"
+}

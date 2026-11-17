@@ -1,0 +1,28 @@
+{
+ "doc": "A CTA memory barrier (MEMBAR.ALL.CTA) or a proxy fence (FENCE.VIEW.ASYNC.S) issued while its CTA has synchronous shared stores accepted since the CTA's previous proxy fence starts when their acceptance ends. The memory barrier then takes its own service latency; the proxy fence takes its own service latency plus `cycles` (plus written bytes / `drain_bytes_per_cycle` when that field is set) and clears the CTA's record. Both hold the issuing warp until then; with nothing written neither is affected.",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "FENCE.VIEW.ASYNC.S",
+   "MEMBAR.ALL.CTA"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "shared_fence_drain"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "drain_bytes_per_cycle": {
+   "kind": "constant"
+  }
+ }
+}

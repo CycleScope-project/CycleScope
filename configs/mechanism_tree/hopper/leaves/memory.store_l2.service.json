@@ -1,0 +1,79 @@
+{
+ "memory.store_l2.service.root": {
+  "fields": {
+   "store_l2.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "store_flood.h100.r1"
+    ]
+   },
+   "store_l2.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 42
+    },
+    "sources": [
+     "hopper.c340d947c0ec62797f048c40"
+    ]
+   },
+   "store_l2.orders_loads": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "load_after_stores.h100.r1"
+    ]
+   },
+   "store_l2.partial_granule_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 32
+    },
+    "sources": [
+     "store_flood.h100.r1"
+    ]
+   },
+   "store_l2.partial_line_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "store_flood.h100.r1"
+    ]
+   },
+   "store_l2.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 31.65
+    },
+    "sources": [
+     "crossings.memory_port.h100.r3"
+    ]
+   },
+   "store_l2.shared_store_shares_fill_port": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "tma_store_loaded.h100.r6.shared_store"
+    ]
+   },
+   "store_l2.shares_fill_port": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "tma_store_loaded.h100.r6"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

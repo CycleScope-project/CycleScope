@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C74-HEURISTIC-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 222783,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2395836,
+ "completed": 2395836,
+ "cycles": 65039,
+ "hard": 0,
+ "walls": {
+  "convert": 7.6,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 5.7,
+  "total": 13.7
+ },
+ "rss_kb": {
+  "convert": 345932,
+  "segments": 345932,
+  "build": 345932,
+  "sim": 438648
+ },
+ "hw_cycles": 52184.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

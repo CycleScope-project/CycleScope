@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-FP8-EINSUM-BHD-BHR-HDR-R03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 120114,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 548641,
+ "completed": 548641,
+ "cycles": 17593,
+ "hard": 0,
+ "walls": {
+  "convert": 5.3,
+  "segments": 0.0,
+  "build": 0.2,
+  "sim": 2.3,
+  "total": 7.9
+ },
+ "rss_kb": {
+  "convert": 332368,
+  "segments": 332368,
+  "build": 332368,
+  "sim": 332368
+ },
+ "hw_cycles": 17830.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 2
+}

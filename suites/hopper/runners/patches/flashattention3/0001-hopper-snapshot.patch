@@ -1,0 +1,121 @@
+--- a/hopper/flash_api.cpp
++++ b/hopper/flash_api.cpp
+@@ -9,6 +9,18 @@
+ 
+ #include <cutlass/numeric_types.h>
+ 
++// FA3 delivery marker override: the cross-TU marker registry is present only when the build
++// prepended harness/override (FA3_DELIVERY_MARKER_OVERRIDE=1) ahead of CUTLASS on the include
++// path.  Probed via __has_include so the default build path stays byte-identical.
++#if defined(__has_include)
++#  if __has_include(<cutlass/fa3_marker_registry.h>)
++#    define FLASH_ATTN_3_HAS_MARKER_REGISTRY 1
++#  endif
++#endif
++#if FLASH_ATTN_3_HAS_MARKER_REGISTRY
++#  include <cutlass/fa3_marker_registry.h>
++#endif
++
+ #include "flash.h"
+ #include "static_switch.h"
+ #include "tile_size.h"
+@@ -1670,6 +1682,51 @@
+     return {out, softmax_lse};
+ }
+ 
++#if FLASH_ATTN_3_HAS_MARKER_REGISTRY
++namespace {
++
++// Number of translation units that registered a marker setter (one per nvcc TU that
++// compiled the device_kernel override).
++int64_t fa3_marker_tu_count() {
++    return static_cast<int64_t>(cutlass::fa3_marker::registry_size());
++}
++
++// Points every TU's `static __device__` marker symbols at the shared device buffers.
++// Tensors carry uint64 values bit-packed in torch.int64 (torch has no uint64 dtype);
++// the device side reinterprets them as unsigned 64-bit.
++void fa3_marker_set_buffers(at::Tensor markers,
++                            at::Tensor grid_ids,
++                            at::Tensor grids) {
++    constexpr int64_t kMarkerMaxLaunches = 256;
++    constexpr int64_t kMarkerMaxCtas = 1024;
++    constexpr int64_t kMarkerMaxWarps = 16;
++    constexpr int64_t kMarkerFields = 7;
++    const auto check_u64 = [](const at::Tensor& t, const char* name) {
++        CHECK_DEVICE(t);
++        CHECK_CONTIGUOUS(t);
++        TORCH_CHECK(t.scalar_type() == at::kLong, name, " must have dtype torch.int64 (uint64 bit pattern)");
++    };
++    check_u64(markers, "markers");
++    check_u64(grid_ids, "grid_ids");
++    check_u64(grids, "grids");
++    TORCH_CHECK(markers.numel() == kMarkerMaxLaunches * kMarkerMaxCtas * kMarkerMaxWarps * kMarkerFields,
++                "markers must have ", kMarkerMaxLaunches * kMarkerMaxCtas * kMarkerMaxWarps * kMarkerFields, " elements");
++    TORCH_CHECK(grid_ids.numel() == kMarkerMaxLaunches, "grid_ids must have ", kMarkerMaxLaunches, " elements");
++    TORCH_CHECK(grids.numel() == kMarkerMaxLaunches, "grids must have ", kMarkerMaxLaunches, " elements");
++    TORCH_CHECK(markers.get_device() == grid_ids.get_device() && markers.get_device() == grids.get_device(),
++                "markers, grid_ids and grids must be on the same device");
++
++    // cudaMemcpyToSymbol writes the current device's copy of the symbols.
++    auto guard = make_cuda_guard_from_tensor(markers);
++    cutlass::fa3_marker::set_all_tu_buffers(
++        reinterpret_cast<unsigned long long*>(markers.data_ptr<int64_t>()),
++        reinterpret_cast<unsigned long long*>(grid_ids.data_ptr<int64_t>()),
++        reinterpret_cast<unsigned long long*>(grids.data_ptr<int64_t>()));
++}
++
++}  // namespace
++#endif  // FLASH_ATTN_3_HAS_MARKER_REGISTRY
++
+ TORCH_LIBRARY(flash_attn_3, m) {
+     m.def("fwd("
+         "Tensor q,"
+@@ -1759,6 +1816,10 @@
+         "int num_splits = 0,"
+         "bool? pack_gqa = None,"
+         "int sm_margin = 0) -> Tensor");
++#if FLASH_ATTN_3_HAS_MARKER_REGISTRY
++    m.def("marker_tu_count() -> int");
++    m.def("marker_set_buffers(Tensor markers, Tensor grid_ids, Tensor grids) -> ()");
++#endif
+ }
+ 
+ TORCH_LIBRARY_IMPL(flash_attn_3, CUDA, m) {
+@@ -1766,4 +1827,22 @@
+     m.impl("bwd", &mha_bwd);
+     m.impl("fwd_combine", &mha_combine);
+     m.impl("get_scheduler_metadata", &mha_fwd_get_scheduler_metadata);
++#if FLASH_ATTN_3_HAS_MARKER_REGISTRY
++    m.impl("marker_set_buffers", &fa3_marker_set_buffers);
++    m.impl("marker_tu_count", &fa3_marker_tu_count);
++#endif
++}
++#if FLASH_ATTN_3_HAS_MARKER_REGISTRY
++// Zero-tensor op: no dispatch key can be derived from the arguments, so also register
++// the CPU implementation (identical function, reads the in-process registry only).
++TORCH_LIBRARY_IMPL(flash_attn_3, CPU, m) {
++    m.impl("marker_tu_count", &fa3_marker_tu_count);
++}
++// A no-tensor-argument op additionally needs a CompositeImplicitAutograd
++// registration to be callable through torch.ops with an empty dispatch key
++// set; CPU/CUDA registrations alone raise NotImplementedError (verified on the
++// H100 probe tree, 20260921).
++TORCH_LIBRARY_IMPL(flash_attn_3, CompositeImplicitAutograd, m) {
++    m.impl("marker_tu_count", &fa3_marker_tu_count);
+ }
++#endif
+--- a/hopper/setup.py
++++ b/hopper/setup.py
+@@ -687,6 +687,11 @@
+         Path(this_dir),
+         cutlass_dir / "include",
+     ]
++    # Delivery harness: FA3_DELIVERY_MARKER_OVERRIDE=1 prepends the local device_kernel.h
++    # marker override (harness/override) ahead of CUTLASS on the include path so every TU
++    # compiles the instrumented kernel.  Default build path is unchanged.
++    if os.environ.get("FA3_DELIVERY_MARKER_OVERRIDE") == "1":
++        include_dirs.insert(0, Path(this_dir).parent.parent / "harness" / "override")
+ 
+     ext_modules.append(
+         CUDAExtension(

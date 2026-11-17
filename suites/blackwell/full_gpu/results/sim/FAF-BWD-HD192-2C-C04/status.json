@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-BWD-HD192-2C-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 188407,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2405965,
+ "completed": 2405965,
+ "cycles": 35530,
+ "hard": 0,
+ "walls": {
+  "convert": 5.8,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 6.2,
+  "total": 12.4
+ },
+ "rss_kb": {
+  "convert": 300280,
+  "segments": 300280,
+  "build": 300280,
+  "sim": 454684
+ },
+ "hw_cycles": 40821.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 5
+}

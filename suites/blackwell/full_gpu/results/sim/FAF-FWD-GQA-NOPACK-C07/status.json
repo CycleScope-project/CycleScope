@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-GQA-NOPACK-C07",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 872060,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 12338256,
+ "completed": 12338256,
+ "cycles": 59692,
+ "hard": 0,
+ "walls": {
+  "convert": 20.9,
+  "segments": 0.1,
+  "build": 1.5,
+  "sim": 28.7,
+  "total": 51.2
+ },
+ "rss_kb": {
+  "convert": 466276,
+  "segments": 466276,
+  "build": 466276,
+  "sim": 1401656
+ },
+ "hw_cycles": 63659.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 16
+}

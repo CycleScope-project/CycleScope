@@ -1,0 +1,20 @@
+{
+ "doc": "imported from legacy mechanism memory.launch_overhead",
+ "doc_blackwell": "imported from legacy mechanism kernel.lifecycle",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "kernel.lifecycle"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "envelope_cycles": {
+   "kind": "linear",
+   "axis": "launch_warps_per_cta"
+  }
+ }
+}

@@ -1,0 +1,37 @@
+{
+ "doc": "imported from legacy mechanism memory.dispatch",
+ "doc_blackwell": "imported from legacy mechanism launch.dispatch",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "launch.dispatch"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "enabled": {
+   "kind": "constant"
+  },
+  "first_wave_interval_ns": {
+   "kind": "constant"
+  },
+  "serial_ns_per_cta": {
+   "kind": "constant"
+  },
+  "slot_free_to_entry_ns": {
+   "kind": "constant"
+  },
+  "slot_free_to_entry_slow_ns": {
+   "kind": "constant"
+  },
+  "slow_gpc_mask": {
+   "kind": "constant"
+  },
+  "dependents_launch_serial_ns": {
+   "kind": "constant"
+  }
+ }
+}

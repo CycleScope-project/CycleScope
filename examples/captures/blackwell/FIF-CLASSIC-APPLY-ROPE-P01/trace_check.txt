@@ -1,0 +1,7 @@
+{
+ "launch": 9,
+ "function_id": 5,
+ "trace": "trace-9.bin.zst",
+ "trace_bytes": 24594645
+}
+trace_check: OK (quick)

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-PAGED-SPLITKV-P04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 321895,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4386621,
+ "completed": 4386621,
+ "cycles": 46258,
+ "hard": 0,
+ "walls": {
+  "convert": 11.2,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 10.8,
+  "total": 22.7
+ },
+ "rss_kb": {
+  "convert": 381576,
+  "segments": 381576,
+  "build": 381576,
+  "sim": 803532
+ },
+ "hw_cycles": 52113.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 6
+}

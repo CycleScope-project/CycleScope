@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "triton_vecadd_03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2031616,
+ "completed": 2031616,
+ "cycles": 116558,
+ "hard": 0,
+ "walls": {
+  "convert": 3.9,
+  "segments": 0.1,
+  "build": 1.0,
+  "sim": 12.4,
+  "total": 17.5
+ },
+ "rss_kb": {
+  "convert": 121272,
+  "segments": 121272,
+  "build": 121272,
+  "sim": 816640
+ },
+ "hw_cycles": 121189.0,
+ "reference_cache_control": "all",
+ "placement_digest": "33a6d69dae9cb75b",
+ "shards": 5
+}

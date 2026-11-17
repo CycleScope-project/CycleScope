@@ -1,0 +1,34 @@
+{
+ "register_file.operand_read.root": {
+  "fields": {
+   "collector": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "dispatch_contention.b300.v4r1"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "dispatch_contention.b300.v4r1"
+    ]
+   },
+   "reads_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "dispatch_contention.b300.v4r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ }
+}

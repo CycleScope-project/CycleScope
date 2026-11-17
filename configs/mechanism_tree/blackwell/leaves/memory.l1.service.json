@@ -1,0 +1,54 @@
+{
+ "memory.l1.service.root": {
+  "fields": {
+   "l1.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "mechtree.w9.memq.l1_issue_interval",
+     "crossings.l1_bandwidth.b300.r2"
+    ]
+   },
+   "l1.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 38.46875
+    },
+    "sources": [
+     "memlat.b300.r2"
+    ]
+   },
+   "l1.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 127.70614654937138
+    },
+    "sources": [
+     "mechtree.w3.memory.l1.sector_bytes_per_cycle",
+     "crossings.l1_bandwidth.b300.r2"
+    ]
+   },
+   "l1.local_frame_interleaved": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "load_after_copies.b300.v3"
+    ]
+   },
+   "l1.local_hit_latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 32.4
+    },
+    "sources": [
+     "load_after_copies.b300.v3"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

@@ -1,0 +1,94 @@
+{
+ "doc": "imported from legacy mechanism tensor.accumulator_handoff.consumer; consumer side of a relation: the engine binds it on an FFMA reading the last wgmma's accumulator window and supplies the producer's facts (engine_axes operation_class/datatype/source_mode/tensor_m/n/k from the wgmma template's shared_operand_occupancy row) plus group_depth (engine.md §14.2)",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "FFMA"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "hopper_wgmma_handoff_consumer",
+  "engine_axes": [
+   "operation_class",
+   "datatype",
+   "source_mode",
+   "tensor_m",
+   "tensor_n",
+   "tensor_k"
+  ]
+ },
+ "root": {
+  "children": [
+   {
+    "guard": {
+     "axis": "group_depth",
+     "operator": "range",
+     "value": [
+      0,
+      1
+     ]
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 0
+       },
+       "sources": [
+        "wgmma_handoff.h100.r1c"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 0
+       },
+       "sources": [
+        "wgmma_handoff.h100.r1c"
+       ]
+      }
+     },
+     "scope": "instruction"
+    }
+   },
+   {
+    "guard": {
+     "axis": "group_depth",
+     "operator": "range",
+     "value": [
+      2,
+      4294967295
+     ]
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 0
+       },
+       "sources": [
+        "wgmma_handoff.h100.r1c"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 0
+       },
+       "sources": [
+        "wgmma_handoff.h100.r1c"
+       ]
+      }
+     },
+     "scope": "instruction"
+    }
+   }
+  ],
+  "partition_axis": "group_depth",
+  "partition_domain": [
+   0,
+   4294967295
+  ]
+ }
+}

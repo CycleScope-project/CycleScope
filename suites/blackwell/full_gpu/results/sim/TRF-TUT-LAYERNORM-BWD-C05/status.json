@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-LAYERNORM-BWD-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2645760,
+ "completed": 2645760,
+ "cycles": 25225,
+ "hard": 0,
+ "walls": {
+  "convert": 4.3,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 5.1,
+  "total": 9.8
+ },
+ "rss_kb": {
+  "convert": 202316,
+  "segments": 202316,
+  "build": 202316,
+  "sim": 477064
+ },
+ "hw_cycles": 39467.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 4
+}

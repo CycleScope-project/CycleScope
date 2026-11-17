@@ -1,0 +1,2829 @@
+{
+  "suite": "triton",
+  "cap": 8,
+  "families": [
+    {
+      "id": "tut_matmul_fp16",
+      "stratum": "matmul_tutorial",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial03_matmul",
+        "entry": "tutorial_03_matrix_multiplication.matmul",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096",
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/03-matrix-multiplication.py:343",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/03-matrix-multiplication.py:343"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 03 autotune; configs saved by an unprofiled prepass and pinned for NCU; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_matmul_fp8",
+      "stratum": "matmul_tutorial",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial03_matmul",
+        "entry": "tutorial_03_matrix_multiplication.matmul",
+        "dtype": "fp8",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_fp8",
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/03-matrix-multiplication.py:343",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/03-matrix-multiplication.py:343"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 03 FP8 autotune; configs saved by an unprofiled prepass and pinned for NCU; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_vecadd",
+      "stratum": "elementwise_misc",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial01_vecadd",
+        "entry": "tutorial_01_vector_add.add_kernel",
+        "dtype": "fp32",
+        "shape": [
+          16777216
+        ],
+        "shape_tag": "N16777216",
+        "params": {
+          "block_size": 1024
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16777216,
+            "min": 1048576,
+            "max": 67108864,
+            "step": 1024
+          }
+        ],
+        "I": {
+          "path": "params.block_size",
+          "base": 1024,
+          "min": 1024,
+          "max": 1024,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N, BLOCK_SIZE)",
+        "evidence": "triton@v3.7.0:python/tutorials/01-vector-add.py:70",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/01-vector-add.py:70"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*add_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 01; upstream has no c450full 3+1 loop; BLOCK_SIZE pinned at the tutorial default 1024 (a tuning parameter, not a workload axis; tl.arange needs a power of 2)"
+    },
+    {
+      "id": "tut_persist_naive",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_naive",
+        "params": {
+          "variant": "naive"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:151",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:151"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 09; autotune is isolated to the unprofiled prepass; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_persist_persistent",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_persistent",
+        "params": {
+          "variant": "persistent"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(default tile count, NUM_SMS)",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:330",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:330"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_persistent.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 09; autotune is isolated to the unprofiled prepass; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_persist_tma",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_tma",
+        "params": {
+          "variant": "tma"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:234",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:234"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_tma.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial 09; autotune is isolated to the unprofiled prepass; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_persist_ws",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_tma_ws_persistent",
+        "params": {
+          "variant": "tma_ws_persistent"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(default tile count, NUM_SMS)",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:435",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:435"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_tma_persistent.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "warp-specialized TMA persistent variant uses matmul_kernel_tma_persistent (triton@v3.7.0:python/tutorials/09-persistent-matmul.py:361,617-630)"
+    },
+    {
+      "id": "tut_softmax",
+      "stratum": "norm_softmax",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial02_softmax",
+        "entry": "tutorial02_softmax",
+        "dtype": "fp16",
+        "shape": [
+          16384,
+          4096
+        ],
+        "shape_tag": "M16384_N4096",
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16384,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SM * occupancy, rows)",
+        "evidence": "triton@v3.7.0:python/tutorials/02-fused-softmax.py:80-155",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/02-fused-softmax.py:80-155"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*softmax_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial implementation; correctness is checked after the final call; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_layernorm_fwd",
+      "stratum": "norm_softmax",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial05_layernorm_fwd",
+        "entry": "tutorial05_layernorm_fwd",
+        "dtype": "fp16",
+        "shape": [
+          16384,
+          4096
+        ],
+        "shape_tag": "M16384_N4096",
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16384,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "M rows",
+        "evidence": "triton@v3.7.0:python/tutorials/05-layer-norm.py:22-70,170-188",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/05-layer-norm.py:22-70,170-188"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*_layer_norm_fwd_fused.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "official tutorial implementation; correctness is checked after the final call; upstream has no c450full 3+1 loop"
+    },
+    {
+      "id": "tut_layernorm_bwd",
+      "stratum": "norm_softmax",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial05_layernorm_bwd",
+        "entry": "tutorial05_layernorm_bwd",
+        "dtype": "fp16",
+        "shape": [
+          1151,
+          8192
+        ],
+        "shape_tag": "M1151_N8192",
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1151,
+            "min": 148,
+            "max": 65536,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 8192,
+          "min": 8192,
+          "max": 8192,
+          "step": 8192
+        }
+      },
+      "grid": {
+        "formula": "M rows",
+        "evidence": "triton@v3.7.0:python/tutorials/05-layer-norm.py:71-159,198-221",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/05-layer-norm.py:71-159,198-221"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*_layer_norm_bwd_dx_fused.*",
+      "aux_kernels": [
+        ".*_layer_norm_fwd_fused.*",
+        ".*_layer_norm_bwd_dwdb.*"
+      ],
+      "status": "draft",
+      "notes": "runner now matches the upstream test shape M=1151,N=8192 and its fp16 input distribution/tolerances; smoke-tr2 at M16384,N4096 failed weight.grad (2549/4096, max abs 0.078 > 0.01); each call rebuilds the graph and LayerNorm.backward allocates fresh lock/_dw/_db buffers (triton@v3.7.0:python/tutorials/05-layer-norm.py:198-218,300-323,374)"
+    },
+    {
+      "id": "tut_blockscaled",
+      "stratum": "matmul_blockscaled",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "tutorial 10 low-level descriptor variants need a separate runner path"
+    },
+    {
+      "id": "tut_grouped",
+      "stratum": "grouped_gemm",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks tutorial 08 pointer/TMA grouped GEMM wrappers"
+    },
+    {
+      "id": "tut_attention_fwd",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks tutorial 06 forward attention wrapper"
+    },
+    {
+      "id": "tut_attention_bwd",
+      "stratum": "attention_bwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks tutorial 06 backward attention wrappers"
+    },
+    {
+      "id": "triton_kernels_moe",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "source-tree package import is not yet verified in the GPU image"
+    },
+    {
+      "id": "tut_dropout",
+      "stratum": "elementwise_misc",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "unsupported",
+        "shape": [
+          1
+        ],
+        "shape_tag": "unsupported"
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1,
+            "min": 1,
+            "max": 1,
+            "step": 1
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 1,
+          "min": 1,
+          "max": 1,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "",
+        "evidence": "",
+        "persistent": false,
+        "persistent_evidence": ""
+      },
+      "calls": {
+        "value": 0,
+        "formula": "no full-mode call path",
+        "evidence": ""
+      },
+      "main_kernel": "",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "runner lacks official tutorial 04/07 wrappers"
+    },
+    {
+      "id": "tut_persist_tma_persistent",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_tma_persistent",
+        "params": {
+          "variant": "tma_persistent"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_SIZE_M) * ceil_div(N,BLOCK_SIZE_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:437-452",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:437-452"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_tma_persistent.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "TMA persistent matmul without warp specialization; grid is NUM_SMS-bounded by the tutorial entrypoint"
+    },
+    {
+      "id": "tut_persist_tma_ws",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_tma_ws",
+        "params": {
+          "variant": "tma_ws"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M,BLOCK_SIZE_M) * ceil_div(N,BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:218-246",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:218-246"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_tma.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Non-persistent TMA matmul with warp specialization enabled"
+    },
+    {
+      "id": "tut_persist_descriptor_persistent",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_descriptor_persistent",
+        "params": {
+          "variant": "descriptor_persistent"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_SIZE_M) * ceil_div(N,BLOCK_SIZE_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:540-571",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:540-571"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_descriptor_persistent.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Device-created Tensor Descriptor persistent matmul with warp_specialize=False; grid is NUM_SMS-bounded by the tutorial entrypoint"
+    },
+    {
+      "id": "tut_persist_descriptor_ws_persistent",
+      "stratum": "matmul_persistent",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial09_matmul",
+        "dtype": "fp16",
+        "entry": "tutorial_09_persistent_matmul",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "M4096_N4096_K4096_descriptor_ws_persistent",
+        "params": {
+          "variant": "descriptor_ws_persistent"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_SIZE_M) * ceil_div(N,BLOCK_SIZE_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:540-571",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/09-persistent-matmul.py:540-571"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": ""
+      },
+      "main_kernel": ".*matmul_kernel_descriptor_persistent.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Device-created Tensor Descriptor persistent matmul with warp_specialize=True; grid is NUM_SMS-bounded by the tutorial entrypoint"
+    },
+    {
+      "id": "tut_attn_fwd_fp16_noncausal",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP16_NONCAUSAL",
+        "params": {
+          "mode": "fwd",
+          "causal": false,
+          "warp_specialize": false
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP16 reference and input distribution match official test_op; head dimension constrained to benchmarked 64/128 values (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690,704-710)"
+    },
+    {
+      "id": "tut_attn_fwd_fp16_noncausal_ws",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP16_NONCAUSAL_WS",
+        "params": {
+          "mode": "fwd",
+          "causal": false,
+          "warp_specialize": true
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP16 reference and input distribution match official test_op; head dimension constrained to benchmarked 64/128 values (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690,704-710)"
+    },
+    {
+      "id": "tut_attn_fwd_fp16_causal",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP16_CAUSAL",
+        "params": {
+          "mode": "fwd",
+          "causal": true,
+          "warp_specialize": false
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP16 reference and input distribution match official test_op; head dimension constrained to benchmarked 64/128 values (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690,704-710)"
+    },
+    {
+      "id": "tut_attn_fwd_fp16_causal_ws",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP16_CAUSAL_WS",
+        "params": {
+          "mode": "fwd",
+          "causal": true,
+          "warp_specialize": true
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP16 reference and input distribution match official test_op; head dimension constrained to benchmarked 64/128 values (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690,704-710)"
+    },
+    {
+      "id": "tut_attn_fwd_fp8_1c",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp8",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP8_1C",
+        "params": {
+          "mode": "fwd",
+          "causal": false,
+          "warp_specialize": false
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP8 forward is enabled by the official Blackwell test path; reference uses FP32 and atol=3 (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-675,700-710)"
+    },
+    {
+      "id": "tut_attn_fwd_fp8_ws",
+      "stratum": "attention_fwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp8",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_FWD_FP8_WS",
+        "params": {
+          "mode": "fwd",
+          "causal": false,
+          "warp_specialize": true
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_M) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:550-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_fwd.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "FP8 forward is enabled by the official Blackwell test path; reference uses FP32 and atol=3 (triton@v3.7.0:python/tutorials/06-fused-attention.py:634-675,700-710)"
+    },
+    {
+      "id": "tut_attn_bwd_fp16",
+      "stratum": "attention_bwd",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial06_attention",
+        "entry": "tutorial_06_fused_attention._attention.apply",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          32,
+          1024,
+          128
+        ],
+        "shape_tag": "TUT_ATTN_BWD_FP16",
+        "params": {
+          "mode": "bwd",
+          "causal": false,
+          "warp_specialize": false
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N_CTX, BLOCK_N1) * BATCH * N_HEAD",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:558-568",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:558-568"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/06-fused-attention.py:634-690; suites/triton/official/run.py:_fused_attention"
+      },
+      "main_kernel": ".*_attn_bwd.*",
+      "aux_kernels": [
+        ".*_attn_bwd_preprocess.*",
+        ".*_attn_fwd.*"
+      ],
+      "status": "draft",
+      "notes": "FP16 backward mirrors official test_op; preprocessing and forward kernels are auxiliary (triton@v3.7.0:python/tutorials/06-fused-attention.py:558-590,659-690)"
+    },
+    {
+      "id": "tut_group_gemm_ptr",
+      "stratum": "grouped_gemm",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial08_grouped_gemm",
+        "entry": "tutorial_08_grouped_gemm.group_gemm_fn",
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          512,
+          256,
+          128
+        ],
+        "shape_tag": "TUT_GROUP_GEMM_PTR",
+        "params": {
+          "variant": "ptr",
+          "group_count": 4
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 512,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          },
+          {
+            "path": "shape.2",
+            "base": 256,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 128,
+          "max": 8192,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "NUM_SM CTAs; each program advances tile_idx by NUM_SM",
+        "evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:140-185,372-400",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:140-185,372-400"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:372-400; suites/triton/official/run.py:_grouped_gemm"
+      },
+      "main_kernel": ".*grouped_matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Uses official four-group sizes [1024,512,256,128]; group_count is pinned at 4"
+    },
+    {
+      "id": "tut_group_gemm_tma",
+      "stratum": "grouped_gemm",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial08_grouped_gemm",
+        "entry": "tutorial_08_grouped_gemm.group_gemm_tma_fn",
+        "dtype": "fp16",
+        "shape": [
+          1024,
+          512,
+          256,
+          128
+        ],
+        "shape_tag": "TUT_GROUP_GEMM_TMA",
+        "params": {
+          "variant": "tma",
+          "group_count": 4
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 1024,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 512,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          },
+          {
+            "path": "shape.2",
+            "base": 256,
+            "min": 128,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 128,
+          "max": 8192,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "NUM_SM CTAs; each program advances tile_idx by NUM_SM",
+        "evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:318-330,372-400",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:318-330,372-400"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/08-grouped-gemm.py:372-400; suites/triton/official/run.py:_grouped_gemm"
+      },
+      "main_kernel": ".*grouped_matmul_tma_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Uses official four-group sizes [1024,512,256,128]; group_count is pinned at 4"
+    },
+    {
+      "id": "tut_blockscaled_nvfp4",
+      "stratum": "matmul_blockscaled",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial10_block_scaled",
+        "entry": "tutorial_10_block_scaled_matmul.block_scaled_matmul",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "TUT_BLOCKSCALED_NVFP4",
+        "params": {
+          "block_scale_type": "nvfp4"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:323-344; suites/triton/official/run.py:_block_scaled"
+      },
+      "main_kernel": ".*block_scaled_matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "nvfp4 uses tutorial block sizes BM=128, BN=256, BK=256; axes preserve scale/tile divisibility (triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:218-223)"
+    },
+    {
+      "id": "tut_blockscaled_mxfp4",
+      "stratum": "matmul_blockscaled",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial10_block_scaled",
+        "entry": "tutorial_10_block_scaled_matmul.block_scaled_matmul",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "TUT_BLOCKSCALED_MXFP4",
+        "params": {
+          "block_scale_type": "mxfp4"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:323-344; suites/triton/official/run.py:_block_scaled"
+      },
+      "main_kernel": ".*block_scaled_matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "mxfp4 uses tutorial block sizes BM=128, BN=256, BK=256; axes preserve scale/tile divisibility (triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:218-223)"
+    },
+    {
+      "id": "tut_blockscaled_mxfp8",
+      "stratum": "matmul_blockscaled",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial10_block_scaled",
+        "entry": "tutorial_10_block_scaled_matmul.block_scaled_matmul",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "TUT_BLOCKSCALED_MXFP8",
+        "params": {
+          "block_scale_type": "mxfp8"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(M, BLOCK_SIZE_M) * ceil_div(N, BLOCK_SIZE_N)",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:237-274"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:323-344; suites/triton/official/run.py:_block_scaled"
+      },
+      "main_kernel": ".*block_scaled_matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "mxfp8 uses tutorial block sizes BM=128, BN=256, BK=128; axes preserve scale/tile divisibility (triton@v3.7.0:python/tutorials/10-block-scaled-matmul.py:218-223)"
+    },
+    {
+      "id": "tut_seeded_dropout",
+      "stratum": "elementwise_misc",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial04_seeded_dropout",
+        "entry": "tutorial_04_low_memory_dropout.seeded_dropout",
+        "dtype": "fp32",
+        "shape": [
+          16777216
+        ],
+        "shape_tag": "N16777216_tut_seeded_dropout",
+        "params": {
+          "block_size": 1024,
+          "p": 0.5,
+          "seed": 123
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16777216,
+            "min": 1048576,
+            "max": 67108864,
+            "step": 1024
+          }
+        ],
+        "I": {
+          "path": "params.block_size",
+          "base": 1024,
+          "min": 1024,
+          "max": 1024,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N, BLOCK_SIZE)",
+        "persistent": false,
+        "evidence": "triton@v3.7.0:python/tutorials/04-low-memory-dropout.py:79-84",
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/04-low-memory-dropout.py:79-84"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/04-low-memory-dropout.py:143-155"
+      },
+      "main_kernel": ".*_seeded_dropout.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "seeded dropout repeats the same seed and input for deterministic output; block size is pinned to tutorial constant 1024 (block_size fixed at tutorial default 1024: triton@v3.7.0:python/tutorials/04-low-memory-dropout.py:79-84)"
+    },
+    {
+      "id": "tut_asin",
+      "stratum": "elementwise_misc",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial07_asin",
+        "entry": "tutorial_07_extern_functions.asin_kernel",
+        "dtype": "fp32",
+        "shape": [
+          16777216
+        ],
+        "shape_tag": "N16777216_tut_asin",
+        "params": {
+          "block_size": 1024
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16777216,
+            "min": 1048576,
+            "max": 67108864,
+            "step": 1024
+          }
+        ],
+        "I": {
+          "path": "params.block_size",
+          "base": 1024,
+          "min": 1024,
+          "max": 1024,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N, BLOCK_SIZE)",
+        "persistent": false,
+        "evidence": "triton@v3.7.0:python/tutorials/07-extern-functions.py:29-46,94-95",
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/07-extern-functions.py:29-46,94-95"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/07-extern-functions.py:94-99"
+      },
+      "main_kernel": ".*asin_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Libdevice asin uses the tutorial libdevice.10.bc path and block size 1024; block_size fixed at tutorial default 1024 (triton@v3.7.0:python/tutorials/07-extern-functions.py:94-95)"
+    },
+    {
+      "id": "tut_pdl_add",
+      "stratum": "elementwise_misc",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "tutorial11_pdl_add",
+        "entry": "tutorial_11_programmatic_dependent_launch.add",
+        "dtype": "fp32",
+        "shape": [
+          16777216
+        ],
+        "shape_tag": "N16777216_tut_pdl_add",
+        "params": {
+          "block_size": 1024,
+          "launch_pdl": true
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 16777216,
+            "min": 1048576,
+            "max": 67108864,
+            "step": 1024
+          }
+        ],
+        "I": {
+          "path": "params.block_size",
+          "base": 1024,
+          "min": 1024,
+          "max": 1024,
+          "step": 1024
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(N, BLOCK_SIZE)",
+        "persistent": false,
+        "evidence": "triton@v3.7.0:python/tutorials/11-programmatic-dependent-launch.py:58-67",
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/11-programmatic-dependent-launch.py:58-67"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/11-programmatic-dependent-launch.py:58-68"
+      },
+      "main_kernel": ".*add_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "PDL uses launch_pdl=True and the tutorial BLOCK_SIZE=1024 constant (block_size fixed at tutorial default 1024: triton@v3.7.0:python/tutorials/11-programmatic-dependent-launch.py:58-67)"
+    },
+    {
+      "id": "tk_matmul_dense",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_matmul_dense",
+        "entry": "triton_kernels.matmul.matmul",
+        "dtype": "float16",
+        "shape": [
+          4096,
+          2560,
+          1024
+        ],
+        "shape_tag": "TK_MATMUL_DENSE",
+        "params": {
+          "split_k": 1,
+          "do_gather": false,
+          "do_scatter": false,
+          "inner_expt_opt": null,
+          "do_gamma": false,
+          "is_persistent": false,
+          "num_warps": null,
+          "block_m": 128,
+          "b_hbm_swizzling": false,
+          "a_hbm_swizzling": false,
+          "colmajor_mxfp_weight": true,
+          "epilogue_subtile": null,
+          "a_transpose": false,
+          "b_transpose": false,
+          "c_transpose": false,
+          "swiglu_opts": null,
+          "test_file": "test_matmul.py",
+          "mode": "plain",
+          "act_dtype_str": "float16",
+          "weight_dtype_str": "float16",
+          "n_slices": 1
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 2048,
+            "max": 4096,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 2560,
+            "min": 2560,
+            "max": 4096,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 1024,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "batch_size * grid_m * grid_n * split_k; ragged M uses metadata.n_blocks",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:403-410",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:403-410"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_matmul.py:212-233,395-430"
+      },
+      "main_kernel": ".*_matmul.*",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "smoke-tr13 full-mode run timed out (repeat_rc=124 at 1200s) with NCU connected but no kernel rows; official prepass passed. One-call diagnosis smoke-tr14-debug (calls=1) also timed out (repeat_rc=124 at 300s) with the same no-row NCU log. This rules out repeated API calls as the sole trigger. The full runner uses direct official matmul API inputs; source dispatch selects non-persistent _matmul for is_persistent=False (triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:338-343,498-553), not _p_matmul. No autotuner decorator or global semaphore/atomic was found in this non-persistent path. Exact blocked stage remains unverified because NCU emitted no rows and the GPU job retained no application progress log; keep dropped with app_timeout evidence."
+    },
+    {
+      "id": "tk_matmul_ragged_moe",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_matmul_ragged",
+        "entry": "triton_kernels.matmul.matmul",
+        "dtype": "float16",
+        "shape": [
+          4096,
+          2560,
+          1024
+        ],
+        "shape_tag": "TK_MATMUL_RAGGED_MOE",
+        "params": {
+          "split_k": 1,
+          "do_gather": true,
+          "do_scatter": true,
+          "inner_expt_opt": null,
+          "do_gamma": false,
+          "is_persistent": false,
+          "num_warps": null,
+          "block_m": 128,
+          "b_hbm_swizzling": false,
+          "a_hbm_swizzling": false,
+          "colmajor_mxfp_weight": true,
+          "epilogue_subtile": null,
+          "a_transpose": false,
+          "b_transpose": false,
+          "c_transpose": false,
+          "swiglu_opts": null,
+          "test_file": "test_matmul.py",
+          "mode": "ragged",
+          "act_dtype_str": "float16",
+          "weight_dtype_str": "float16",
+          "n_slices": 10
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 2048,
+            "max": 4096,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 2560,
+            "min": 2560,
+            "max": 4096,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 1024,
+          "min": 128,
+          "max": 65536,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "batch_size * grid_m * grid_n * split_k; ragged M uses metadata.n_blocks",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:403-410",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:403-410"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_matmul.py:212-233,395-430"
+      },
+      "main_kernel": ".*_matmul.*",
+      "aux_kernels": [],
+      "status": "dropped",
+      "notes": "smoke-tr13 full-mode run timed out (repeat_rc=124 at 1200s) with NCU connected but no kernel rows; official prepass passed. One-call diagnosis smoke-tr14-debug (calls=1) also timed out (repeat_rc=124 at 300s) with the same no-row NCU log. This rules out repeated API calls as the sole trigger. The full runner uses direct official matmul API inputs; source dispatch selects non-persistent _matmul for is_persistent=False (triton@v3.7.0:python/triton_kernels/triton_kernels/matmul.py:338-343,498-553), not _p_matmul. No autotuner decorator or global semaphore/atomic was found in this non-persistent path. Exact blocked stage remains unverified because NCU emitted no rows and the GPU job retained no application progress log; keep dropped with app_timeout evidence."
+    },
+    {
+      "id": "tk_topk",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_topk",
+        "entry": "triton_kernels.topk.topk",
+        "dtype": "float32",
+        "shape": [
+          8192,
+          128
+        ],
+        "shape_tag": "TK_TOPK",
+        "params": {
+          "test_file": "test_topk.py",
+          "n_rows": 8192,
+          "n_cols": 128,
+          "k": 8,
+          "apply_softmax": false,
+          "dtype": "float32"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 8192,
+            "min": 4736,
+            "max": 32768,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 128,
+            "min": 32,
+            "max": 16384,
+            "step": 32
+          }
+        ],
+        "I": {
+          "path": "params.k",
+          "base": 8,
+          "min": 8,
+          "max": 8,
+          "step": 8
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(n_rows, BLOCK_M=32)",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/topk.py:58-67",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/topk.py:58-67"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_topk.py:15-27"
+      },
+      "main_kernel": ".*_topk_forward.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "The top-k forward grid is ceil_div(n_rows, 32); n_cols must remain <32768. Base rows=8192 and min rows=4736 keep all P points at grid>=148 (triton@v3.7.0:python/triton_kernels/triton_kernels/topk.py:25-38,58-67; tests/test_topk.py:10-24)"
+    },
+    {
+      "id": "tk_swiglu",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_swiglu",
+        "entry": "triton_kernels.swiglu.swiglu",
+        "dtype": "bfloat16",
+        "shape": [
+          4096,
+          8192
+        ],
+        "shape_tag": "TK_SWIGLU",
+        "params": {
+          "test_file": "test_swiglu.py",
+          "m": 4096,
+          "n": 8192,
+          "limit": 0.01,
+          "alpha": 0.5
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 2048,
+            "max": 8192,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.1",
+          "base": 8192,
+          "min": 4096,
+          "max": 16384,
+          "step": 128
+        }
+      },
+      "grid": {
+        "formula": "min(M_BLOCKS*N_BLOCKS, 4*NUM_SMS) or 8*NUM_SMS",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/swiglu.py:39-52",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/swiglu.py:39-52"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_swiglu.py:25-32"
+      },
+      "main_kernel": ".*_swiglu.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "M and N are passed directly to the library API; the semi-persistent grid is capped at 8*num_sms when work reaches that threshold. Base M=4096,N=8192 increases per-CTA work while retaining the 8-wave grid (triton@v3.7.0:python/triton_kernels/triton_kernels/swiglu.py:29-52; tests/test_swiglu.py:23-31)"
+    },
+    {
+      "id": "tk_reduce",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_reduce",
+        "entry": "triton_kernels.reduce.reduce",
+        "dtype": "float32",
+        "shape": [
+          16,
+          1536,
+          768
+        ],
+        "shape_tag": "TK_REDUCE",
+        "params": {
+          "test_file": "test_reduce.py",
+          "batch": 16,
+          "m": 1536,
+          "n": 768,
+          "dtype": "float32",
+          "dim": 0,
+          "mask_mode": "none"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.1",
+            "base": 1536,
+            "min": 1024,
+            "max": 4096,
+            "step": 128
+          },
+          {
+            "path": "shape.2",
+            "base": 768,
+            "min": 640,
+            "max": 2048,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.0",
+          "base": 16,
+          "min": 8,
+          "max": 64,
+          "step": 1
+        }
+      },
+      "grid": {
+        "formula": "ceil_div(S0, BLOCK_S0=32) * ceil_div(Y_S1, BLOCK_Y_S1=128)",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/reduce.py:252-269",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/reduce.py:252-269"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_reduce.py:62-117"
+      },
+      "main_kernel": ".*_reduce_forward.*",
+      "aux_kernels": [
+        ".*_reduce_backward.*"
+      ],
+      "status": "draft",
+      "notes": "P scales the unreduced output M,N dimensions that determine the 2D launch grid; I scales the reduced batch B. Base M=1536,N=768 and P minima produce grid>=160 (triton@v3.7.0:python/triton_kernels/triton_kernels/reduce.py:252-269; tests/test_reduce.py:70-104)"
+    },
+    {
+      "id": "tk_compaction",
+      "stratum": "triton_kernels_moe",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "triton_kernels_compaction",
+        "entry": "triton_kernels.compaction.compaction",
+        "dtype": "bfloat16",
+        "shape": [
+          32768,
+          64
+        ],
+        "shape_tag": "TK_COMPACTION",
+        "params": {
+          "test_file": "test_compaction.py",
+          "n_tokens": 32768,
+          "n_cols": 64,
+          "k": 4,
+          "p": 0.5
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 32768,
+            "min": 8192,
+            "max": 65536,
+            "step": 1
+          },
+          {
+            "path": "shape.1",
+            "base": 64,
+            "min": 32,
+            "max": 1024,
+            "step": 32
+          }
+        ],
+        "I": {
+          "path": "params.k",
+          "base": 4,
+          "min": 4,
+          "max": 16,
+          "step": 4
+        }
+      },
+      "grid": {
+        "formula": "n_rows CTAs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/compaction.py:32-43",
+        "persistent": false,
+        "persistent_evidence": "triton@v3.7.0:python/triton_kernels/triton_kernels/compaction.py:32-43"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/triton_kernels/tests/test_compaction.py:12-27"
+      },
+      "main_kernel": ".*_masked_compaction.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "n_tokens directly determines one compaction CTA per row; P scales that work and input is built once before repeated API calls (triton@v3.7.0:python/triton_kernels/triton_kernels/compaction.py:32-43; tests/test_compaction.py:6-25)"
+    },
+    {
+      "id": "gluon07_persistent",
+      "stratum": "gluon_matmul",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon07_persistent",
+        "entry": "tutorial_07_persistence.persistent_matmul",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "GLUON07_PERSISTENT",
+        "params": {
+          "block_m": 128,
+          "block_n": 256,
+          "block_k": 64,
+          "num_buffers": 3,
+          "num_warps": 4
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_M) * ceil_div(N,BLOCK_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/07-persistence.py:440-443",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/gluon/07-persistence.py:440-443"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/07-persistence.py:455-461"
+      },
+      "main_kernel": ".*persistent_matmul_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Persistent Gluon matmul uses the official PersistentTileScheduler and fp16 reference"
+    },
+    {
+      "id": "gluon08_warp_specialized",
+      "stratum": "gluon_matmul",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon08_warp_specialized",
+        "entry": "tutorial_08_warp_specialization.matmul_warp_specialized",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "GLUON08_WARP_SPECIALIZED",
+        "params": {
+          "block_m": 128,
+          "block_n": 256,
+          "block_k": 64,
+          "num_buffers": 3,
+          "subtile_factor": 4,
+          "num_warps": 4
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_M) * ceil_div(N,BLOCK_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/08-warp-specialization.py:455-459",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/gluon/08-warp-specialization.py:455-459"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/08-warp-specialization.py:622-635"
+      },
+      "main_kernel": ".*matmul_warp_specialized_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Warp-specialized Gluon matmul uses the official fp16 reference"
+    },
+    {
+      "id": "gluon09_gather_scatter",
+      "stratum": "gluon_matmul",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon09_gather_scatter",
+        "entry": "tutorial_09_tma_gather_scatter.matmul_fused_gather_scatter",
+        "dtype": "bfloat16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "GLUON09_GATHER_SCATTER",
+        "params": {
+          "block_m": 128,
+          "block_n": 128,
+          "block_k": 64,
+          "num_buffers": 3,
+          "group_size_m": 8
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_M) * ceil_div(N,BLOCK_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/09-tma-gather-scatter.py:609-615",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/gluon/09-tma-gather-scatter.py:609-615"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/09-tma-gather-scatter.py:619-643"
+      },
+      "main_kernel": ".*matmul_fused_gather_scatter_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Gather/scatter indices and bfloat16 reference mirror the official test"
+    },
+    {
+      "id": "gluon10_matmul_accumulate",
+      "stratum": "gluon_matmul",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon10_matmul_accumulate",
+        "entry": "tutorial_10_tcgen05_copy.matmul_accumulate",
+        "dtype": "fp16",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "GLUON10_MATMUL_ACCUMULATE",
+        "params": {
+          "block_m": 128,
+          "block_n": 128,
+          "block_k": 64,
+          "num_buffers": 3,
+          "group_size_m": 8
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 64,
+          "max": 65536,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,BLOCK_M) * ceil_div(N,BLOCK_N))",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/10-tcgen05-copy.py:415-419",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/gluon/10-tcgen05-copy.py:415-419"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/10-tcgen05-copy.py:422-433"
+      },
+      "main_kernel": ".*matmul_accumulate_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Accumulation reference is A @ B + C in fp32 per the official test"
+    },
+    {
+      "id": "gluon11_mma_scaled",
+      "stratum": "gluon_matmul",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon11_mma_scaled",
+        "entry": "tutorial_11_tcgen05_mma_scaled.mma_scaled",
+        "dtype": "nvfp4",
+        "shape": [
+          4096,
+          4096,
+          4096
+        ],
+        "shape_tag": "GLUON11_MMA_SCALED",
+        "params": {
+          "a_format": "nvfp4",
+          "b_format": "nvfp4",
+          "impl": "mma_scaled_warp_specialized_kernel"
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4096,
+            "min": 128,
+            "max": 65536,
+            "step": 128
+          },
+          {
+            "path": "shape.1",
+            "base": 4096,
+            "min": 256,
+            "max": 65536,
+            "step": 256
+          }
+        ],
+        "I": {
+          "path": "shape.2",
+          "base": 4096,
+          "min": 256,
+          "max": 65536,
+          "step": 256
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(M,128) * ceil_div(N,256))",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/11-tcgen05-mma-scaled.py:1510-1515",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/tutorials/gluon/11-tcgen05-mma-scaled.py:1510-1515"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/tutorials/gluon/11-tcgen05-mma-scaled.py:1518-1536"
+      },
+      "main_kernel": ".*mma_scaled_warp_specialized_kernel.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "NVFP4 operands/scales and tolerance mirror the official tcgen05_mma_scaled test"
+    },
+    {
+      "id": "gluon_attention_forward",
+      "stratum": "gluon_attention",
+      "spec": {
+        "suite": "triton",
+        "mode": "full",
+        "kind": "gluon_attention_forward",
+        "entry": "tutorial_01_attention_forward.attention_forward",
+        "dtype": "fp16",
+        "shape": [
+          4,
+          48,
+          1024,
+          128
+        ],
+        "shape_tag": "GLUON_ATTENTION_FORWARD",
+        "params": {
+          "causal": false,
+          "sm_scale": 0.5,
+          "use_tmem_red": false
+        },
+        "seed": 20261024
+      },
+      "axes": {
+        "P": [
+          {
+            "path": "shape.0",
+            "base": 4,
+            "min": 1,
+            "max": 128,
+            "step": 1
+          },
+          {
+            "path": "shape.2",
+            "base": 1024,
+            "min": 128,
+            "max": 16384,
+            "step": 128
+          }
+        ],
+        "I": {
+          "path": "shape.3",
+          "base": 128,
+          "min": 64,
+          "max": 128,
+          "step": 64
+        }
+      },
+      "grid": {
+        "formula": "min(NUM_SMS, ceil_div(N_CTX, BLOCK_M) * B * H)",
+        "evidence": "triton@v3.7.0:python/examples/gluon/01-attention-forward.py:947-956",
+        "persistent": true,
+        "persistent_evidence": "triton@v3.7.0:python/examples/gluon/01-attention-forward.py:947-956"
+      },
+      "calls": {
+        "value": 4,
+        "formula": "3 warmups + 1 measured call on identical inputs",
+        "evidence": "triton@v3.7.0:python/examples/gluon/01-attention-forward.py:978-1001"
+      },
+      "main_kernel": ".*gluon_attention.*",
+      "aux_kernels": [],
+      "status": "draft",
+      "notes": "Inputs and scaled-dot-product reference mirror the official Gluon attention test"
+    }
+  ]
+}

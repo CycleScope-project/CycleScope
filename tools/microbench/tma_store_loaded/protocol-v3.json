@@ -1,0 +1,43 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "tma_store_loaded",
+ "version": 3,
+ "supersedes": "protocol-v2.json (control C1 failed on its absolute form; nothing installed)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-10",
+ "mechanisms": [
+  "memory.l2.service (per-SM port)",
+  "memory.store_l2.service (per-SM port)",
+  "storage.shared.acceptance_sm"
+ ],
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a"
+ },
+ "findings_from_v2": "r3 ($A/microbench/tma_store_loaded/{b300,h100}-r3, models $A/fg-gemm/tsl/*-v2-model.json). Control C1 failed as written: UTMASTG issue to wait_group 0 return is 156 / 348 / 604 (b300) and 190 / 382 / 638 (h100) cycles at 2 / 8 / 16 KiB against the installed 76 / 275 / 524 and 126 / 322 / 574: the slope is the installed one (32.0 B/cycle on both), the constant is 73-80 (b300) / 60-64 (h100) cycles higher because the leaf is a difference against an empty committed group and the probe's is absolute; by the protocol nothing else of v2 is used for an install. Recorded: (1) the store time does not depend on the tensor-map geometry (7 geometries identical to the cycle); (2) v1's 575-cycle round contained a software integer modulo in the thread-0 block (v1 hold 216 vs v2 47-53): v2's full round is 413 (b300) / 412 (h100) cycles at N = 1 and with all SMs (b300), of which ~258 is this probe's 16-way bank-conflicted STS pattern (256 wavefronts per round), so one SM alone does not reproduce the GEMM stretch; (3) the 4-stage store ring alone drains exactly at the installed store port rate (257.0 / 257.1 cycles per 8 KiB); (4) with 4 TMA load slots in flight on the same SM the store ring slows to 349.9 / 367.9 cycles and the loads to 33.7 / 38.1 B/cycle from 80.3 / 82.7: 8192 / store port / period + load rate / L2 port rate = 0.998 (b300) / 1.015 (h100) with the installed port rates, i.e. the two time-share one server; v1's stg rounds with the v1 loaders give 1.02 / 1.06 the same way; (5) the STS-only step slows from 354 to 579-584 cycles per round with the loaders (fence-only without STS is unchanged, 96 -> 97), and loads + 256 wavefronts then account for 518 of the 579 cycles; (6) STS wavefronts and the store drain do not serialise with each other (full round 413 < 256 + 254). In the sim the per-SM L2 read port, the per-SM store port and the shared-memory wavefront acceptance are three independent servers.",
+ "question": "On one SM, which load kinds (TMA tile load, cp.async LDGSTS, plain LDG) time-share a server with which write kinds (TMA store drain, direct STG, shared-memory STS wavefronts), and is the sharing exact time-sharing at the installed port rates?",
+ "probe": "tools/microbench/tma_store_loaded/probe/port_pairs.cu = store_round.cu (v2) plus MODE stg (4 x st.global.v4 per thread, 128 threads x 64 B = 8 KiB of full sectors per round, then the two named barriers) and loader kinds on warps 4-7: tma (v2), ldgsts (all lanes, 4 x 16 B cp.async per lane = 2 KiB per warp per group, commit, wait_group 3: 4 groups in flight per warp; 4 MiB region per CTA), ldg (all lanes, 8 independent ld.global.v4 = 4 KiB per warp per round, folded into a register; 4 MiB region per CTA so rounds are L1 misses and L2 hits). Two untimed read-warm passes over the loader region before the timed launches. N = 1, 264 rounds (8 not counted), 8 repetitions after a discarded one, runs a and b, STAMPS 0 only.",
+ "cells": "run.sh with V3=1: alone: store (G64W ring of 4), stg, sts (4 writers), fence (no writers), full; loader-only for the three kinds; pairs: {store, stg, sts, fence, full} x {tma, ldgsts, ldg} with 4 loader warps (23 cells per run).",
+ "sass_gate": "sass_check_v3.py (run by build_v3.sh): 17 k_round instantiations, per-mode round counts as v2 plus mode 4 (4k STG.128), loaders present (1 UTMALDG, >= 4 LDGSTS, >= 8 LDG.128).",
+ "derivation": "model_v3.py, per run: P_B(alone), R_A(alone); for each pair slow = P_B(with A) / P_B(alone), keep = R_A(with B) / R_A(alone), U = 1 / slow + R_A(with B) / l2.sector_bytes_per_cycle (installed: b300 124.57, h100 122.31). Pair verdict: share if slow >= 1.10 and 0.90 <= U <= 1.10; independent if slow <= 1.05 and keep >= 0.95; otherwise partial; the verdict must be the same on runs a and b.",
+ "acceptance": "Controls, nothing else is read if one fails: (C1) store alone: period within 5 % of 8192 / store_l2.sector_bytes_per_cycle (b300 254.5, h100 258.8); (C2) tma loader alone within 15 % of tma_loaded N1.S4 (b300 92.7, h100 88.9 B/cycle). The fence + {any loader} pairs are the negative control (no shared-memory write, no global store): they must come out independent, else the loaders disturb the round itself and no verdict is used. For a B side whose alone period is not its port-saturated value (stg alone more than 10 % above 8192 / store port) the verdict of its pairs is recorded as relative time-sharing only.",
+ "engine_rules_declared_before_data": {
+  "X_memory_port": "for each load kind A whose pairs with both store and stg are share: fill sectors of that load class and store-drain sectors of the same SM serialise on one per-SM port, a fill sector occupying it sector_bytes / l2.sector_bytes_per_cycle and a store sector sector_bytes / store_l2.sector_bytes_per_cycle (the installed occupancies; no new leaf value). If all three kinds share: MemoryHierarchy's per-SM L2 read port and per-SM store port become one port (every fill and every store drain of the SM). If only tma and ldgsts share (ldg independent): the shared server is on the async-copy path; the rule is then restricted to async-copy fills (TMA / LDGSTS classes) against store drains. Any other pattern: recorded, no install.",
+  "W_shared_write": "for each load kind A whose pair with sts is share: that class's delivery into shared memory serialises with STS wavefront acceptance on the per-SM acceptance server (storage.shared.acceptance_sm), occupying it delivered bytes / l2.sector_bytes_per_cycle. Expected for async copies only (ldg delivers to registers); if ldg + sts is share as well, STS acceptance sits on the same port as rule X and the two rules are one server. Partial or disagreeing verdicts: recorded, no install.",
+  "prediction_check": "the full + {tma, ldgsts, ldg} cells are not used to choose rules; after the engine change the probe's full + tma round (b300 630 / h100 660 at N = 1 in v2) is the reference for a CTest-level replay of the rule (period ratio with / without loads within 20 % of the measured ratio)."
+ },
+ "install": "structural rules only (the occupancies are installed leaves); source tma_store_loaded.<device>.<run>; both devices must give the same verdict pattern for a rule to be installed in the common core, otherwise it is installed per architecture behind the arch module with the device's verdicts. Gate: single-cluster 500 x 2 against $A/fg-fix5/sc-r7 (MAPE must not get worse), full-gpu 500 x 2 against $A/fg-fix5/full-r7, CTest, pytest, cyclescope tree validate --strict.",
+ "not_allowed": "no case-cycle tuning; no threshold, form or derivation change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-10",
+   "before_run": "r5 (r4 stopped at the SASS gate on both devices, exit 3, no timed cell)",
+   "text": "The ldg loader's 8 ld.global.v4 per round were removed by ptxas (their fold was multiplied by zero), so the kernels held no plain LDG; the gate also counted LDGSTS.E.BYPASS.128 as LDG .128. Fix: the fold of loader slot 0 is written to the output record (the loads are live), and the gate's LDG pattern no longer matches LDGSTS. Round bodies, cells, derivation and rules unchanged."
+  },
+  {
+   "date": "2026-11-10",
+   "after_run": "r5 ($A/microbench/tma_store_loaded/{b300,h100}-r5, models $A/fg-gemm/tsl/{b300,h100}-v3-model.json)",
+   "text": "Controls C1 / C2 pass on both devices. The negative control does not: fence + tma leaves the round alone (slow 1.014 / 1.015) but the loaders drop to 0.885 / 0.87 of their own rate; fence + ldg slows the round 1.17 / 1.20; fence + ldgsts slows it 2.47 / 2.52 (the async-proxy fence waits behind in-flight cp.async copies). By this protocol no verdict is used and nothing is installed. Recorded: U = 1 / slow + load rate / L2 port rate is 1.006 / 1.010 (store + tma), 1.003 / 1.008 (stg + tma), 1.004 / 1.009 (store + ldg), 0.994 / 0.991 (stg + ldg, slow 1.09-1.10), 0.989 / 0.981 (sts + tma), 0.995 / 0.991 (sts + ldg, slow 1.08-1.09), on b300 / h100, runs a and b equal to three digits; ldgsts pairs give 0.75-0.89 (more interference than its bytes at the port rate). The observed pattern (tma and ldg share, ldgsts interferes more) is not one of the patterns this version declared. Superseded by protocol-v4.json, which states the rule and confirms it on cells not measured so far."
+  }
+ ]
+}

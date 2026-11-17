@@ -1,0 +1,37 @@
+{
+ "doc": "imported from legacy mechanism memory.constant_cache",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.constant_cache",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "capacity_bytes": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "hit_latency_cycles": {
+   "kind": "constant"
+  },
+  "line_bytes": {
+   "kind": "constant"
+  },
+  "miss_latency_cycles": {
+   "kind": "constant"
+  },
+  "same_line_latency_cycles": {
+   "kind": "constant"
+  },
+  "bank0_access_cycles": {
+   "kind": "constant"
+  }
+ }
+}

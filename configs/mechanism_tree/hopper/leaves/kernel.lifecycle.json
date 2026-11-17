@@ -1,0 +1,37 @@
+{
+ "kernel.lifecycle.root": {
+  "fields": {
+   "envelope_cycles": {
+    "model": {
+     "axis": "launch_warps_per_cta",
+     "kind": "linear",
+     "points": [
+      [
+       1,
+       723.6
+      ],
+      [
+       4,
+       763.5
+      ],
+      [
+       8,
+       775.5
+      ],
+      [
+       16,
+       811.1
+      ],
+      [
+       32,
+       893.3
+      ]
+     ]
+    },
+    "sources": [
+     "lifecycle.h100.v3r4"
+    ]
+   }
+  }
+ }
+}

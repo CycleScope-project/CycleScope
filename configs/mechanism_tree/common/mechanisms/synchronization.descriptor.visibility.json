@@ -1,0 +1,22 @@
+{
+ "doc": "imported from legacy mechanism synchronization.descriptor.visibility",
+ "program": {
+  "event": "issue",
+  "operation_classes": [],
+  "parameter_schema": "timing_row",
+  "timing_kind": "tensor_map_descriptor_visibility"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

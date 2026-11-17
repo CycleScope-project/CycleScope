@@ -1,0 +1,64 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "tensor_pipe",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "tensor.pipe",
+    "tensor.completion"
+  ],
+  "fields": [
+    "tensor.pipe cycles: per-SM tensor pipe hold of one MMA op = issue cadence of back-to-back same-D accumulating ops of one shape",
+    "tensor.completion cycles: from the end of the op's pipe hold to its accumulator being readable (Hopper: wgmma.wait_group returns; Blackwell: tcgen05.commit -> mbarrier observed, minus the commit-only baseline)"
+  ],
+  "devices": {
+    "h100": "sm_90a (1 GPU), default image + $A/tools/dump-tools-bin on PATH",
+    "b300": "sm_103a (1 GPU)"
+  },
+  "purpose": "The engine models every warpgroup / CTA MMA op as start = max(now, pipe_next[sm]); pipe_next = start + tensor.pipe; result readable at start + tensor.pipe + tensor.completion (Simulator::tensor_pipe_start, cpp/arch/{hopper/wgmma,blackwell/umma}.cpp). Hopper carries predecessor numbers for both terms (pipe 19..128 by tensor_n from unexplained selector rows, completion derived as result_latency - issue_interval); Blackwell carries umma.cu cadence leaves but tensor.completion = 0 structural although the predecessor's own probe measured a single-op latency (kind 11) larger than the cadence. Both devices are measured with one definition: cadence slope = pipe, single-op latency minus cadence = completion.",
+  "probe": {
+    "b300": "blackwell-prototype tools/microbench/probes/umma.cu + tools/microbench/umma_impl.cuh + mb.cuh copied verbatim into tools/microbench/tensor_pipe/probe/ (cells: 6 umma kinds x cta_group {1,2} with A from SMEM, and the same 6 kinds x cta_group {1,2} with A from TMEM, N in {64,128,256}, M = 128 per CTA; xw mode U in {0,1} cross-warp jittered waiter; cad mode U in {8,16,32,64}); SASS gate: the umma kernels contain exactly U UTC*MMA of the expected kind between t_s and the commit (checked by a script that reads the cuobjdump SASS, written for this protocol)",
+    "h100": "new probe tools/microbench/tensor_pipe/probe/wgmma.cu (no predecessor .cu covers the shape table; the hopper-prototype wgmma numbers come from Python harnesses). One CTA of one warpgroup (128 threads) on one SM, operands in shared memory with valid no-swizzle K-major descriptors (B always SMEM; A from SMEM = ss form, A from registers = rs form), accumulator F32 (S32 for IGMMA; F16 accumulator only for the f16 cells listed below). Timing thread = warp 0 lane 0. lat mode: t_s = clock64; wgmma.fence; U x wgmma.mma_async (same D, scale-d = 1 so every op accumulates); wgmma.commit_group; wgmma.wait_group 0; t_w = clock64 (the warp cannot pass wait_group 0 before the accumulators are written); U in {0, 1}. cad mode: same window with U in {8, 16, 32, 64} straight-line ops in ONE commit group. wg2 diagnostic: two warpgroups of one CTA run the cad window concurrently on the same SM (bf16 ss, n in {64, 128, 256}). --launches 8 --reps 33 per cell, results to wgmma.jsonl (one object per sample: cell, mode, U, t_w - t_s, smid). SASS gate (script written with the probe): each lat/cad kernel window holds exactly U HGMMA/QGMMA/IGMMA with the cell's exact SASS shape string (e.g. HGMMA.64x128x16.F32.BF16), rs cells have a register A operand, and between t_s and the first op only WARPGROUP.ARRIVE / WARPGROUP.DEPBAR-free fence instructions appear; failing kernels are dropped and listed as unrealised."
+  },
+  "cells": {
+    "h100": {
+      "HGMMA input f16 (accumulator F32 and F16), bf16 (F32), tf32 (F32)": "m = 64; every ISA-valid n (8..256 step 8); source ss and rs",
+      "QGMMA e4m3.e4m3, e4m3.e5m2, e5m2.e5m2 (F32)": "m = 64; every ISA-valid n (8..256 step 8); ss and rs",
+      "IGMMA s8.s8 (S32)": "m = 64; every ISA-valid n (8, 16, 24, 32, 48, 64, 80, 96, 112, 128, 144, 160, 176, 192, 208, 224, 240, 256); ss and rs",
+      "corpus check": "tools/microbench/tensor_pipe/census.py (written for this protocol) lists every (class, input dtype, accumulator, source form, n) in the static SASS of the 450 hp-sc captures ($A/captures/cold4/hp-sc/*/functions/*.tsv); every census cell must be one of the cells above, otherwise the cell is added BEFORE the GPU run and this file gets a dated addendum"
+    },
+    "b300": "every cell umma.cu emits (see probe.b300)",
+    "runs": "two independent runs per device (run-a, run-b: separate processes of the same binary in one job)"
+  },
+  "derivation": {
+    "E_U(cell, mode)": "mean over samples of (t_w - t_s) at U",
+    "o_s(cell, U)": "stall cycles from t_s to the first MMA (U > 0) or to the commit (U = 0), summed from the SASS control words of the kernel (sass_ctrl.py, verbatim from barrier_release)",
+    "beat (tensor.pipe cycles)": "OLS slope of E_U(cell, cad) over U in {8, 16, 32, 64}",
+    "latency_1 (b300)": "(E_1(cell, xw) - E_0(cg, xw)) - (o_s(cell, 1) - o_s(cg, 0))  [umma_impl.cuh kind11 definition: one op issue -> commit observed, minus the commit-only baseline of the same cta_group]",
+    "latency_1 (h100)": "(E_1(cell, lat) - E_0(source form, lat)) - (o_s(cell, 1) - o_s(source form, 0))",
+    "completion (tensor.completion cycles)": "latency_1 - beat",
+    "se": "standard error of E_1 and of the slope (from the per-U sample sd); run agreement = |run a - run b| / mean",
+    "wg2 (h100 diagnostic)": "per-op beat with two concurrent warpgroups divided by the one-warpgroup beat; per-SM pipe predicts 2.0"
+  },
+  "acceptance": {
+    "beat": "cad fit max relative residual <= 5 % and run agreement <= 3 % -> measured; otherwise experimental and listed",
+    "completion": "run agreement <= 5 % or <= 2 cycles (whichever is larger) -> measured; a negative completion within 2 se of 0 is installed as 0 (measured: no separate term); a negative completion beyond 2 se is reported and not installed (leaf left as is)",
+    "b300_control": "beat at (kind, cta_group, a_src, M 128, N) is compared with the installed b300 tensor.pipe leaf at the same coordinates (umma_operation normal, operand major 0, max shift 0); within 10 % -> installed leaf kept and the protocol run cited as reproduction; beyond 10 % with the cell passing -> the protocol value replaces the leaf at that coordinate (measured, old value in the source description); cells of the installed table this probe does not emit stay as they are and are listed",
+    "h100": "every passing cell is installed (measured); experimental cells are installed as experimental; census cells with no realised measurement are reported (no neighbour fill)",
+    "wg2": "reported only; a ratio outside 2.0 +- 10 % is recorded as an open engine question (per-SM vs per-SMSP pipe), the leaves are installed regardless"
+  },
+  "install": {
+    "h100": "hopper/leaves/tensor.pipe.json and tensor.completion.json: per operation_class (HGMMA / QGMMA / IGMMA) cycles = discrete over [input_dtype, source_mode, tensor_n] at the measured points (accumulator dtype added as a further axis only for HGMMA f16 if the F16-accumulator cells differ from F32 by more than 10 %); predecessor selector-row sources removed. common tensor.pipe / tensor.completion field_models axes_subset_of gains input_dtype and source_mode.",
+    "b300": "blackwell/leaves/tensor.completion.json: per UTC class, cycles = discrete over [umma_kind, cta_group] = mean of completion over the measured N and a_src of that (kind, cta_group) when the spread (max - min) <= max(10 % of the mean, 4 cycles); a (kind, cta_group) with larger spread is installed as discrete over [umma_kind, cta_group, a_src, tensor_n] at the measured points if every corpus instance of that kind is covered, otherwise as the mean with experimental evidence and the spread in the source description. tensor.pipe leaves per b300_control.",
+    "sources": "tensor_pipe.<device>.<run>; artifact $A/microbench/tensor_pipe/<device>-<run>/ (jsonl per run, sass, checks) and $A/microbench/tensor_pipe-model/<device>-<run>/model.json",
+    "ab": "one two-architecture 450 A/B round after install (GEMM families deepgemm / cutlass / cublas, DG3 / CU3 / FA3 watched); attribution in mechanism-merge-report.md"
+  },
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no neighbour fill for unmeasured n",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "before_analysis": true,
+      "text": "Transcription error in probe.b300 / derivation: the verbatim umma.cu (uadd_cell in umma_impl.cuh) emits U in {1, 2, 4, 8, 16} for both xw and cad (not cad {8, 16, 32, 64}), M = 128 per CTA (cta_group 2: tensor M 256 over the pair), and adds f16 smem cells with SWIZZLE_NONE layout. The probe is not changed; beat = OLS slope of E_U(cad) over all emitted U >= 1 (the umma_impl.cuh field7 definition), latency_1 uses xw U = 1 and the commit-only kernel k_umma<0, CG, 0, 0, 0> as U = 0; the SWIZZLE_NONE cells and xw U >= 2 are reported, control and install use the sw128 cells. Written after the b300-r1 job finished and before any derived value was computed (only the record schema and the first samples were inspected)."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-SEEDED-DROPOUT-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 12832908,
+ "completed": 12832908,
+ "cycles": 37756,
+ "hard": 0,
+ "walls": {
+  "convert": 14.6,
+  "segments": 0.2,
+  "build": 2.3,
+  "sim": 32.3,
+  "total": 49.4
+ },
+ "rss_kb": {
+  "convert": 184668,
+  "segments": 184668,
+  "build": 184668,
+  "sim": 1846116
+ },
+ "hw_cycles": 37217.0,
+ "reference_cache_control": "all",
+ "placement_digest": "bec1298cb8490225",
+ "shards": 15
+}

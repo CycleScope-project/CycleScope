@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "flashmla_sparse_prefill_k512_topklen_02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 500922,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 8970804,
+ "completed": 8970804,
+ "cycles": 69538,
+ "hard": 0,
+ "walls": {
+  "convert": 14.7,
+  "segments": 0.0,
+  "build": 1.3,
+  "sim": 20.1,
+  "total": 36.1
+ },
+ "rss_kb": {
+  "convert": 276884,
+  "segments": 276884,
+  "build": 276884,
+  "sim": 1325672
+ },
+ "hw_cycles": 72857.0,
+ "reference_cache_control": "all",
+ "placement_digest": "7874d79a9c959f25",
+ "shards": 16
+}

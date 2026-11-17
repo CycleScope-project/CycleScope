@@ -1,0 +1,2108 @@
+{
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b01_sk256_hq16_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 4096.0,
+     "work_scaled": 4096.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 1",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 256
+     },
+     "grid": [
+      1,
+      1,
+      132
+     ],
+     "median_cycles_reference": 24671.922
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 1,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 256
+     },
+     "effective_sm_count_env": 1,
+     "estimated_cycles": 24671.9,
+     "grid": [
+      1,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [],
+    "target_ctas": 1
+   },
+   "correctness_check": true,
+   "delivery_group": 0,
+   "delivery_index": 0,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 16,
+   "implementation": "FlashMLA",
+   "input_seed": 20260929,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 256,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 2,
+   "case_id": "flashmla_mla_decode_b08_sk1024_hq64_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 524288.0,
+     "work_scaled": 131072.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 1",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 8,
+      "seqlen_kv": 1024
+     },
+     "grid": [
+      1,
+      1,
+      132
+     ],
+     "median_cycles_reference": 34305.069
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 1,
+     "dims": {
+      "batch": 2,
+      "seqlen_kv": 1024
+     },
+     "effective_sm_count_env": 1,
+     "estimated_cycles": 342565.8,
+     "grid": [
+      1,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 1,
+      "dim": "batch",
+      "est_before": 1296247.4,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 1,
+      "dim": "batch",
+      "est_before": 660459.6,
+      "from": 4,
+      "to": 2
+     }
+    ],
+    "target_ctas": 1
+   },
+   "correctness_check": true,
+   "delivery_group": 1,
+   "delivery_index": 1,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 64,
+   "implementation": "FlashMLA",
+   "input_seed": 20260930,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 4,
+   "case_id": "flashmla_mla_decode_b64_sk1024_hq128_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 8388608.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 64,
+      "seqlen_kv": 1024
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 93914.291
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 4,
+      "seqlen_kv": 1024
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 310296.7,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 4594668.3,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 2309670.1,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1167171.0,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 595921.5,
+      "from": 8,
+      "to": 4
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": true,
+   "delivery_group": 2,
+   "delivery_index": 2,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260931,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk4096_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 67108864.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 4096
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 443852.655
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 240812.0,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 27690600.3,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 13857636.1,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6941154.0,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3482913.0,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1753792.4,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 889232.2,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 456952.1,
+      "from": 2,
+      "to": 1
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 3,
+   "delivery_index": 3,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260932,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk8192_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 134217728.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 8192
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 855527.394
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 238876.8,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 54861133.1,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 27442902.5,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 13733787.2,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6879229.6,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3451950.7,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1738311.3,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 881491.6,
+      "from": 2,
+      "to": 1
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 453081.8,
+      "from": 8192,
+      "to": 4096
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 4,
+   "delivery_index": 4,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260933,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk16384_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 268435456.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 16384
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 1599001.036
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 227612.8,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 103930393.5,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 51977532.7,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 26001102.3,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 13012887.1,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6518779.5,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3271725.7,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1648198.8,
+      "from": 2,
+      "to": 1
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 836435.4,
+      "from": 16384,
+      "to": 8192
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 430553.6,
+      "from": 8192,
+      "to": 4096
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 5,
+   "delivery_index": 5,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260934,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk32768_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 536870912.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 32768
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 3050019.344
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 219665.0,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 199697601.8,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 99861136.9,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 49942904.4,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 24983788.2,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 12504230.0,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6264451.0,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3144561.5,
+      "from": 2,
+      "to": 1
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 1584616.7,
+      "from": 32768,
+      "to": 16384
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 804644.3,
+      "from": 16384,
+      "to": 8192
+     },
+     {
+      "ctas_before": 2,
+      "dim": "seqlen_kv",
+      "est_before": 414658.1,
+      "from": 8192,
+      "to": 4096
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 6,
+   "delivery_index": 6,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260935,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 4,
+   "case_id": "flashmla_mla_decode_b256_sk1024_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 33554432.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 256,
+      "seqlen_kv": 1024
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 284945.531
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 4,
+      "seqlen_kv": 1024
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 293079.1,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 17202730.2,
+      "from": 256,
+      "to": 128
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 8613701.0,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 4319186.5,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 2171929.2,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1098300.6,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 561486.2,
+      "from": 8,
+      "to": 4
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 7,
+   "delivery_index": 7,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260936,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b64_sk2048_hkv2_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 16777216.0,
+     "work_scaled": 262144.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 64,
+      "seqlen_kv": 2048
+     },
+     "grid": [
+      1,
+      2,
+      66
+     ],
+     "median_cycles_reference": 218074.13
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 2048
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 224117.9,
+     "grid": [
+      1,
+      2,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 12789217.7,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6406944.8,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3215808.4,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1620240.1,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 822456.0,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 423564.0,
+      "from": 2,
+      "to": 1
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 0,
+   "delivery_index": 8,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 2,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260937,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_mqa_multi_kv_head"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 2048,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 2,
+   "case_id": "flashmla_mla_decode_b64_sk2048_hkv8_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "conversion_note": "grid dim product floor 8 CTAs > 2 (num_m_block*h_k); expected conversion-gate reject, kept as data",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 16777216.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 8",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 128,
+     "dims": {
+      "batch": 64,
+      "seqlen_kv": 2048
+     },
+     "grid": [
+      1,
+      8,
+      16
+     ],
+     "median_cycles_reference": 775289.092
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": false,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 8,
+     "dims": {
+      "batch": 2,
+      "seqlen_kv": 2048
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 399980.5,
+     "grid": [
+      1,
+      8,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 8,
+      "dim": "batch",
+      "est_before": 12034546.7,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 8,
+      "dim": "batch",
+      "est_before": 6029609.3,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 8,
+      "dim": "batch",
+      "est_before": 3027140.6,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 8,
+      "dim": "batch",
+      "est_before": 1525906.3,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 8,
+      "dim": "batch",
+      "est_before": 775289.1,
+      "from": 4,
+      "to": 2
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 1,
+   "delivery_index": 9,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 8,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260938,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_mqa_multi_kv_head"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 2048,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 4,
+   "case_id": "flashmla_mla_decode_b32_sq2_sk1024_causal_cluster_sm",
+   "category": "hopper_attention",
+   "causal": true,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "conversion_note": "grid dim product floor 4 CTAs > 2 (num_m_block*h_k); expected conversion-gate reject, kept as data",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 8388608.0,
+     "work_scaled": 1048576.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 4",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 32,
+      "seqlen_kv": 1024
+     },
+     "grid": [
+      4,
+      1,
+      33
+     ],
+     "median_cycles_reference": 80860.876
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": false,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 4,
+     "dims": {
+      "batch": 4,
+      "seqlen_kv": 1024
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 256451.4,
+     "grid": [
+      4,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 1878907.4,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 951789.7,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 488230.8,
+      "from": 8,
+      "to": 4
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": true,
+   "delivery_group": 2,
+   "delivery_index": 10,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260939,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_causal_speculative_sq"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 2,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sq2_sk8192_causal_cluster_sm",
+   "category": "hopper_attention",
+   "causal": true,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "conversion_note": "grid dim product floor 4 CTAs > 2 (num_m_block*h_k); expected conversion-gate reject, kept as data",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 268435456.0,
+     "work_scaled": 2097152.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 4",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 8192
+     },
+     "grid": [
+      4,
+      1,
+      33
+     ],
+     "median_cycles_reference": 1374119.601
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": false,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 4,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 8192
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 372576.4,
+     "grid": [
+      4,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 44556445.3,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 22290558.6,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 11157615.3,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 5591143.6,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 2807907.8,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 1416289.8,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 4,
+      "dim": "batch",
+      "est_before": 720480.9,
+      "from": 2,
+      "to": 1
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 3,
+   "delivery_index": 11,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260940,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_causal_speculative_sq"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 8192,
+   "seqlen_q": 2,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk4096_fp16_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 67108864.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 4096
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 434866.302
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 236178.4,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 27097501.0,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 13561086.5,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 6792879.2,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3408775.6,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1716723.7,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 870697.8,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 447684.9,
+      "from": 2,
+      "to": 1
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 4,
+   "delivery_index": 12,
+   "dtype": "fp16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260941,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_fp16_path"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 4,
+   "case_id": "flashmla_mla_decode_b08_sk1024_varlen_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 1048576.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 8,
+      "seqlen_kv": 1024
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 34795.724
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 4,
+      "seqlen_kv": 1024
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 358757.4,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 692842.9,
+      "from": 8,
+      "to": 4
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": true,
+   "delivery_group": 5,
+   "delivery_index": 13,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260942,
+   "is_varlen": true,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_varlen_seqlens"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 1024,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b128_sk4096_varlen_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 67108864.0,
+     "work_scaled": 524288.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 2",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 132,
+     "dims": {
+      "batch": 128,
+      "seqlen_kv": 4096
+     },
+     "grid": [
+      2,
+      1,
+      66
+     ],
+     "median_cycles_reference": 467607.185
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": true,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 2,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 253060.4,
+     "grid": [
+      2,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 29258399.3,
+      "from": 128,
+      "to": 64
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 14641535.6,
+      "from": 64,
+      "to": 32
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 7333103.8,
+      "from": 32,
+      "to": 16
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 3678887.8,
+      "from": 16,
+      "to": 8
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 1851779.9,
+      "from": 8,
+      "to": 4
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 938225.9,
+      "from": 4,
+      "to": 2
+     },
+     {
+      "ctas_before": 2,
+      "dim": "batch",
+      "est_before": 481448.9,
+      "from": 2,
+      "to": 1
+     }
+    ],
+    "target_ctas": 2
+   },
+   "correctness_check": false,
+   "delivery_group": 6,
+   "delivery_index": 14,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260943,
+   "is_varlen": true,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_varlen_seqlens"
+   ],
+   "notes": "",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 1,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  },
+  {
+   "api": "flash_mla_with_kvcache",
+   "architecture": "sm_90a",
+   "batch": 1,
+   "case_id": "flashmla_mla_decode_b01_sq4_sk4096_cluster_sm",
+   "category": "hopper_attention",
+   "causal": false,
+   "cluster_sm": {
+    "achieved_by": "build_patch_num_sm_parts",
+    "conversion_note": "grid dim product floor 8 CTAs > 2 (num_m_block*h_k); expected conversion-gate reject, kept as data",
+    "estimate_model": {
+     "est_target_cycles": 400000.0,
+     "name": "class_floor_plus_linear_work_scale",
+     "overhead_floor_cycles": 24671.922,
+     "work_natural": 2097152.0,
+     "work_scaled": 2097152.0
+    },
+    "notes": [
+     "build-time patch (suites/flashmla/upstream/csrc/api/dense_decode.cpp): num_sm_parts = max(effective_sms / h_k / ceil_div(s_q*h_q/h_k, 64), 1) with effective_sms from env FLASHMLA_EFFECTIVE_SM_COUNT (driver sets it to target_ctas); kernel TU untouched so the main-kernel SASS is unchanged",
+     "shape floor num_m_block*h_k = 8",
+     "problem shrink rotation: batch first, then seqlen_kv at page_size granularity (plan '\u5148\u7f29 batch \u518d\u7f29 sk'); dtype/causal/GQA/page_size kept"
+    ],
+    "original_launch": {
+     "ctas": 128,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "grid": [
+      8,
+      1,
+      16
+     ],
+     "median_cycles_reference": 46388.496
+    },
+    "pre_shrink_status": "converged",
+    "predicted_conversion_compatible": false,
+    "scale_method": "build_patch_num_sm_parts+uniform_work_shrink",
+    "scale_rule": "t0011_uniform_work_shrink_v1",
+    "scaled_launch": {
+     "ctas": 8,
+     "dims": {
+      "batch": 1,
+      "seqlen_kv": 4096
+     },
+     "effective_sm_count_env": 2,
+     "estimated_cycles": 372137.1,
+     "grid": [
+      8,
+      1,
+      1
+     ]
+    },
+    "scaling_applied": true,
+    "shrink_steps": [],
+    "target_ctas": 2
+   },
+   "correctness_check": true,
+   "delivery_group": 7,
+   "delivery_index": 15,
+   "dtype": "bf16",
+   "head_dim_k": 576,
+   "head_dim_v": 512,
+   "heads_kv": 1,
+   "heads_q": 128,
+   "implementation": "FlashMLA",
+   "input_seed": 20260944,
+   "is_varlen": false,
+   "kernel_symbols": [
+    "get_mla_metadata_kernel",
+    "flash_fwd_splitkv_mla_kernel",
+    "flash_fwd_mla_combine_kernel"
+   ],
+   "mechanisms": [
+    "mla_paged_kv_cache",
+    "mla_splitkv_decode",
+    "mla_multi_token_query"
+   ],
+   "notes": "small reference-checked decode shape (upstream correctness family)",
+   "operation": "mla_decode_dense_paged",
+   "page_size": 64,
+   "primary_mechanism": "mla_splitkv_decode",
+   "seqlen_kv": 4096,
+   "seqlen_q": 4,
+   "softmax_scale": null,
+   "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+   "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+   "suite": "flashmla",
+   "target_repeats": 9
+  }
+ ],
+ "cluster_sm_scaling": {
+  "build_patch": {
+   "file": "suites/flashmla/upstream/csrc/api/dense_decode.cpp",
+   "mechanism": "effective SM count cap -> num_sm_parts (env FLASHMLA_EFFECTIVE_SM_COUNT, 0/unset = stock)",
+   "uniform_rule": true
+  },
+  "class_overhead_floor_cycles": 24671.921658986175,
+  "est_model": "class_floor_plus_linear_work_scale",
+  "est_target_cycles": 400000.0,
+  "generator": "suites/flashmla/scripts/generate_scaled_manifest.py",
+  "marker_scope": "outermost_in_kernel_clock_marker_interval",
+  "notes": [
+   "uniform rules from suites/common/far_holdout/scale_rules.py; no per-case hand tuning",
+   "original natural launch preserved per case under cluster_sm.original_launch; scaled dims are the case body"
+  ],
+  "reference": {
+   "round1_median_cycles": {
+    "flashmla_mla_decode_b01_sk256_hq16_cluster_sm": 24671.921658986175,
+    "flashmla_mla_decode_b01_sq4_sk4096_cluster_sm": 46388.49644381223,
+    "flashmla_mla_decode_b08_sk1024_hq64_cluster_sm": 34305.06896551724,
+    "flashmla_mla_decode_b08_sk1024_varlen_cluster_sm": 34795.72386831276,
+    "flashmla_mla_decode_b128_sk16384_cluster_sm": 1599001.0362305264,
+    "flashmla_mla_decode_b128_sk32768_cluster_sm": 3050019.344062368,
+    "flashmla_mla_decode_b128_sk4096_cluster_sm": 443852.6547619048,
+    "flashmla_mla_decode_b128_sk4096_fp16_cluster_sm": 434866.3016853263,
+    "flashmla_mla_decode_b128_sk4096_varlen_cluster_sm": 467607.18537414965,
+    "flashmla_mla_decode_b128_sk8192_cluster_sm": 855527.3936741595,
+    "flashmla_mla_decode_b128_sq2_sk8192_causal_cluster_sm": 1374119.6008964004,
+    "flashmla_mla_decode_b256_sk1024_cluster_sm": 284945.5312606988,
+    "flashmla_mla_decode_b32_sq2_sk1024_causal_cluster_sm": 80860.87600732385,
+    "flashmla_mla_decode_b64_sk1024_hq128_cluster_sm": 93914.29089416332,
+    "flashmla_mla_decode_b64_sk2048_hkv2_cluster_sm": 218074.12979544894,
+    "flashmla_mla_decode_b64_sk2048_hkv8_cluster_sm": 775289.0922889978
+   },
+   "rounds_table": "/path/to/hopper-prototype/artifacts/tasks/T0005/far_holdout/rounds_table.json",
+   "sha256": "b9816635faa20f8eff0d899b9e02807909f461abc796918449e9967d06e12172"
+  },
+  "rule": "t0011_uniform_work_shrink_v1",
+  "sm_count_reference": 132,
+  "window": [
+   0.0,
+   500000.0
+  ]
+ },
+ "coverage": {
+  "correctness_checked_cases": 6,
+  "mechanism_counts": {
+   "mla_causal_speculative_sq": 2,
+   "mla_fp16_path": 1,
+   "mla_mqa_multi_kv_head": 2,
+   "mla_multi_token_query": 1,
+   "mla_paged_kv_cache": 16,
+   "mla_splitkv_decode": 16,
+   "mla_varlen_seqlens": 2
+  },
+  "scope": "single_gpu_hopper",
+  "selection": "shape_first_g0"
+ },
+ "delivery": {
+ "capture_wrapper": "common/capture_case.py (per-case invocation: scripts/invocations/<manifest>/<case_id>.json)",
+  "group_assignment": "delivery_index modulo 8",
+  "groups": 8,
+  "runner": "scripts/run_cluster_sm.sh"
+ },
+ "measurement_status": "unmeasured_new_set",
+ "name": "FlashMLA Hopper SM90 dense-decode cluster-SM G0 candidate set_t0011_scaled",
+ "schema_version": "hopper.delivery.cases.v1",
+ "selected_count": 16,
+ "selection": {
+  "constraints": {
+   "causal": "kernel forces causal=false when seqlen_q==1",
+   "dtype": "bf16 or fp16 (identical q/kv dtype)",
+   "head_dims": "head_dim_k 576 (d_v 512 + RoPE 64) with head_dim_v 512; head_dim_k 512 reserved for DeepSeek V4.x",
+   "heads": "heads_q % heads_kv == 0",
+   "page_size": "fixed 64 (csrc/api/dense_decode.cpp TORCH_CHECK)"
+  },
+  "cycle_filter": "target_gpu_cycles_100000_5000000 (deepgemm source_version convention)",
+  "input_seed_rule": "input_seed = 20260929 + delivery_index; varlen seqlens use a deterministic sawtooth (see harness build_inputs)",
+  "mode": "hand_pinned_g0_candidate_set",
+  "operation_class": "mla_decode"
+ },
+ "suite": "flashmla",
+ "supported_gpu_profiles": [
+  "h100"
+ ],
+ "upstream": {
+  "cutlass_commit": "147f5673d0c1c3dcf66f78d677fd647e4a020219",
+  "cutlass_source": "fetched at build time to $HOPPER_ARTIFACT_ROOT/tool_cache/cutlass/<commit> (not vendored, T0005 rev3)",
+  "package": "flash_mla 1.0.0 source build from upstream/ (pip install --no-build-isolation)",
+  "pin_record": "upstream/PINNED.md",
+  "repository": "https://github.com/deepseek-ai/FlashMLA",
+  "revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+  "revision_date": "2026-09-15"
+ },
+ "validated_gpu_profiles": []
+}

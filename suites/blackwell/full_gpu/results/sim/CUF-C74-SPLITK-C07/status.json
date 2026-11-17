@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C74-SPLITK-C07",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 532330,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2788218,
+ "completed": 2788218,
+ "cycles": 76493,
+ "hard": 0,
+ "walls": {
+  "convert": 9.9,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 8.4,
+  "total": 18.9
+ },
+ "rss_kb": {
+  "convert": 350440,
+  "segments": 350440,
+  "build": 350440,
+  "sim": 678352
+ },
+ "hw_cycles": 71150.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 9
+}

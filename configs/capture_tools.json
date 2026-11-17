@@ -1,0 +1,682 @@
+{
+  "comment": "External directories the full-GPU suite captures reference as $CYCLESCOPE_ARTIFACT_ROOT/tools/<name>; cases = number of cases that use an entry (informational).",
+  "tools": {
+    "hopper-cutlass-build": {
+      "purpose": "CUTLASS sm_90a example/delivery binaries (dense_algorithms, example5x-6x, delivery53)",
+      "cases": 200,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-cutlass-build.sh",
+      "inputs": [
+        "hopper-cutlass-source"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "build/dense_algorithms",
+          "sha256": ""
+        },
+        {
+          "path": "build/example49_collective_builder",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed"
+    },
+    "hopper-deepgemm-build": {
+      "purpose": "DeepGEMM JIT marker delivery package (marker_package)",
+      "cases": 200,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-deepgemm-build.sh",
+      "inputs": [
+        "hopper-deepgemm-source"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "marker_package/deep_gemm/sm90_suite_marker.json",
+          "sha256": ""
+        }
+      ]
+    },
+    "hopper-fa3-build": {
+      "purpose": "FlashAttention-3 @98eb799 compiled site-packages/objects",
+      "cases": 1000,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-fa3-build.sh",
+      "inputs": [
+        "hopper-flashattention-source"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "site-packages/flash_attn_3/_C.so",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed",
+      "note": "globaltimer_timer.cu: snapshot path broken by hopper-prototype@55bc671f (delivery_tests moved); placed file byte-identical to suites/common copy (sha256 56b9d3a1…)"
+    },
+    "hopper-triton-3.7.0": {
+      "purpose": "Triton 3.7.0 PyPI wheel unpacked site-packages",
+      "cases": 100,
+      "kind": "pypi_wheels",
+      "requirements": "configs/capture_locks/triton-3.7.0.lock",
+      "index_url": "https://pypi.org/simple",
+      "install": "unpack",
+      "site_packages": true,
+      "note": "MANIFEST.json 记 wheel sha256；unpack 后需恢复 backends/*/bin 执行位",
+      "python_version": "3.12",
+      "tree_sha256": "0ec2e635da0230d7a6479d786adf094b16f393fb1fee506764c0f708853dadf9"
+    },
+    "hopper-cutlass-source": {
+      "purpose": "CUTLASS v4.2.1 @f3fde58 source snapshot (harness suites/cutlass/upstream link)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/NVIDIA/cutlass",
+      "rev": "f3fde58372d33e9a5650ba7b80fc48b3b49d40c8",
+      "tag": "v4.2.1",
+      "paths": [
+        ".github",
+        ".gitignore",
+        ".gitmodules",
+        "CHANGELOG.md",
+        "CITATION.cff",
+        "CMakeLists.txt",
+        "CONTRIBUTORS.md",
+        "CUDA.cmake",
+        "Doxyfile",
+        "EULA.txt",
+        "LICENSE.txt",
+        "PUBLICATIONS.md",
+        "README.md",
+        "bin2hex.cmake",
+        "cmake",
+        "cuBLAS.cmake",
+        "cuDNN.cmake",
+        "customConfigs.cmake",
+        "include",
+        "pyproject.toml",
+        "setup.cfg",
+        "examples/49_hopper_gemm_with_collective_builder",
+        "examples/50_hopper_gemm_with_epilogue_swizzle",
+        "examples/52_hopper_gather_scatter_fusion",
+        "examples/53_hopper_gemm_permute",
+        "examples/54_hopper_fp8_warp_specialized_gemm",
+        "examples/55_hopper_mixed_dtype_gemm",
+        "examples/56_hopper_ptr_array_batched_gemm",
+        "examples/57_hopper_grouped_gemm",
+        "examples/61_hopper_gemm_with_topk_and_softmax",
+        "examples/62_hopper_sparse_gemm",
+        "examples/63_hopper_gemm_with_weight_prefetch",
+        "examples/67_hopper_fp8_warp_specialized_gemm_with_blockwise_scaling",
+        "examples/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling",
+        "examples/69_hopper_mixed_dtype_grouped_gemm",
+        "examples/common",
+        "tools/util/include/cutlass/util/GPU_Clock.hpp",
+        "tools/util/include/cutlass/util/command_line.h",
+        "tools/util/include/cutlass/util/cublas_wrappers.hpp",
+        "tools/util/include/cutlass/util/debug.h",
+        "tools/util/include/cutlass/util/device_dump.h",
+        "tools/util/include/cutlass/util/device_groupnorm.h",
+        "tools/util/include/cutlass/util/device_layernorm.h",
+        "tools/util/include/cutlass/util/device_memory.h",
+        "tools/util/include/cutlass/util/device_nchw_to_nhwc.h",
+        "tools/util/include/cutlass/util/device_nhwc_padding.h",
+        "tools/util/include/cutlass/util/device_nhwc_pooling.h",
+        "tools/util/include/cutlass/util/device_nhwc_to_nchw.h",
+        "tools/util/include/cutlass/util/device_rmsnorm.h",
+        "tools/util/include/cutlass/util/device_utils.h",
+        "tools/util/include/cutlass/util/distribution.h",
+        "tools/util/include/cutlass/util/exceptions.h",
+        "tools/util/include/cutlass/util/gett_commandline.hpp",
+        "tools/util/include/cutlass/util/helper_cuda.hpp",
+        "tools/util/include/cutlass/util/host_reorder.h",
+        "tools/util/include/cutlass/util/host_tensor.h",
+        "tools/util/include/cutlass/util/host_tensor_planar_complex.h",
+        "tools/util/include/cutlass/util/host_uncompress.h",
+        "tools/util/include/cutlass/util/index_sequence.h",
+        "tools/util/include/cutlass/util/mixed_dtype_utils.hpp",
+        "tools/util/include/cutlass/util/packed_stride.hpp",
+        "tools/util/include/cutlass/util/print_error.hpp",
+        "tools/util/include/cutlass/util/reference/detail/inner_product.h",
+        "tools/util/include/cutlass/util/reference/detail/linear_to_coordinate.h",
+        "tools/util/include/cutlass/util/reference/device/convolution.h",
+        "tools/util/include/cutlass/util/reference/device/gemm.h",
+        "tools/util/include/cutlass/util/reference/device/gemm_complex.h",
+        "tools/util/include/cutlass/util/reference/device/gemm_planar_complex.h",
+        "tools/util/include/cutlass/util/reference/device/gett.hpp",
+        "tools/util/include/cutlass/util/reference/device/kernel/gemm.h",
+        "tools/util/include/cutlass/util/reference/device/kernel/tensor_elementwise.h",
+        "tools/util/include/cutlass/util/reference/device/kernel/tensor_foreach.h",
+        "tools/util/include/cutlass/util/reference/device/rank_2k_complex.h",
+        "tools/util/include/cutlass/util/reference/device/tensor_compare.h",
+        "tools/util/include/cutlass/util/reference/device/tensor_fill.h",
+        "tools/util/include/cutlass/util/reference/device/tensor_foreach.h",
+        "tools/util/include/cutlass/util/reference/device/tensor_reduce.h",
+        "tools/util/include/cutlass/util/reference/device/tensor_relu.h",
+        "tools/util/include/cutlass/util/reference/device/thread/gemm.h",
+        "tools/util/include/cutlass/util/reference/host/conv.hpp",
+        "tools/util/include/cutlass/util/reference/host/convolution.h",
+        "tools/util/include/cutlass/util/reference/host/error_metrics.h",
+        "tools/util/include/cutlass/util/reference/host/gemm.h",
+        "tools/util/include/cutlass/util/reference/host/gemm_complex.h",
+        "tools/util/include/cutlass/util/reference/host/gemm_planar_complex.h",
+        "tools/util/include/cutlass/util/reference/host/gett.hpp",
+        "tools/util/include/cutlass/util/reference/host/rank_2k.h",
+        "tools/util/include/cutlass/util/reference/host/rank_2k_complex.h",
+        "tools/util/include/cutlass/util/reference/host/rank_k_complex.h",
+        "tools/util/include/cutlass/util/reference/host/symm.h",
+        "tools/util/include/cutlass/util/reference/host/symm_complex.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_compare.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_compare.hpp",
+        "tools/util/include/cutlass/util/reference/host/tensor_copy.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_elementwise.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_fill.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_fill.hpp",
+        "tools/util/include/cutlass/util/reference/host/tensor_foreach.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_norm.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_reduce.h",
+        "tools/util/include/cutlass/util/reference/host/tensor_reduce.hpp",
+        "tools/util/include/cutlass/util/reference/host/trmm.h",
+        "tools/util/include/cutlass/util/reference/host/trmm_complex.h",
+        "tools/util/include/cutlass/util/tensor_view_io.h",
+        "tools/util/include/cutlass/util/type_traits.h"
+      ],
+      "note": "快照剔除 docs/media/python/test",
+      "tree_sha256": "9d46a5f936ec24864518ecb253a5f23edaef6a50735ea5b91f8c9a3343e2c6cf"
+    },
+    "hopper-deepgemm-source": {
+      "purpose": "DeepGEMM 2.6.1 @559d79f source snapshot (harness suites/deepgemm/upstream link)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/deepseek-ai/DeepGEMM",
+      "rev": "559d79fb6994a58b8a15b4b93bf13ccc16edf247",
+      "tag": "v2.6.1",
+      "submodules": [
+        {
+          "path": "third-party/fmt",
+          "url": "https://github.com/fmtlib/fmt",
+          "rev": "553ec11ec06fbe0beebfbb45f9dc3c9eabd83d28"
+        },
+        {
+          "path": "third-party/cutlass",
+          "url": "https://github.com/NVIDIA/cutlass",
+          "rev": "f3fde58372d33e9a5650ba7b80fc48b3b49d40c8"
+        }
+      ],
+      "patches": [
+        "suites/hopper/runners/patches/deepgemm/0001-hopper-snapshot.patch"
+      ],
+      "note": "third-party/cutlass gitlink 为空目录（不拉取）；fmt 有内容",
+      "exclude": [
+        "third-party/fmt/test"
+      ],
+      "tree_sha256": "b700074f42fba7b757c6d4f92671a8ea67555cdefb75e160cc8717003d823c14"
+    },
+    "hopper-flashattention-source": {
+      "purpose": "flash-attention @98eb799 + vendored cutlass @7127592 source snapshot (harness suites/flashattention3/upstream link)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/Dao-AILab/flash-attention",
+      "rev": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+      "submodules": [
+        {
+          "path": "csrc/cutlass",
+          "url": "https://github.com/NVIDIA/cutlass",
+          "rev": "7127592069c2fe01b041e174ba4345ef9b279671"
+        }
+      ],
+      "paths": [
+        "hopper",
+        {
+          "src": "csrc/cutlass/include",
+          "dest": "cutlass/include"
+        }
+      ],
+      "note": "快照 = fa3 repo 的 hopper/ + cutlass 子模块的 include/（csrc/cutlass 为 gitlink，重命名为上游布局 cutlass/）",
+      "patches": [
+        "suites/hopper/runners/patches/flashattention3/0001-hopper-snapshot.patch"
+      ],
+      "tree_sha256": "664267ad37aea80b43d1427984625e48c8c19dfbc946e7f16ea936288d761d47"
+    },
+    "hopper-flashinfer-source": {
+      "purpose": "FlashInfer v0.6.17 @a0a6b01 source snapshot (harness suites/flashinfer/upstream link)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/flashinfer-ai/flashinfer",
+      "rev": "a0a6b019b9b27d49d209f85d028a1ae5a9b347d7",
+      "tag": "v0.6.17",
+      "paths": [
+        "LICENSE",
+        "NOTICE",
+        "README.md",
+        "benchmarks",
+        "build_backend.py",
+        "build_utils.py",
+        "csrc",
+        "flashinfer",
+        "include",
+        "pyproject.toml",
+        "requirements.txt",
+        "version.txt"
+      ],
+      "patches": [
+        "suites/hopper/runners/patches/flashinfer/0001-hopper-snapshot.patch",
+        "suites/hopper/runners/patches/flashinfer/0002-fi-smid-obs.patch"
+      ],
+      "note": "快照 = 上游子集（无 tests/docs 等）；含本地 fi_smid_obs.cuh 新增与 3 文件改动",
+      "tree_sha256": "9aeadb5fef932853bcd26063260570989087ab1c574e5e4f1f3724e6b3d04bc4"
+    },
+    "hopper-flashmla-source": {
+      "purpose": "FlashMLA source snapshot (harness suites/flashmla/upstream link)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/deepseek-ai/FlashMLA",
+      "rev": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "note": "rev=PINNED.md 记录值；快照剪掉了 sm100/tests/docs/benchmark 子树并有本地 11 文件补丁；PINNED.md 为 hopper-prototype 快照文件（非上游），overlay 恢复",
+      "exclude": [
+        "csrc/kernels/sm100",
+        "tests",
+        "docs",
+        "benchmark",
+        "README.md",
+        ".gitmodules",
+        "csrc/api/dense_bwd.cpp",
+        "csrc/api/dense_fwd.cpp",
+        "csrc/api/fused_norm_rope_attn_rope_cast_fwd.cpp",
+        "flash_mla/fused_norm_rope_attn_rope_cast.py"
+      ],
+      "patches": [
+        "suites/hopper/runners/patches/flashmla/0001-hopper-snapshot.patch"
+      ],
+      "ignored_extras": [],
+      "overlay": {
+        "PINNED.md": {
+          "src": "suites/hopper/runners/patches/flashmla/PINNED.md",
+          "sha256": "81df8b4124b2e22e153378beb163ade02def3d728e1e9185e5acc0a7c3a656d8"
+        }
+      },
+      "tree_sha256": "0d1b7c5dd4f5b8c4e166e840c949805936a92c93ffba40b206985b1ddcadd242"
+    },
+    "hopper-cublas-build-full-gpu": {
+      "purpose": "cublaslt_case binary (full-gpu build)",
+      "cases": 50,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-cublas-build-full-gpu.sh",
+      "inputs": [],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "cublaslt_case",
+          "sha256": "e56ebe9eebd49f1dd3dbce0b391e9db5307a9893542c9fef348e61d91cfb5f92"
+        }
+      ]
+    },
+    "hopper-flashinfer-site-effective-sms": {
+      "purpose": "FlashInfer delivery site-packages built with effective-SM caps (FLASHINFER_DELIVERY_SITE, far profile)",
+      "cases": 50,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-flashinfer-site-effective-sms.sh",
+      "inputs": [
+        "hopper-flashinfer-delivery"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "flashinfer/__init__.py",
+          "sha256": ""
+        },
+        {
+          "path": "EFFSM_PATCH.json",
+          "sha256": ""
+        },
+        {
+          "path": "sitecustomize.py",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed",
+      "note": "marker 双版本顺序注入（证据 65579254+55bc671f）：pre-17986138 版(sha 539efbb1, marker-pre-mha/)→55bc671f^ 版(sha 9a12b845, marker-rename-era/)→effsm；58/58 before+after 全等；sitecustomize=run_flashinfer_suite.sh@c91ba913 heredoc(sha 9bdf54a4)"
+    },
+    "hopper-flashinfer-delivery": {
+      "purpose": "FlashInfer delivery artifacts root (FLASHINFER_DELIVERY_ARTIFACTS_ROOT, far profile default; supplies build/cubins)",
+      "cases": 100,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-flashinfer-delivery.sh",
+      "inputs": [
+        "hopper-flashinfer-source"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "build/site-packages-fi0617-cutlass470-tvmffi0113/flashinfer/__init__.py",
+          "sha256": ""
+        },
+        {
+          "path": "build/libdelivery_fi_marker.so",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed",
+      "note": "runtime reads only build/cuda-link (per-link targets) and build/site-packages-fi0617-cutlass470-tvmffi0113 (input to fisite). build/cubins is never read (FLASHINFER_CUBIN_DIR unset at capture time)."
+    },
+    "hopper-flashmla-build-full-gpu": {
+      "purpose": "FlashMLA build root + site-packages-flashmla, full-gpu variant",
+      "cases": 150,
+      "kind": "build",
+      "script": "scripts/provision/build/hopper-flashmla-build-full-gpu.sh",
+      "inputs": [
+        "hopper-flashmla-source",
+        "hopper-cutlass-source",
+        "cuda-toolkit-13.2"
+      ],
+      "toolchain": "h100",
+      "device": "h100",
+      "outputs": [
+        {
+          "path": "site-packages-flashmla/flash_mla/__init__.py",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed"
+    },
+    "blackwell-cublas-build": {
+      "purpose": "cublaslt_case binary for B300 (suites/blackwell/runners/cublas/build.sh)",
+      "cases": 100,
+      "kind": "build",
+      "script": "scripts/provision/build/blackwell-cublas-build.sh",
+      "inputs": [],
+      "toolchain": "b300",
+      "device": "b300",
+      "outputs": [
+        {
+          "path": "cublaslt_case",
+          "sha256": "df36f53672caa0af053f38d4fa92edf357090d1a6a01227a2e1509b03514e9a8"
+        }
+      ]
+    },
+    "blackwell-deps": {
+      "purpose": "runner deps dir (fa4 pip prefix, flashinfer/flashmla deps links) — runners/.deps symlink target (BW_DEPS_DIR)",
+      "cases": 900,
+      "composed_of": {
+        "fa4": "blackwell-fa4-deps",
+        "flashinfer": "blackwell-flashinfer-deps",
+        "flashmla": "blackwell-flashmla-build"
+      },
+      "kind": "composite"
+    },
+    "blackwell-fa4-deps": {
+      "purpose": "FA4 pip --target prefix (flash_attn_4 4.0.0b31, quack_kernels, nvidia_cutlass_dsl); reachable via blackwell-deps/fa4",
+      "cases": 900,
+      "kind": "pypi_wheels",
+      "requirements": "configs/capture_locks/fa4-deps.lock",
+      "index_url": "https://pypi.org/simple",
+      "install": "unpack-ep:local/lib/python3.12/dist-packages,local/bin",
+      "python_version": "3.12",
+      "patches": [
+        "suites/blackwell/runners/flashattention4/patches/0001-packgqa-bound.patch"
+      ],
+      "patch_apply": "local/lib/python3.12/dist-packages",
+      "note": "unpack 后应用 patch（原目录含 interface.py.orig-sc 备份；RECORD/INSTALLER/pycache 差异为 pip 安装痕迹，已记录）",
+      "tree_sha256": "6839f209c0a29d15c1ccb83a4350a58efaaa5c90fce6f720920b08a9f525245c"
+    },
+    "blackwell-flashinfer-deps": {
+      "purpose": "vendored flashinfer prefix with src/flashinfer symlink (BW_FI_SRC)",
+      "cases": 900,
+      "kind": "composite",
+      "composed_of": {
+        "src/flashinfer": "blackwell-flashinfer-source/flashinfer"
+      },
+      "note": "旧目录只有 src/flashinfer 一个符号链接（→ src/flashinfer-0.7.0/flashinfer，包级，runner 把 src 放进 sys.path）；composite 由 provision_tools fetch 用相对符号链接复原，verify 检查链接"
+    },
+    "blackwell-flashinfer-source": {
+      "purpose": "flashinfer git checkout v0.7.0 @4d75a33 (clean)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/flashinfer-ai/flashinfer",
+      "rev": "4d75a33f19aaf48b44d5b1c5dbca33bc1eca5c58",
+      "tag": "v0.7.0",
+      "ignored_extras": [
+        ".git"
+      ],
+      "tree_sha256": "dfc6237ae706d3aa0acc9cf6d94651ab05f37635215e66cefc28fa550d40c8a9"
+    },
+    "blackwell-flashmla-build": {
+      "purpose": "FlashMLA built cuda.abi3.so (BW_FLASHMLA_PREFIX default)",
+      "cases": 900,
+      "kind": "build",
+      "script": "scripts/provision/build/blackwell-flashmla-build.sh",
+      "inputs": [
+        "blackwell-flashmla-source"
+      ],
+      "toolchain": "b300",
+      "device": "b300",
+      "outputs": [
+        {
+          "path": "flash_mla/cuda.abi3.so",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed"
+    },
+    "blackwell-flashmla-source": {
+      "purpose": "FlashMLA git checkout @0f11e17 stock (BW_FLASHMLA_SRC fallback)",
+      "cases": 900,
+      "kind": "git",
+      "url": "https://github.com/deepseek-ai/FlashMLA",
+      "rev": "0f11e178da1f67becb087a324b400854931ec3e3",
+      "patches": [],
+      "note": "FlashMLA @0f11e17 stock source — api-fragment patch belongs to the effective-sms variant only (old stock build 2026-10-15T21:06 predates the api.cpp STABLE_TORCH_LIBRARY→FRAGMENT change of 2026-10-16T08:55; old stock references aoti_torch_library_init_def, effective-sms uses _fragment).",
+      "ignored_extras": [
+        ".git",
+        "build",
+        "csrc/3rdparty/cutlass/.git",
+        "flash_mla/_build_info.py",
+        "flash_mla/cuda.abi3.so"
+      ],
+      "submodules": [
+        {
+          "path": "csrc/3rdparty/cutlass",
+          "url": "https://github.com/NVIDIA/cutlass",
+          "rev": "4faf1a1568cf1e4ad8ff71846a13e16f2a6a6f6b"
+        }
+      ],
+      "tree_sha256": "945506418a2c20a6e4270b4380e9f7c3776324d77651596a02b01db2865c1b48"
+    },
+    "triton-source": {
+      "purpose": "Triton 3.7.0 source tree (TRITON_SOURCE_ROOT; shared by blackwell runners and hopper triton runner)",
+      "cases": 1000,
+      "kind": "download",
+      "url": "https://github.com/triton-lang/triton/archive/refs/tags/v3.7.0.tar.gz",
+      "unpack": "tar.gz",
+      "note": "tools/src/triton-3.7.0 对应上游 tag v3.7.0；解压后顶层目录名需重命名对齐",
+      "sha256": "ff5cdcdd1b3f30a5db06c4e690ac73b16342c8181820e2cdf74e8514065ea7b8",
+      "strip_components": 1,
+      "tree_sha256": "422ef155a6f36df91ef692359a598e2a3350b882ce5e2576bf8286701595fafd"
+    },
+    "blackwell-cutlass-source": {
+      "purpose": "CUTLASS checkout (BW_CUTLASS_DIR; runners/third_party/cutlass link target)",
+      "cases": 900,
+      "kind": "git",
+      "url": "https://github.com/NVIDIA/cutlass",
+      "rev": "f614dc40e17fb3ddb1b7b474318b48a8d5d21a2c",
+      "paths": [
+        ".github",
+        ".gitignore",
+        ".gitmodules",
+        "CHANGELOG.md",
+        "CITATION.cff",
+        "CMakeLists.txt",
+        "CONTRIBUTORS.md",
+        "CUDA.cmake",
+        "Doxyfile",
+        "EULA.txt",
+        "LICENSE.txt",
+        "PUBLICATIONS.md",
+        "README.md",
+        "bin2hex.cmake",
+        "cmake",
+        "cuBLAS.cmake",
+        "cuDNN.cmake",
+        "customConfigs.cmake",
+        "cutlass-f614dc4",
+        "cutlass_compiler",
+        "docs",
+        "examples",
+        "include",
+        "media",
+        "operators",
+        "pyproject.toml",
+        "python",
+        "setup.cfg",
+        "test",
+        "tools"
+      ],
+      "note": "目录名 cutlass-f614dc4 无 .git；rev 由 API 定位",
+      "ignored_extras": [
+        ".git"
+      ],
+      "tree_sha256": "1d58601eb4b998aff73822c09fbff20233cc31277253c2d0636714a386ad4fd9"
+    },
+    "blackwell-corpus": {
+      "purpose": "corpus_sc root; cutlass/ holds SM100 example binaries (BW_CORPUS_ROOT, BW_CUTLASS_BIN_ROOT=<name>/cutlass)",
+      "cases": 900,
+      "kind": "build",
+      "script": "scripts/provision/build/blackwell-corpus.sh",
+      "inputs": [
+        "blackwell-cutlass-source"
+      ],
+      "toolchain": "b300",
+      "device": "b300",
+      "outputs": [
+        {
+          "path": "cutlass/bin/70_blackwell_fp16_gemm_sc",
+          "sha256": ""
+        },
+        {
+          "path": "cutlass/bin-c450v2/90_sm103_fp4_ultra_grouped_gemm",
+          "sha256": ""
+        }
+      ],
+      "provenance": "reconstructed"
+    },
+    "cuda-toolkit-13.2": {
+      "purpose": "CUDA 13.2 toolchain copied from the B300 pod image (nvdisasm/cuobjdump; NVDISASM default)",
+      "cases": 2000,
+      "kind": "build",
+      "script": "scripts/provision/build/cuda-toolkit-13.2.sh",
+      "inputs": [],
+      "toolchain": "b300",
+      "device": "cpu",
+      "outputs": [
+        {
+          "path": "bin/nvdisasm",
+          "sha256": ""
+        }
+      ],
+      "provenance": "image-copy",
+      "note": "exit.txt 记录 image/src=/usr/local/cuda/date；redist 归档见 report"
+    },
+    "nvbit": {
+      "kind": "download",
+      "url": "https://github.com/NVlabs/NVBit/releases/download/v1.8/nvbit-Linux-x86_64-1.8.tar.bz2",
+      "sha256": "72a2b827f9531dcb86b6be13844f267640fb440929d92944177029da6da2b9e1",
+      "unpack": "tar.bz2",
+      "strip_components": 1,
+      "purpose": "NVBit 1.8 release root (libnvbit.a + nvbit.h) for tools/tracer/build.sh (CYCLESCOPE_NVBIT_DIR)",
+      "cases": 2000,
+      "tree_sha256": "a33e0d164e8365826a66b6e751fadfa4f5f88eab478f0b36f4b5eda470a4dc4e"
+    },
+    "flashinfer-cubins": {
+      "purpose": "precompiled sm_103a fmha cubins (FLASHINFER_CUBIN_DIR)",
+      "cases": 550,
+      "kind": "download",
+      "url": "https://edge.urm.nvidia.com/artifactory/sw-kernelinferencelibrary-public-generic-local",
+      "files": "configs/capture_locks/flashinfer-cubins.files.json",
+      "unpack": "none",
+      "note": "369 files, per-file sha verified 2026-11-05; tree_sha256 recorded from verified tree",
+      "tree_sha256": "a2dfad6991663193ef05bb4d67766cd9aeaeafe9aa9a6392f85d7c84788cd84a"
+    },
+    "nsight-compute": {
+      "purpose": "Nsight Compute 2025.1.0 (CYCLESCOPE_NCU ncu census)",
+      "cases": 1000,
+      "kind": "download",
+      "manual": true,
+      "page": "https://developer.nvidia.com/tools-downloads (Nsight Compute 2025.1.0; devtools redist 需登录)",
+      "note": "已装 2025.1.0 linux-desktop-glibc_2_11_3-x64；自动下载链接不可得，标 manual"
+    },
+    "bin": {
+      "purpose": "auxiliary binaries on PATH (zstd)",
+      "cases": 2000,
+      "kind": "build",
+      "script": "scripts/provision/build/bin.sh",
+      "inputs": [],
+      "toolchain": "host",
+      "device": "cpu",
+      "outputs": [
+        {
+          "path": "zstd",
+          "sha256": "",
+          "note": "zstd 1.4.8 built from source"
+        }
+      ],
+      "note": "zstd 1.4.8; 主源 github release tarball (sha32478297)，备用 codeload（同 tag，sha 不同，构建时按实际源校验）",
+      "sha256": "32478297ca1500211008d596276f5367c54198495cf677e9439f4791a4c69f24",
+      "fallback_sha256": "f176f0626cb797022fbf257c3c644d71c1c747bb74c32201f9203654da35e9fa"
+    },
+    "tracer-sm_90a": {
+      "kind": "build",
+      "script": "scripts/provision/build/tracer-sm_90a.sh",
+      "inputs": [
+        "nvbit"
+      ],
+      "toolchain": "h100",
+      "device": "cpu",
+      "outputs": [
+        "tracer.so",
+        "build-manifest.json"
+      ],
+      "purpose": "NVBit tracer .so (tools/tracer/build.sh; NVBit 1.8)",
+      "cases": 1000,
+      "note": "输出目录用 $CYCLESCOPE_ARTIFACT_ROOT/build/tracer/<sm>（driver/capture_batch 默认约定），不在 tools/ 下",
+      "target": "build/tracer/sm_90a"
+    },
+    "tracer-sm_103a": {
+      "kind": "build",
+      "script": "scripts/provision/build/tracer-sm_103a.sh",
+      "inputs": [
+        "nvbit"
+      ],
+      "toolchain": "b300",
+      "device": "cpu",
+      "outputs": [
+        "tracer.so",
+        "build-manifest.json"
+      ],
+      "purpose": "NVBit tracer .so (tools/tracer/build.sh; NVBit 1.8)",
+      "cases": 1000,
+      "note": "输出目录用 $CYCLESCOPE_ARTIFACT_ROOT/build/tracer/<sm>（driver/capture_batch 默认约定），不在 tools/ 下",
+      "target": "build/tracer/sm_103a"
+    },
+    "hopper-flashmla-cutlass-source": {
+      "purpose": "CUTLASS pinned for FlashMLA build (PINNED.md L46)",
+      "cases": 0,
+      "kind": "git",
+      "url": "https://github.com/NVIDIA/cutlass.git",
+      "rev": "147f5673d0c1c3dcf66f78d677fd647e4a020219",
+      "note": "separate from hopper-cutlass-source (f614dc4) per build_cluster_sm.sh; fetched via codeload tarball (pod has no egress; verified top dir cutlass-<rev>)",
+      "download": {
+        "url": "https://codeload.github.com/NVIDIA/cutlass/tar.gz/147f5673d0c1c3dcf66f78d677fd647e4a020219",
+        "sha256": "9f6c53320a85b4a570975e557918cde65168cd311f081920446c238437347dc6"
+      },
+      "tree_sha256": "7df52dcb7dba8fe303267f963419f9075b5e193968fba55752e6f62d7090a8b0"
+    }
+  },
+  "schema_version": "cyclescope.capture_tools.v1"
+}

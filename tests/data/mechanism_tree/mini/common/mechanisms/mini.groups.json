@@ -1,0 +1,40 @@
+{
+  "doc": "groups shorthand mechanism",
+  "program": {
+    "event": "issue",
+    "parameter_schema": "timing_row",
+    "operation_classes": [
+      "X",
+      "Y"
+    ],
+    "timing_kind": "nanosleep_warp_delay"
+  },
+  "groups": {
+    "X": {
+      "fields": {
+        "cycles": {
+          "model": {
+            "kind": "constant",
+            "value": 3.0
+          },
+          "sources": [
+            "src.measured"
+          ]
+        }
+      }
+    },
+    "Y": {
+      "fields": {
+        "cycles": {
+          "model": {
+            "kind": "constant",
+            "value": 5.0
+          },
+          "sources": [
+            "src.measured"
+          ]
+        }
+      }
+    }
+  }
+}

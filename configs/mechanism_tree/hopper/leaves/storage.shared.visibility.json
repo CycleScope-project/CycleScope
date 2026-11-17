@@ -1,0 +1,240 @@
+{
+ "storage.shared.visibility.root/operation_class=LDS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=LDS/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 290.03390997023985
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=STS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=STS/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 290.03390997023985
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=STSM/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=STSM/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 290.03390997023985
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=LD/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=LD/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 290.03390997023985
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=ST/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.h100.r1"
+    ]
+   }
+  },
+  "scope": "cta"
+ },
+ "storage.shared.visibility.root/operation_class=ST/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 290.03390997023985
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "dsmem.h100.unreachable"
+    ]
+   }
+  },
+  "scope": "cta"
+ }
+}

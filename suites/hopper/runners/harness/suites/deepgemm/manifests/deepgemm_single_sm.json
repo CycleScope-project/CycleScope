@@ -1,0 +1,4727 @@
+{
+  "candidate_count": 100,
+  "cases": [
+    {
+      "case_id": "bf16_dense_nn_s5_single_sm",
+      "class_id": "bf16_dense_nn",
+      "delivery_group": 0,
+      "delivery_index": 0,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.09710688484516834,
+        "implementation_match": true,
+        "median_cycles": 280099.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_nn_s5",
+      "source_core_sass_signatures": [
+        "9fe1a4fc31d7551bfb52f2d6e174ea330968ed806d439791cc675026367c40e0"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nn_acc_bf16_s5_single_sm",
+      "class_id": "bf16_dense_nn_acc_bf16",
+      "delivery_group": 1,
+      "delivery_index": 1,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11559887740779207,
+        "implementation_match": true,
+        "median_cycles": 283607.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_nn_acc_bf16_s5",
+      "source_core_sass_signatures": [
+        "5e4b02d3b416f6b01e969f1594eb3728b2f45dd03d7bf0ea1fd32b8d1203d2c4"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_s8_single_sm",
+      "class_id": "bf16_dense_nt",
+      "delivery_group": 2,
+      "delivery_index": 2,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07265794412076575,
+        "implementation_match": true,
+        "median_cycles": 278742.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_nt_s8",
+      "source_core_sass_signatures": [
+        "871ed2156018801bc355c271ffe56d781122dd763989434db5842bdd07d90976"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_bf16_s8_single_sm",
+      "class_id": "bf16_dense_nt_acc_bf16",
+      "delivery_group": 3,
+      "delivery_index": 3,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.033361832579138606,
+        "implementation_match": true,
+        "median_cycles": 281351.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_nt_acc_bf16_s8",
+      "source_core_sass_signatures": [
+        "9b79726b8da34eed2e1294f165d2d5a67bb768f187ce0274e402b8d9a85bf3df"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_nt_acc_fp32_s6_single_sm",
+      "class_id": "bf16_dense_nt_acc_fp32",
+      "delivery_group": 0,
+      "delivery_index": 4,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.06430430429944195,
+        "implementation_match": true,
+        "median_cycles": 340748.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_nt_acc_fp32_s6",
+      "source_core_sass_signatures": [
+        "83484d70783416042eff95bd9d5dd25dd8c9ccf42ec2ba405023e131988794cd"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_s6_single_sm",
+      "class_id": "bf16_dense_tn",
+      "delivery_group": 1,
+      "delivery_index": 5,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.08824626880104865,
+        "implementation_match": true,
+        "median_cycles": 281452.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_tn_s6",
+      "source_core_sass_signatures": [
+        "c1c9a87e0bcb87827e2eba9acf2b700962f77f914f472aa0c40f6e811c16ca56"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tn_acc_fp32_s7_single_sm",
+      "class_id": "bf16_dense_tn_acc_fp32",
+      "delivery_group": 2,
+      "delivery_index": 6,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11897093117297063,
+        "implementation_match": true,
+        "median_cycles": 344677.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_tn_acc_fp32_s7",
+      "source_core_sass_signatures": [
+        "a3b9eb187eebdf7183f3b8cc6e7fbd97b848f24cca3a5f1cf7e79ee121da5364"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_s5_single_sm",
+      "class_id": "bf16_dense_tt",
+      "delivery_group": 3,
+      "delivery_index": 7,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.05596427362085872,
+        "implementation_match": true,
+        "median_cycles": 280634.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_tt_s5",
+      "source_core_sass_signatures": [
+        "16d68c95bc62f8397c22ed578281ae8a173fc220c43d0b0ea97379c7148aa63b"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_dense_tt_acc_fp32_s8_single_sm",
+      "class_id": "bf16_dense_tt_acc_fp32",
+      "delivery_group": 0,
+      "delivery_index": 8,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.09712506762628444,
+        "implementation_match": true,
+        "median_cycles": 341764.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_dense_tt_acc_fp32_s8",
+      "source_core_sass_signatures": [
+        "2d0824758c0d28b9bfdcd1968e2a5fb3a78eae8fcf26343455fd336033550135"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nn_contiguous_s7_single_sm",
+      "class_id": "bf16_mgroup_nn_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 9,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.2318527605458171,
+        "implementation_match": true,
+        "median_cycles": 136046.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 2,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nn_contiguous_s7",
+      "source_core_sass_signatures": [
+        "e64706d62019b378e7d0d085c2369836a994996b3b03682fc3c7dc9e5929b4d5"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_contiguous_s5_single_sm",
+      "class_id": "bf16_mgroup_nt_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 10,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.1434986879102887,
+        "implementation_match": true,
+        "median_cycles": 136193.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 2,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_contiguous_s5",
+      "source_core_sass_signatures": [
+        "112e40a3060f59bee2bc99f32a3b7957dbae14ec182abe89091dec6acce9cc21"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_contiguous_psum_s7_single_sm",
+      "class_id": "bf16_mgroup_nt_contiguous_psum",
+      "delivery_group": 3,
+      "delivery_index": 11,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.02809646452821353,
+        "implementation_match": true,
+        "median_cycles": 136418.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 2,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_contiguous_psum_s7",
+      "source_core_sass_signatures": [
+        "9bd409ca9f91c72d813663ce10a5b7d25d3bf3d92246912fcac53b2cfef9ebf0"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_contiguous_s8_single_sm",
+      "class_id": "bf16_mgroup_nt_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 12,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.03383321319723659,
+        "implementation_match": true,
+        "median_cycles": 270399.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 4,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_contiguous_s8",
+      "source_core_sass_signatures": [
+        "582cf3a51aad31966e3c552a1eedbde5b7fa465e44090a2d936f158baadec4b6"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_contiguous_psum_s4_single_sm",
+      "class_id": "bf16_mgroup_nt_contiguous_psum",
+      "delivery_group": 1,
+      "delivery_index": 13,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.025698258122619964,
+        "implementation_match": true,
+        "median_cycles": 270724.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 4,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_contiguous_psum_s4",
+      "source_core_sass_signatures": [
+        "2aed0b3a54649bc082f3688a16012d4e71f715bed05bcf55aabaaaee1b430cce"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nn_contiguous_s8_single_sm",
+      "class_id": "bf16_mgroup_nn_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 14,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_bf16_gemm_contiguous"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.03376337454802882,
+        "implementation_match": true,
+        "median_cycles": 270540.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 8192,
+        "n": 128,
+        "num_groups": 4,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nn_contiguous_s8",
+      "source_core_sass_signatures": [
+        "58830227dd32f519fccd64e7e2d7f63983ef772cc317098d45c1b6e739a0bdf4"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_bf16_gemm_contiguous"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s7_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 3,
+      "delivery_index": 15,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.06460532754886933,
+        "implementation_match": true,
+        "median_cycles": 203114.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 8192,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s7",
+      "source_core_sass_signatures": [
+        "474b25e7b5222db0965a0a087bac984917f89213a59ec95dd9bfb29591fd4056"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s4_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 0,
+      "delivery_index": 16,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.05526921737371945,
+        "implementation_match": true,
+        "median_cycles": 304675.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 8192,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s4",
+      "source_core_sass_signatures": [
+        "f930a60b07e61b426d1d038256419c95d45f2902dc5104baef9a2d7bf0973953"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s8_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 1,
+      "delivery_index": 17,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07917107662893487,
+        "implementation_match": true,
+        "median_cycles": 285137.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 4096,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s8",
+      "source_core_sass_signatures": [
+        "fedb6bd3dace9dea0e8e9b407599d2af92afa66db086caa08675769202b66483"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s1_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 2,
+      "delivery_index": 18,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07573966833706307,
+        "implementation_match": true,
+        "median_cycles": 400652.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s1",
+      "source_core_sass_signatures": [
+        "6d6f00d83980cbbfe37d2c4bc2246ac170b94d0a4195e45e2595904ff0762197"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s6_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 3,
+      "delivery_index": 19,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.025808323622805062,
+        "implementation_match": true,
+        "median_cycles": 600327.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s6",
+      "source_core_sass_signatures": [
+        "f10fbf156990d027878be0cd3e9872f76ebd6ba31336856672909e669415e7c3"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_mgroup_nt_masked_s3_single_sm",
+      "class_id": "bf16_mgroup_nt_masked",
+      "delivery_group": 0,
+      "delivery_index": 20,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_m_grouped_gemm_masked"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.20573080950269718,
+        "implementation_match": true,
+        "median_cycles": 556160.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 8192,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_mgroup_nt_masked_s3",
+      "source_core_sass_signatures": [
+        "932970aee6b34d4d203102a710db62823a92c7ffec6ca639fe3af08f219a1faf"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_m_grouped_gemm_masked"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s3_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 21,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.10508364856086445,
+        "implementation_match": true,
+        "median_cycles": 140507.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 128,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s3",
+      "source_core_sass_signatures": [
+        "ea2c5e6ef5a1c78551be55ee3e3580865c40a0e6b1f3b6dd819364bca440cd9d"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s6_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 22,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.08347034850834624,
+        "implementation_match": true,
+        "median_cycles": 281100.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 128,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s6",
+      "source_core_sass_signatures": [
+        "f8a1f2c08c4097fd40da313c7c4e10fc3b486cf1f9d3c77e0ab593d265a37bc3"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s7_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 3,
+      "delivery_index": 23,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.12389549429899864,
+        "implementation_match": true,
+        "median_cycles": 561517.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 128,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s7",
+      "source_core_sass_signatures": [
+        "c73c8277dd0b545382788e40bdeb147efedabf38f71758dcf68c043f5fec9383"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s5_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 24,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.0642514496213719,
+        "implementation_match": true,
+        "median_cycles": 272724.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s5",
+      "source_core_sass_signatures": [
+        "7696432ab3d258b0a064f1033e2a1d1b98e71de05b9407aa6e0ab59cb638e7fc"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s2_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 25,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.05157456430220194,
+        "implementation_match": true,
+        "median_cycles": 544111.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s2",
+      "source_core_sass_signatures": [
+        "719442c1d3e2da04ecf22b0b5d70f61d26b2156459c87e1a09dda6fb65a72357"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_kgroup_tn_contiguous_s8_single_sm",
+      "class_id": "bf16_kgroup_tn_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 26,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_k_grouped_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.053893499647634374,
+        "implementation_match": true,
+        "median_cycles": 1086351.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_kgroup_tn_contiguous_s8",
+      "source_core_sass_signatures": [
+        "3345e0d842c45658eb94f758a0bdf15fbcded38f1ac4abbea932f001cb878cca"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_k_grouped_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s12_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 3,
+      "delivery_index": 27,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.21644291750158315,
+        "implementation_match": true,
+        "median_cycles": 171333.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 4096
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s12",
+      "source_core_sass_signatures": [
+        "defe8e208dcd2087c8b14ccad6319fb6c154030fc01efd6536a7ae910ef6bc08"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s7_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 0,
+      "delivery_index": 28,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.1953882778972641,
+        "implementation_match": true,
+        "median_cycles": 168972.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 1,
+        "r": 8192
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s7",
+      "source_core_sass_signatures": [
+        "7eeea597cf7bbd441f9b95718011d05c49b5ed3feaad15258c64bb3e7eed5113"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s8_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 1,
+      "delivery_index": 29,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.08946498210798576,
+        "implementation_match": true,
+        "median_cycles": 336059.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 8192
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s8",
+      "source_core_sass_signatures": [
+        "b7614854324392ea2a5aabf74216554032be37538515b6358f7db25ff19e482e"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s15_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 2,
+      "delivery_index": 30,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.12777341617637086,
+        "implementation_match": true,
+        "median_cycles": 251389.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 1,
+        "r": 12288
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s15",
+      "source_core_sass_signatures": [
+        "1858f97d989f659f22f80e580d973ffe1dbe7462679140b50c2b3ed8e0249893"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s13_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 3,
+      "delivery_index": 31,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11305354018351825,
+        "implementation_match": true,
+        "median_cycles": 499432.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 12288
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s13",
+      "source_core_sass_signatures": [
+        "d82d5c341c7fb93dc229e267e440d3227bb9e6fa86c58280bb3919a00ed16672"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhr_hdr_bhd_s17_single_sm",
+      "class_id": "bf16_einsum_bhr_hdr_bhd",
+      "delivery_group": 0,
+      "delivery_index": 32,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhr_hdr_bhd"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.10884108274105382,
+        "implementation_match": true,
+        "median_cycles": 333140.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 1,
+        "r": 16384
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhr_hdr_bhd_s17",
+      "source_core_sass_signatures": [
+        "6f08a45ec07e35b0321090ed60c6f7ac7804259b2bbe6122d0b703dfda6437a5"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhr_hdr_bhd"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s20_single_sm",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "delivery_group": 1,
+      "delivery_index": 33,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhd_hdr_bhr"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.01954588396260221,
+        "implementation_match": true,
+        "median_cycles": 194616.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 4096
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhd_hdr_bhr_s20",
+      "source_core_sass_signatures": [
+        "23e47e5585c2ee881076f16c5e83048ea5fd3d514bca720840206d7c27a1b522"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s12_single_sm",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "delivery_group": 2,
+      "delivery_index": 34,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhd_hdr_bhr"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5099029215176021,
+        "implementation_match": true,
+        "median_cycles": 210615.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 1,
+        "r": 8192
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhd_hdr_bhr_s12",
+      "source_core_sass_signatures": [
+        "617d8ddda4c491a6b979364eda14344eee817db5dd17a2760773a22aaa38721e"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s19_single_sm",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "delivery_group": 3,
+      "delivery_index": 35,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhd_hdr_bhr"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.03350296691999349,
+        "implementation_match": true,
+        "median_cycles": 381846.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 8192
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhd_hdr_bhr_s19",
+      "source_core_sass_signatures": [
+        "6c1057e318d3ecb9c825720ee69e7b37651124791e2d93e9ac7023b1dbbfc6c0"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s16_single_sm",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "delivery_group": 0,
+      "delivery_index": 36,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhd_hdr_bhr"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.39339109671439737,
+        "implementation_match": true,
+        "median_cycles": 317091.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 1,
+        "r": 12288
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhd_hdr_bhr_s16",
+      "source_core_sass_signatures": [
+        "8d19cfb3a67472cb78845a0d16d6e6af818a06966303cc7d00e7aaef61632c36"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bhd_hdr_bhr_s21_single_sm",
+      "class_id": "bf16_einsum_bhd_hdr_bhr",
+      "delivery_group": 1,
+      "delivery_index": 37,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bf16_bhd_hdr_bhr"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.027369964350491372,
+        "implementation_match": true,
+        "median_cycles": 567706.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 1,
+        "r": 12288
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bhd_hdr_bhr_s21",
+      "source_core_sass_signatures": [
+        "d74984a17eb8bdfdda653f171ec6302b2a89c190de31b7c1cee1d45cbdc2bbca"
+      ],
+      "source_implementation_entries": [
+        "sm90_bf16_bhd_hdr_bhr"
+      ],
+      "source_implementation_modules": [
+        "sm90_bf16_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_s6_single_sm",
+      "class_id": "fp8_dense_nt",
+      "delivery_group": 2,
+      "delivery_index": 38,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.7027858516529577,
+        "implementation_match": true,
+        "median_cycles": 177765.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_s6",
+      "source_core_sass_signatures": [
+        "60a6c5e4fadaf79f13050d0cc38b98d7797587426514f9d9c1563d6935b14539"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_skip_head_mid_s3_single_sm",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "delivery_group": 3,
+      "delivery_index": 39,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5639651208420307,
+        "implementation_match": true,
+        "median_cycles": 356649.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 512,
+        "m": 128,
+        "n": 12288
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_skip_head_mid_s3",
+      "source_core_sass_signatures": [
+        "b55e18b0799d5061a6fa958c72fae378cd5c6becc30567a9ed24d37ba92690c5"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_skip_head_mid_s6_single_sm",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "delivery_group": 0,
+      "delivery_index": 40,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.6079384785875481,
+        "implementation_match": true,
+        "median_cycles": 375144.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 1024,
+        "m": 128,
+        "n": 8192
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_skip_head_mid_s6",
+      "source_core_sass_signatures": [
+        "a138f0616a0e43c35d85dd52b0d4a85564991d5660be484320bbf9e98e04aa6f"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_s5_single_sm",
+      "class_id": "fp8_dense_nt",
+      "delivery_group": 1,
+      "delivery_index": 41,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.8507540217396388,
+        "implementation_match": true,
+        "median_cycles": 362291.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_s5",
+      "source_core_sass_signatures": [
+        "d1fe5484ebc0fcacf64214562359b2dd4d4f3628737637f46b7f051695331d47"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_s3_single_sm",
+      "class_id": "fp8_dense_nt",
+      "delivery_group": 2,
+      "delivery_index": 42,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5484594157627201,
+        "implementation_match": true,
+        "median_cycles": 693012.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 8192
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_s3",
+      "source_core_sass_signatures": [
+        "c81165724e874932d41c0cba1977eaf99fec17dca63a3d107e0e059a5a43d410"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_skip_head_mid_s7_single_sm",
+      "class_id": "fp8_dense_nt_skip_head_mid",
+      "delivery_group": 3,
+      "delivery_index": 43,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07287322482198239,
+        "implementation_match": true,
+        "median_cycles": 334597.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 1024,
+        "m": 256,
+        "n": 4096
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_skip_head_mid_s7",
+      "source_core_sass_signatures": [
+        "d3b5cd3b9a610363f02ddf3f032b761fe2ee0009c173d1681bc112552ef6f756"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s3_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 44,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 2.2057952897188877,
+        "implementation_match": true,
+        "median_cycles": 284159.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 32768,
+        "n": 128,
+        "num_groups": 2,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s3",
+      "source_core_sass_signatures": [
+        "5b2c88e77cbd1fa59d44e6d76b22055951298927bdb64ec13842a36ce785e76e"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s6_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 45,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.334587181930894,
+        "implementation_match": true,
+        "median_cycles": 262867.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 16384,
+        "n": 128,
+        "num_groups": 4,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s6",
+      "source_core_sass_signatures": [
+        "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s8_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 46,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5558148088514316,
+        "implementation_match": true,
+        "median_cycles": 505696.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 16384,
+        "n": 128,
+        "num_groups": 8,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s8",
+      "source_core_sass_signatures": [
+        "5bef673d5b10d1fd452acb42bf95a8791303e03e712e32b8c1e98b95197ed916"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s1_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 3,
+      "delivery_index": 47,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.7955325756647964,
+        "implementation_match": true,
+        "median_cycles": 146943.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 16384,
+        "n": 128,
+        "num_groups": 2,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s1",
+      "source_core_sass_signatures": [
+        "02035cda63660c86b82f4a5b3ff1ac9424516544a4053daa936881bf2b3fecfd"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s5_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 48,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.2789633576160453,
+        "implementation_match": true,
+        "median_cycles": 259174.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 16384,
+        "n": 128,
+        "num_groups": 4,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s5",
+      "source_core_sass_signatures": [
+        "533b236fdc088f5e809591f8564a5625fa9c4046a01edba5f8237dc5bc8bfb08"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_contiguous_s7_single_sm",
+      "class_id": "fp8_mgroup_nt_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 49,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_m_grouped_fp8_gemm_contiguous_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5443219504918176,
+        "implementation_match": true,
+        "median_cycles": 507642.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k": 16384,
+        "n": 128,
+        "num_groups": 8,
+        "tokens_per_group": 64
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_contiguous_s7",
+      "source_core_sass_signatures": [
+        "3a1a5058aa79dc7d086c71f2944e453106d30576337e077e3be417a63766666a"
+      ],
+      "source_implementation_entries": [
+        "sm90_m_grouped_fp8_gemm_contiguous_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s8_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 2,
+      "delivery_index": 50,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.895449782422292,
+        "implementation_match": true,
+        "median_cycles": 152314.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s8",
+      "source_core_sass_signatures": [
+        "d678f9dfee425080598fac50a2678449bfa6ac5aa2ac5cc7091203b7c921e343"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s7_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 3,
+      "delivery_index": 51,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.1450221472065382,
+        "implementation_match": true,
+        "median_cycles": 268178.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s7",
+      "source_core_sass_signatures": [
+        "06a3e2e9f06a379c57a4a2be11c0cb12a7cc38336e0acc45a8ca30eefaff3c6c"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s5_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 0,
+      "delivery_index": 52,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.7903328936171674,
+        "implementation_match": true,
+        "median_cycles": 505483.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s5",
+      "source_core_sass_signatures": [
+        "dc792c3b751a6079b7cb60ed3b6257e24f258b0d136949bbfb6126f048a39d84"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s6_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 1,
+      "delivery_index": 53,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.99427327130101,
+        "implementation_match": true,
+        "median_cycles": 152918.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s6",
+      "source_core_sass_signatures": [
+        "c12c6207fe089ddae7385aaa7df5a907ff68f841ce459c239b7531d4b98b823a"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s4_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 2,
+      "delivery_index": 54,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.1567200324727342,
+        "implementation_match": true,
+        "median_cycles": 268087.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s4",
+      "source_core_sass_signatures": [
+        "20646b99b862ad8754e4e2caefc10f807b784adc414373734e833cea5dfb5b05"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_mgroup_nt_masked_s3_single_sm",
+      "class_id": "fp8_mgroup_nt_masked",
+      "delivery_group": 3,
+      "delivery_index": 55,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_m_grouped_gemm_masked_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.0855747629082109,
+        "implementation_match": true,
+        "median_cycles": 504729.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "expected_m": 64,
+        "k": 16384,
+        "max_m": 256,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_mgroup_nt_masked_s3",
+      "source_core_sass_signatures": [
+        "520aa14d5b9df16d9b3bb9dffc5e0b03810dc730ea9b6eb22f799bd98f79fbf3"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_m_grouped_gemm_masked_1d2d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s16_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 0,
+      "delivery_index": 56,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.10265963536892142,
+        "implementation_match": true,
+        "median_cycles": 986270.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 8,
+        "r": 4096
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s16",
+      "source_core_sass_signatures": [
+        "c8a5e8f1bcb2fd4501e17b8c9a42d6313290799a039bda5273fdc0e9564f925e"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s13_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 1,
+      "delivery_index": 57,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.05612645788511661,
+        "implementation_match": true,
+        "median_cycles": 951739.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 8,
+        "r": 8192
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s13",
+      "source_core_sass_signatures": [
+        "4ea6b1f9f40751bf8a8ea17969dc2d4fb2544730b3dd2b2c566299db17aad86f"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s8_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 2,
+      "delivery_index": 58,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.46344914368686696,
+        "implementation_match": true,
+        "median_cycles": 1907888.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 8,
+        "r": 8192
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s8",
+      "source_core_sass_signatures": [
+        "23a8b8acdb32f5389519187ec2c02c2763ee59cbf4b68bd27e68b42017a81595"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s10_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 3,
+      "delivery_index": 59,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5564586585842893,
+        "implementation_match": true,
+        "median_cycles": 1417505.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 8,
+        "r": 12288
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s10",
+      "source_core_sass_signatures": [
+        "19007585ca9ad5651930e7ff074a4bb7ca24fb11efa11cb2666e40a4ea749a65"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s9_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 0,
+      "delivery_index": 60,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.3331599784673343,
+        "implementation_match": true,
+        "median_cycles": 2833729.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 1024,
+        "h": 8,
+        "r": 12288
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s9",
+      "source_core_sass_signatures": [
+        "90faae1c683b07f52a7a76c2d3276782d1a24eb20f6b782ba180ebc5d23a2fc7"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_einsum_bhr_hdr_bhd_s14_single_sm",
+      "class_id": "fp8_einsum_bhr_hdr_bhd",
+      "delivery_group": 1,
+      "delivery_index": 61,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d2d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.017980149002827368,
+        "implementation_match": true,
+        "median_cycles": 1893676.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "b": 1,
+        "d": 512,
+        "h": 8,
+        "r": 16384
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_einsum_bhr_hdr_bhd_s14",
+      "source_core_sass_signatures": [
+        "f33c36131fac9602bb22da795b92e5e84a16de72d8fbb623d77ae0f35646521a"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_bmm"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d2d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s6_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 2,
+      "delivery_index": 62,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.9758006806359724,
+        "implementation_match": true,
+        "median_cycles": 295133.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s6",
+      "source_core_sass_signatures": [
+        "fb945f9a2806d4c4f7259c90537df557af0d1a5fd39de3b619dc6b72d81ae55a"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s2_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 3,
+      "delivery_index": 63,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.4940683893851652,
+        "implementation_match": true,
+        "median_cycles": 567372.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 4096
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s2",
+      "source_core_sass_signatures": [
+        "110af1d4adb1175acd2aa9c4d1edfa99cc7c82fd9af7b335cd17e782e9641e12"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s4_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 0,
+      "delivery_index": 64,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.08783662913050622,
+        "implementation_match": true,
+        "median_cycles": 1509390.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 6144
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s4",
+      "source_core_sass_signatures": [
+        "dccbbc414943c41fa8d278034c3f0e9a8389253c0ce55d5363e532af56bf6558"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s8_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 1,
+      "delivery_index": 65,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.15651359598479972,
+        "implementation_match": true,
+        "median_cycles": 569254.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 2048
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s8",
+      "source_core_sass_signatures": [
+        "95f39587db7e561187b4b051f511d593b612de0cf67c085b588ec7e0a6ab5521"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s5_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 2,
+      "delivery_index": 66,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.5780473425673861,
+        "implementation_match": true,
+        "median_cycles": 2183622.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 8192
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s5",
+      "source_core_sass_signatures": [
+        "1fb55b4f63c78344ae43224198c25fbd3a45a7dfd585e576ce007868a39a4b07"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_dense_nt_acc_fp32_s1_single_sm",
+      "class_id": "fp8_dense_nt_acc_fp32",
+      "delivery_group": 3,
+      "delivery_index": 67,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d",
+          "transpose_fp32"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.3335544116719044,
+        "implementation_match": true,
+        "median_cycles": 1148383.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 3072,
+        "m": 128,
+        "n": 6144
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_dense_nt_acc_fp32_s1",
+      "source_core_sass_signatures": [
+        "95f39587db7e561187b4b051f511d593b612de0cf67c085b588ec7e0a6ab5521"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s6_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 68,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.02930260581960514,
+        "implementation_match": true,
+        "median_cycles": 624981.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 32768,
+        "m": 128,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s6",
+      "source_core_sass_signatures": [
+        "3f173da684e3734c5f83c9436e2d0093eb352be5221121a63d6715e51c210536"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s8_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 69,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.10499283769266417,
+        "implementation_match": true,
+        "median_cycles": 319662.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 128,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s8",
+      "source_core_sass_signatures": [
+        "88268ad278c545a4fda8f94ad17f96d1cfea395cc4437869f7e2e1f13e52423c"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s3_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 2,
+      "delivery_index": 70,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11611734660596966,
+        "implementation_match": true,
+        "median_cycles": 635176.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 8192,
+        "m": 128,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s3",
+      "source_core_sass_signatures": [
+        "f25c5f7c6bd270f7e26c944693ed592805b835f90426fc374a9738746f708ca5"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s7_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 3,
+      "delivery_index": 71,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07019439872835319,
+        "implementation_match": true,
+        "median_cycles": 294003.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 2
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s7",
+      "source_core_sass_signatures": [
+        "e1ff0f86b033e767663f4b5d7738cfd0851c6a9b31ade090c44365c739f33457"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s5_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 0,
+      "delivery_index": 72,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 1.4876147484469402,
+        "implementation_match": true,
+        "median_cycles": 627619.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 4
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s5",
+      "source_core_sass_signatures": [
+        "cfd9b87da1242575260648b16a37b9807343fdd39f6165dd20377003641838da"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "fp8_kgroup_nt_contiguous_s2_single_sm",
+      "class_id": "fp8_kgroup_nt_contiguous",
+      "delivery_group": 1,
+      "delivery_index": 73,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_gemm_1d1d"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.06432827713166783,
+        "implementation_match": true,
+        "median_cycles": 1251267.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "alignment": 128,
+        "k_per_group": 16384,
+        "m": 128,
+        "n": 128,
+        "num_groups": 8
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "fp8_kgroup_nt_contiguous_s2",
+      "source_core_sass_signatures": [
+        "ff63c008ff7719363fcaa4f2b903f3d4930bfc96cc02d177d444c9c54fe588a4"
+      ],
+      "source_implementation_entries": [
+        "sm90_k_grouped_fp8_gemm_1d1d"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_gemm_1d1d"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s18_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 2,
+      "delivery_index": 74,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11064136243358297,
+        "implementation_match": true,
+        "median_cycles": 137402.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 2048,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s18",
+      "source_core_sass_signatures": [
+        "296eec844d5c9bd594f3aff815e97d065fdea695d6704b85b0db30e777f7ccb1"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s5_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 3,
+      "delivery_index": 75,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.06169088179679255,
+        "implementation_match": true,
+        "median_cycles": 269776.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 4096,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s5",
+      "source_core_sass_signatures": [
+        "e493d8d8c2c3815e6491eccc0922ae3d9d854eba8a2f95cb4fd8a3162808e29b"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s17_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 0,
+      "delivery_index": 76,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07897679061640585,
+        "implementation_match": true,
+        "median_cycles": 403101.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 6144,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s17",
+      "source_core_sass_signatures": [
+        "585f8cefd9b8b06c88db6779124a4e5c3db307d4049228ab4ead6b563028d303"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s4_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 1,
+      "delivery_index": 77,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.08132116813530914,
+        "implementation_match": true,
+        "median_cycles": 536567.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 8192,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s4",
+      "source_core_sass_signatures": [
+        "22f0105bd42885f125a282b0619d2a4a4dca5e989994b6c107849e5165285ebf"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s19_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 2,
+      "delivery_index": 78,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.11947465218520023,
+        "implementation_match": true,
+        "median_cycles": 676004.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 10240,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s19",
+      "source_core_sass_signatures": [
+        "10bcc55a5c7ab16a8e9b48ff0406a11949c9fe32eaa345881e9b93b7fc09311b"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "bf16_einsum_bmk_bnk_mn_s3_single_sm",
+      "class_id": "bf16_einsum_bmk_bnk_mn",
+      "delivery_group": 3,
+      "delivery_index": 79,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_bmn_bnk_mn_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.10463514994715084,
+        "implementation_match": true,
+        "median_cycles": 813317.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "k": 12288,
+        "m": 128,
+        "n": 128,
+        "s": 8
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "bf16_einsum_bmk_bnk_mn_s3",
+      "source_core_sass_signatures": [
+        "ce6bef29c95678b5ff26b37330d2960f1cd7e80a5f7c7162a0084fe82df6c725"
+      ],
+      "source_implementation_entries": [
+        "sm90_bmn_bnk_mn_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_bmk_bnk_mn"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s11_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 0,
+      "delivery_index": 80,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.162376443016079,
+        "implementation_match": true,
+        "median_cycles": 111557.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 16384,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 0,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s11",
+      "source_core_sass_signatures": [
+        "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s13_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 1,
+      "delivery_index": 81,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07774022404101714,
+        "implementation_match": true,
+        "median_cycles": 168359.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 24576,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 1,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s13",
+      "source_core_sass_signatures": [
+        "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s16_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 2,
+      "delivery_index": 82,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.07863607511374067,
+        "implementation_match": true,
+        "median_cycles": 222694.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 32768,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 2,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s16",
+      "source_core_sass_signatures": [
+        "7ab6b45902dffcdd9255b495479d0903e28a1c2576bc7ef23ac829eab5d82bdb"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s3_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 3,
+      "delivery_index": 83,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.0664924641873921,
+        "implementation_match": true,
+        "median_cycles": 276705.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 40960,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 3,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s3",
+      "source_core_sass_signatures": [
+        "a9d08aebdfcea6f612db586a88830269a1d7358c501747c7a4a1af2bc28954dd"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s14_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 0,
+      "delivery_index": 84,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.02614543753311927,
+        "implementation_match": true,
+        "median_cycles": 335148.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 49152,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 4,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s14",
+      "source_core_sass_signatures": [
+        "7c9b3cc6cc78097cdf4b2248a052e415bacfa4db12b913ff83b6dc09917262df"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "tf32_hc_prenorm_s12_single_sm",
+      "class_id": "tf32_hc_prenorm",
+      "delivery_group": 1,
+      "delivery_index": 85,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_tf32_hc_prenorm_gemm"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.016851396534614572,
+        "implementation_match": true,
+        "median_cycles": 388591.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "shape": {
+        "batch_size": 1,
+        "k": 57344,
+        "m": 64,
+        "n": 24,
+        "num_heads": 24,
+        "token_count": 64
+      },
+      "shape_variant": 5,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "tf32_hc_prenorm_s12",
+      "source_core_sass_signatures": [
+        "9e4c6d5537e1e3e5ffff63ff9f9096ddc37f028a4b589537c2e0fe0127722849"
+      ],
+      "source_implementation_entries": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "source_implementation_modules": [
+        "sm90_tf32_hc_prenorm_gemm"
+      ],
+      "suite_part": "core"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d128_bf16_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 2,
+      "delivery_index": 86,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.20610067777722751,
+        "implementation_match": true,
+        "median_cycles": 904130.7760282757,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "bf16",
+      "mode": "prefill_clean",
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 64,
+      "seq_len_kv": 8192,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d128_bf16",
+      "source_core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "c4c65373f59cf74e27d35d7fab783ce3d4cd87489cdfebb263808572af505cea"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 3,
+      "delivery_index": 87,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.3758974660944197,
+        "implementation_match": true,
+        "median_cycles": 2317362.0790266,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 32,
+      "logits_dtype": "fp32",
+      "mode": "prefill_clean",
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 192,
+      "seq_len_kv": 16384,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32",
+      "source_core_sass_signatures": [
+        "b849f2d4666d2efd4948742ef65435387edc144d0a38448107f0baf76d8f76c6",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h32_d64_fp32_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.13153638619830724,
+        "implementation_match": true,
+        "median_cycles": 1303102.0313722428,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 64,
+      "logits_dtype": "fp32",
+      "mode": "prefill_clean",
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 96,
+      "seq_len_kv": 16384,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq4096_sk16384_h32_d64_fp32",
+      "source_core_sass_signatures": [
+        "89baced026ce9e5fae0a0fd9d11a1a2cbd46b0f013028f2ff13e76182fb0c49d",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d32_bf16_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 1,
+      "delivery_index": 89,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.13449511682102325,
+        "implementation_match": true,
+        "median_cycles": 1892938.6215137113,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 32,
+      "logits_dtype": "bf16",
+      "mode": "prefill_clean",
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 192,
+      "seq_len_kv": 8192,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d32_bf16",
+      "source_core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "827a9c6f5a9cc966401ecaf603f8de894a8137d37b47cec4af658c78b1a35bd6"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d32_fp32_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.3785985491424977,
+        "implementation_match": true,
+        "median_cycles": 1872992.111133632,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 32,
+      "logits_dtype": "fp32",
+      "mode": "prefill_clean",
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 96,
+      "seq_len_kv": 16384,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d32_fp32",
+      "source_core_sass_signatures": [
+        "1abcf60429ec77d4bb133ff4f50b6ad8107009c5abbc3c61423d18912a88740a",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d128_fp32_single_sm",
+      "class_id": "prefill_clean",
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits",
+          "smxx_clean_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.15585514997741176,
+        "implementation_match": true,
+        "median_cycles": 889334.0664489301,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "fp32",
+      "mode": "prefill_clean",
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 32,
+      "seq_len_kv": 16384,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d128_fp32",
+      "source_core_sass_signatures": [
+        "86d75d2aa8fa51203600928108f0f36a7accd212e089c40915378f61a2122828",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_compressed_sq4096_sk16384_h64_d128_fp32_single_sm",
+      "class_id": "prefill_compressed",
+      "delivery_group": 0,
+      "delivery_index": 92,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.31027950181178193,
+        "implementation_match": true,
+        "median_cycles": 446833.5982444734,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "fp32",
+      "mode": "prefill_compressed",
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 16,
+      "seq_len_kv": 16384,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_compressed_sq4096_sk16384_h64_d128_fp32",
+      "source_core_sass_signatures": [
+        "4bbf79e992edfb47102511a1d67bc5d040d45379bb9bc1e083a1efd222bb32fa"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "case_id": "deepgemm_prefill_compressed_sq2048_sk8192_h32_d32_bf16_single_sm",
+      "class_id": "prefill_compressed",
+      "delivery_group": 1,
+      "delivery_index": 93,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.9710878566731547,
+        "implementation_match": true,
+        "median_cycles": 2405775.717540704,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 32,
+      "logits_dtype": "bf16",
+      "mode": "prefill_compressed",
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "seq_len": 384,
+      "seq_len_kv": 8192,
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_prefill_compressed_sq2048_sk8192_h32_d32_bf16",
+      "source_core_sass_signatures": [
+        "f345e76064a32d5b21394fd9dc7c9224f914d80d862ecef31572939581b3e5ce"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 64,
+      "case_id": "deepgemm_paged_large_b1024_q1_kv8192_h64_d128_fp32_single_sm",
+      "class_id": "paged",
+      "delivery_group": 2,
+      "delivery_index": 94,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.8853342216469076,
+        "implementation_match": true,
+        "median_cycles": 2260782.0,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "fp32",
+      "mode": "paged",
+      "next_n": 1,
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_large_b1024_q1_kv8192_h64_d128_fp32",
+      "source_core_sass_signatures": [
+        "9a2676bc700e49c2f5bfe53cadd49c4f8780c92dd873d849e982e1fbb072ff8a"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 128,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h32_d128_bf16_single_sm",
+      "class_id": "paged",
+      "delivery_group": 3,
+      "delivery_index": 95,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.38434696915401884,
+        "implementation_match": true,
+        "median_cycles": 3596708.5958103584,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "bf16",
+      "mode": "paged",
+      "next_n": 1,
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_small_b256_q1_kv8192_h32_d128_bf16",
+      "source_core_sass_signatures": [
+        "a36044c3b52e3a2220ce417c37c158817cb02a79b47587f94e7323b4bc18d584"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 64,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h32_d128_fp32_single_sm",
+      "class_id": "paged",
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.767241448820125,
+        "implementation_match": true,
+        "median_cycles": 2402665.276590049,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "fp32",
+      "mode": "paged",
+      "next_n": 2,
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_large_b1024_q2_kv8192_h32_d128_fp32",
+      "source_core_sass_signatures": [
+        "893313ea71c7b4851c25826d76f9ae852ea31d7c56162593cd0f32aa15f746f8"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 64,
+      "case_id": "deepgemm_paged_small_b256_q2_kv8192_h32_d128_bf16_single_sm",
+      "class_id": "paged",
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.1652079396479008,
+        "implementation_match": true,
+        "median_cycles": 2463158.9919712935,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "bf16",
+      "mode": "paged",
+      "next_n": 2,
+      "num_heads": 32,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_small_b256_q2_kv8192_h32_d128_bf16",
+      "source_core_sass_signatures": [
+        "317a63ddb46d7448ef7945863232874f001b7d57828d45adce49f801df94b8d1"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 64,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h64_d128_bf16_single_sm",
+      "class_id": "paged",
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.6956135070692742,
+        "implementation_match": true,
+        "median_cycles": 2352970.0936981207,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "bf16",
+      "mode": "paged",
+      "next_n": 1,
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_small_b256_q1_kv8192_h64_d128_bf16",
+      "source_core_sass_signatures": [
+        "216a3487f4b72582c74dfbf697df3f779f3e8745ef6aa532f0d8595f90f0e46b"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    },
+    {
+      "avg_kv": 8192,
+      "batch_size": 32,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h64_d128_fp32_single_sm",
+      "class_id": "paged",
+      "delivery_group": 3,
+      "delivery_index": 99,
+      "h100_qualification": {
+        "active_sm_count": 1,
+        "actual_implementation_entries": [
+          "sm90_fp8_paged_mqa_logits"
+        ],
+        "cluster_cta_count": 1,
+        "correctness_status": "pass",
+        "cta_count": 1,
+        "cv_percent": 0.3395532856689636,
+        "implementation_match": true,
+        "median_cycles": 1689988.0982471176,
+        "raw_span_count": 27,
+        "recorded_sample_count": 9,
+        "sass_validation": "pass",
+        "topology_status": "pass"
+      },
+      "head_dim": 128,
+      "logits_dtype": "fp32",
+      "mode": "paged",
+      "next_n": 2,
+      "num_heads": 64,
+      "qualification_status": "qualified_h100_one_cta_one_sm",
+      "single_sm_requirements": {
+        "active_sm_count": 1,
+        "cluster_cta_count": 1,
+        "cta_count_per_primary_kernel": 1
+      },
+      "source_case_id": "deepgemm_paged_large_b1024_q2_kv8192_h64_d128_fp32",
+      "source_core_sass_signatures": [
+        "794f5e89b75e785caee6ac1e7aff7002dd5aa1d460fb09ac2aa3b168a69de8d1"
+      ],
+      "source_implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "source_implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "suite_part": "attention"
+    }
+  ],
+  "corpus_revision": "exact241_min20k_final",
+  "excluded_case_count": 0,
+  "excluded_cases": [],
+  "h100_qualification": {
+    "excluded_cases": 0,
+    "implementation_check": "same full-GPU API semantic class and JIT implementation module",
+    "maximum_cv_percent": 3.0,
+    "qualified_cases": 100,
+    "required_topology": "one CTA, one active SM, cluster size one",
+    "status": "pass",
+    "timing": "3 warmups, 36 raw in-kernel globaltimer spans, 9 phase-balanced quartet medians"
+  },
+  "implementation_policy": "preserve the full-GPU public API semantic class and JIT implementation modules; change only input dimensions plus requested num_sms=1",
+  "minimum_hardware_cycle_policy": {
+    "changed_case_count": 0,
+    "kernel_or_harness_source_changed": false,
+    "plan_id": "exact241_min20k_final",
+    "plan_sha256": "00d2e95d463344aeb6b8b29216d2aacaf54beff0c79734ca85387b59016ba830",
+    "qualification_status": "pending_fresh_h100_topology_and_timing",
+    "source_accuracy_csv_sha256": "c35768893ef098fad464e26e2ab98e62a15c5304885fcd4b868e759fccf1f29b",
+    "threshold_cycles_exclusive": 20000.0
+  },
+  "pending_requalification_case_count": 0,
+  "qualified_case_count": 100,
+  "runner_manifest": "manifests/deepgemm_core_runtime_manifest.json",
+  "schema_version": "deepgemm-hopper-single-sm-v2",
+  "selection": {
+    "maximum_cv_percent": 3.0,
+    "maximum_cycles": 5000000,
+    "minimum_cycles": 100000,
+    "primary_metric": "in-kernel globaltimer span",
+    "trials": 9,
+    "warmups": 3
+  },
+  "single_sm_package_policy": "extend the host GemmDesc validity check to accept num_sms=1; do not change CUDA kernel bodies, layout selection, scheduler or pipeline",
+  "source_case_count": 100,
+  "source_manifest": "manifests/deepgemm_100.json"
+}

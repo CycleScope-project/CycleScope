@@ -1,0 +1,30 @@
+{
+ "doc": "imported from legacy mechanism memory.l1.service",
+ "program": {
+  "event": "memory_issue",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "l1.issue_interval_cycles": {
+   "kind": "constant"
+  },
+  "l1.latency_cycles": {
+   "kind": "constant"
+  },
+  "l1.sector_bytes_per_cycle": {
+   "kind": "constant"
+  },
+  "l1.local_frame_interleaved": {
+   "kind": "constant"
+  },
+  "l1.local_hit_latency_cycles": {
+   "kind": "constant"
+  }
+ }
+}

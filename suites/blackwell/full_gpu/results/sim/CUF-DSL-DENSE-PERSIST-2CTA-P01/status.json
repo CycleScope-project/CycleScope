@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-DSL-DENSE-PERSIST-2CTA-P01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2217050,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4248500,
+ "completed": 4248500,
+ "cycles": 134294,
+ "hard": 0,
+ "walls": {
+  "convert": 15.0,
+  "segments": 0.0,
+  "build": 2.2,
+  "sim": 36.9,
+  "total": 54.1
+ },
+ "rss_kb": {
+  "convert": 602816,
+  "segments": 602816,
+  "build": 602816,
+  "sim": 2291368
+ },
+ "hw_cycles": 138991.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 15
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-MGM-BF16-NT-R04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2058807,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4539439,
+ "completed": 4539439,
+ "cycles": 134775,
+ "hard": 0,
+ "walls": {
+  "convert": 14.2,
+  "segments": 0.0,
+  "build": 2.0,
+  "sim": 47.0,
+  "total": 63.2
+ },
+ "rss_kb": {
+  "convert": 567764,
+  "segments": 567764,
+  "build": 567764,
+  "sim": 2918896
+ },
+ "hw_cycles": 146387.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 15
+}

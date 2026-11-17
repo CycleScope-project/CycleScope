@@ -1,0 +1,987 @@
+{
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "case_id": "dg_holdout_shape_01_r6c1_cluster_sm",
+   "class_id": "bf16_dense_nt",
+   "delivery_group": 0,
+   "delivery_index": 0,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.nt",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_dense_nt_s8",
+    "rationale": "M/N 非 64 对齐 (100/2072) + 极小 K=64 (bf16 下限 k%64==0)；296 同类 K∈{2048,4096,8192,16384}",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.05014684109090127,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=skipped reason=vendor get_best_config at num_sms=2 did not select a 2CTA cluster; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; jit=None; log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/dg_holdout_shape_01/cluster_mechanism_probe/run.log; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; round2: status=ski",
+     "replaces": "dg_holdout_shape_01",
+     "seed_order_candidate": "1",
+     "why_this_candidate": "同格补选：同 family 新形状候选（原种子顺序），锚定 296 sibling 已证 2CTA 工作区扰动该格新形状轴，契约/探针/周期窗准入后取第一通过者"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 2048,
+    "m": 100,
+    "n": 2072
+   },
+   "source_case_id": "dg_holdout_shape_01_r6c1",
+   "source_shape": {
+    "k": 4096,
+    "m": 8192,
+    "n": 8192
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_02_r6c1_cluster_sm",
+   "class_id": "fp8_dense_nt",
+   "delivery_group": 1,
+   "delivery_index": 1,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_fp8_gemm_1d2d"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_gemm_1d2d"
+   ],
+   "mechanisms": [
+    "fp8.dense.nt",
+    "fp8.scale.fp32.1d2d.identity",
+    "sm90.fp8_gemm_1d2d"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "fp8_dense_nt_s6",
+    "rationale": "M/N 非 128 对齐 (200/4104%128=8) + 极小 K=128 (fp8 k%128==0)",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.04275571456427044,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=skipped reason=vendor get_best_config at num_sms=2 did not select a 2CTA cluster; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; jit=None; log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/dg_holdout_shape_02/cluster_mechanism_probe/run.log; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; round2: status=ski",
+     "replaces": "dg_holdout_shape_02",
+     "seed_order_candidate": "1",
+     "why_this_candidate": "同格补选：同 family 新形状候选（原种子顺序），锚定 296 sibling 已证 2CTA 工作区扰动该格新形状轴，契约/探针/周期窗准入后取第一通过者"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 2048,
+    "m": 200,
+    "n": 4104
+   },
+   "source_case_id": "dg_holdout_shape_02_r6c1",
+   "source_shape": {
+    "k": 8192,
+    "m": 8192,
+    "n": 4096
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_03_r6c4_cluster_sm",
+   "class_id": "bf16_dense_tn",
+   "delivery_group": 2,
+   "delivery_index": 2,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.tn",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_dense_tn_s6",
+    "rationale": "极大 K=65536 (296 最大 16384)，M/N 非 tile 对齐 (192/2632%64=8)",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.040677834941580795,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=skipped reason=vendor get_best_config at num_sms=2 did not select a 2CTA cluster; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; jit=None; log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/dg_holdout_shape_03/cluster_mechanism_probe/run.log; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; round2: status=ski",
+     "replaces": "dg_holdout_shape_03",
+     "seed_order_candidate": "4",
+     "why_this_candidate": "同格补选：同 family 新形状候选（原种子顺序），锚定 296 sibling 已证 2CTA 工作区扰动该格新形状轴，契约/探针/周期窗准入后取第一通过者"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 2048,
+    "m": 192,
+    "n": 2048
+   },
+   "source_case_id": "dg_holdout_shape_03_r6c4",
+   "source_shape": {
+    "k": 8192,
+    "m": 8192,
+    "n": 4096
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_04_r6c1_cluster_sm",
+   "class_id": "bf16_mgroup_nt_contiguous",
+   "delivery_group": 3,
+   "delivery_index": 3,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_m_grouped_bf16_gemm_contiguous"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.mgroup.nt.contiguous",
+    "sm90.m_grouped_bf16_gemm_contiguous"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_mgroup_nt_contiguous_s8",
+    "rationale": "num_groups=5 (296 只有 4/8) + N=1160 非 64 对齐",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.11710242222392837,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=skipped reason=vendor get_best_config at num_sms=2 did not select a 2CTA cluster; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; jit=None; log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/dg_holdout_shape_04/cluster_mechanism_probe/run.log; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; round2: status=ski",
+     "replaces": "dg_holdout_shape_04",
+     "seed_order_candidate": "1",
+     "why_this_candidate": "同格补选：同 family 新形状候选（原种子顺序），锚定 296 sibling 已证 2CTA 工作区扰动该格新形状轴，契约/探针/周期窗准入后取第一通过者"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "alignment": 128,
+    "k": 512,
+    "n": 1160,
+    "num_groups": 5,
+    "tokens_per_group": 256
+   },
+   "source_case_id": "dg_holdout_shape_04_r6c1",
+   "source_shape": {
+    "alignment": 128,
+    "k": 3072,
+    "n": 7168,
+    "num_groups": 8,
+    "tokens_per_group": 512
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_05_r6c5_cluster_sm",
+   "class_id": "bf16_mgroup_nt_masked",
+   "delivery_group": 4,
+   "delivery_index": 4,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bf16_m_grouped_gemm_masked"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.mgroup.nt.masked",
+    "sm90.bf16_m_grouped_gemm_masked"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_mgroup_nt_masked_s4",
+    "rationale": "masked 期望 M=100 非 tile 对齐 (296 只有 128/256)，N=1032 非 64 对齐",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.04363246253147395,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=skipped reason=vendor get_best_config at num_sms=2 did not select a 2CTA cluster; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; jit=None; log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/dg_holdout_shape_05/cluster_mechanism_probe/run.log; observed_cluster_cta_counts=[1]; cta_count=2; sm_ids=[124, 126]; round2: status=ski",
+     "replaces": "dg_holdout_shape_05",
+     "seed_order_candidate": "5",
+     "why_this_candidate": "同格补选：同 family 新形状候选（原种子顺序），锚定 296 sibling 已证 2CTA 工作区扰动该格新形状轴，契约/探针/周期窗准入后取第一通过者"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "alignment": 128,
+    "expected_m": 100,
+    "k": 2048,
+    "max_m": 256,
+    "n": 2048,
+    "num_groups": 3
+   },
+   "source_case_id": "dg_holdout_shape_05_r6c5",
+   "source_shape": {
+    "alignment": 128,
+    "expected_m": 1024,
+    "k": 4096,
+    "max_m": 2048,
+    "n": 4096,
+    "num_groups": 8
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_06_r6c4_cluster_sm",
+   "class_id": "bf16_kgroup_tn_contiguous",
+   "delivery_group": 5,
+   "delivery_index": 5,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bf16_k_grouped_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.kgroup.tn.contiguous",
+    "grouped.k.skew",
+    "sm90.bf16_k_grouped_gemm"
+   ],
+   "plain_2cta_fallback": true,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_kgroup_tn_contiguous_s7",
+    "rationale": "非均匀 skew ks（296 为均匀/阶梯），M=312 非 128 对齐，K 上限 1408",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.19124332323081397,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=cycle window unmet at vendor-legal config; median=928109.5512081028 samples=9 window=(0,500000]; not padded; round2: status=unresolved reason=cycle window unmet at vendor-legal config; median=927265.6054659027 samples=9 window=(0,500000]; not padded; two-round median drift 0.09% (limit 5.0%)",
+     "replaces": "dg_holdout_shape_06",
+     "seed_order_candidate": "4",
+     "why_this_candidate": "同格补选（周期窗格）：同 family skew 轴同向缩 K，直至落入 296 同窗"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "alignment": 128,
+    "k_per_group": 512,
+    "ks": [
+     128,
+     384,
+     512,
+     128,
+     256,
+     128,
+     128,
+     128
+    ],
+    "m": 128,
+    "n": 384,
+    "num_groups": 8
+   },
+   "source_case_id": "dg_holdout_shape_06_r6c4",
+   "source_shape": {
+    "alignment": 128,
+    "k_per_group": 4096,
+    "m": 512,
+    "n": 512,
+    "num_groups": 16
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_07",
+   "class_id": "prefill_clean",
+   "delivery_group": 6,
+   "delivery_index": 6,
+   "gemm_desc_even_sms_required": false,
+   "head_dim": 128,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_fp8_mqa_logits",
+    "smxx_clean_logits"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_mqa_logits",
+    "smxx_clean_logits"
+   ],
+   "logits_dtype": "bf16",
+   "mechanisms": [
+    "mqa.clean_logits",
+    "mqa.logits.prefill",
+    "sm90.fp8_mqa_logits",
+    "smxx.clean_logits"
+   ],
+   "mode": "prefill_clean",
+   "num_heads": 64,
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "seq_len",
+     "seq_len_kv"
+    ],
+    "nearest_296_case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d128_bf16",
+    "rationale": "DG attention：奇数 seqlen (sq=100, skv=1040)，296 只有 (128,256)",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "seq_len": 100,
+   "seq_len_kv": 1040,
+   "source_attention": {
+    "avg_kv": null,
+    "batch_size": null,
+    "next_n": null,
+    "seq_len": 4096,
+    "seq_len_kv": 8192
+   },
+   "source_case_id": "dg_holdout_shape_07",
+   "source_shape": {},
+   "suite_part": "attention",
+   "target_ctas": 1,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_shape_08",
+   "class_id": "fp8_einsum_bhr_hdr_bhd",
+   "delivery_group": 7,
+   "delivery_index": 7,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_fp8_bmm"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_gemm_1d2d"
+   ],
+   "mechanisms": [
+    "fp8.einsum.bhr_hdr_bhd",
+    "sm90.fp8_bmm"
+   ],
+   "plain_2cta_fallback": true,
+   "selection": {
+    "bucket": "new_shape",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "fp8_einsum_bhr_hdr_bhd_s14",
+    "rationale": "einsum b=100 非 16 对齐、h=32 (296 h∈{64,128})、r=384 非 2 幂 (296 r∈{256,512,1024,2048})",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "b": 100,
+    "d": 128,
+    "h": 32,
+    "r": 384
+   },
+   "source_case_id": "dg_holdout_shape_08",
+   "source_shape": {
+    "b": 1024,
+    "d": 1024,
+    "h": 16,
+    "r": 8192
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_01_r6c4_cluster_sm",
+   "class_id": "bf16_dense_nn_acc_bf16",
+   "delivery_group": 0,
+   "delivery_index": 8,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": true,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.acc.bf16",
+    "bf16.dense.nn",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "heuristic_cluster_at_2",
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "bf16_dense_nn_acc_bf16_s5",
+    "rationale": "累加 bf16 类从 296 的 tc=2/cluster 翻到 1 CTA（cluster 侧新组合）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.011701280532025923,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_bf16_gemm']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/",
+     "replaces": "dg_holdout_cfg_01",
+     "seed_order_candidate": "4",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 5120,
+    "m": 128,
+    "n": 2560
+   },
+   "source_case_id": "dg_holdout_cfg_01_r6c4",
+   "source_shape": {
+    "k": 8192,
+    "m": 4096,
+    "n": 8192
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_02_r6c2_cluster_sm",
+   "class_id": "bf16_dense_nt_acc_fp32",
+   "delivery_group": 1,
+   "delivery_index": 9,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": true,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.acc.fp32",
+    "bf16.dense.nt",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "heuristic_cluster_at_2",
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "bf16_dense_nt_acc_fp32_s6",
+    "rationale": "acc_fp32 交叉 1 CTA（296 仅 tc=2/h2=True）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.04540861965440804,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_bf16_gemm']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/",
+     "replaces": "dg_holdout_cfg_02",
+     "seed_order_candidate": "2",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 2048,
+    "m": 128,
+    "n": 1024
+   },
+   "source_case_id": "dg_holdout_cfg_02_r6c2",
+   "source_shape": {
+    "k": 8192,
+    "m": 8192,
+    "n": 4096
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_03_r6c3_cluster_sm",
+   "class_id": "fp8_dense_nt_acc_fp32",
+   "delivery_group": 2,
+   "delivery_index": 10,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": true,
+   "implementation_entries": [
+    "sm90_fp8_gemm_1d1d"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_gemm_1d1d"
+   ],
+   "mechanisms": [
+    "fp8.dense.acc.fp32",
+    "fp8.dense.nt",
+    "fp8.scale.fp32.1d1d.transpose",
+    "sm90.fp8_gemm_1d1d"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "heuristic_cluster_at_2",
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "fp8_dense_nt_acc_fp32_s4",
+    "rationale": "fp8 1D1D 累加 fp32 × 1 CTA",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.009849421111026374,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_fp8_gemm_1d1d']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attem",
+     "replaces": "dg_holdout_cfg_03",
+     "seed_order_candidate": "3",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 3072,
+    "m": 128,
+    "n": 1536
+   },
+   "source_case_id": "dg_holdout_cfg_03_r6c3",
+   "source_shape": {
+    "k": 8192,
+    "m": 8192,
+    "n": 4096
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_04_r6c2_cluster_sm",
+   "class_id": "bf16_dense_tt_acc_fp32",
+   "delivery_group": 3,
+   "delivery_index": 11,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": true,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.acc.fp32",
+    "bf16.dense.tt",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "heuristic_cluster_at_2",
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "bf16_dense_tt_acc_fp32_s8",
+    "rationale": "tt 布局 × acc_fp32 × 1 CTA",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.0476084574321287,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_bf16_gemm']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/",
+     "replaces": "dg_holdout_cfg_04",
+     "seed_order_candidate": "2",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 2048,
+    "m": 128,
+    "n": 1024
+   },
+   "source_case_id": "dg_holdout_cfg_04_r6c2",
+   "source_shape": {
+    "k": 4096,
+    "m": 8192,
+    "n": 8192
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_05_r6c6_cluster_sm",
+   "class_id": "bf16_dense_tn_acc_fp32",
+   "delivery_group": 4,
+   "delivery_index": 12,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": true,
+   "implementation_entries": [
+    "sm90_bf16_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.dense.acc.fp32",
+    "bf16.dense.tn",
+    "sm90.bf16_gemm"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "heuristic_cluster_at_2",
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "bf16_dense_tn_acc_fp32_s7",
+    "rationale": "tn 布局 × acc_fp32 × 1 CTA",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.08383179787082845,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_bf16_gemm']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/",
+     "replaces": "dg_holdout_cfg_05",
+     "seed_order_candidate": "6",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 1664,
+    "m": 128,
+    "n": 768
+   },
+   "source_case_id": "dg_holdout_cfg_05_r6c6",
+   "source_shape": {
+    "k": 4096,
+    "m": 4096,
+    "n": 16384
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_06_r6c2_cluster_sm",
+   "class_id": "bf16_mgroup_nt_contiguous_psum",
+   "delivery_group": 5,
+   "delivery_index": 13,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_m_grouped_bf16_gemm_contiguous"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.mgroup.nt.contiguous",
+    "bf16.mgroup.psum",
+    "sm90.m_grouped_bf16_gemm_contiguous"
+   ],
+   "plain_2cta_fallback": false,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "target_ctas",
+     "uses_cluster"
+    ],
+    "nearest_296_case_id": "bf16_mgroup_nt_contiguous_psum_s7",
+    "rationale": "psum 布局 × 1 CTA（296 该族仅 2 CTA/cluster 侧）",
+    "rev6": {
+     "admission": {
+      "cycle_window": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+      "median_drift_percent": 0.007227546076551473,
+      "round2": "qualified",
+      "runtime_round1": "qualified",
+      "static": "pass (generator, pre-GPU)"
+     },
+     "cell_failure": "round1: status=unresolved reason=topology=None error=None smids=None source=missing_marker_smid_or_grid_product_1; correctness=None; cycle window unmet at vendor-legal config; median=None samples=0 window=(0,500000]; not padded; cluster mismatch expected=1 observed=0 modules=['sm90_bf16_gemm']; exit_code=1 log=/path/to/hopper-prototype/artifacts/tasks/T0005/near_holdout/deepgemm/round1/attempts/",
+     "replaces": "dg_holdout_cfg_06",
+     "seed_order_candidate": "2",
+     "why_this_candidate": "同格补选：原 1CTA GemmDesc 组合 vendor 非法（even-SM assert），plain-2CTA 被 vendor multicast 事实排除；改 family canonical cluster 配置 × 新形状（296 同族形状未出现过的取值点）"
+    },
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "alignment": 128,
+    "k": 2048,
+    "n": 640,
+    "num_groups": 4,
+    "tokens_per_group": 256
+   },
+   "source_case_id": "dg_holdout_cfg_06_r6c2",
+   "source_shape": {
+    "alignment": 128,
+    "k": 4096,
+    "n": 4096,
+    "num_groups": 8,
+    "tokens_per_group": 1024
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": true,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_07",
+   "class_id": "bf16_einsum_bmk_bnk_mn",
+   "delivery_group": 6,
+   "delivery_index": 14,
+   "gemm_desc_even_sms_required": false,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bmn_bnk_mn_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bmk_bnk_mn"
+   ],
+   "mechanisms": [
+    "bf16.einsum.bmk_bnk_mn",
+    "sm90.bmn_bnk_mn_gemm"
+   ],
+   "plain_2cta_fallback": true,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "plain_2cta_fallback",
+     "target_ctas"
+    ],
+    "nearest_296_case_id": "bf16_einsum_bmk_bnk_mn_s3",
+    "rationale": "einsum bmk 普通 2 CTA（plain_2cta_fallback，cluster_dim 保持 1x1x1；296 仅 1 CTA）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "k": 4096,
+    "m": 64,
+    "n": 64,
+    "s": 1
+   },
+   "source_case_id": "dg_holdout_cfg_07",
+   "source_shape": {
+    "k": 8192,
+    "m": 2048,
+    "n": 1024,
+    "s": 4
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  },
+  {
+   "case_id": "dg_holdout_cfg_08",
+   "class_id": "bf16_kgroup_tn_contiguous",
+   "delivery_group": 7,
+   "delivery_index": 15,
+   "gemm_desc_even_sms_required": true,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_bf16_k_grouped_gemm"
+   ],
+   "implementation_modules": [
+    "sm90_bf16_gemm"
+   ],
+   "mechanisms": [
+    "bf16.kgroup.tn.contiguous",
+    "sm90.bf16_k_grouped_gemm"
+   ],
+   "num_groups_raised_for_multicast_free": true,
+   "plain_2cta_fallback": true,
+   "selection": {
+    "bucket": "new_config",
+    "diff_dims": [
+     "shape"
+    ],
+    "nearest_296_case_id": "bf16_kgroup_tn_contiguous_s8",
+    "rationale": "num_groups 8→12 提高 group 数关闭 multicast（296 仅 fp8 族有此标记，bf16 族新组合）",
+    "rule": "T0005 hand-curated table + seeded tie-break",
+    "seed": 20260929
+   },
+   "shape": {
+    "alignment": 128,
+    "k_per_group": 256,
+    "m": 128,
+    "n": 1024,
+    "num_groups": 12
+   },
+   "source_case_id": "dg_holdout_cfg_08",
+   "source_shape": {
+    "alignment": 128,
+    "k_per_group": 4096,
+    "m": 512,
+    "n": 512,
+    "num_groups": 16
+   },
+   "suite_part": "core",
+   "target_ctas": 2,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  }
+ ],
+ "constraints": {
+  "correctness_required": true,
+  "cycle_range_inclusive": [
+   100000,
+   500000
+  ],
+  "cycle_range_note": "DG user-authorized 2026-09-21: real short cases below 100k may qualify; upper 500k unchanged; other suites stay [100000,500000]",
+  "recorded_samples_per_case": 9
+ },
+ "name": "DeepGEMM near-holdout 16 (8 new shapes + 8 new config combos, T0005, rev6 补选)",
+ "notes": [
+  "Not the archived manifests/deepgemm_single_sm.json or deepgemm_dual_sm.json inventories",
+  "uses_cluster comes from H100 full-GPU topology.cluster_cta_counts / multicast",
+  "cluster cases request one 2CTA cluster via set_num_sms(2) (even, vendor-legal)",
+  "non-cluster cases prefer set_num_sms(1) when the kernel does not construct GemmDesc",
+  "GemmDesc even-SM assert kept; non-cluster GemmDesc cases use legal num_sms=2 as two ordinary CTAs (not cluster/multicast)",
+  "bf16/fp8 k-grouped skew cases keep the source non-cluster mechanism by requesting num_groups>4, the only vendor-heuristic condition that disables KGrouped multicast at num_sms=2",
+  "T0005 near-holdout: same families as the 296 set, unseen shapes/config combos",
+  "selection: hand-curated candidate table, seeded tie-break rng(20260929), identity dedup vs 296"
+ ],
+ "runner": "scripts/run_cluster_sm.sh",
+ "schema_version": "hopper.delivery.cluster_sm.v1",
+ "selected_count": 16,
+ "selection": {
+  "identity": "class_id + shape + (uses_cluster,target_ctas,heuristic_cluster_at_2,plain_2cta_fallback)",
+  "mode": "near_holdout_new_shape_new_config",
+  "rev6": {
+   "date": "2026-09-29",
+   "exhausted_slots": [],
+   "harness_fixed_slots": [],
+   "rejection_list": "artifacts/tasks/T0005/rev6/rejection_list.json",
+   "replaced_slots": [],
+   "revision": "rev6-reselect",
+   "rule": "27 个 needs_marker_remeasure 槽位：同格（同 suite×同 bucket×同 family）按原种子顺序取下一候选，静态+运行时准入到过，两轮 marker 计时合格者入选；原 21 例不动；FA3 cfg_02/04 为 harness 插桩修复原例重测（不换例）",
+   "seed": 20260929
+  },
+  "rev6_admission": {
+   "can_implement": "CUTLASS can_implement 拒绝/无 summary → 准入拒绝；DG vendor get_best_config 崩溃（GemmDesc even-SM assert）→ 静态拒绝；FA3 PRIMARY_OK + traits 合法",
+   "cluster_sm_contract": "主核/launched cta_count == target_ctas；2CTA = 一个 2-CTA cluster（cluster_dim 积 2、两个不同 smid）或两个普通 CTA（cluster_dim 1x1x1、grid 积 2）；1CTA = grid 积 1、cluster 1x1x1",
+   "cycle_window": {
+    "cutlass": "[100000, 500000]（marker 主核区间，296 同窗）",
+    "deepgemm": "(0, 500000]（marker 主核区间；DG 无下限，296 同窗）",
+    "flashattention3": "(0, 500000]（marker scope，296 同窗）"
+   },
+   "marker_instrumentation": "FA3 候选的主核实例必须在 marker 二进制中带 SR_CLOCKLO（链接对象级静态检查 + 本轮动态证据），否则拒绝",
+   "no_simulation": "补选只看准入检查与硬件计时结果，不看模拟结果（修订 6-3）",
+   "order": "静态准入（生成器，硬件计时前）→ 运行时探针/首轮计时准入 → 两轮 marker 计时（两轮均 qualified 且 drift<=5.0%）",
+   "target_cta_count": "逐 suite 判据同 296 qualification（DG cluster_mechanism_probe 观测 cluster cta counts；CU runner 实测 cta_count；FA3 主核 grid product）",
+   "vendor_heuristic_num_sms": "DG：num_sms=1（1CTA）或 num_sms=2（2CTA/cluster）下 vendor 启发式必须可选中目标配置（GemmDesc even-SM 静态规则 + cluster_mechanism_probe 运行时探针）；kgroup num_groups<=4 静态拒绝"
+  },
+  "seed": 20260929
+ },
+ "source_manifest": "manifests/deepgemm_cluster_sm100.json",
+ "suite": "deepgemm",
+ "version": "rev6-reselect-20260929"
+}

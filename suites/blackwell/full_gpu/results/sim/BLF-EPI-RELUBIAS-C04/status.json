@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-EPI-RELUBIAS-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 703680,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1577672,
+ "completed": 1577672,
+ "cycles": 72934,
+ "hard": 0,
+ "walls": {
+  "convert": 6.0,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 13.7,
+  "total": 20.4
+ },
+ "rss_kb": {
+  "convert": 476400,
+  "segments": 476400,
+  "build": 476400,
+  "sim": 1011076
+ },
+ "hw_cycles": 73615.0,
+ "reference_cache_control": "all",
+ "placement_digest": "bfdc2d45d3e1fdf2",
+ "shards": 6
+}

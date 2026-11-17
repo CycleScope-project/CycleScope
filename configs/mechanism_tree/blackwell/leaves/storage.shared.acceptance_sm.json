@@ -1,0 +1,358 @@
+{
+ "storage.shared.acceptance_sm.root/operation_class=LDS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 0.9749
+    },
+    "sources": [
+     "shared.b300.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=LDS/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=LDSM/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 1.0481684874685984
+    },
+    "sources": [
+     "shared.b300.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=LDSM/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=STS/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 1.0021
+    },
+    "sources": [
+     "shared.b300.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=STS/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=STSM/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 1.0425016065899397
+    },
+    "sources": [
+     "shared.b300.r2"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=STSM/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=LD/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 0.9749
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=LD/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=ST/remote_smem=0": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 0.0,
+     "kind": "affine",
+     "slope": 1.0021
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.r1.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "shared.b300.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ },
+ "storage.shared.acceptance_sm.root/operation_class=ST/remote_smem=1": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "shared_wavefronts",
+     "domain": [
+      0,
+      4294967295
+     ],
+     "intercept": 12.0,
+     "kind": "affine",
+     "slope": 0.0
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "structural.v10.lds_sts_cta_window"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "structural.generic_shared_alias",
+     "structural.v10.lds_sts_cta_window"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

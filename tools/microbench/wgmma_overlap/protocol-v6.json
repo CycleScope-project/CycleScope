@@ -1,0 +1,254 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "wgmma_overlap",
+ "version": 6,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "supersedes": "nothing (v5 rules stay installed); adds cells",
+ "mechanisms": [
+  "hopper.wgmma.register_file_issue_steal (kind 44, C3 + C7 + R as installed)",
+  "instruction.service units of MUFU / FMNMX / FADD / FFMA with several warps per SMSP"
+ ],
+ "devices": {
+  "h100": "sm_90a pod (own quota of the fg-cold line)"
+ },
+ "question": "With two or three warps per SMSP running a softmax-like FP32 stream (independent MUFU.EX2, FFMA with a reusable operand pair, a dependent FMNMX chain, a dependent FADD chain) while wgmma ops execute on the SM -- issued by the window warps' own warpgroup (self) or by another warpgroup (other) -- how much SMSP time does one stream instruction take?",
+ "why": "fa3_fwd_hdim_small_05 on main 8c848cb5 (sim / ncu 0.78; $A/fg-line-cold/attrib1, attrib2; tools region_visits.py, warp_trace.py): per consumer warp and iteration the hardware spends 1869 cycles in the softmax loop (391 issues) and 395 at the wait for the QK wgmma, the simulation 982 and 1025; everything else agrees within about 10 %. In the simulation the three consumer warps of an SMSP run their softmax one after another (2.2 cycles of SMSP time per softmax issue, the tensor pipe is busy all the time); on hardware the visits overlap and one softmax issue takes 2.9 cycles of SMSP time. fp32_mix and fp_stream_mix reproduce such mixes without a wgmma (W >= 2 within 6 %); wgmma_overlap r7 has no softmax mix, no dependent FMNMX / FADD chain and no W = 3 cell (other.w2 = ctrl for independent kinds, dep3r 4.5-5.0 against 3.98).",
+ "probe": "probe/overlap_v4.cu = overlap_v3.cu plus W = 3 and two window kinds. smx (unit I, I % 5): 0 ex2.approx.ftz on d[(I / 5) & 3]; 1 fma.rn d[4] = d[4] * a + b; 2 fma.rn d[5] = d[5] * a + b (a, b the reusable pair); 3 max.NaN d[6] = max(d[6], c[I & 3]); 4 add d[7] = d[7] + c[I & 3]. smxc: the same with unit 0 replaced by fma.rn d[(I / 5) & 3] = d * a8[k] + b8[k]. U = 140, G = 16 ops in flight, forms hgmma_bf16_n128_ss and hgmma_bf16_n256_rs, modes ctrl.w1-3, self.w1-3, other.w2-3; --launches 8 --reps 33, two runs; per-warp rows as v3 (the warps of warpgroup 0 are the owners of the ops in self mode).",
+ "prediction_of_the_installed_rules (cycles per instruction per window warp)": {
+  "ctrl": "smx 1.9 / 3.1 / 4.9 at W = 1 / 2 / 3 (the fp_stream_mix mix5 hardware values; same mix with an FADD chain instead of a third FFMA); smxc about 1.6 x W below 2 warps of issue-slot bound.",
+  "other": "window warps of other warpgroups do not pay for independent instructions (r7), the chains are not binding at 5 instructions per step: other.w2 = ctrl.w1 (1.9), other.w3 = ctrl.w2 (3.1).",
+  "self": "the owners' warps pay the floor max(stall, 2, n_GPR), 4 for instructions that carry a reuse flag, +0.5 for the rs form: with the two FFMA flagged, mean floor 2.8 (ss) / 3.3 (rs) per instruction for the owner warp at W = 1; at W = 2 / 3 the non-owner warps run as in ctrl with one fewer competitor."
+ },
+ "reading": {
+  "usable": "runs within 3 %; overlap gate as v3 (ops still executing at the end of the window; cells that fail are dropped and listed); SASS window = 140 instructions of the declared classes, reuse flags of the FFMA recorded.",
+  "SMSP time": "per cell, s = 1 / sum over the window warps of one SMSP of (1 / t_warp) = SMSP cycles per stream instruction.",
+  "R1": "other.w3 and self.w3 within max(15 %, 0.3) of the prediction and s <= 2.2 -> the installed rules cover this stream; the flash-attention softmax cost (2.9) is not reproduced by a probe and stays a kernel-level open item (reported with the phase analysis).",
+  "R2": "s >= 2.6 in other.w3 or self.w3, or a miss beyond the tolerance -> the excess is in the probe; the table by mode / W / form is the result and a rule is proposed in an addendum (post hoc) and judged on cells its constants do not come from."
+ },
+ "not_allowed": "no value chosen by full-GPU error; no rule per kernel; criteria changed only by an addendum stating why and whether data had been seen.",
+ "addenda": [
+  {
+   "date": "2026-11-12",
+   "written": "after run 1 (h100-r1, $A/fg-line-cold/wov6/h100-r1; table by $A/fg-line-cold/tools/wov6_table.py), before run 2",
+   "reading_of_run_1 (cycles per instruction per window warp; runs agree to 0.02)": {
+    "ctrl": "smx 2.21 / 3.9 / 5.6 at W = 1 / 2 / 3 (predicted 1.9 / 3.1 / 4.9: 15-25 % higher than fp_stream_mix's mix5, the FADD chain instead of a third FFMA); smxc 1.24 / 1.87 / 2.49.",
+    "other": "R2. One window warp per SMSP while another warpgroup's ops execute: smx 7.78 (n128 ss) / 12.81 (n256 rs) against the predicted 1.9; two window warps 9.4 / 24.6. smxc 1.31 / 1.30: no effect. So the MUFU.EX2 of a warp outside the owning warpgroup is what waits: the stream advances one MUFU per 38.9 cycles (n128, 1.66 per op of about 64.5 cycles) or per 64 cycles (n256 rs, 2.0 per op of about 128.5); with two window warps the SMSP gets one MUFU per 23.6 / 61.6 cycles (2.7 / 2.1 per op).",
+    "self": "the owner's warp: 3.29 / 3.53 at W = 1 (predicted 2.8 / 3.3 from the floors), 4.7-6.5 at W = 2 / 3; the non-owner warps in the same cells 9.0-10.5 (n128) and 15.6-26.7 (n256 rs).",
+    "gate": "the overlap flag (ops still executing at the end of the window) is 0 on the n128 other cells and on n256 other.w3: the window outlasts 16 ops there, so those per-instruction values contain a free tail and understate the in-flight cost; run 2 uses G = 32 for them."
+   },
+   "not in the engine": "the installed rules give other.w2 = ctrl.w1. The flash-attention softmax has 81 MUFU.EX2 per visit and an excess of 887 cycles per visit (11 per MUFU) while other warpgroups' ops occupy the pipe.",
+   "candidates for the rule (post hoc; judged on run 2)": {
+    "T1": "while an op of another warpgroup executes on the SM, the XU unit accepts a MUFU only during a window of w cycles per op (before or after which it is held); unit interval unchanged inside.",
+    "T2": "a fixed number k of MUFU per executing op per SMSP.",
+    "T3": "every such MUFU is delayed by a constant D.",
+    "what separates them": "MUFU-only streams (mufu8) with one and two window warps against the op length (n 64 / 128 / 256): T2 gives one MUFU per beat / k for every n and W; T3 gives 8 + D independent of n; T1 gives a count per op that grows with W up to w / 8 + 1 and is independent of n."
+   },
+   "run_2 cells (other mode unless noted; U = 140 for smx, 64 for the single-class kinds; --launches 8 --reps 33, two runs)": {
+    "kinds": "mufu8 (v3 kind 23), mufu_rsq8 (rsqrt.approx.ftz on d[I & 7]), shfl8 (shfl.sync.bfly.b32 on the bit pattern of d[I & 7], lane mask all), smx.",
+    "forms": "hgmma_bf16 ss n64, n128, n256; rs n256.",
+    "G": "32 for n64 / n128, 16 for n256 (so the ops outlast the window); smx n128 additionally with G = 8 and W = 2 as a tail check.",
+    "W": "other.w2, other.w3; self.w1 and self.w2 for mufu8 and shfl8 (owner against non-owner); ctrl.w1-w3 for every kind.",
+    "record only": "mufu_ts: 32 MUFU.EX2 each followed by a clock read (other.w2, n128 and n256): issue times relative to the window start, to see the pattern inside an op; the clock read may itself perturb the stream."
+   },
+   "judging": "a candidate holds if it reproduces every usable other cell of mufu8 within max(15 %, 2 cycles per MUFU) with one constant per device (w, k or D) and then predicts the smx cells of run 1 and run 2 within 20 %. If none holds the table is reported and nothing is installed."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 2 (h100-r2, $A/fg-line-cold/wov6/h100-r2), before run 3",
+   "reading_of_run_2": {
+    "candidates T1-T3": "all three refuted by the per-MUFU clock cell: with G = 32 (n128) the first MUFU of the window warp issues 1677 cycles after the window start and then one every 10 cycles (control 8) while the ops go on for about 440 more cycles; n256 rs, G = 16: first at 1280, then 10 each, ops go on for about 880. Nothing per op.",
+    "issue duration of the owner (t_i1 - t_i0)": "n128 ss: G = 8 208 cycles (26 per op), G = 16 647, G = 32 1671: beyond the sixth pending op every further HGMMA waits one op time (64.5): (G - D) x beat with D = 6.0 / 6.1. n256 rs G = 16 1329 (D 5.7), n256 ss 1226 (D 6.5). In other mode the window starts while the owner is still issuing; in self mode it starts after the last issue, with at most six ops left (so r7's self cells with G = 8 saw the ops but never the blocked issue).",
+    "what waits": "the window warp's MUFU.EX2, MUFU.RSQ and SHFL.BFLY do not issue until the owner has issued its last op (mufu8 / mufu_rsq8 / shfl8 other cells: starved for the issue duration, then about 10.7 cycles per instruction, then free after the ops end; e.g. n128 G = 32: 35.6 per MUFU over the window = 1677 starved + 41 MUFU at 10.7 + a free tail). FFMA / FMNMX / FADD streams are not held (smxc 1.31 against 1.24).",
+    "after the last issue (ops pending, owner waiting)": "MUFU-only 10 against 8.4; smx about 4.0 against 2.2 per instruction (n128 G = 8). Both equal 80 cycles per revisit of a MUFU register (8 chains x 10, 4 chains per 20 instructions) -- possibly a longer MUFU result latency while ops are pending; not established.",
+    "secondary, unexplained": "the blocked issue gets slower with competitors on the SMSP (n128 G = 16: 647 alone, 832 / 1016 with one / two FP-stream warps; n256 rs: 1330 -> 3300-3970 with two window warps)."
+   },
+   "rule candidates (post hoc from run 2; judged on run 3)": {
+    "Q": "a wgmma op launches only while fewer than D ops of the SM are pending (launched, not completed); D = 6. Unblocked issue spacing as today.",
+    "H": "while a warp is held by Q, MUFU.* and SHFL.* of the other warps on its SMSP do not issue.",
+    "predictions": "(1) owner alone, n128: issue duration = max(26 G, (G - 6) x 64.5) = 104 / 156 / 208 / 258 / 387 / 1161 for G = 4 / 6 / 8 / 10 / 12 / 24. (2) two warpgroups issuing G = 16 each (n128): one queue per SM -> both finish issuing when 26 ops are done, about 1680; one queue per warpgroup -> 20 op times, about 1290. (3) per-instruction clocks, other.w2, n128 G = 24: the first SHFL and the first shared-memory load (if it is in the held set) issue at about the owner's issue duration (1161 + the window's start offset), the first FFMA within 10 cycles. (4) MUFU register revisit: if the 80 cycles are a result latency, mufu2 / mufu4 / mufu8 after the last issue give 40 / 20 / 10 per MUFU; if not, about 10 for all."
+   },
+   "run_3 cells (n128 ss unless noted; two runs)": {
+    "issue": "self.w1 with a 64-MUFU window, G = 4, 6, 8, 10, 12, 24 (read the issue duration only); n64 and n256 ss with G = 12, 24.",
+    "both": "mode both.w2: warpgroups 0 and 1 each issue G = 16 ops (no window); issue start / end and completion per group; n128 and n256 ss.",
+    "clocks": "other.w2, G = 24: shfl_ts, lds_ts (shared-memory load + add), ffma_ts, mufu_ts; each 32 units with a clock read after every unit; ctrl of each.",
+    "revisit": "other.w2, n256 ss, G = 8: mufu2, mufu4, mufu8 (U = 64); ctrl.w1 of each."
+   },
+   "judging": "Q holds if the issue durations are within max(10 %, 30 cycles) with one D; the queue scope is whichever of (2) is within 10 %; H's class set is what (3) shows. Installed as experimental if Q and H hold; the slowdown after the last issue and the competitor effect are recorded unless (4) gives a clean rule."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 3 (h100-r3, $A/fg-line-cold/wov6/h100-r3)",
+   "reading_of_run_3": {
+    "Q": "holds with D = 6. Owner alone, n128: issue duration 89 / 129 / 169 / 263 / 391 / 1159 for G = 4 / 6 / 8 / 10 / 12 / 24 against max(21 G, (G - 6) x 64.5) = 84 / 126 / 168 / 258 / 387 / 1161 (the unblocked spacing is 21, not the 26 read from a cell with a competitor). n64: 250 / 615 for G = 12 / 24 (252 / 18 x 34.2); n256 ss: 712 / 2248 = (G - 6) x 128 - 56: the slot frees 56 cycles before the end of the 128-cycle op there, at the end for n128; the rule uses the end of the op's pipe time.",
+    "scope of Q": "not decided by the two-issuer cell: issue 1213 (group that started first) / 1481 (started 311 cycles later), all 32 ops done after 2450 (76.6 per op, the single-issuer pipe is 64.5); a replay with one queue per SM gives 979 / 1677, with one queue per warpgroup and a FIFO pipe 645 / 1366. Installed per warpgroup, counting ops; the two-issuer slowdown is open. (Independent of the probe: a flash-attention consumer section of 6 + 9 ops from an empty queue then ends its issue at the completion of its ninth op, 576 cycles after the first launch for 72- and 48-cycle ops; the hardware samples give 592 for the section.)",
+    "H, class set": "per-unit clocks, n128 G = 24: the first MUFU.EX2 and the first SHFL.BFLY issue 1165 cycles after the window start (= (24 - 6) x 64.5), the first shared-memory load at 1246; FFMA issues from the first cycle (2 cycles per unit, 4 after the owner starts to wait). Held: MUFU.*, SHFL.*, LDS. Other classes that use the same units (STS, global loads and stores) were not measured and are not held by the rule.",
+    "after the last issue": "MUFU-only 11.2 per MUFU for two, four and eight registers alike (control 8.4-8.9): not a result latency (prediction (4) second branch). With ops pending and nobody held, the softmax-like stream still costs 3.7-4.2 against 2.2, SHFL about 13 against 5.2, a shared load about 30 more: real, form unknown, not installed.",
+    "competitor effect": "the held issue itself is slower when other warps of the SMSP run (run 2); not modelled."
+   },
+   "installed (experimental)": {
+    "Q": "a wgmma op launches only while fewer than pending_ops_limit = 6 ops of its warpgroup are launched and have not finished their pipe time.",
+    "H": "while a warp is held by Q, instances of MUFU.*, SHFL.* and LDS of the other warps on its SMSP do not issue.",
+    "where": "timing_row fields pending_ops_limit and launch_hold_blocks_memory_queue on hopper.wgmma.register_file_issue_steal (h100); engine cpp/arch/hopper/wgmma.cpp + the issue path."
+   },
+   "not_modelled": "the slowdown of memory-queue instructions while ops are pending but nobody is held; the competitor effect on the held issue; two groups issuing at once; Blackwell (not measured)."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after the full-GPU regression of Q + H (flash-attention cases with long sections overshoot: fa3_varlen_fwd_06 1.19, fa3_fwd_mask_05 1.20; per-PC tables $A/fg-line-cold/attrib4 show the simulated MUFU / SHFL / HGMMA of those cases slower than hardware), before run 4",
+   "question": "Runs 1-3 issued one op per commit group. A flash-attention section is 6 ops in one group and 9 in a second. Does the limit of six count ops or commit groups?",
+   "run_4 cells": "owner alone (self.w1, mufu8 window, n128 ss): G = 12 and 24 ops with a commit_group after every C = 3 ops and after every C = 6 ops (the SASS must show the group marker gsb0 on every C-th HGMMA only; if ptxas emits another form the cell is void and the form is reported).",
+   "predictions": "limit on ops: issue duration (G - 6) x 64.5 = 387 / 1161 for G = 12 / 24 whatever C. Limit on groups: the op that opens group 7 waits for group 1 to end: with C = 3 the limit is 18 ops -> max(21 G, (G - 18) x 64.5) = 252 / 504 (G = 24: 6 x 64.5 = 387 or the unblocked 504); with C = 6 it is 36 ops -> unblocked, 252 / 504.",
+   "judging": "within 10 % of one of the two predictions on all four cells; the installed rule is corrected if the limit is on groups."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 4 (h100-r4, $A/fg-line-cold/wov6/h100-r4), before run 5",
+   "reading_of_run_4": {
+    "limit counts commit groups": "owner alone, n128: with one commit group per op the issue takes 391 / 1159 cycles for G = 12 / 24 (as run 3); with a commit after every third or sixth op it takes 251.5 / 491.5 = 21 per op, not held. The 'six pending ops' of addendum 3 is six pending commit groups. The rule installed after run 3 (Q on ops) is therefore wrong for sections that put several ops into one group -- the flash-attention sections (6 + 9 ops in two groups) are never held at launch on hardware, and the full-GPU movement of that family came from a condition that does not occur there.",
+    "what the owner's own MUFUs do": "the 64-MUFU window after the issue costs 12.06 (G = 12) and 20.3 (G = 24) cycles per MUFU against 10.13 with one op per group: the MUFUs start 123 / 651 cycles late, i.e. when 5.8 / 17.7 ops are done and at most six ops are left, and then run at 10.13."
+   },
+   "candidate (post hoc, judged on run 5)": {
+    "Q'": "a launch is held while six commit groups of the warpgroup are pending.",
+    "H'": "MUFU.*, SHFL.*, LDS on the SMSPs of the warpgroup do not issue while its demand -- ops launched and not complete, plus a launch held by Q' -- exceeds six. Runs 2-3 (owner held: 6 + 1) and run 4 (more than six ops pending) are both this."
+   },
+   "run_5 cells (n128 ss, G = 24, C = 6, two runs)": "other.w2: mufu_ts, shfl_ts, ffma_ts (32 units with a clock after each), mufu8 (U = 64); self.w2: mufu8 (owner and non-owner windows); controls as run 3.",
+   "predictions": "H' for non-owners: first MUFU / SHFL of the other warpgroup's warp at about (24 - 6) x 64.5 = 1161 cycles after the owner's first launch (the window starts while the owner issues for about 500 cycles), FFMA from the first cycle. If non-owners are not held: first MUFU within tens of cycles and about 10 per MUFU throughout.",
+   "judging": "first-issue time within 15 % of 1161 -> H' applies to every warp of the SMSP; under 200 -> owner only. Then the engine rule is replaced (Q by Q', H by H') and the regression repeated."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 5 (h100-r5, $A/fg-line-cold/wov6/h100-r5)",
+   "reading_of_run_5": {
+    "non-owner": "n128, G = 24: the first MUFU.EX2 / SHFL.BFLY of the other warpgroup's warp issues 1144 cycles after the window start with six ops per commit group and 1165 with one (FFMA from the second cycle in both); the 64-MUFU window costs 27.36 / 27.62 per MUFU. The starvation does not depend on the commit grouping (prediction 'first-issue time near the one-op-per-group value' holds).",
+    "anchor": "the owner's first launch is 294 cycles before the window start (new field i0_rel), so 'N cycles after the window start' in addenda 2-3 is not '(G - 6) op times after the first launch'. Anchored on the measured end of the ops instead: the held instructions start when about seven ops remain (C = 1, G = 24: 7.3; G = 32: 6.8; n256 rs G = 16: 6.9) -- the same statement as before, now without the wrong origin.",
+    "owner": "self.w1, six ops per group, G = 24: the owner's own MUFUs start with 8.8 ops left (run 4: 6.3)."
+   },
+   "corrected rule (replaces 'installed' of addendum 3)": {
+    "Q'": "a launch is held while six commit groups of the warpgroup are pending (a group is pending until its last op has finished its pipe time).",
+    "H'": "MUFU.*, SHFL.* and LDS of every warp on the SMSPs of the warpgroup's warps do not issue while the warpgroup has more than six ops outstanding (launched, pipe time not finished) or a launch held by Q'.",
+    "fields": "timing_row 11 pending_commit_groups_limit = 6 (renamed from pending_ops_limit), 12 launch_hold_blocks_memory_queue = 1, 13 memory_queue_hold_above_pending_ops = 6; experimental."
+   },
+   "open": "owner's threshold 6.3-8.8 ops between two runs; the ops take about 80 cycles each instead of 64.5 while a window warp runs (also the two-issuer cell: 76.6); after the hold MUFU 10 against 8.4; none modelled."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after the full-GPU regression of the corrected rule ($A/fg-line-cold/full-wq3: H100 7.79 -> 8.2 %, flash-attention family 6.8 -> 9.0 %; fa3_fwd_hdim_small_05 0.958 -> 1.171), before run 6",
+   "what the regression shows (not used to choose values)": "per consumer warp and iteration of fa3_fwd_hdim_small_05 (hardware | corrected rule): section of 15 ops 592 | 293, wait for the QK result 395 | 789, softmax loop 1869 | 2771. In the simulation the three warpgroups' sections follow each other at once, their ops queue in the FIFO pipe and the 'more than six outstanding' holds merge into one; the hardware numbers fit three separate holds of about 430 cycles. Everything measured so far has ONE issuing warpgroup; the two-issuer cell of run 3 was not reproduced by either queue scope and its judging criterion was not met, so the hold should not have been installed for kernels with several issuing warpgroups.",
+   "run_6 (mode seq3)": {
+    "kernel": "three warpgroups (384 threads), IT = 6 iterations per rep. Warpgroup g per iteration: named barrier sync on id 1 + g with count 256 (its own 128 threads plus the 128 arrivals of the previous warpgroup; before the first iteration warpgroup 2 arrives once on id 1; in the last iteration warpgroup 2 does not arrive); t0; NQ = 6 ops of form A, commit_group; NP = 9 ops of form B, commit_group; t1; barrier arrive on id 1 + (g + 1) % 3 with count 256; wgmma.wait_group 1; t2; window of U = 390 smx units (kind 24); t3. After the loop wgmma.wait_group 0. Lane 0 of every warp records t0..t3 per iteration relative to the rep's start.",
+    "forms": "A = hgmma_bf16 ss n144, B = n96 (the flash-attention sizes) if the descriptor table has them, else n128 / n64.",
+    "cells": "seq3 (as above); seq3.nomma (no ops, no wait_group: the token and the windows only); seq1 (warpgroup 0 alone, no barriers, with the ops).",
+    "runs": "--launches 8 --reps 17, two runs."
+   },
+   "predictions": {
+    "engine as corrected (FIFO pipe, holds by outstanding ops of any warpgroup on the SMSP)": "sections 300-350 cycles each and back to back; window (t3 - t2) of every warpgroup about 2 x the nomma window or more; period about 3 x pipe work + 3 x solo window.",
+    "if the hardware does what flash attention suggests": "section about 590; window about 1.9-2.1 x the nomma window; holds of the three warpgroups separate."
+   },
+   "judging": "the table (per warpgroup medians over iterations 2..5 of t1 - t0, t2 - t1, t3 - t2, and the offsets between the warpgroups' t0) is the result; the engine's multi-warpgroup handling is corrected from it in a further addendum, or the hold is taken out of the tree for kernels with several issuing warpgroups if no rule reproduces it."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 6 (h100-r6, $A/fg-line-cold/wov6/h100-r6; $A/fg-line-cold/tools/wov6_seq_table.py)",
+   "reading_of_run_6 (medians, cycles)": {
+    "seq1 (one warpgroup, 6 + 9 ops, window)": "section 126, wait for the first group 465, window 1074 (the same 390 units alone: about 860), period 1812.",
+    "seq3.nomma (token ring and windows, no ops)": "windows 2307 / 2228 / 2052 (three warps per SMSP in the window), period 2575.",
+    "seq3": "section 941 / 385 / 206 for warpgroups 0 / 1 / 2, wait for the first group 469 / 460 / 462, window 2017 / 1931 / 1861, period about 3650. The first launch of the run differs (sections 770-1090, waits 100-190, windows 2240-2550, same period).",
+    "against the predictions": "neither holds. The engine's picture (sections of about 300 back to back, the three warpgroups' ops in one FIFO pipe) is contradicted twice: every warpgroup waits about 465 cycles for its first group after its own section, alone or with the others' ops in flight; and a section that takes 126 cycles alone takes 200-1000 in the ring."
+   },
+   "decision": "the memory-queue hold (H') is taken out of the tree (launch_hold_blocks_memory_queue = 0, memory_queue_hold_above_pending_ops = 0): it is measured for one issuing warpgroup, and with several the engine's op timeline is not the hardware's, so the hold lands in the wrong place (full-GPU: fa3_fwd_hdim_small_05 1.17). The launch hold on six pending commit groups stays. Engine code and tests stay.",
+   "open": "what a wgmma op waits for when several warpgroups issue (start at launch or at the group commit; one pipe or one per warpgroup; why sections stretch). Next step is to replay these probe kernels in the simulator and compare the clock readings."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after replaying seq1 / seq3 / seq3.nomma in the simulator ($A/fg-line-cold/replay2; clocks by $A/fg-line-cold/tools/clock_cycles.py), before run 7",
+   "replay against hardware (simulation | hardware, cycles)": "seq3.nomma period 2580 | 2575. seq1: section 138 | 126, wait for the first group 407 | 465, window 948 | 1074, period 1604 | 1812. seq3: section 150 | 941 / 385 / 206, wait about 1230 | about 465, window about 1040 | 2017 / 1931 / 1861, period 2600 | 3650. So without ops the ring is right; with ops the engine queues a warpgroup's ops behind the other warpgroups' (long wait, short section) while on hardware the wait is the solo value and the section stretches.",
+   "candidates": {
+    "X": "the pipe holds ops of one warpgroup at a time: a launch of another warpgroup waits until no op of a different warpgroup is pending.",
+    "RR": "the pipe alternates between the warpgroups that have a pending commit group, one group at a time."
+   },
+   "run_7 (mode grp2; n128 ss)": "warpgroups 0 and 1 each issue 4 commit groups of 3 ops, then wgmma.wait_group 3, 2, 1, 0 with a clock after each (completion of its 1st .. 4th group) and clocks at issue start / end. Cells: together (both start at the rep barrier); staggered (warpgroup 1 starts after a bar.sync that warpgroup 0 arrives on right after its last issue); solo (warpgroup 0 only).",
+   "predictions (op 64.5, issue 21 per op; times from warpgroup 0's first launch)": {
+    "solo": "groups complete at about 194 / 387 / 581 / 774.",
+    "together, FIFO by launch (engine)": "ops interleave one by one: both warpgroups' groups complete at about 2 x the solo times (387 / 774 / 1161 / 1548), issues not held.",
+    "together, X": "warpgroup 0's groups at the solo times, its issue not held; warpgroup 1's launch held until about 774, its groups at 968 / 1161 / 1355 / 1548.",
+    "together, RR": "groups alternate: wg0 194, wg1 387, wg0 581, wg1 774, ... (wg0 at 194 / 581 / 968 / 1355, wg1 at 387 / 774 / 1161 / 1548), issues not held.",
+    "staggered": "X: warpgroup 1's first launch waits for warpgroup 0's last group; FIFO / RR: its groups follow warpgroup 0's remaining ops without a held launch."
+   },
+   "judging": "the candidate (or FIFO) whose completion times are within 10 % on both cells; if none, the table is the result."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 7 (h100-r7, job fgcold-wov6-h100-r7b; $A/fg-line-cold/wov6/h100-r7; replay $A/fg-line-cold/replay3; $A/fg-line-cold/tools/wov6_grp_table.py)",
+   "reading_of_run_7": {
+    "cells": "solo is void as a reference (ptxas serialised the ops: 12 x 118 cycles; the simulator replays it at 1400 against 1415). staggered is void: BAR.SYNC and BAR.ARV on id 1 sit under the same predicate in the SASS and warps 0-3 are the ones that wait 650 cycles; the roles are not what the protocol describes. together is valid (SASS order: clock, ARRIVE, 12 HGMMA with the group marker on every third, clock, four DEPBAR each followed by a clock).",
+    "together (cycles from warpgroup 0's first launch)": "warpgroup 0: issue ends at 66, its groups complete at 444 / 1225 / 1417 / 1609. Warpgroup 1: issue ends at 520, groups at 837 / 1093 / 1285 / 1477. Simulation: issues 65 / 64, groups 555 / 939 / 1323 / 1579 and 247 / 631 / 1015 / 1399.",
+    "against the predictions": "none of FIFO, X, RR is within 10 %. Two facts: the second warpgroup's issue is held for about 450 cycles while the first one's ops are in flight; and in the last 500 cycles both warpgroups complete a three-op group every 192 cycles, i.e. two ops are in flight at once (a single pipe at 64.5 per op cannot do that), after an early phase in which only six ops complete in 444 cycles."
+   },
+   "state": "with run 6 (each warpgroup waits the solo time for its own first group whatever the others have in flight) this points to ops of different warpgroups executing side by side and the issue side being shared, but tensor_pipe's two-warpgroup cells (each 1.8-2.06 x the solo window) and run 3's two-issuer cell (76.6 cycles per op overall) say otherwise for their forms. Not decided; nothing installed beyond the launch hold on six commit groups. The memory-queue hold stays measured-but-uninstalled."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "before run 8 (run 7 left two of three cells void)",
+   "run_8 (mode grp2r: run 7's kernel with the cell chosen at run time so every cell executes the same SASS)": {
+    "kernel": "k_grp2r<CID, NG, NC>: as k_grp2 mode together, with kernel arguments `mask` (bit g = warpgroup g issues; an inactive warpgroup skips to the end of the rep) and `delay` (warpgroup 1 executes `delay` dependent integer adds before its first launch). Clocks ti0, ti1, tc0..tc(NG-1) as run 7 (wait_group NG-1 .. 0).",
+    "cells (n128 ss)": "(NG, NC) = (4, 3), (1, 12), (12, 1); each with mask 1 (solo), mask 3 delay 0 (together), mask 3 delay 150 and delay 600 (the second warpgroup starts about 300 / 1200 cycles later; the realised offset is read from the clocks).",
+    "predictions (op 64.5 cycles, issue about 21 per op)": {
+     "one FIFO pipe (engine)": "together: both warpgroups' last group completes at about 24 x 64.5 = 1550 after the first launch, groups interleaved by launch order; delayed: the second warpgroup's ops follow the first one's remaining ops.",
+     "a pipe per warpgroup": "together and delayed: every warpgroup's completions equal the solo cell's (relative to its own first launch).",
+     "solo": "(4, 3): groups at about 3 / 6 / 9 / 12 x 64.5 + 55; (12, 1): launch hold after six groups (issue ends at about 6 x 64.5 = 387); (1, 12): one completion at about 12 x 64.5 + 55."
+    },
+    "judging": "per (NG, NC): which picture is within 10 % on the together and both delayed cells; if neither, the table is the result. The simulator replays the same cells."
+   }
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 8 (h100-r8, job fgcold-wov6-h100-r8c; $A/fg-line-cold/wov6/h100-r8; replay $A/fg-line-cold/replay4)",
+   "reading_of_run_8": {
+    "void for its question": "ptxas serialised every op in all three instantiations (WARPGROUP.ARRIVE, one HGMMA with the group marker, WARPGROUP.DEPBAR.LE gsb0, 0x0, twelve times): the wait_group calls with a non-literal count expanded through templates lost the pipelined form that run 7's literal wait_group 3 / 2 / 1 / 0 kept. The run-time delay did nothing on hardware (the 150- and 600-iteration cells have the same offset of about -10 cycles between the warpgroups).",
+    "by-product (serialised ops)": "one warpgroup alone: 118 cycles per op (1412 for twelve); two warpgroups at once: 129 per op each (1544-1561 for twelve) = 2 x 64.5, i.e. one pipe shared by the warpgroups, ops alternating. The simulator replays 1408 alone and 1530 / 1587 together: right for this form.",
+    "consequence for run 7's reading": "'ops of different warpgroups execute side by side' is not supported (run 7's together cell also completes 24 ops in 1609 cycles, one per 67). What differs from the engine in run 7 and in the three-warpgroup ring is the order in which the shared pipe serves pending ops of different warpgroups and which warpgroup is held at issue."
+   },
+   "state": "the multi-warpgroup order is still not determined; nothing installed beyond the launch hold on six commit groups. A further run must keep run 7's literal wait_group form and set the start offset by a mechanism checked in the SASS."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "before run 9; after re-reading runs 7 and 8 (no new data)",
+   "re-reading (no new data)": {
+    "why runs 7 solo and 8 were serialised": "in k_grp2 MODE 2 and in k_grp2r the ops sit under a run-time predicate (`active` depends on the warpgroup index / on the mask argument); in k_grp2 MODE 0, the only pipelined cell, `active` is a compile-time constant. Run 7's solo cell has literal wait_group counts and was serialised all the same, so the template-expanded counts blamed in addendum 12 are not the common factor; the conditional execution of the ops is. Hypothesis until the SASS of run 9 confirms it.",
+    "run 7 together in op units": "with a lead of 57 cycles and 64.5 cycles per op the eight group completions sit at 6.0 / 18.1 / 21.1 / 24.1 (warpgroup 0) and 12.1 / 16.1 / 19.0 / 22.0 (warpgroup 1) op times: whole numbers, and the last one is 24, so the SM does 24 ops of work in 24 op times. But no order of whole ops, served one at a time with each warpgroup's ops in launch order, gives these eight numbers (warpgroup 1's tenth and eleventh op would both have to be the 20th op served). Either a group's completion is seen later than its last op ends, or ops are not served whole and in order. Group clocks cannot separate these; per-op clocks can."
+   },
+   "run_9 (mode grpq)": {
+    "observation": "one op per commit group and literal wgmma.wait_group NG-1 .. 0 with a clock after each: the k-th clock is the completion of the warpgroup's k-th op. A warpgroup may have six commit groups pending without its launches being held (Q'), so NG = 6 gives six per-op completion times per warpgroup with no launch hold.",
+    "kernel": "k_grpq<CID, SHAPE>: launch bound 384 threads; EVERY thread executes the ops (no predicate around them); the number of issuing warpgroups is the block size of the launch (128 / 256 / 384), so all cells of a shape execute the same SASS. Start offset: after the rep's __syncthreads and trep, every warp spins `while (clock64 - trep < wg * delay)` (delay is a kernel argument in cycles; warp-uniform loop, the ops come after it unconditionally); then ti0, wgmma.fence, the ops with their commit_group markers, ti1, the literal wait_group sequence with a clock after each. Lane 0 of every warp records ti0, ti1, tc[..] relative to trep.",
+    "shapes (n128 ss, the descriptor of runs 7 / 8)": "q6: 6 groups of 1 op, wait_group 5 4 3 2 1 0. g4c3: 4 groups of 3 ops, wait_group 3 2 1 0 (run 7's kernel). fa: one group of 6 ops, one group of 9 ops, wait_group 1 0 (the flash-attention section).",
+    "cells": "per shape: w1 (128 threads); w2.d0, w2.d200, w2.d500 (256 threads, delay 0 / 200 / 500); w3.d0, w3.d200 (384 threads). --launches 8 --reps 17, two runs; rep 0 and launch 0 excluded.",
+    "SASS gate": "per shape: between the ti0 and ti1 clocks only WARPGROUP.ARRIVE / HGMMA lines and no WARPGROUP.DEPBAR; the wait sequence is NG DEPBAR.LE gsb0 with counts NG-1 .. 0, each followed by a clock read; the spin loop is before ti0. A shape that fails the gate is not run."
+   },
+   "predictions (lead 57, op 64.5 cycles; times from the cell's first launch)": {
+    "w1": "q6: ops complete at 57 + 64.5 k (k = 1..6). g4c3: groups at 57 + 193.5 k. fa: 444 and 1025.",
+    "engine (one pipe, ops booked at launch in arrival order)": "w2.d0: the two warpgroups' ops alternate one by one: q6 completions at 57 + 64.5 (2k - 1) and 57 + 64.5 * 2k; w3.d0 the same with three. Delayed cells: the later warpgroup's ops follow the ops already booked. No launch is held (at most six groups pending per warpgroup). The replay gives the exact numbers.",
+    "what run 7 suggests": "w2.d0 q6: not the alternation above; the second warpgroup's issue end several hundred cycles after the first one's."
+   },
+   "judging": "the per-op table (q6) is the result. A service rule is written in a further addendum from the q6 cells only, and has to reproduce within 10 % the g4c3 and fa cells of this run and run 7's together cell (444 / 1225 / 1417 / 1609 and 837 / 1093 / 1285 / 1477) before the engine is changed; the engine change is then checked by replaying q6 / g4c3 / fa cells and the three-warpgroup ring of run 6 (seq3). If no rule does, the table is recorded and the memory-queue hold stays uninstalled.",
+   "not_allowed": "no value or order chosen from full-GPU error."
+  },
+  {
+   "date": "2026-11-13",
+   "written": "after run 9 (h100-r9c, job fgcold-wov6-r9c, $A/fg-line-cold/wov6/h100-r9c/{r9a,r9b}; tools/wov9_table.py; replay $A/fg-line-cold/replay9; two earlier attempts r9 / r9b had a build error / uncalibrated delays and are not read)",
+   "reading_of_run_9 (cycles from warpgroup 0's first launch; two runs identical unless noted)": {
+    "SASS": "all three shapes are pipelined with the ops executed unconditionally (6 / 12 / 15 HGMMA between the issue clocks, no DEPBAR; literal waits in order). The hypothesis of addendum 13 holds: runs 7-solo and 8 were serialised because the ops sat under a run-time predicate.",
+    "one warpgroup": "q6: issue ends at 72-76, op k completes at 56 + 64 k (120 .. 440). g4c3: groups at 248 / 440 / 632 / 824. fa: 440 and 1016.",
+    "one pipe": "every multi-warpgroup cell finishes its last op at 56 + 64 x (number of ops) within 3 %: 12 ops 836, 18 ops 1228, 24 ops 1608, 30 ops 1988, 45 ops 2956. Ops of different warpgroups never run side by side.",
+    "a later warpgroup queues behind": "q6, second warpgroup starting 210 / 548 cycles later: the first is untouched (120 .. 440); the second completes at 534, 604, 656, 712, 776, 840 (first-in-first-out after the first one's ops, 16-36 late) / at its solo times. Third warpgroup at 484: issue takes 160 instead of 76 cycles (launches held), ops at 936 .. 1236 behind the second's.",
+    "simultaneous start, q6 two warpgroups": "service order b a b a b a b b b a a a (b = the warpgroup that launched 4 cycles earlier): completions b 116, 244, 372, 500, 564, 628; a 180, 308, 436, 720, 792, 836.",
+    "simultaneous start, g4c3 two warpgroups": "a 376 / 632 / 1016 / 1400, b 440 / 952 / 1336 / 1608: in op slots a b a b a b, a a a, then b a alternating, last b b b. Not run 7's together cell (444 / 1225 / 1417 / 1609 and 837 / 1093 / 1285 / 1477, second issue held to 520): that kernel differs (256-thread bound, no delay loop) and is not explained.",
+    "simultaneous start, fa": "two: a 632 / 1784, b 1016 / 1988. Three: 1964 / 2956, 940 / 2494, 880 / 2288: the two later-indexed warpgroups share the pipe first; warpgroup 0's first group completes at 1964.",
+    "simultaneous start, q6 three warpgroups": "c b a c b a, then c c b c b c b b a a a a (c = warpgroup 2, first to launch): c done at 816, b at 980, a at 1228; a's last three ops complete 124 / 24 / 44 apart. Runs differ by up to 3 % here; g4c3 three warpgroups differs between the two runs (not read)."
+   },
+   "replay against hardware": "q6 one warpgroup 437 | 440. Delayed second warpgroup 501 .. 821 | 534 .. 840. Simultaneous: the engine alternates strictly (q6 two warpgroups: 117, 245, .. 757 and 181 .. 821 against the hardware order above; fa three warpgroups first groups 1253 / 997 / 1125 against 1964 / 940 / 880, last groups 2917 / 2725 / 2856 against 2956 / 2494 / 2288). Totals agree within 2 %; the order inside a simultaneous burst does not.",
+   "state": "what is established: one pipe per SM at 64 cycles per n128 op, first-in-first-out between warpgroups that start apart (the engine's rule), six ops served in launch order at a simultaneous start. What is not: the order after those six (the pipe then keeps serving one warpgroup for three ops and later starves the first-indexed warpgroup of three). No rule from the q6 cells reproduces the g4c3 and fa cells yet (tried on paper: a six-entry pipe queue refilled first-come, refilled by warpgroup priority, or with a per-warpgroup share: each fails on one of the three shapes), so by addendum 13's judging nothing is changed in the engine and the memory-queue hold stays uninstalled. The admission order is recorded above for the next attempt.",
+   "open": "the refill order of the six-op window; run 7's together cell; why three warpgroups of g4c3 differ between runs."
+  }
+ ]
+}

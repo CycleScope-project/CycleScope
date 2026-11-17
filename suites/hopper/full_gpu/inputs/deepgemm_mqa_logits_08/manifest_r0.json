@@ -1,0 +1,57 @@
+{
+ "cases": [
+  {
+   "c450_full": {
+    "rule": "restore source_attention batch/lengths",
+    "walk_start": {
+     "seq_len": 2048,
+     "seq_len_kv": 16384
+    }
+   },
+   "case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32",
+   "class_id": "prefill_clean",
+   "delivery_group": 3,
+   "delivery_index": 87,
+   "gemm_desc_even_sms_required": false,
+   "head_dim": 32,
+   "heuristic_cluster_at_2": false,
+   "implementation_entries": [
+    "sm90_fp8_mqa_logits",
+    "smxx_clean_logits"
+   ],
+   "implementation_modules": [
+    "sm90_fp8_mqa_logits",
+    "smxx_clean_logits"
+   ],
+   "logits_dtype": "fp32",
+   "mechanisms": [
+    "mqa.clean_logits",
+    "mqa.logits.prefill",
+    "sm90.fp8_mqa_logits",
+    "smxx.clean_logits"
+   ],
+   "mode": "prefill_clean",
+   "num_heads": 32,
+   "seq_len": 2048,
+   "seq_len_kv": 16384,
+   "source_attention": {
+    "avg_kv": null,
+    "batch_size": null,
+    "next_n": null,
+    "seq_len": 2048,
+    "seq_len_kv": 16384
+   },
+   "source_case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32",
+   "source_shape": {},
+   "suite_part": "attention",
+   "target_ctas": 1,
+   "uses_cluster": false,
+   "vendor_legal_num_sms": true
+  }
+ ],
+ "selection": {
+  "maximum_cv_percent": 100.0,
+  "trials": 1,
+  "warmups": 3
+ }
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-FWD-BLOCKSPARSE-1C-R05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 223082,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3425636,
+ "completed": 3425636,
+ "cycles": 25115,
+ "hard": 0,
+ "walls": {
+  "convert": 7.0,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 7.3,
+  "total": 14.8
+ },
+ "rss_kb": {
+  "convert": 347480,
+  "segments": 347480,
+  "build": 347480,
+  "sim": 515044
+ },
+ "hw_cycles": 26076.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 5
+}

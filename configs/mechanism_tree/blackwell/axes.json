@@ -1,0 +1,105 @@
+{
+ "a_src": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "smem",
+   "tmem"
+  ]
+ },
+ "cta_group": {
+  "kind": "int",
+  "maximum": 2,
+  "minimum": 1,
+  "owner": "capture",
+  "unit": "count",
+  "discrete_ok": true,
+  "doc_discrete": "ISA-encoded finite shape; a discrete leaf may key on it (plan section 2.3)"
+ },
+ "tma_box_planes": {
+  "kind": "int",
+  "maximum": 65536,
+  "minimum": 1,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "tmem_repeat": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "x1",
+   "x2",
+   "x4",
+   "x8",
+   "x16",
+   "x32",
+   "x64"
+  ]
+ },
+ "tmem_shape": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "x1",
+   "x2",
+   "x4",
+   "x8",
+   "x16",
+   "x32",
+   "x64",
+   "16dp256bit",
+   "16dp32bit",
+   "x128",
+   "copy_default",
+   "4dp256bit",
+   "128dp128bit",
+   "2x64dp128bit_lw02_lw13",
+   "4x32dp128bit"
+  ]
+ },
+ "umma_kind": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "f16",
+   "tf32",
+   "f8f6f4",
+   "mxf8f6f4",
+   "mxf4",
+   "mxf4nvf4"
+  ]
+ },
+ "umma_max_shift": {
+  "kind": "int",
+  "maximum": 3,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count",
+  "discrete_ok": true,
+  "doc_discrete": "ISA-encoded finite shape; a discrete leaf may key on it (plan section 2.3)"
+ },
+ "umma_operand_major": {
+  "kind": "int",
+  "maximum": 3,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count",
+  "discrete_ok": true,
+  "doc_discrete": "ISA-encoded finite shape; a discrete leaf may key on it (plan section 2.3)"
+ },
+ "umma_operation": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "normal",
+   "ws",
+   "sp",
+   "ws_sp"
+  ]
+ }
+}

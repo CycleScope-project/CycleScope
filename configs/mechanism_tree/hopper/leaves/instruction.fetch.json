@@ -1,0 +1,114 @@
+{
+ "instruction.fetch.root": {
+  "fields": {
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "hopper.87e5c7d8ce731b349aa9f2c9"
+    ]
+   },
+   "line_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 128
+    },
+    "sources": [
+     "ifetch.h100.r4"
+    ]
+   },
+   "prefetch_depth_lines": {
+    "model": {
+     "kind": "constant",
+     "value": 5
+    },
+    "sources": [
+     "hopper.359300cc48bfe4dce90561ec"
+    ]
+   },
+   "capacity_l0_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 32768
+    },
+    "sources": [
+     "ifetch.h100.v3"
+    ]
+   },
+   "capacity_l1_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 114688
+    },
+    "sources": [
+     "ifetch.h100.r4"
+    ]
+   },
+   "stream_l1_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 19.615178571428572
+    },
+    "sources": [
+     "ifetch.h100.r4.experimental"
+    ]
+   },
+   "stream_l2_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 49.37300688644935
+    },
+    "sources": [
+     "ifetch.h100.r4.experimental"
+    ]
+   },
+   "stream_cold_cycles_per_line": {
+    "model": {
+     "kind": "constant",
+     "value": 120.7666105290474
+    },
+    "sources": [
+     "ifetch.h100.r4.experimental"
+    ]
+   },
+   "launch_prefetch_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 65536
+    },
+    "sources": [
+     "ifetch.h100.r4"
+    ]
+   },
+   "sharing": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "ifetch.h100.r4"
+    ]
+   },
+   "fetch_parallelism": {
+    "model": {
+     "kind": "constant",
+     "value": 8
+    },
+    "sources": [
+     "ifetch.h100.r1.mix"
+    ]
+   },
+   "l0_ways": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "ifetch.h100.v3"
+    ]
+   }
+  }
+ }
+}

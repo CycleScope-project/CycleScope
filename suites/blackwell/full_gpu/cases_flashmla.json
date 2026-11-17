@@ -1,0 +1,6177 @@
+{
+  "count": 212,
+  "cases": [
+    {
+      "shape": [
+        4,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-P01",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-P02",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        64,
+        512,
+        4096,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-P03",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16,
+        64,
+        512,
+        4096,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-P04",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-P05",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        296,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-P01",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        1184,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-P02",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        296,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-P03",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1184,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-P04",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-P05",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-P01",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-P02",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        128,
+        512,
+        4096,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-P03",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16,
+        128,
+        512,
+        4096,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-P04",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-P05",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        148,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-P01",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        592,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-P02",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        148,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-P03",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        592,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-P04",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        74,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-P05",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-P01",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16384,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-P02",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-P03",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16384,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-P04",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1024,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-P05",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-P01",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16384,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-P02",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-P03",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16384,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-P04",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1024,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-P05",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-P01",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16384,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-P02",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-P03",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16384,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-P04",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1024,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-P05",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        4096,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-P01",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        8,
+        8192,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-P02",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        4096,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-P01",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        8,
+        8192,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-P02",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-P01",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+      "seqlen_k": 6144,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-P02",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        4096,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-P01",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        16384,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-P02",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4096,
+        64,
+        512,
+        8192,
+        2048
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-P03",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        16384,
+        64,
+        512,
+        8192,
+        2048
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-P04",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        1024,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-P05",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        4096,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-P03",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        8,
+        8192,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-P04",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        2,
+        2048,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-P05",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        4096,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-P03",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        8,
+        8192,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-P04",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        2,
+        2048,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-P05",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        4,
+        4096,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-P03",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        8,
+        8192,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 32768,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-P04",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 4
+      }
+    },
+    {
+      "shape": [
+        2,
+        2048,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 8192,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-P05",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1
+      }
+    },
+    {
+      "shape": [
+        6,
+        64,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-R01",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-SPLIT-P01",
+          "c0": 20257.0,
+          "scale": 1.974626
+        }
+      }
+    },
+    {
+      "shape": [
+        24,
+        64,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-R02",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-SPLIT-P01",
+          "c0": 20257.0,
+          "scale": 1.974626
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        64,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-R03",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-SPLIT-P01",
+          "c0": 20257.0,
+          "scale": 1.974626
+        }
+      }
+    },
+    {
+      "shape": [
+        6,
+        64,
+        512,
+        6144,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-R04",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-SPLIT-P01",
+          "c0": 20257.0,
+          "scale": 1.974626
+        }
+      }
+    },
+    {
+      "shape": [
+        6,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-R05",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-SPLIT-P01",
+          "c0": 20257.0,
+          "scale": 1.974626
+        }
+      }
+    },
+    {
+      "shape": [
+        173,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-R01",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-NOSPLIT-P01",
+          "c0": 68385.0,
+          "scale": 0.584924
+        }
+      }
+    },
+    {
+      "shape": [
+        692,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-R02",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-NOSPLIT-P01",
+          "c0": 68385.0,
+          "scale": 0.584924
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-R03",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-NOSPLIT-P01",
+          "c0": 68385.0,
+          "scale": 0.584924
+        }
+      }
+    },
+    {
+      "shape": [
+        173,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-R04",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-NOSPLIT-P01",
+          "c0": 68385.0,
+          "scale": 0.584924
+        }
+      }
+    },
+    {
+      "shape": [
+        173,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-R05",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDEC-H64-NOSPLIT-P01",
+          "c0": 68385.0,
+          "scale": 0.584924
+        }
+      }
+    },
+    {
+      "shape": [
+        5,
+        128,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-R01",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-SPLIT-P01",
+          "c0": 22459.0,
+          "scale": 1.781023
+        }
+      }
+    },
+    {
+      "shape": [
+        20,
+        128,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-R02",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-SPLIT-P01",
+          "c0": 22459.0,
+          "scale": 1.781023
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        128,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-R03",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-SPLIT-P01",
+          "c0": 22459.0,
+          "scale": 1.781023
+        }
+      }
+    },
+    {
+      "shape": [
+        5,
+        128,
+        512,
+        6144,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-R04",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-SPLIT-P01",
+          "c0": 22459.0,
+          "scale": 1.781023
+        }
+      }
+    },
+    {
+      "shape": [
+        5,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-R05",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-SPLIT-P01",
+          "c0": 22459.0,
+          "scale": 1.781023
+        }
+      }
+    },
+    {
+      "shape": [
+        140,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-R01",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-NOSPLIT-P01",
+          "c0": 44864.0,
+          "scale": 0.891583
+        }
+      }
+    },
+    {
+      "shape": [
+        560,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-R02",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-NOSPLIT-P01",
+          "c0": 44864.0,
+          "scale": 0.891583
+        }
+      }
+    },
+    {
+      "shape": [
+        74,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-R03",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-NOSPLIT-P01",
+          "c0": 44864.0,
+          "scale": 0.891583
+        }
+      }
+    },
+    {
+      "shape": [
+        140,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-R04",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-NOSPLIT-P01",
+          "c0": 44864.0,
+          "scale": 0.891583
+        }
+      }
+    },
+    {
+      "shape": [
+        140,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-R05",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDEC-H128-NOSPLIT-P01",
+          "c0": 44864.0,
+          "scale": 0.891583
+        }
+      }
+    },
+    {
+      "shape": [
+        948,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-R01",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128-P01",
+          "c0": 746089.0,
+          "scale": 0.053613
+        }
+      }
+    },
+    {
+      "shape": [
+        3792,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-R02",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128-P01",
+          "c0": 746089.0,
+          "scale": 0.053613
+        }
+      }
+    },
+    {
+      "shape": [
+        237,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-R03",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128-P01",
+          "c0": 746089.0,
+          "scale": 0.053613
+        }
+      }
+    },
+    {
+      "shape": [
+        948,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-R04",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLSPF-H128-P01",
+          "c0": 746089.0,
+          "scale": 0.053613
+        }
+      }
+    },
+    {
+      "shape": [
+        1091,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-R01",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H64-P01",
+          "c0": 563595.0,
+          "scale": 0.070973
+        }
+      }
+    },
+    {
+      "shape": [
+        4364,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-R02",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H64-P01",
+          "c0": 563595.0,
+          "scale": 0.070973
+        }
+      }
+    },
+    {
+      "shape": [
+        273,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-R03",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H64-P01",
+          "c0": 563595.0,
+          "scale": 0.070973
+        }
+      }
+    },
+    {
+      "shape": [
+        1091,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-R04",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLSPF-H64-P01",
+          "c0": 563595.0,
+          "scale": 0.070973
+        }
+      }
+    },
+    {
+      "shape": [
+        947,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-R01",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128ST-P01",
+          "c0": 748095.0,
+          "scale": 0.053469
+        }
+      }
+    },
+    {
+      "shape": [
+        3788,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-R02",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128ST-P01",
+          "c0": 748095.0,
+          "scale": 0.053469
+        }
+      }
+    },
+    {
+      "shape": [
+        237,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-R03",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLSPF-H128ST-P01",
+          "c0": 748095.0,
+          "scale": 0.053469
+        }
+      }
+    },
+    {
+      "shape": [
+        947,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-R04",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLSPF-H128ST-P01",
+          "c0": 748095.0,
+          "scale": 0.053469
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1730,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1280,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-R01",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-P01",
+          "c0": 1258381.0,
+          "scale": 0.031787
+        }
+      }
+    },
+    {
+      "shape": [
+        4,
+        3460,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1280,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-R02",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-P01",
+          "c0": 1258381.0,
+          "scale": 0.031787
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        865,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1280,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-R03",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-P01",
+          "c0": 1258381.0,
+          "scale": 0.031787
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1730,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 5120,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-R04",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-P01",
+          "c0": 1258381.0,
+          "scale": 0.031787
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1730,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 256,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-R05",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-P01",
+          "c0": 1258381.0,
+          "scale": 0.031787
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1824,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-R01",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-P01",
+          "c0": 1016425.0,
+          "scale": 0.039354
+        }
+      }
+    },
+    {
+      "shape": [
+        4,
+        3648,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-R02",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-P01",
+          "c0": 1016425.0,
+          "scale": 0.039354
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        912,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-R03",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-P01",
+          "c0": 1016425.0,
+          "scale": 0.039354
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1824,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 6144,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-R04",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-P01",
+          "c0": 1016425.0,
+          "scale": 0.039354
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1824,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 512,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-R05",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-P01",
+          "c0": 1016425.0,
+          "scale": 0.039354
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        1857,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-R01",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 3113058.0,
+          "scale": 0.012849
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        3714,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-R02",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 3113058.0,
+          "scale": 0.012849
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        464,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-R03",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 3113058.0,
+          "scale": 0.012849
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        1857,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 4096,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-R04",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 3113058.0,
+          "scale": 0.012849
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        1857,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 256,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-R05",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 3113058.0,
+          "scale": 0.012849
+        }
+      }
+    },
+    {
+      "shape": [
+        1244,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-R01",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-P01",
+          "c0": 433688.0,
+          "scale": 0.092232
+        }
+      }
+    },
+    {
+      "shape": [
+        4976,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-R02",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-P01",
+          "c0": 433688.0,
+          "scale": 0.092232
+        }
+      }
+    },
+    {
+      "shape": [
+        311,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-R03",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-P01",
+          "c0": 433688.0,
+          "scale": 0.092232
+        }
+      }
+    },
+    {
+      "shape": [
+        1244,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-R04",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-P01",
+          "c0": 433688.0,
+          "scale": 0.092232
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C01",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 17748,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        5,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C03",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 21122,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        3,
+        64,
+        512,
+        6656,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C04",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 28761,
+        "band": "lo",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        109,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C05",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37928,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        313,
+        64,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C06",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50599,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        542,
+        64,
+        512,
+        3584,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C07",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67483,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        10309,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C08",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 89999,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        6866,
+        64,
+        512,
+        6656,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C09",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 125001,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        65536,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-C10",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 127882,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 8.149994,
+          "b": 0.189937,
+          "c": 0.21675,
+          "rms": 0.025298,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C01",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 55184,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C02",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 16003,
+        "predicted": 86097,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C03",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 22671,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C04",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 134326,
+        "band": "lo",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        311,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C05",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37975,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1077,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C08",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 90002,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2577,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-C10",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164994,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 3.443733,
+          "b": 0.694686,
+          "c": 0.641711,
+          "rms": 0.274078,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        128,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C01",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 20348,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        128,
+        512,
+        3584,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C02",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 16003,
+        "predicted": 23464,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        3,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C03",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 21738,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        128,
+        512,
+        6656,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C04",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 28340,
+        "band": "lo",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        286,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C05",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37946,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1727,
+        128,
+        512,
+        1536,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C06",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50610,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        5670,
+        128,
+        512,
+        3584,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C07",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67489,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        65536,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C08",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 73734,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        65536,
+        128,
+        512,
+        6656,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-C09",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 101011,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 8.686899,
+          "b": 0.122239,
+          "c": 0.168166,
+          "rms": 0.051814,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        74,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C01",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 29086,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        74,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C02",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 16003,
+        "predicted": 41784,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        122,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C03",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 21340,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        74,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C04",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 60026,
+        "band": "lo",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        244,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C05",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37930,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        144,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C06",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50536,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        132,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C07",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67542,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        691,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C08",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 89974,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        179,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C09",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 124929,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1435,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B148_H128_topk512_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-NOSPLIT-C10",
+      "calls": 4,
+      "family": "mldec_h128_nosplit",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164993,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 6,
+          "a": 3.446224,
+          "b": 0.829778,
+          "c": 0.522636,
+          "rms": 0.104964,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        237,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C01",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 31077,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        294,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C05",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37891,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        403,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C06",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50643,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        309,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C07",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67580,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        753,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C08",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 90002,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        451,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C09",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 124906,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1455,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128-C10",
+      "calls": 4,
+      "family": "mlspf_h128",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164967,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 3.449387,
+          "b": 0.919868,
+          "c": 0.384361,
+          "rms": 0.044177,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        273,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C01",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 22064,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        363,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C04",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 28425,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        502,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C05",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37922,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        694,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C06",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50578,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        385,
+        64,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C07",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67469,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1327,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C08",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 90006,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        488,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C09",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 125024,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2624,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H64_topk512_kv8192",
+      "kind": "sparse_prefill_h64",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H64-C10",
+      "calls": 4,
+      "family": "mlspf_h64",
+      "stratum": "sparse_prefill_h64",
+      "main_kernel": ".*sparse_attn_fwd.*|.*Sm100FmhaFwd.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 165025,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 2.171662,
+          "b": 0.889166,
+          "c": 0.58579,
+          "rms": 0.022316,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        237,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C01",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 30863,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        296,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C05",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37900,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        405,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C06",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50635,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        312,
+        128,
+        512,
+        512,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C07",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67557,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        755,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C08",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 90028,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        456,
+        128,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C09",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 124999,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1454,
+        128,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "Sq4096_H128_topk512_kv8192",
+      "kind": "sparse_prefill_st",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLSPF-H128ST-C10",
+      "calls": 4,
+      "family": "mlspf_h128st",
+      "stratum": "sparse_prefill_h128",
+      "main_kernel": ".*sparse_attn_fwd.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164952,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 3.432138,
+          "b": 0.923972,
+          "c": 0.381868,
+          "rms": 0.044404,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        2200,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 256,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C01",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 21121,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        2200,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 512,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C04",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 33524,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1617,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 512,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C05",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 46243,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1634,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C06",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 61123,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1941,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C07",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 70572,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        2306,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 768,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C08",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 81492,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        3,
+        3301,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 512,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C09",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 117714,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        4,
+        3898,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 512,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": false
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-C10",
+      "calls": 4,
+      "family": "mldense_fwd",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 171955,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": -0.163345,
+          "b": 0.834891,
+          "c": 0.666504,
+          "rms": 0.119528,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        15,
+        64,
+        512,
+        3584,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-K07",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 68872,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 14,
+          "a": 5.224563,
+          "b": 0.669971,
+          "c": 0.501101,
+          "rms": 0.512222,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        57,
+        64,
+        512,
+        1024,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-K08",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 89918,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 14,
+          "a": 5.224563,
+          "b": 0.669971,
+          "c": 0.501101,
+          "rms": 0.512222,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        21,
+        64,
+        512,
+        7680,
+        8192
+      ],
+      "shape_tag": "B4_H64_topk1024_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-SPLIT-K09",
+      "calls": 4,
+      "family": "mldec_h64_split",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 126417,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 14,
+          "a": 5.224563,
+          "b": 0.669971,
+          "c": 0.501101,
+          "rms": 0.512222,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1288,
+        64,
+        512,
+        128,
+        8192
+      ],
+      "shape_tag": "B296_H64_topk512_kv8192",
+      "kind": "sparse_decode",
+      "dtype": "fp8kv",
+      "no_split": true,
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H64-NOSPLIT-K10",
+      "calls": 4,
+      "family": "mldec_h64_nosplit",
+      "stratum": "sparse_decode_h64",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164968,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 13,
+          "a": 2.422275,
+          "b": 0.95247,
+          "c": 0.571047,
+          "rms": 0.240724,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        10,
+        128,
+        512,
+        2048,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-K06",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50312,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 13,
+          "a": 6.005641,
+          "b": 0.59669,
+          "c": 0.452013,
+          "rms": 0.50945,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        10,
+        128,
+        512,
+        4096,
+        8192
+      ],
+      "shape_tag": "B4_H128_topk1024_kv8192",
+      "kind": "sparse_decode_h128",
+      "dtype": "fp8kv",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDEC-H128-SPLIT-K07",
+      "calls": 4,
+      "family": "mldec_h128_split",
+      "stratum": "sparse_decode_h128",
+      "main_kernel": ".*splitkv_mla.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 68824,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 13,
+          "a": 6.005641,
+          "b": 0.59669,
+          "c": 0.452013,
+          "rms": 0.50945,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1551,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-S01",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-R04",
+          "c0": 256441.0,
+          "scale": 0.155981
+        }
+      }
+    },
+    {
+      "shape": [
+        4,
+        3102,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-S02",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-R04",
+          "c0": 256441.0,
+          "scale": 0.155981
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        775,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-S03",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-R04",
+          "c0": 256441.0,
+          "scale": 0.155981
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1551,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 4096,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-S04",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-R04",
+          "c0": 256441.0,
+          "scale": 0.155981
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1551,
+        16,
+        4,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv4_D128",
+      "seqlen_k": 256,
+      "kind": "dense_fwd",
+      "params": {
+        "causal": true
+      },
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-FWD-CAUSAL-S05",
+      "calls": 4,
+      "family": "mldense_fwd_causal",
+      "stratum": "dense_fwd",
+      "main_kernel": ".*Sm100FmhaFwdKernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-FWD-CAUSAL-R04",
+          "c0": 256441.0,
+          "scale": 0.155981
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-S01",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-R04",
+          "c0": 257788.0,
+          "scale": 0.155166
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1462,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-S02",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-R04",
+          "c0": 257788.0,
+          "scale": 0.155166
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        183,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1536,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-S03",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-R04",
+          "c0": 257788.0,
+          "scale": 0.155166
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 6144,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-S04",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-R04",
+          "c0": 257788.0,
+          "scale": 0.155166
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 512,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-S05",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-R04",
+          "c0": 257788.0,
+          "scale": 0.155166
+        }
+      }
+    },
+    {
+      "shape": [
+        331,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-S01",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-R03",
+          "c0": 35247.0,
+          "scale": 1.134848
+        }
+      }
+    },
+    {
+      "shape": [
+        1324,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-S02",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 4,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-R03",
+          "c0": 35247.0,
+          "scale": 1.134848
+        }
+      }
+    },
+    {
+      "shape": [
+        128,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-S03",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 0.25,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-R03",
+          "c0": 35247.0,
+          "scale": 1.134848
+        }
+      }
+    },
+    {
+      "shape": [
+        331,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-S04",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLNORM-ROPE-R03",
+          "c0": 35247.0,
+          "scale": 1.134848
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        537,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 256,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C01",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 13499,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        537,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 512,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C03",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 23138,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        537,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 768,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C04",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 31712,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        537,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C05",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 39660,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        732,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C06",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50617,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        1055,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C07",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67499,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        767,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 2048,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C08",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 90010,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1537,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C09",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 156688,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        2,
+        1833,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B4_S4096_Hq16_Hkv16_D128",
+      "seqlen_k": 1024,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-C10",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 179998,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 4,
+          "a": 0.249528,
+          "b": 0.787463,
+          "c": 0.777407,
+          "rms": 0.105689,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        148,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C01",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 12000,
+        "predicted": 17052,
+        "band": "lo",
+        "i_split": "floor",
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        191,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C03",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 21340,
+        "predicted": 21376,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        189,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C04",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 28458,
+        "predicted": 28412,
+        "band": "lo",
+        "i_split": 4.0,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        365,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C05",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 37950,
+        "predicted": 37943,
+        "band": "lo",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        505,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C06",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 50609,
+        "predicted": 50591,
+        "band": "lo",
+        "i_split": 1.0,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        502,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C07",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 67489,
+        "predicted": 67515,
+        "band": "lo",
+        "i_split": 2.0,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        967,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C08",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 90000,
+        "predicted": 89962,
+        "band": "lo",
+        "i_split": 0.5,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1006,
+        64,
+        512,
+        8192,
+        512
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C09",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 125000,
+        "predicted": 124995,
+        "band": "hi",
+        "i_split": 4.0,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1917,
+        64,
+        512,
+        8192,
+        128
+      ],
+      "shape_tag": "Sq4096_H64_KV8192_topk512",
+      "kind": "norm_rope",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLNORM-ROPE-C10",
+      "calls": 4,
+      "family": "mlnorm_rope",
+      "stratum": "norm_rope",
+      "main_kernel": ".*fwd_kernel.*",
+      "candidate": {
+        "target": 165000,
+        "predicted": 164964,
+        "band": "hi",
+        "i_split": 0.25,
+        "fit": {
+          "n": 5,
+          "a": 4.287703,
+          "b": 0.886056,
+          "c": 0.211975,
+          "rms": 0.062608,
+          "solve_on": "P"
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+      "seqlen_k": 896,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-T01",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 1,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 73648.0,
+          "scale": 0.543124
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+      "seqlen_k": 3584,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-T02",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 4,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 73648.0,
+          "scale": 0.543124
+        }
+      }
+    },
+    {
+      "shape": [
+        1,
+        731,
+        16,
+        16,
+        128
+      ],
+      "shape_tag": "B1_S731_Hq16_Hkv16_D128",
+      "seqlen_k": 768,
+      "kind": "dense_bwd",
+      "suite": "flashmla",
+      "mode": "full",
+      "id": "MLF-MLDENSE-BWD-T03",
+      "calls": 4,
+      "family": "mldense_bwd",
+      "stratum": "dense_bwd",
+      "main_kernel": ".*FmhaBwd.*|.*bwd.*",
+      "probe_point": {
+        "P": 1,
+        "I": 0.25,
+        "recenter": {
+          "from": "MLF-MLDENSE-BWD-P01",
+          "c0": 73648.0,
+          "scale": 0.543124
+        }
+      }
+    }
+  ]
+}

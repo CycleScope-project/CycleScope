@@ -1,0 +1,33 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "math_occupancy",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: issue rate of integer-multiply, FP add / min-max and shuffle streams as a function of the warps issuing them per SMSP and per SM; no workload-based fitting",
+  "question": "When W warps on one SMSP, or on all four SMSPs of an SM, each run the same stream, how many cycles does one instruction of the stream cost a warp, for (a) independent IMAD, (b) a dependent FADD chain, (c) a dependent FMNMX chain, (d) SHFL.BFLY + FADD pairs (warp reduction), (e) independent LOP3 (control)? Is the limiting unit per SMSP or per SM, and what is its interval?",
+  "motivation": "Full-gpu cases with 52-64 warps per SM ($A/fg-over20/notes/NOTES.md, lead C): triton_seeded_dropout_01 IMAD 64.0 cycles per issue and warp on hardware (math_pipe_throttle + not_selected) against 20.9 in the engine; triton_softmax_06 FADD 52.8 / FMNMX 59.4 (short_scoreboard) against 23.6 / 30.8; FIF-RMSNORM-C09 FADD 295 against 24. Installed (h100): IMAD on fmaheavy_smsp, issue interval 2.006, result 4.0; FADD on fma_smsp 1.045 / 4.0; FMNMX on alu_smsp 2.011 / 4.0; every unit one copy per SMSP at interval 1. The service_latency / dispatch_contention protocols measured 1-4 warps.",
+  "probe": "math_occupancy.cu. One CTA on one SM, 32 x Wt threads; warp w sits on SMSP w % 4, so 'one SMSP' cells use a kernel whose warps with (w % 4 != 0) exit at once after the start barrier and Wt = 4 x W, while 'all SMSPs' cells run every warp. Window per warp: bar.sync; clock t0; 256 instructions of the stream, fully unrolled, operands in registers only (no memory, no branch); clock t1; lane 0 records t1 - t0. Streams: imad (independent: each multiplies two loop-invariant registers into its own destination out of 8 rotating registers, later xor-ed into a sink), fadd_chain (x = x + c, one chain per warp), fmnmx_chain (x = max(x, c_k) with alternating constants), shfl_fadd (x += shfl_xor(x, 16 >> (k % 5)), 128 pairs), lop3 (independent xor of invariant registers). Cells: W per SMSP in {1, 2, 4, 8, 16} x placement {one SMSP, four SMSPs} x stream (5); 33 repetitions x 8 launches, repetition 0 discarded; runs a and b.",
+  "controls": {
+    "sass": "per kernel: between the two clock reads exactly 256 instructions of the declared opcode (IMAD / FADD / FMNMX / LOP3; 128 SHFL + 128 FADD for shfl_fadd), no memory instruction, no branch; the chain kernels show the dependence (destination = one source).",
+    "timing": "W = 1 one-SMSP cells reproduce the installed leaves within max(0.3 cycle, 15 %) per instruction: IMAD 2.0 (independent: issue interval), FADD chain 4.0 (result latency), FMNMX chain 4.0, LOP3 2.0 or 1.0 (single-source forms 1.0). Runs a and b agree within 5 %."
+  },
+  "derivation": "c(stream, W, placement) = median(t1 - t0) / 256 cycles per instruction and warp. Unit interval estimate per SMSP: c / W for independent streams once c grows linearly in W; scope: compare c(W, one SMSP) with c(W, four SMSPs).",
+  "predictions_before_data": {
+    "engine_today": "independent streams: c = max(issue interval, W x unit interval of its SMSP unit, W x 1.0 for the SMSP issue front end) -> IMAD c = max(2.0, W); at W = 16: 16, identical in both placements. Chains: c = max(result latency 4.0, W) -> 16 at W = 16.",
+    "hardware": "from the full-gpu cases: IMAD at 16 warps per SMSP on four SMSPs costs about 64 cycles (4 per warp and SMSP, i.e. a multiplier interval of 4 per SMSP or one multiplier per SM at interval 1); the one-SMSP cell decides which: per-SMSP interval 4 gives 64 in both placements, a per-SM unit gives 16 on one SMSP and 64 on four. FADD / FMNMX chains at W = 16 on four SMSPs: 50-60 cycles (the softmax reading), above the engine's 16."
+  },
+  "outcomes_before_data": {
+    "interval": "If c of a stream is linear in W with the same slope in both placements: the slope is the unit's initiation interval per SMSP for that class; install it as the class's unit interval (class_resource / execution-unit leaf), experimental until the replay passes.",
+    "sm_scope": "If c at fixed W is about four times larger on four SMSPs than on one: the unit is SM-wide; install scope sm with the measured interval.",
+    "none": "If W = 16 cells match the engine prediction within 15 %: the full-gpu deficit is not an issue-rate limit of these classes; nothing installed."
+  },
+  "prediction_check": "H100 replay (tracer -> convert -> engine) of imad and fadd_chain at W = 16 on four SMSPs and W = 4 on one SMSP with the candidate leaves: c within 15 %; then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-g1).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled with their reason.",
+  "addenda": [
+    {
+      "when": "after h100-r1 (data seen); b300 queued",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/math_occupancy/h100-r1 (table.txt, exit 0)",
+      "text": "Cycles per instruction and warp at W = 1 / 2 / 4 / 8 warps per SMSP: imad 2.01 / 3.96 / 7.57 / 15.95 (one SMSP) and 2.01 / 3.98 / 7.82 / 15.96 (four SMSPs); lop3 2.01 / 3.98 / 7.55 / 15.88 in both placements; fmnmx_chain 4.00 / 4.00 / 7.84 / 15.88; fadd_chain 4.00 / 4.00 / 4.04 / 8.10 (7.83 on four SMSPs); shfl_fadd 14.5 / 14.5 / 14.5 / 15.2 on one SMSP and 14.5 / 14.9 / 17.0 / 22.5 on four. The W = 16 cells are invalid (64 warps exceed the 1024 threads of one CTA; they repeat W = 8). Reading: every stream follows c = max(result latency, class issue interval x W) with the installed intervals (IMAD 2.0, LOP3 2.0, FMNMX 2.0, FADD 1.0), per SMSP, no SM-wide term except for SHFL. The 'engine_today' line of this protocol was wrong: the engine applies the class issue interval to the SMSP unit copy shared by the warps (simulator.cpp, next_free = now + issue_interval), so it already gives these numbers. Outcome 'none' for single streams up to 8 warps per SMSP: nothing installed. Open: 16 warps per SMSP (needs several CTAs on the SM) and mixed streams - the full-gpu case issues IMAD, IMAD.HI and LOP3 interleaved; if their 2.0-cycle intervals are one shared SMSP issue path rather than separate units (fmaheavy / alu), 381 such instructions x 2.0 x 16 warps = 12.2 k cycles per warp, the measured residency. Protocol v2 tests that."
+    }
+  ]
+}

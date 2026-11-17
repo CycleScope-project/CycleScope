@@ -1,0 +1,40 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "mma_sync",
+  "version": 3,
+  "supersedes": "tools/microbench/mma_sync/protocol-v2.json (version 2 run v2r2 on both devices: the wps sweep shows the DMMA window growing linearly with warps -- quotient 512 / 512 / 512 (h100) and 584 / 584 / 572 (b300) at wps 1 / 2 / 4 -- i.e. a shared unit queuing, not per-warp blocking; v2 had no rule for the unit's scope, so its data are not installed)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "instruction.service"
+  ],
+  "classes": [
+    "DMMA",
+    "HMMA",
+    "IMMA",
+    "HMMA.SPARSE",
+    "IMMA.SPARSE",
+    "BMMA",
+    "BMMA.SPARSE"
+  ],
+  "fields": [
+    "issue_interval_cycles (DMMA, BMMA, BMMA.SPARSE)",
+    "result_latency_cycles / completion_latency_cycles (BMMA, BMMA.SPARSE)"
+  ],
+  "purpose": "(1) The v1 wps = 1 thr cell measures per-warp blocking when a class does not overlap its own independent instances (DMMA: thr slope == lat slope on both devices). The SMSP admission interval needs warps per SMSP > 1: with wps warps per SMSP each running 8 independent chains, the per-warp window slope over K divided by 8 is the per-warp cost; the per-SMSP interval is that divided by wps once the warps overlap. (2) BMMA / BMMA.SPARSE (b1 mma.sync) are placeholder 1 / 1 / 0 on both devices; they get v1-style lat + thr cells.",
+  "definitions": "issue_interval_cycles(class) = min over wps in {1, 2, 4} of (thr slope over K at that wps) / (8 x wps), where the thr window at wps w is run by 4 x w warps (w per SMSP, 128 x w threads, the same k_thr kernel with a wps template parameter) between two bar.sync. Reading: if the unit admits one instance per SMSP every T cycles, the per-warp window grows as 8 x K x T x w (warps queue) and the quotient is T at every w; if the warp merely blocks on latency L, the quotient is L / w and keeps falling -- the min over w is then L / 4, which is reported with the flag per_warp_blocking = true when (slope at w=4) / (slope at w=1) < 1.25 (the window did not grow with w, i.e. no shared-unit queuing); a per_warp_blocking class installs issue_interval = quotient at w = 4 as experimental (the unit admits at least that rate; the true interval is <= it) and lists it for a wps = 8 follow-up. lat and the BMMA cells follow v1 definitions and acceptance verbatim. SCOPE RULE (new in v3, from the engine's resource semantics, cpp/core/simulator.cpp service admission: a resource with scope sm and copy_count 1 is one unit per SM shared by the 4 SMSPs, and the leaf's issue_interval_cycles is that unit's admission spacing): the thr window is run by 4 x wps warps, one SMSP each, so for a class bound to an sm-scoped resource (DMMA -> fp64_sm) the 4 SMSPs queue on the same unit and the per-warp quotient equals 4 x T_unit; the installed issue_interval_cycles = quotient / 4 for sm-scoped resources and = quotient for smsp-scoped resources (HMMA / IMMA / BMMA / sparse -> matrix_smsp). The binding comes from common/class_resource.json and the scope from common/resources.json, read by the model, never typed by hand. The queuing-vs-blocking test stays: ratio = slope(w=4) / slope(w=1) >= 1.25 -> queuing (measured); < 1.25 -> per_warp_blocking (experimental, interval = quotient(w=4) / scope_divisor).",
+  "probe": "tools/microbench/mma_sync/probe/mma.cu extended: k_thr<O, K, WPS> with WPS in {1, 2, 4} (launch 128 x WPS threads), bmma cell = mma.sync.aligned.m16n8k256.row.col.s32.b1.b1.s32.and.popc (BMMA; class root BMMA, shape 16n8k256 -> SASS BMMA.168256.AND.POPC or similar: the gate records the shape token it finds and requires exactly U / 8K instructions of root BMMA), bmma_sp = none (PTX has no sparse b1 mma; BMMA.SPARSE stays unrealised on both devices and is recorded as ISA-absent).",
+  "sass_gate": "v1 rule + addendum allow-list; the wps = 2 / 4 thr windows are gated the same way (per-warp window, same instruction counts).",
+  "acceptance": {
+    "cell": "v1 rules (5 % / 15 %)",
+    "per_warp_blocking": "flag as defined; experimental install",
+    "bmma": "v1 rules; measured when passing"
+  },
+  "install": "DMMA issue_interval on both devices = quotient / 4 (fp64_sm); BMMA result / completion / issue_interval from its cells where the gate finds the BMMA opcode (h100); where the toolchain emits no BMMA opcode at all (b300 sm_103a: the window holds a CALL.REL.NOINC emulation, 0 target instructions) the class is unrealised:emulated and the leaf stays as it is; BMMA.SPARSE unrealised (ISA absent). A/B 500 x 2 single-cluster per architecture; BL3-F64 is the observation target.",
+  "devices": {
+    "h100": "sm_90a",
+    "b300": "sm_103a"
+  },
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install without the gate",
+  "addenda": []
+}

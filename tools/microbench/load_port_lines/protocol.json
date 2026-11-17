@@ -1,0 +1,56 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "load_port_lines",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "mechanisms": [
+  "memory.l1.service / memory.l2.service / memory.dram.service: what the SM's load port charges per request (sector_bytes_per_cycle)"
+ ],
+ "ownership": "cluster-local (one SM); no commit of the other lines on these leaves beyond main.",
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "Is the time an SM needs to serve a global load proportional to the bytes (sectors) it reads, as the engine charges, or to the number of distinct lines its lanes touch?",
+ "why": "gather_latency run 1: one SM with 16 warps issuing loads whose 32 lanes touch 32 different lines needs 6036-6795 cycles per round of 3584 one-sector requests (1.7-1.9 cycles each; b300 1.9-2.0) where the simulator replays 1621-1656; the engine charges 32 B per sector at 127 B per cycle (0.25 cycle per sector), a value measured with 16 B x 32 contiguous lanes (four full lines per instruction, 4.03 cycles). load_lines r1 had recorded, unused, 1.67 cycles per extra line for one warp at L1 hits. Full-GPU case behind it: flashmla_sparse_decode (producer loop 4820 against 3750 cycles per iteration).",
+ "probe": "probe/port_lines.cu: one CTA, W warps, per rep U independent 4-byte loads per lane with lane spread S = 4 (one line), 32 (8 lines, 32 sectors), 128 and 512 (32 lines, 32 sectors); levels l1 (ring of 8 positions), l2 (region read by a warm-up launch), dram (after an evicting launch). Cells: l1: W = 1, 4; l2: W = 1, 4, 8; dram: W = 1, 4, 16; all four spreads; U = 16, 32, 64; 6 launches.",
+ "derivation": "per cell the slope over U of the CTA window median (cycles per load instruction per warp = slope; per SM and instruction = slope / W) and of the per-warp window.",
+ "prediction_of_the_installed_model (h100: 127 / 122 / 122 B per cycle, floor one cycle per request)": "cycles per load instruction on the port: S = 4: 1 (four sectors); S = 32, 128, 512: 8 (32 sectors) at every level; CTA slope = W x that when the port is the limit.",
+ "alternative (lines)": "S = 4: about 1-1.7; S = 32: 8 lines: 8-14; S = 128 and 512: 32 lines: 32-54.",
+ "reading": {
+  "usable": "OLS residual of the three U points <= 5 % of the slope x 64; the SASS window holds U scalar LDG (or a loop of one LDG) and the predicated store.",
+  "R1": "S = 128 and 512 within 25 % of S = 32 at each level and of 8 x W -> bytes are the unit; the gather excess is elsewhere.",
+  "R2": "S = 128 / 512 at least 2x S = 32 -> lines are the unit; the per-line cost per level is the result, the rule is written in an addendum and judged against gather_latency's cells and the contiguous stream cell (4.03 cycles for four lines)."
+ },
+ "replay": "l2 and dram, W = 4, S = 4 and 128, U = 64 are also replayed in the simulator.",
+ "not_allowed": "no value from full-GPU error; no per-kernel rule.",
+ "addenda": [
+  {
+   "date": "2026-11-13",
+   "written": "after run 1 on both devices ($A/fg-line-cold/portlines/{h100,b300}-r1; $A/fg-line-cold/tools/portlines_table.py) and the replay of four cells ($A/fg-line-cold/replay6)",
+   "probe form": "the window is a loop unrolled eight times with about nine address instructions (64-bit multiplies) per load: 25-32 cycles per load of baseline, visible in the one-line cells (h100 l1 32.0 per load). The loads are independent. The l2 cells of the simulator replay are not comparable (the simulation starts cold; the hardware region was read by the warm-up launch).",
+   "reading (R2: lines are the unit)": {
+    "port time of one load whose 32 lanes touch 32 lines, SM-wide, where the port is saturated (CTA slope / W)": "h100: l1 W = 4: 40 cycles; l2 W = 4: 35-36, W = 8: 33-36; dram W = 16: 32-35. b300: l1 W = 4: 32; l2 W = 8: 34; dram W = 16: 40-42. That is 1.0-1.25 cycles per line at every level.",
+    "32 sectors in 8 lines": "h100 l1 W = 4: 9.3 per load; l2 W = 8: 12; the installed charge (32 sectors x 32 B at 127 B per cycle = 8) is about right here and four times too small for 32 sectors in 32 lines (S = 128 / 512 are 2.7-4.3x the S = 32 cells; R1 fails).",
+    "one warp": "a 32-line load adds 38 (l1), 19 (l2), 40 (dram) cycles to its own warp's chain on h100 over a one-line load."
+   },
+   "rule (post hoc)": "a load request occupies the SM's load ports for one full line (line_bytes at the level's sector_bytes_per_cycle, about one cycle) per distinct line it touches, whether one or all four sectors of the line are read. For requests of whole lines nothing changes (the contiguous stream cell the rates come from: four lines, 4.03 cycles).",
+   "judged on cells the rule's statement does not come from": "gather_latency, one SM, 16 warps x 14 load instructions x 32 lines = 7168 line requests per round: 7168 cycles at one per line against 6036-6795 measured on h100 and 6872-7255 on b300; one warp: 448 line requests against a measured increase of about 480 over the one-load cell. The rule is installed if the simulator's replay of the gather cells (W = 16 and W = 1, K = 7) and of the dram port cells (W = 4, S = 4 and 128) comes within 25 % of hardware with it; replays first, then the full-GPU regression.",
+   "installed": "switch memory.load_port.line_granular = 1 on both devices (experimental); no new constant.",
+   "not_modelled": "1.0 against 1.2-1.25 cycles per line in some saturated cells; the one-warp additive cost at L2 (19 against 32)."
+  },
+  {
+   "date": "2026-11-13",
+   "written": "after the simulator replays with the rule on / off ($A/fg-line-cold/replay7) and the full-GPU regression ($A/fg-line-cold/full-lp)",
+   "replays (simulated off | on | hardware)": {
+    "gather, one SM, 16 warps, K = 7, wait per iteration (iterations 8-15)": "1621-1656 | 7075 | 6795 (rows 64), 6036 (rows 65536); iteration 0: 2308-2363 | 7024-7060 | 9022, 7184.",
+    "gather, one warp, K = 7": "883 | 1198 | 1530 (rows 64), 1651 (rows 65536).",
+    "port lines, dram, W = 4, per-warp window of 64 loads": "S = 4: 7358 | 7365 | 8298; S = 128: 8062 | 10692 | 13430 (CTA window 8079 | 11062 | 14611).",
+    "l2 cells": "not comparable: the simulation of a single launch starts cold."
+   },
+   "judging": "criterion (25 %, set after the hardware data and before the replays): seven of the eight numbers hold with the rule on (4-24 % apart); the one-warp gather over 65536 rows is 27 % low (46 % low with the rule off). Installed as experimental with this miss recorded: in the one-warp cells the port time is already in (448 line requests); the rest of their gap is not explained by this rule.",
+   "full GPU (not used to choose anything)": "$A/fg-line-cold/full-lp against full-m6b, 500 cases each: b300 8.19 -> 7.83 % MAPE, P90 16.6 -> 15.7; h100 8.19 -> 8.15 %, P90 17.1. The full-GPU case that started this (flashmla_sparse_decode_v32_h64_03) moves only 0.745 -> 0.765: its gathers are 128-bit loads of contiguous lanes (whole lines), which the rule leaves unchanged; its deficit is still open."
+  }
+ ]
+}

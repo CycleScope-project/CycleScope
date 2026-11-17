@@ -1,0 +1,149 @@
+--- a/include/flashinfer/pos_enc.cuh
++++ b/include/flashinfer/pos_enc.cuh
+@@ -27,6 +27,7 @@
+ #include "page.cuh"
+ #include "utils.cuh"
+ #include "vec_dtypes.cuh"
++#include "fi_smid_obs.cuh"
+ 
+ namespace flashinfer {
+ 
+@@ -725,6 +726,7 @@
+     uint32_t rotary_dim, size_t q_stride_n, size_t q_stride_h, size_t k_stride_n, size_t k_stride_h,
+     size_t q_rope_stride_n, size_t q_rope_stride_h, size_t k_rope_stride_n, size_t k_rope_stride_h,
+     float smooth_a, float smooth_b, float rope_rcp_scale, float rope_rcp_theta) {
++  fi_note_cta_smid();
+   uint32_t bx = blockIdx.x, tx = threadIdx.x, ty = threadIdx.y;
+   const uint32_t bdy = blockDim.y;
+   vec_t<float, vec_size> freq;
+@@ -1480,6 +1482,7 @@
+       uint32_t bdy = num_threads / bdx;
+       dim3 nblks(batch_size * (num_qo_heads + num_kv_heads));
+       dim3 nthrs(bdx, bdy);
++      fi_smid_bind();
+       auto kernel = BatchQKApplyRotaryKernel<INTERLEAVE, HEAD_DIM, vec_size, bdx, DType, IdType>;
+       void* args[] = {(void*)&q,
+                       (void*)&k,
+@@ -1504,6 +1507,7 @@
+                       (void*)&rope_rcp_scale,
+                       (void*)&rope_rcp_theta};
+       FLASHINFER_CUDA_CALL(cudaLaunchKernel((void*)kernel, nblks, nthrs, args, 0, stream));
++      fi_smid_dump("device %%smid in BatchQKApplyRotaryKernel");
+     });
+   });
+ 
+@@ -1546,6 +1550,7 @@
+       uint32_t bdy = num_threads / bdx;
+       dim3 nblks(batch_size * (num_qo_heads + num_kv_heads));
+       dim3 nthrs(bdx, bdy);
++      fi_smid_bind();
+       auto kernel = BatchQKApplyRotaryKernel<INTERLEAVE, HEAD_DIM, vec_size, bdx, DType, IdType>;
+       void* args[] = {(void*)&q,
+                       (void*)&k,
+@@ -1570,6 +1575,7 @@
+                       (void*)&rope_rcp_scale,
+                       (void*)&rope_rcp_theta};
+       FLASHINFER_CUDA_CALL(cudaLaunchKernel((void*)kernel, nblks, nthrs, args, 0, stream));
++      fi_smid_dump("device %%smid in BatchQKApplyRotaryKernel");
+     });
+   });
+ 
+@@ -1621,6 +1627,7 @@
+                       (void*)&rope_rcp_scale,
+                       (void*)&rope_rcp_theta};
+       FLASHINFER_CUDA_CALL(cudaLaunchKernel((void*)kernel, nblks, nthrs, args, 0, stream));
++      fi_smid_dump("device %%smid in BatchQKApplyRotaryKernel");
+     });
+   });
+ 
+--- a/include/flashinfer/attention/prefill.cuh
++++ b/include/flashinfer/attention/prefill.cuh
+@@ -2447,6 +2447,7 @@
+ template <typename KTraits, typename Params>
+ __global__ __launch_bounds__(KTraits::NUM_THREADS) void SinglePrefillWithKVCacheKernel(
+     const __grid_constant__ Params params) {
++  fi_note_cta_smid();
+   extern __shared__ uint8_t smem[];
+   using SmemStorage =
+       std::conditional_t<KTraits::USE_SINGLE_PREFILL_SOFTMAX_VO_SPLIT,
+@@ -2460,6 +2461,7 @@
+           typename Params>
+ cudaError_t SinglePrefillWithKVCacheDispatched(Params params, typename Params::DTypeO* tmp,
+                                                cudaStream_t stream) {
++  fi_smid_bind();
+   using DTypeQ = typename Params::DTypeQ;
+   using DTypeKV = typename Params::DTypeKV;
+   using DTypeO = typename Params::DTypeO;
+@@ -2652,6 +2654,7 @@
+           }
+         })
+   });
++  fi_smid_dump("device %%smid in SinglePrefillWithKVCacheKernel");
+   return cudaSuccess;
+ }
+ 
+--- a/include/flashinfer/gemm/group_gemm_sm90.cuh
++++ b/include/flashinfer/gemm/group_gemm_sm90.cuh
+@@ -19,6 +19,8 @@
+ #include "../allocator.h"
+ #include "../cutlass_utils.cuh"
+ #include "../utils.cuh"
++#include <cstdlib>
++#include <cstdio>
+ 
+ namespace flashinfer {
+ 
+@@ -123,6 +125,14 @@
+       cudaGetDevice(&hw_info.device_id);
+       hw_info.sm_count =
+           cutlass::KernelHardwareInfo::query_device_multiprocessor_count(hw_info.device_id);
++      // Cluster-SM derived only: persistent grouped GEMM launches sm_count CTAs.
++      // One 2x1x1 cluster is sm_count=2. Unset keeps the default full-GPU path.
++      if (const char* target_sms = std::getenv("FLASHINFER_CLUSTER_SM_TARGET_SMS")) {
++        int parsed = std::atoi(target_sms);
++        if (parsed > 0) {
++          hw_info.sm_count = parsed;
++        }
++      }
+ 
+       typename Gemm::EpilogueOutputOp::Params params;
+       params =
+@@ -147,7 +157,38 @@
+ 
+       CUTLASS_CHECK(gemm.can_implement(arguments));
+       CUTLASS_CHECK(gemm.initialize(arguments, workspace_ptr));
++      const char* smid_log = std::getenv("FLASHINFER_CLUSTER_SMID_LOG");
++      static unsigned long long* obs = nullptr;
++      static bool dumped = false;
++      if (smid_log && smid_log[0] && !obs) {
++        cudaMalloc(&obs, 32 * sizeof(unsigned long long));
++        cutlass::fi_bind_cluster_obs(obs);
++      }
+       CUTLASS_CHECK(gemm.run(stream));
++      if (obs && !dumped && smid_log && smid_log[0]) {
++        dumped = true;
++        unsigned long long host[32] = {};
++        cudaMemcpy(host, obs, sizeof(host), cudaMemcpyDeviceToHost);
++        FILE* fp = fopen(smid_log, "w");
++        if (fp) {
++          fprintf(fp, "{\"smids\":[");
++          int n = 0;
++          for (int i = 0; i < 16; ++i) {
++            if (host[i * 2] == 0 && host[i * 2 + 1] == 0) continue;
++            if (n) fprintf(fp, ",");
++            fprintf(fp, "%u", static_cast<unsigned>(host[i * 2]));
++            ++n;
++          }
++          unsigned packed0 = static_cast<unsigned>(host[1] & 0xffffffffull);
++          unsigned nx = packed0 & 0xffu;
++          unsigned ny = (packed0 >> 8) & 0xffu;
++          unsigned nz = (packed0 >> 16) & 0xffu;
++          fprintf(fp,
++                  "],\"cluster_nctaid\":[%u,%u,%u],\"method\":\"device %%%%smid and %%%%cluster_nctaid in cutlass::device_kernel\"}\n",
++                  nx ? nx : 1u, ny ? ny : 1u, nz ? nz : 1u);
++          fclose(fp);
++        }
++      }
+     }
+   });
+ 

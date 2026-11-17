@@ -1,0 +1,137 @@
+{
+ "architecture": "sm_90a",
+ "cases": [
+  {
+   "api": "flash_attn_func",
+   "append_kv": false,
+   "attention_chunk": 0,
+   "batch": 256,
+   "c450_full": {
+    "rule": "I=c450; P=batch until est grid>=132",
+    "walk_start": {
+     "batch": 256,
+     "num_splits": null,
+     "sm_margin": null
+    }
+   },
+   "cache_batch_idx": false,
+   "cache_leftpad": false,
+   "case_id": "fa3_causal_lpt_01_cluster_sm_f3",
+   "causal": true,
+   "cluster_sm": true,
+   "deterministic": false,
+   "dtype": "bf16",
+   "exact_lengths": true,
+   "head_dim": 64,
+   "head_dim_v": 64,
+   "heads_kv": 1,
+   "heads_q": 1,
+   "implementation": "FA3",
+   "input_seed": 0,
+   "invocation": {
+    "allow_missing_lineinfo": true,
+    "argv": [
+     "python3",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/harness/run_full_gpu.py",
+     "--manifest",
+     "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/manifests/fa3_cluster_sm100.json",
+     "--case-id",
+     "fa3_causal_lpt_01_cluster_sm",
+     "--mode",
+     "capture",
+     "--build-root",
+     "/path/to/hopper-prototype/artifacts/fa3_cluster_topo_marker_20260921"
+    ],
+    "carveout": "auto",
+    "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3",
+    "env": {},
+    "kernel_range": "",
+    "marker_contract": {
+     "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/delivery_tests/flashattention3/harness/run_full_gpu.py",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+   },
+   "mechanism_evidence": {
+    "condition": "Is_causal \u2192 LPT scheduler; hd64 causal uses RS BlockN=128",
+    "files": [
+     "upstream/hopper/flash_fwd_launch_template.h"
+    ],
+    "observed_cluster_source": false,
+    "primary": "causal_lpt",
+    "sm_margin": "official flash_attn_* sm_margin \u2192 params.num_sm = multiProcessorCount - sm_margin",
+    "source_launch": "upstream/hopper/flash_fwd_launch_template.h Enable_cluster/CLUSTER_SWITCH/UsePersistentScheduler",
+    "symbols": [
+     "LPT",
+     "DynamicPersistentTileScheduler"
+    ]
+   },
+   "mechanisms": [
+    "causal_lpt",
+    "mma_pv_rs"
+   ],
+   "num_splits": null,
+   "operation": "fixed_fwd",
+   "pack_gqa": null,
+   "page_size": null,
+   "predicted_cluster_m": 1,
+   "primary_mechanism": "causal_lpt",
+   "qv": false,
+   "reuse_scheduler_metadata": false,
+   "rotary_dim": 0,
+   "rotary_interleaved": true,
+   "seed_index": 1,
+   "seqlen_k": 4096,
+   "seqlen_new": null,
+   "seqlen_q": 192,
+   "sm_margin": null,
+   "softcap": 0.0,
+   "source": "upstream/hopper/flash_attn_interface.py",
+   "source_case_id": "fa3_causal_lpt_01",
+   "source_evidence": {
+    "condition": "Is_causal \u2192 LPT scheduler; hd64 causal uses RS BlockN=128",
+    "files": [
+     "upstream/hopper/flash_fwd_launch_template.h"
+    ],
+    "symbols": [
+     "LPT",
+     "DynamicPersistentTileScheduler"
+    ]
+   },
+   "source_revision": "98eb7998a0eba4047c7a30375522569d4b8efb20",
+   "suite": "flashattention3",
+   "target_ctas": 1,
+   "trigger": {
+    "cluster_m": 1,
+    "combine_dense": false,
+    "combine_sparse": false,
+    "dqacc_atomic_d256": false,
+    "dqacc_bulk_tma": false,
+    "element_size": 2,
+    "enable_cluster": false,
+    "fp8_transpose_v": false,
+    "has_qv": false,
+    "intra_wg_overlap": true,
+    "is_local": false,
+    "is_split": false,
+    "is_varlen": false,
+    "kBlockM": 192,
+    "kBlockN": 128,
+    "mma_pv_is_rs": true,
+    "n_m_tiles": 1,
+    "pack_gqa": false,
+    "pagedkv_nontma": false,
+    "pagedkv_tma": false
+   },
+   "uses_cluster": false,
+   "window_size": [
+    -1,
+    -1
+   ]
+  }
+ ],
+ "name": "fa3_c450_full",
+ "schema_version": 1,
+ "suite": "flashattention3"
+}

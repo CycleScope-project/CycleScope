@@ -1,0 +1,128 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "row_gather",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "mechanisms": [
+  "memory.dram.service / memory.l2.service: load-to-use latency of ONE 128-bit global load whose lanes fall on several rows",
+  "memory.load_port"
+ ],
+ "ownership": "gpu-shared (full-GPU loop) for the level latencies; the other lines' clones (fg-line-mem task/fg-mem-share, fg-line-sync) have no commit on memory.l2 / memory.dram latency of plain loads (fg-line-mem works on the async-copy issue gate).",
+ "devices": {
+  "h100": "sm_90a pod",
+  "b300": "sm_103a"
+ },
+ "question": "How long does a warp wait for one 128-bit global load as a function of the number of distinct rows (lines) its lanes touch, from DRAM and from the L2; and for the block of seven such loads that the flash-MLA sparse gather issues back to back?",
+ "why": {
+  "kernel": "flashmla_sparse_decode_v32_h64_03 (H100 full GPU, sim / ncu 0.765; job and journal kept in $A/fg-line-cold/attrib6). Read from the job (MACC / MSEC of the producer warps, $A/fg-line-cold/tools/ldg_lanes.py): every LDG.E.EL.LTC256B.128.CONSTANT of the gather reads 8 token rows (lane l: row l % 8, 16-byte chunk l / 8, so 64 contiguous bytes per row), 20-23 sectors on 8-10 lines; rows are 656 bytes apart in units, not line aligned. It is NOT a lane-contiguous whole-line read (the earlier note said so; corrected here), so the line-granular port rule already applies to it.",
+  "gap": "first block of an iteration (7 loads within 27 cycles: +0x200 with LTC128B, then +0x0 .. +0x140 in steps of 0x40 with LTC256B; the wait is taken at the first use of the second load's data): hardware 1168 cycles per iteration (long scoreboard at that PC, average of 16 iterations), simulation 467 on average (iterations 0-4: 956 / 727 / 664 / 648, falling to 150 by iteration 15 as rows repeat).",
+  "earlier cells": "gather_latency run 1, one warp, one CTA, cold table, 2 scalar loads per lane on 32 lines: 1054-1274 cycles (h100), 1223-1526 (b300), against the single-sector pointer-chase DRAM latency leaf 697.9 (h100) / 874.9 (b300) (memlat). With the table already in the L2 the same cell is 274-514 (leaf 305.5, far hit +159.6): the L2 level agrees, the DRAM level is 350-570 above the leaf."
+ },
+ "probe": {
+  "file": "probe/row_gather.cu, 128-bit loads written as inline PTX (ld.global.v4.u32; the hinted form is ld.global.nc.L1::evict_last.L2::256B.v4.u32 / .L2::128B as in the kernel) so that ptxas cannot scalarise them; the SASS gate requires exactly the expected LDG.E...128 forms in the timed window and no other global load there.",
+  "single": "one load per iteration. Lane l reads 16 bytes of row g = l % L at chunk c = (l / L) % C (C = 1: all lanes of a row read the same 16 bytes; C = 4: 64 contiguous bytes per row, L <= 8). spread = far: row g of an iteration is a random 4-KiB slot of the table (hash of cta, warp, iteration, g), address slot * 4096 + c * 16; spread = adjacent: rows are consecutive 128-byte lines inside one random 4-KiB slot. Lane 0 records clock64 before the load and after the use of the loaded value (x ^ w accumulated into a result that is stored).",
+  "block": "the kernel's first block: 8 rows per warp (row = lane % 8, chunk = lane / 8), row address = table + index * 656 with a random index per (cta, warp, iteration, row); loads at +0x200 (L2::128B) then +0x0, +0x40, +0x80, +0xc0, +0x100, +0x140 (L2::256B); t_first = clock after the use of the second load's value, t_all = clock after the use of all seven.",
+  "passes": "in one launch: pass 0 over 32 iterations on a table pushed out of the L2 by reading a 512-MiB buffer before the launch (DRAM); then the warp reads a 4-MiB spoiler buffer (pushes the rows out of its L1, not out of the L2); pass 1 repeats the same rows in the same order (L2).",
+  "cells": {
+   "single (one warp, grid 1)": "L = 1, 2, 4, 8, 16, 32 x hint = plain, kernel, C = 1, far; L = 8, C = 4, far x both hints; L = 32, C = 1, adjacent x both hints",
+   "block": "W = 1, 4 warps per CTA x grid = 1, all SMs, kernel hints; W = 1, grid 1, plain",
+   "table": "1 GiB; 5 launches per cell; iterations 4..31 are read, iteration 0 separately"
+  },
+  "replay (h100, the engine of main, build-6ba18727)": "single far plain L = 1, 8, 32; single L = 8 C = 4 kernel hint; block W = 1 and W = 4, grid 1, kernel hints (one launch each)."
+ },
+ "derivation": "per cell and pass: median, p10, p90 of the wait per iteration (t_first and t_all for block) over iterations 4..31 and launches 1..4.",
+ "prediction_from_the_installed_leaves": {
+  "rule": "a request completes at its last sector: level latency + one line of port time per distinct line (128 B / about 122-127 B per cycle), a few cycles of issue and use.",
+  "h100": "single, pass 0: 715 (L = 1) rising to about 750 (L = 32); pass 1: 320-340 near, 480-500 on the first far hit; no dependence on the hint. block, W = 1: t_first about 730, t_all about 790 (pass 0); 340-560 (pass 1); W = 4 on one SM: t_all up to about 980.",
+  "b300": "single, pass 0: 890-925; pass 1: 320-340 near (far-hit leaf as installed); block W = 1 pass 0: t_first about 905, t_all about 965."
+ },
+ "reading": {
+  "usable": "launches 1..4 agree within 5 % on the medians; SASS gate passed.",
+  "R1": "every pass-0 cell within 15 % of the prediction: a single gather request is timed correctly; the flash-MLA excess is not in the request latency and the next step is the interaction with the rest of that kernel (role by role in the replay of the kernel itself).",
+  "R2": "single pass-0 latency grows with L beyond the prediction: the table latency(L, C, spread, hint) is the result; a rule is proposed in an addendum (post hoc) with constants taken from the single cells L <= 16 only and judged on cells they do not come from: L = 32 far, L = 32 adjacent, both block cells with W = 1 (t_first, t_all), and the gather_latency run-1 one-warp cells (1054-1274 h100, 1223-1526 b300); the replay with the rule must be within 15 % of hardware on the block cells.",
+  "R3": "single cells agree with the prediction but block cells do not: the excess needs several requests outstanding together (ordering of returns inside a warp or an SM); the block table is the result and the next probe varies the number and order of loads.",
+  "hint": "plain and kernel-hint cells differing by more than 10 % at the same L means the hint changes timing; the converter does not carry it today (MACC cache_hint is 0 on these loads) and that becomes a capture requirement."
+ },
+ "not_allowed": "no value from full-GPU error; no per-kernel rule.",
+ "addenda": [
+  {
+   "date": "2026-11-12",
+   "written": "after run 1 on both devices ($A/fg-line-cold/rowgather/{h100,b300}-r1, tables-r1.txt, tools/rowgather_table.py; replay $A/fg-line-cold/replay8) and before run 2",
+   "probe form": "ptxas split the v4 load into two scalar loads when only x ^ w was used; the use is (x ^ w) + (y ^ z) (commits e955f0a5, 14f34653; two scalarised runs discarded as rowgather/*-r1-scalarised, *-r2-badsass). SASS gate passed on both devices; ptxas issues the block's +0x0 load first, then +0x200, +0x40 .. +0x140, and t_first waits for the +0x0 load.",
+   "usable": "pass 1 within 5 % everywhere; about half of the pass-0 cells have launch medians more than 5 % apart (up to 30 %, b300 adjacent). The cause is in the reading below (levels by address plus occasional slow accesses), so the criterion is not met as written and the pass-0 medians are read together with their distributions.",
+   "reading (R2; pass 0 = DRAM, one warp, one SM, plain loads; medians, cycles)": {
+    "single, rows L = 1 / 2 / 4 / 8 / 16 / 32 (far)": "h100 794 / 810 / 835 / 888 / 1039 / 1121; b300 674 / 986 / 1044 / 1084 / 1176 / 1424. Simulator replay (h100): 722 / - / - / 729 / - / 754. Prediction was 715 .. 750 (h100), 890 .. 925 (b300).",
+    "32 adjacent lines in one 4-KiB slot": "h100 888, b300 1026: less than 32 far rows, so the growth is by separate locations, not by lines.",
+    "L2 pass": "h100 332 .. 400, b300 314 .. 390 for L = 1 .. 32; replay 330 .. 362: agrees within 10 %.",
+    "hint": "kernel-hint cells are 0 .. 9 % above plain at the same L (one cell 8.8 %, the rest below 5 %): below the 10 % line, the hint is not a timing fact to carry.",
+    "block, W = 1 (hardware | replay)": "h100 t_first 906 | 717, t_all 1242 | 1139; L2 pass 360 | 325 and 617 | 550. W = 4: 1042 | 719 and 1388 | 1152; L2 pass 378 | 325, 724 | 558. b300 hardware t_first 1118, t_all 1480 (W = 1).",
+    "all-SM block cells": "pass 1 of the grid = all cells is not an L2 measurement: 132 x W spoilers of 4 MiB push the table out of the L2 (pass 1 t_first 924-1133 against 360-386 on one SM). Pass 0: h100 W = 1 980 / 1510, W = 4 1413 / 1846; b300 1136 / 1648 and 1224 / 1685."
+   },
+   "what the per-iteration values show (same data; the slot of an iteration is the same in every launch and in the plain and hint cells)": {
+    "levels": "the wait of a one-row load is not one number. b300: about 640 (56 % of the slots) or about 1010 (36 %); h100: about 600, 745 and 805. A slot keeps its level from launch to launch (b300 21 of 28 iterations identical in all four launches, h100 23 of 28; plain and hint cells agree on 99 / 106 of 112) and the 32 adjacent lines of the same slot take the level of the slot (b300 slot levels 640 -> 750, 1010 -> 1140 with 32 lines). So the DRAM-miss latency depends on where the data lives (unit at least 4 KiB), as the L2 far hit does, and a load on several rows waits for its slowest row: with two or more rows the far level is nearly always present.",
+    "occasional slow accesses": "in launches 1-4 about 7 % (h100) / 5 % (b300) of one-row loads are 200-450 cycles above their slot's level, not tied to the slot. With L rows the share of iterations above the far level is 10 / 11 / 25 / 25 / 59 % for L = 2 / 4 / 8 / 16 / 32 on b300 (1 - 0.97^L gives 6 / 11 / 22 / 39 / 62 %).",
+    "first launch of the process": "most slots cost 800-1100 cycles more the first time they are read in the process (launch 0; later iterations of launch 0 less often), never again: a first-touch cost of a unit much larger than a slot. Excluded from all medians above, not modelled; whether the cold reference of the suite contains it is not known.",
+    "engine": "one DRAM latency for every miss (697.9 / 874.9, between the hardware levels), home side by line parity, far extra only on L2 hits; a miss on any number of rows costs the same. That is the 100-400 cycles the replay is short on every pass-0 cell with more than one row."
+   },
+   "no rule yet": "the judged cells of R2 cannot be scored before the unit of the levels and their dependence on the SM are known; nothing installed.",
+   "run_2": {
+    "pair cells (unit of the level)": "k_pair: per iteration row A = the slot of run 1 (4-KiB slot by hash of the iteration), row B = A + delta inside the table; every lane reads the same 16 bytes; clock, load A, use, clock, load B, use, clock: the two waits are recorded separately. delta = 128 B, 4 KiB, 64 KiB, 2 MiB, 64 MiB; one warp, grid 1, 32 iterations, 5 launches, plain loads, pass 0 only.",
+    "matrix cells (SM against address)": "k_single_plain, L = 1, grid = all SMs, but only one CTA (argument active_cta) executes the pass, the others return at once; the slots are the same for every CTA (hash of the iteration only). active_cta = 0, 11, .., 121 (12 cells), 5 launches each; the output has the SM id (%smid) of the active CTA and every iteration's wait.",
+    "predictions": "engine: every wait about 722 (h100) / 900 (b300), whatever the address and the SM. If the level belongs to a region of size R: A and B have the same level for delta < R and are independent beyond (same-level share p^2 + q^2 with the one-row shares). If the level is the SM's side against the region's home: for a fixed slot the SMs split into groups with different levels and every SM sees both levels; if it belongs to the address alone every SM sees the same level for a slot.",
+    "judging": "R = the smallest delta at which the same-level share falls to the independent value (launches 1-4, iterations 4-31, levels cut at 700 / 780 on h100 and 800 on b300, slow accesses above 900 / 1200 set aside); the matrix is reported as slots x SMs with the level. A rule (latency of a DRAM miss by the region's level; a request waits for its slowest region) is then written with the levels of the one-row cells only and judged as R2 says (L = 32 far and adjacent, block W = 1, gather_latency one-warp cells, replay within 15 % on the block cells). The occasional slow accesses stay unmodelled unless run 2 ties them to something a trace knows."
+   }
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after run 2 on both devices ($A/fg-line-cold/rowgather/{h100,b300}-r2y, tables-r2-{h100,b300}.txt, tools/rowgather_run2.py; the first attempt had no binary and is kept as *-r2x-nobuild) and before run 3",
+   "reading_of_run_2": {
+    "unit (pair cells; share of iterations in which rows A and A + delta have the same level, slow accesses set aside)": "b300: 128 B 92 %, 4 KiB 37 %, 64 KiB 62 %, 2 MiB 17 %, 64 MiB 46 %. h100 (three cuts): 78 %, 40 %, 31 %, 63 %, 11 %. Lines of one 4-KiB page share the level; pages 4 KiB or more apart do not, and not by one address bit (a single-bit rule would give 0 or 100 % at each delta). The level belongs to the page.",
+    "b300 matrix (12 SMs x 28 pages)": "every page is at about 620-700 for one set of SMs and about 1000-1100 for the other, and the sets are the same for all pages: {142, 33, 50, 123, 82, 57} against {23, 112, 10, 89, 28, 105}; in sm_topology these are gpc {0, 1, 2, 4} (SM 142 has no gpc row) against gpc {3, 5, 6}. So the b300 DRAM miss is near or far by (the SM's side, the page's home), about 650 against about 1040: a far extra of about 390 cycles (the L2 far hit leaf is 97).",
+    "h100 matrix (11 SMs x 28 pages)": "no two-valued picture: an SM sees its pages between about 590 and 900 in several steps (per-SM counts low / mid / high from 19 / 3 / 5 to 3 / 6 / 17); the pages fall into two sets (20 and 8 of 28) that swap fast and slow between SM 124 / 61 and SM 24 / 56 / 11 / 16 / 40, with other SMs in between. The installed l2_partition column does not reproduce the sets (124 -> 0, 61 -> 1; 24, 56, 40 -> 1, 11, 16 -> 0).",
+    "against the predictions": "the engine's single latency is contradicted on both devices; 'region of size R' holds with R = one 4-KiB page; 'SM side against the page's home' holds on b300 and in a graded form on h100."
+   },
+   "run_3 (side map)": {
+    "cells": "matrix cells of run 2 for EVERY CTA of an all-SM grid, in one process: sweep active_cta = 0 .. grid - 1, one launch per active CTA (L2 pushed out before each launch as before), same shared pages, L = 1, far, plain, 32 iterations; three sweeps, the first discarded (first touch in the process). Output per launch: SM id and the 32 waits.",
+    "derivation": "per SM and page the median of sweeps 1-2 (pass 0); SMs are grouped by the sign pattern of (wait - the page's median over SMs); per SM: group, median wait on its fast pages and on its slow pages; cross table of group against gpc, placement_domain and l2_partition of sm_topology.json.",
+    "predictions": "b300: two groups, split by gpc ({0, 1, 2, 4} against {3, 5, 6} and whatever the unsampled gpcs do), about 650 / 1040 for every SM. h100: not predicted; the installed l2_partition column is tested (run 2 says it fails).",
+    "judging": "a device's side table is taken from this run if at least 95 % of its SMs fall into two groups with opposite page patterns and the group is a function of gpc (or the table is listed per SM if not of gpc); the near and far latencies are the medians over SMs. If a device shows more than two levels per SM (h100 in run 2), the table of levels is the result and the rule for that device is written only after it is understood. The rule to install is then: a DRAM miss costs the near latency, plus the far extra when the page's home differs from the SM's side; the home of a page is drawn per 4-KiB page (the trace has virtual addresses: the split is by page index parity, which reproduces 'same inside a page, about half of the pages on each side'); a request waits for its slowest sector as today. Judged as R2 of the protocol: L = 32 far and adjacent, block W = 1 (t_first, t_all), gather_latency one-warp cells, replay within 15 % on the block cells."
+   }
+  },
+  {
+   "date": "2026-11-13",
+   "written": "after run 3 on both devices ($A/fg-line-cold/rowgather/{h100,b300}-r3s, tables-r3-{h100,b300}.{txt,tsv}, tools/rowgather_run3.py) and BEFORE the engine change and its replays",
+   "reading_of_run_3 (pass 0, medians over pages and sweeps 1-2)": {
+    "b300": "148 SMs: two groups of 70 and 76 with opposite page patterns (98.6 %; two SMs apart). Group = function of gpc: gpc {0, 1, 3, 4} and the six SMs without a gpc row against gpc {2, 5, 6, 7}. Fast pages 639 / 642, slow pages 1041 / 1028.",
+    "h100": "117 SMs were reached (the idle CTAs of the grid leave and several active CTAs land on the same SM; 15 SMs unmapped): two groups of 55 and 59 (97.4 %; two SMs apart, one unassigned). gpc {0, 5, 6, 7} against gpc {1, 2, 3, 4} (one gpc-0 SM in the other group). Fast 608 / 606, slow 803 / 791. The installed l2_partition column splits the groups 39 / 16 and 15 / 44: it is not this side. Run 2's graded look came from twelve SMs only.",
+    "judging of the side table": "both devices pass the 95 % criterion with the group a function of gpc."
+   },
+   "rule (to install, experimental)": {
+    "statement": "a DRAM miss costs the near latency when the page's home is on the SM's side and the near latency plus a far extra otherwise. The SM's side is its gpc's side (h100 gpc 1-4, b300 gpc 2, 5, 6, 7 on side 1; SMs without a gpc on side 0, as the six b300 SMs measured). The home of a page is per 4-KiB page; the trace has virtual addresses, so the engine takes the parity of the page index (same inside a page, half of the pages on each side, neighbouring pages differ: run 2 found 63 % of 4-KiB neighbours on different levels on b300). A request waits for its slowest sector, as today. Applies to every DRAM miss of the load path (plain loads, async copies, TMA loads): one fetch path.",
+    "values": "the probe's wait contains 24 cycles of issue / use / port that the h100 replay shows with the installed leaves (722 against the 697.9 leaf). near = fast level - 24: h100 583, b300 616 (the 24 is taken over from h100: the b300 kernel has two instructions fewer in the window and there is no b300 replay; assumption, stated in the source). far extra = slow - fast: h100 190, b300 395. dram.latency_cycles changes from 697.9 / 874.9 (a mixture of the two levels in a pointer chase) to the near value.",
+    "not modelled": "the occasional slow accesses (5-7 % of single-row loads, +200-450; they are what lifts L = 16 and 32 far rows to 1039-1424) and the first-touch cost of the first launch of a process. The L2 far-hit side (memory.l2_partition, line parity and its own SM column) is left as it is: no L2-hit data in this probe says it is the same side."
+   },
+   "predictions of the rule for the judged cells (written before the replay)": "h100: single L = 1 607 or 797 by page; L = 8 about 805; L = 32 far about 830 (hardware 1121: expected to FAIL the 15 % line, the slow accesses are not in the rule); 32 adjacent lines 640 or 830 (hardware 888 median, 693 p10); block W = 1 t_first about 815 (906), t_all about 1240 (1242); W = 4 t_first about 815 (1042: expected to fail), t_all about 1250 (1388). gather_latency one warp, K = 1: about 910 (1054-1274: expected at or beyond the line). b300 has no replay; its numbers are judged by the full-GPU regression only, which is not a criterion.",
+   "install decision": "the side table and the two levels are measured directly (run 3); the rule is installed as experimental whatever the L = 32 and gather_latency cells give, because those cells contain the unmodelled slow accesses; the replay results are recorded cell by cell in the next addendum, failures included."
+  },
+  {
+   "date": "2026-11-13",
+   "written": "after the rule was implemented (tree 488f1e9f, engine 30bad81b; first attempt 337d1e79 / 2a00bb85 superseded: it reused retired schema ids) and replayed ($A/fg-line-cold/replay10, build-30bad81b, clone fgcold-launch38); before the full-GPU regression",
+   "gates": "CTest 16 / 16, pytest 461 passed, tree validate --strict five classes 0 (h100 69a3bf98bf09a249, b300 0488c73dcc9dbf62), generated-schema test passed ($A/fg-line-cold/build-30bad81b.GATES.txt).",
+   "judged cells, h100 (replay before | replay with the rule | hardware; pass 0 medians)": {
+    "single L = 1": "722 | 608 on near pages, 798 on far pages (median 798) | 607 / 797 by construction, median 794.",
+    "single L = 8": "729 | 804 | 888: -9.5 %, inside the 15 % line.",
+    "single L = 32 far": "754 | 830 | 1121: -26 %, FAILS (predicted: the occasional slow accesses are not in the rule).",
+    "single L = 8, 64 B per row, kernel hint": "730 | 806 | 964: -16 %, fails by one point.",
+    "block W = 1": "t_first 717 | 793 | 906 (-12.5 %, passes); t_all 1139 | 1252 | 1242 (+0.8 %, passes).",
+    "block W = 4": "t_first 718 | 794 | 1042 (-24 %, FAILS, predicted); t_all 1235 | 1349 | 1388 (-2.8 %, passes).",
+    "gather_latency one warp, K = 7 (iterations 8-15)": "1198 | 1274 | 1530 / 1651: -17 % / -23 % (was -22 % / -27 %), fails.",
+    "gather_latency sixteen warps": "7075 | 7075 | 6795 / 6036: unchanged.",
+    "load_port_lines DRAM, W = 4": "1 line 7366 | 7214 | 8298 (-13 %, was -11 %: one-page requests now average the two levels below the old single value); 32 lines 10692 | 11156 | 13430 (-17 %, was -20 %).",
+    "L2 pass": "unchanged by the rule (330-362 against 332-400)."
+   },
+   "summary": "of the cells R2 names, block W = 1 passes on both clocks and the replay is within 15 % of hardware there as required; L = 32 far, the 64-B variant, block W = 4 t_first and the one-warp gather fail on the low side. All failures are cells with many separate rows per request or several warps, where the slow accesses and whatever several warps add are not modelled. Installed as experimental, as decided before the replay.",
+   "b300": "no probe replay exists for b300; its leaves (616 / 395 / gpc 2, 5, 6, 7) rest on run 3 alone."
+  }
+ ]
+}

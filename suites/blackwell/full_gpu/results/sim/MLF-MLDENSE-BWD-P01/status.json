@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLDENSE-BWD-P01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 418281,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 7121602,
+ "completed": 7121602,
+ "cycles": 65424,
+ "hard": 0,
+ "walls": {
+  "convert": 14.8,
+  "segments": 0.0,
+  "build": 1.1,
+  "sim": 17.5,
+  "total": 33.5
+ },
+ "rss_kb": {
+  "convert": 388620,
+  "segments": 388620,
+  "build": 388620,
+  "sim": 1166432
+ },
+ "hw_cycles": 76766.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 12
+}

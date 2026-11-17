@@ -1,0 +1,32 @@
+{
+  "case_id": "cutlass_071_fp8_grouped_blockwise_pingpong_sparse_groups_cluster_sm",
+  "invocation": {
+    "argv": [
+      "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example68_grouped_blockwise_pingpong",
+      "--benchmark=/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/harness/group_problems/cluster_sm/empty_8_k1024.txt",
+      "--raster=m",
+      "--iterations=1"
+    ],
+    "carveout": "auto",
+    "env": {
+      "CUTLASS_CLUSTER_SHAPE": "1x1x1",
+      "CUTLASS_CLUSTER_SM_COUNT": "1",
+      "CUTLASS_DELIVERY_ALGORITHM": "fp8_grouped_blockwise_pingpong_sparse_groups",
+      "CUTLASS_DELIVERY_CASE_ID": "cutlass_071_fp8_grouped_blockwise_pingpong_sparse_groups_cluster_sm",
+      "CUTLASS_DELIVERY_MODE": "cluster_sm",
+      "CUTLASS_DELIVERY_SAMPLE_COUNT": "1",
+      "CUTLASS_DELIVERY_TRACE": "1",
+      "CUTLASS_DELIVERY_TRACE_ONLY": "1",
+      "GEMM_DELIVERY_GPU": "h100"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+      "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example68_grouped_blockwise_pingpong",
+    "source_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/upstream/examples/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling/68_hopper_fp8_warp_specialized_grouped_gemm_with_blockwise_scaling_with_sparse_groups.cu",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+  },
+  "schema_version": "hopper.capture-case-invocation.v1"
+}

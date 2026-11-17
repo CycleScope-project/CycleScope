@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-MATMUL-FP16-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 5893236,
+ "completed": 5893236,
+ "cycles": 34859,
+ "hard": 0,
+ "walls": {
+  "convert": 13.8,
+  "segments": 0.0,
+  "build": 1.4,
+  "sim": 16.9,
+  "total": 32.1
+ },
+ "rss_kb": {
+  "convert": 295580,
+  "segments": 295580,
+  "build": 295580,
+  "sim": 1320972
+ },
+ "hw_cycles": 40768.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 11
+}

@@ -1,0 +1,1072 @@
+{
+  "schema_version": "hopper.delivery.cases.v1",
+  "suite": "flashmla",
+  "name": "FlashMLA Hopper SM90 dense-decode cluster-SM G0 candidate set",
+  "architecture": "sm_90a",
+  "selected_count": 16,
+  "supported_gpu_profiles": [
+    "h100"
+  ],
+  "validated_gpu_profiles": [],
+  "delivery": {
+    "groups": 8,
+    "group_assignment": "delivery_index modulo 8",
+    "runner": "scripts/run_cluster_sm.sh",
+    "capture_wrapper": "common/capture_case.py"
+  },
+  "upstream": {
+    "repository": "https://github.com/deepseek-ai/FlashMLA",
+    "revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+    "revision_date": "2026-09-15",
+    "package": "flash_mla 1.0.0 source build from upstream/ (pip install --no-build-isolation)",
+    "cutlass_commit": "147f5673d0c1c3dcf66f78d677fd647e4a020219",
+    "cutlass_source": "fetched at build time to $HOPPER_ARTIFACT_ROOT/tool_cache/cutlass/<commit> (not vendored, T0005 rev3)",
+    "pin_record": "upstream/PINNED.md"
+  },
+  "selection": {
+    "mode": "hand_pinned_g0_candidate_set",
+    "operation_class": "mla_decode",
+    "input_seed_rule": "input_seed = 20260929 + delivery_index; varlen seqlens use a deterministic sawtooth (see harness build_inputs)",
+    "cycle_filter": "target_gpu_cycles_100000_5000000 (deepgemm source_version convention)",
+    "constraints": {
+      "page_size": "fixed 64 (csrc/api/dense_decode.cpp TORCH_CHECK)",
+      "head_dims": "head_dim_k 576 (d_v 512 + RoPE 64) with head_dim_v 512; head_dim_k 512 reserved for DeepSeek V4.x",
+      "dtype": "bf16 or fp16 (identical q/kv dtype)",
+      "heads": "heads_q % heads_kv == 0",
+      "causal": "kernel forces causal=false when seqlen_q==1"
+    }
+  },
+  "coverage": {
+    "scope": "single_gpu_hopper",
+    "selection": "shape_first_g0",
+    "mechanism_counts": {
+      "mla_paged_kv_cache": 16,
+      "mla_splitkv_decode": 16,
+      "mla_mqa_multi_kv_head": 2,
+      "mla_causal_speculative_sq": 2,
+      "mla_fp16_path": 1,
+      "mla_varlen_seqlens": 2,
+      "mla_multi_token_query": 1
+    },
+    "correctness_checked_cases": 6
+  },
+  "measurement_status": "unmeasured_new_set",
+  "cases": [
+    {
+      "case_id": "flashmla_mla_decode_b01_sk256_hq16_cluster_sm",
+      "delivery_index": 0,
+      "delivery_group": 0,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 1,
+      "seqlen_q": 1,
+      "seqlen_kv": 256,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 16,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260929,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b01_sk256_hq16_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b08_sk1024_hq64_cluster_sm",
+      "delivery_index": 1,
+      "delivery_group": 1,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 8,
+      "seqlen_q": 1,
+      "seqlen_kv": 1024,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 64,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260930,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b08_sk1024_hq64_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b64_sk1024_hq128_cluster_sm",
+      "delivery_index": 2,
+      "delivery_group": 2,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 64,
+      "seqlen_q": 1,
+      "seqlen_kv": 1024,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260931,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b64_sk1024_hq128_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk4096_cluster_sm",
+      "delivery_index": 3,
+      "delivery_group": 3,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 4096,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260932,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk4096_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk8192_cluster_sm",
+      "delivery_index": 4,
+      "delivery_group": 4,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 8192,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260933,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk8192_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk16384_cluster_sm",
+      "delivery_index": 5,
+      "delivery_group": 5,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 16384,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260934,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk16384_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk32768_cluster_sm",
+      "delivery_index": 6,
+      "delivery_group": 6,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 32768,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260935,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "shape mirrors the upstream performance sweep family (b=128) with pinned equal seqlens",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk32768_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b256_sk1024_cluster_sm",
+      "delivery_index": 7,
+      "delivery_group": 7,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 256,
+      "seqlen_q": 1,
+      "seqlen_kv": 1024,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260936,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b256_sk1024_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b64_sk2048_hkv2_cluster_sm",
+      "delivery_index": 8,
+      "delivery_group": 0,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 64,
+      "seqlen_q": 1,
+      "seqlen_kv": 2048,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 2,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260937,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_mqa_multi_kv_head"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b64_sk2048_hkv2_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b64_sk2048_hkv8_cluster_sm",
+      "delivery_index": 9,
+      "delivery_group": 1,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 64,
+      "seqlen_q": 1,
+      "seqlen_kv": 2048,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 8,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260938,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_mqa_multi_kv_head"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b64_sk2048_hkv8_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b32_sq2_sk1024_causal_cluster_sm",
+      "delivery_index": 10,
+      "delivery_group": 2,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 32,
+      "seqlen_q": 2,
+      "seqlen_kv": 1024,
+      "is_varlen": false,
+      "causal": true,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260939,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_causal_speculative_sq"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b32_sq2_sk1024_causal_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sq2_sk8192_causal_cluster_sm",
+      "delivery_index": 11,
+      "delivery_group": 3,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 2,
+      "seqlen_kv": 8192,
+      "is_varlen": false,
+      "causal": true,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260940,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_causal_speculative_sq"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sq2_sk8192_causal_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk4096_fp16_cluster_sm",
+      "delivery_index": 12,
+      "delivery_group": 4,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "fp16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 4096,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260941,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_fp16_path"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk4096_fp16_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b08_sk1024_varlen_cluster_sm",
+      "delivery_index": 13,
+      "delivery_group": 5,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 8,
+      "seqlen_q": 1,
+      "seqlen_kv": 1024,
+      "is_varlen": true,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260942,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_varlen_seqlens"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b08_sk1024_varlen_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b128_sk4096_varlen_cluster_sm",
+      "delivery_index": 14,
+      "delivery_group": 6,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 128,
+      "seqlen_q": 1,
+      "seqlen_kv": 4096,
+      "is_varlen": true,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260943,
+      "correctness_check": false,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_varlen_seqlens"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b128_sk4096_varlen_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    },
+    {
+      "case_id": "flashmla_mla_decode_b01_sq4_sk4096_cluster_sm",
+      "delivery_index": 15,
+      "delivery_group": 7,
+      "suite": "flashmla",
+      "category": "hopper_attention",
+      "operation": "mla_decode_dense_paged",
+      "api": "flash_mla_with_kvcache",
+      "implementation": "FlashMLA",
+      "source": "upstream/tests/test_flash_mla_dense_decoding.py",
+      "source_revision": "ba89a3466e9470ad08ab39738d4e7bb66989e1e7",
+      "architecture": "sm_90a",
+      "dtype": "bf16",
+      "batch": 1,
+      "seqlen_q": 4,
+      "seqlen_kv": 4096,
+      "is_varlen": false,
+      "causal": false,
+      "page_size": 64,
+      "heads_q": 128,
+      "heads_kv": 1,
+      "head_dim_k": 576,
+      "head_dim_v": 512,
+      "softmax_scale": null,
+      "input_seed": 20260944,
+      "correctness_check": true,
+      "target_repeats": 9,
+      "mechanisms": [
+        "mla_paged_kv_cache",
+        "mla_splitkv_decode",
+        "mla_multi_token_query"
+      ],
+      "primary_mechanism": "mla_splitkv_decode",
+      "kernel_symbols": [
+        "get_mla_metadata_kernel",
+        "flash_fwd_splitkv_mla_kernel",
+        "flash_fwd_mla_combine_kernel"
+      ],
+      "notes": "small reference-checked decode shape (upstream correctness family)",
+      "invocation": {
+        "argv": [
+          "python3",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+          "--manifest",
+          "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/manifests/flashmla_cluster_sm.json",
+          "--mode",
+          "capture",
+          "--case-id",
+          "flashmla_mla_decode_b01_sq4_sk4096_cluster_sm"
+        ],
+        "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla/harness/flashmla_cluster_sm.py",
+        "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/flashmla",
+        "env": {
+          "PYTHONPATH": "/path/to/hopper-prototype-wt/T0016-stage56-capture/artifacts/suites/flashmla/build/site-packages-flashmla"
+        },
+        "kernel_range": "",
+        "carveout": "auto",
+        "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+        "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root",
+        "marker_contract": {
+          "clock_marker_policy": "outermost_pair"
+        }
+      }
+    }
+  ]
+}

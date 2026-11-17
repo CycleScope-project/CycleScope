@@ -1,0 +1,29 @@
+{
+ "doc": "imported from legacy mechanism control.nanosleep",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "NANOSLEEP"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "nanosleep_warp_delay"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "affine",
+   "axis": "requested_sleep_cycles"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "syncs_wake_cycles": {
+   "kind": "linear",
+   "axis": "requested_sleep_cycles"
+  }
+ }
+}

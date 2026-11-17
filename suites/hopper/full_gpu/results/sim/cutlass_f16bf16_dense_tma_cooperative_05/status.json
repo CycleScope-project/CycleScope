@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "cutlass_f16bf16_dense_tma_cooperative_05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 22448,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 6390574,
+ "completed": 6390574,
+ "cycles": 68098,
+ "hard": 0,
+ "walls": {
+  "convert": 11.8,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 10.9,
+  "total": 23.6
+ },
+ "rss_kb": {
+  "convert": 415684,
+  "segments": 415684,
+  "build": 415684,
+  "sim": 872288
+ },
+ "hw_cycles": 65718.0,
+ "reference_cache_control": "all",
+ "placement_digest": "937cc6867de7ae46",
+ "shards": 5
+}

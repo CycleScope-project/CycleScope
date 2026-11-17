@@ -1,0 +1,93 @@
+{
+ "doc": "wgmma register-file issue steal (protocol-v5 C3+C7+R, wgmma_overlap h100-r7; r5 C3/C4 base): while a warpgroup has a wgmma op in flight, its warps issue at half rate (floor cycles=2) with one exclusive read port; an instruction carrying any .reuse source flag pays the reuse_flag_floor 4 instead of 2; while the in-flight op's A operand comes from registers (source_mode rs), every other issue of that warpgroup pays an extra +1 (rs_extra_half_cycles, alternating +0/+1). co-resident dependent penalty +0.5 unchanged (coresident_dependent_half_cycles). uniform-register operands are free (r6).",
+ "program": {
+  "event": "collective_launch",
+  "operation_classes": [
+   "HGMMA",
+   "QGMMA",
+   "IGMMA"
+  ],
+  "parameter_schema": "timing_row",
+  "target_index": 0,
+  "timing_kind": "hopper_wgmma_register_file_issue_steal"
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "coresident_dependent_half_cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "wgmma_overlap.h100.r7"
+     ]
+    },
+    "cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 2
+     },
+     "sources": [
+      "wgmma_overlap.h100.r7"
+     ]
+    },
+    "enabled": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "wgmma_overlap.h100.r7"
+     ]
+    },
+    "launch_hold_blocks_memory_queue": {
+     "model": {
+      "kind": "constant",
+      "value": 0
+     },
+     "sources": [
+      "wgmma_overlap.h100.v6"
+     ]
+    },
+    "memory_queue_hold_above_pending_ops": {
+     "model": {
+      "kind": "constant",
+      "value": 0
+     },
+     "sources": [
+      "wgmma_overlap.h100.v6"
+     ]
+    },
+    "pending_commit_groups_limit": {
+     "model": {
+      "kind": "constant",
+      "value": 6
+     },
+     "sources": [
+      "wgmma_overlap.h100.v6"
+     ]
+    },
+    "reuse_flag_floor_cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 4
+     },
+     "sources": [
+      "wgmma_overlap.h100.r7"
+     ]
+    },
+    "rs_extra_half_cycles": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "wgmma_overlap.h100.r7"
+     ]
+    }
+   },
+   "scope": "sm"
+  }
+ }
+}

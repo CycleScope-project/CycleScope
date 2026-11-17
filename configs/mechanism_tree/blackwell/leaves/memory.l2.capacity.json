@@ -1,0 +1,17 @@
+{
+ "memory.l2.capacity.root": {
+  "fields": {
+   "l2.outstanding_requests": {
+    "model": {
+     "kind": "constant",
+     "value": 256
+    },
+    "sources": [
+     "memory_request.b300.r2.l2.outstanding_requests",
+     "mechtree.w4.mem_outstanding"
+    ]
+   }
+  },
+  "scope": "cluster"
+ }
+}

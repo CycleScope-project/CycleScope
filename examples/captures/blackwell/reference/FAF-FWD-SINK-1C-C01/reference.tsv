@@ -1,0 +1,2 @@
+case	kernel	launch_ordinal	grid	block	cluster	cycles_median	cycles_min	cycles_max	cycles_active_avg	sm_clock_khz	sm_clock_source	cache_control	clock_control	repeats	status	source
+FAF-FWD-SINK-1C-C01	kernel_cutlass_kernel_flash_attncuteflash_fwd_sm100FlashAttentionForwardSm100_object_at__tensor00000o41112101314_tensor0000o11101213_tensor0000o10111213_tensor00000o41112101314_None_None__0	19	148x1x1	512x1x1	0x0x0	21102	20956	21755		1934552	ncu	all	none	3	success	cyclescope reference

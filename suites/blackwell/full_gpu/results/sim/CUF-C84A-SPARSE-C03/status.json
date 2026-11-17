@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C84A-SPARSE-C03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 93617,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2036411,
+ "completed": 2036411,
+ "cycles": 19827,
+ "hard": 0,
+ "walls": {
+  "convert": 5.9,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 4.2,
+  "total": 10.5
+ },
+ "rss_kb": {
+  "convert": 313724,
+  "segments": 313724,
+  "build": 313724,
+  "sim": 313724
+ },
+ "hw_cycles": 18960.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 3
+}

@@ -1,0 +1,27 @@
+{
+ "doc": "imported from legacy mechanism synchronization.cluster.release",
+ "program": {
+  "event": "barrier_release",
+  "operation_classes": [
+   "UCGABAR",
+   "UCGABAR_ARV",
+   "UCGABAR_WAIT"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "cluster_barrier_release"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "linear",
+   "axis": "actual_participant_warps"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

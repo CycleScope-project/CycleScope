@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-MLA-VARLEN-2C-C03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 285473,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1808194,
+ "completed": 1808194,
+ "cycles": 35120,
+ "hard": 0,
+ "walls": {
+  "convert": 6.1,
+  "segments": 0.0,
+  "build": 0.4,
+  "sim": 4.7,
+  "total": 11.2
+ },
+ "rss_kb": {
+  "convert": 352900,
+  "segments": 352900,
+  "build": 352900,
+  "sim": 369684
+ },
+ "hw_cycles": 33362.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 4
+}

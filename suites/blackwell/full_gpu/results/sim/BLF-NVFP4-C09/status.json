@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-NVFP4-C09",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 1911658,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2327844,
+ "completed": 2327844,
+ "cycles": 72539,
+ "hard": 0,
+ "walls": {
+  "convert": 10.0,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 11.4,
+  "total": 22.0
+ },
+ "rss_kb": {
+  "convert": 615192,
+  "segments": 615192,
+  "build": 615192,
+  "sim": 839268
+ },
+ "hw_cycles": 73166.0,
+ "reference_cache_control": "all",
+ "placement_digest": "bfdc2d45d3e1fdf2",
+ "shards": 12
+}

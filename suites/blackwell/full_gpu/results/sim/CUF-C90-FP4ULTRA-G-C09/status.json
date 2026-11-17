@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C90-FP4ULTRA-G-C09",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2295409,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 10116254,
+ "completed": 10116254,
+ "cycles": 142034,
+ "hard": 0,
+ "walls": {
+  "convert": 23.0,
+  "segments": 0.0,
+  "build": 1.6,
+  "sim": 31.0,
+  "total": 55.7
+ },
+ "rss_kb": {
+  "convert": 744636,
+  "segments": 744636,
+  "build": 744636,
+  "sim": 1677312
+ },
+ "hw_cycles": 143914.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 16
+}

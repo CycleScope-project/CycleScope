@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLDEC-H64-SPLIT-R03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 38222,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 457072,
+ "completed": 457072,
+ "cycles": 19907,
+ "hard": 0,
+ "walls": {
+  "convert": 1.6,
+  "segments": 2.6,
+  "build": 0.3,
+  "sim": 1.0,
+  "total": 5.5
+ },
+ "rss_kb": {
+  "convert": 371196,
+  "segments": 371196,
+  "build": 371196,
+  "sim": 371196
+ },
+ "hw_cycles": 21404.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 1
+}

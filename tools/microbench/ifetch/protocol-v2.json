@@ -1,0 +1,46 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "ifetch",
+ "version": 2,
+ "supersedes": "tools/microbench/ifetch/protocol.json (version 1; h100-r1, b300-r1; stream_* installed experimental at r11 because the cpi-difference and slope forms differ > 10 % and the cold per-line cost rises with footprint)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "instruction.fetch"
+ ],
+ "devices": {
+  "h100": "sm_90a (17 per-N builds, -Xptxas -O1, as version 1)",
+  "b300": "sm_103a"
+ },
+ "purpose": "Version 1 derived per-line costs as plateau cpi differences, a form that averages the launch-prefetched head of the code with the cold tail; the cold per-line cost then rises with footprint (h100 31 -> 100, b300 42 -> 126 cycles per line) and disagrees with the marginal slope. Version 2 derives every stream_* field as a marginal slope of total pass cycles over code lines, in the same piecewise form the engine evaluates (prefetched head at stream_l1 pace up to launch_prefetch_bytes, then stream_cold per line), so the installed fields reproduce the measured pass times.",
+ "probe": "tools/microbench/ifetch/probe/ifetch.cu + bodies unchanged (verbatim blackwell-prototype); ifetch.line.n<N>.w1 variants with N such that the code spans 4 KiB .. 512 KiB (version-1 set) plus N at 80, 96, 112 KiB to resolve the prefetch knot; cache-control all; two runs per device; jump variants not built (fetch_parallelism stays unrealised, version 1)",
+ "derivation": {
+  "T_p(F)": "median sm__cycles_active of pass p of a variant of code footprint F bytes minus the same pass of the smallest variant, i.e. the extra cycles of the extra code (lines = F / 128)",
+  "capacity_l0 / capacity_l1 / line": "version-1 plateau rules (unchanged)",
+  "stream_l1": "OLS slope of T_warm(F) over lines for F between capacity_l0 and capacity_l1 (warm pass >= 1)",
+  "stream_l2": "OLS slope of T_warm(F) over lines for F above capacity_l1",
+  "launch_prefetch_bytes and stream_cold": "two-segment fit of T_0(F) (pass 0, cold) over lines with slope stream_l1 fixed below the knot and a free slope above it; knot candidates = every measured F; the knot minimising the squared error is launch_prefetch_bytes and the slope above it is stream_cold",
+  "check": "the engine-form prediction T_0(F) = stream_l1 x min(lines, W/128) + stream_cold x max(0, lines - W/128) is evaluated at every measured F"
+ },
+ "acceptance": {
+  "field": "slope fit residual <= 5 %, runs within 5 %, and the engine-form prediction within 10 % of T_0(F) at every F >= 16 KiB -> measured; else experimental with the per-F table recorded",
+  "b300": "in-repo protocol values replace the installed b300 fields when they pass (old values in the source description)"
+ },
+ "install": "instruction.fetch fields of both devices (source ifetch.<device>.<run>, protocol tools/microbench/ifetch/protocol-v2.json); one two-architecture 450 A/B round",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+ "addenda": [
+  {
+   "date": "2026-11-05",
+   "written": "after the h100-r1 (version 1) run and its k_mix launches.log had been read as a table (warm cycles per variant), before any per-field derivation of fetch_parallelism on H100 and before model_parallelism.py existed; the rule below is taken verbatim from blackwell-prototype instruction_fetch_protocol.json amendments 4 / 5 (2026-10-28, frozen there before any B300 k_mix data), i.e. the rule that produced the installed b300 value",
+   "field": "fetch_parallelism",
+   "text": "fetch_parallelism on H100 is derived from the k_mix variants of the version-1 run (ifetch.mix.n<N>.w<W>: W warps of one CTA, warp w on its own straight-line body at a distinct code address; SASS gate ok for all 15 variants in h100-r1), not from k_jump (unrealised). Rules F7 / F8 as in blackwell-prototype: per mode (all / none, two independent runs of the same binary; warm passes only, median of passes 2 and 3 of the slowest warp, overhead-corrected cpi_c = (T - a0) / N with a0 the level-0 intercept of k_line W=1), cpi_line_L2 = median warm cpi_c of k_line W=1 on its L2 plateau; for every k_mix point whose total footprint W x N x 16 B exceeds capacity_l1_bytes (every stream misses L1) q(W, N) = (cpi_mix(W, N) - 1) / (cpi_line_L2 - 1). F7: p = 4 / q(4) (4 -> four independent per-SMSP cadences, 1 -> one shared cadence per SM). F8: q(8), q(16); q ~ 1 -> per-warp streams, q ~ W/4 -> per-SMSP cadence, intermediate -> streams per SMSP = 4 / q(16) rounded to the nearest integer, fetch_parallelism = 4 x that (the engine's arrival channels per SM, warp-slot indexed as on b300). Acceptance: the two modes agree within 5 % on q(4), q(8), q(16) (medians over the qualifying N), the k_line L2 plateau has >= 3 footprints; verdict experimental (the channel form reproduces q(4) and q(8) ~ 1 but not an intermediate q(16); same classification as mechtree.ifetch.r3 on b300). Install: hopper/leaves/instruction.fetch.json fetch_parallelism, source ifetch.h100.r1.mix; one hopper 500-case A/B against the same engine build; b300 untouched.",
+   "not_allowed": "no value from the B300 run; no rounding rule other than nearest integer of 4 / q(16); if the modes disagree > 5 % the field stays unrealised (1)"
+  },
+  {
+   "date": "2026-11-06",
+   "written_before": "any new ifetch run; reads only the existing b300-r3 model (ifetch-model/b300-r3/model.json)",
+   "field": "stream_l1_cycles_per_line, stream_l2_cycles_per_line, stream_cold_cycles_per_line (b300)",
+   "text": "Form consistency: the engine applies one fetch rule to both devices, so both devices' stream fields must come from the same derivation form. h100 carries the version-2 slope-form values (experimental). b300 still carries version-1 values whose stream_cold is the cpi-difference form (93.36; the same run's slope form was 148.8) and whose l1 / l2 were accepted by the 10 % reproduction rule against the predecessor, i.e. not by this derivation. The b300 control clause ('replace when they pass') kept them although the h100 counterparts were installed at the same experimental tier. Rule: when a device's version-2 slope-form field is experimental and the other device's installed field is the version-2 slope form, install it at the experimental tier as well (old values and forms in the source description). Applied to b300-r3: stream_l1 18.384, stream_l2 49.248, stream_cold 142.570 (runs a / b within 0.3 %); capacities / line_bytes / launch_prefetch / sharing already agree with r3. Per-PC evidence that motivated the check: 32-cycle ncu sampling on B300 (diag/pcstalls2/bw) shows no_inst 20-31 k cycles on CU3-C77 / C90 / C74 / MLA and FA3-SCOREMOD against engine fetch waits of 8-20 k."
+  }
+ ]
+}

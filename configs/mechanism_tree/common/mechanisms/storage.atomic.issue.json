@@ -1,0 +1,61 @@
+{
+ "doc": "imported from legacy mechanism storage.atomic.issue",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "ATOM",
+   "ATOMG",
+   "ATOMS",
+   "RED",
+   "REDG",
+   "REDS"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "atomic_issue_interval_sm"
+ },
+ "root": {
+  "children": [
+   {
+    "classes": [
+     "ATOM",
+     "ATOMG",
+     "ATOMS"
+    ],
+    "parameter": {
+     "fields": "device"
+    }
+   },
+   {
+    "classes": [
+     "RED",
+     "REDG",
+     "REDS"
+    ],
+    "parameter": {
+     "fields": "device"
+    }
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "ATOM",
+   "ATOMG",
+   "ATOMS",
+   "RED",
+   "REDG",
+   "REDS"
+  ]
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "linear",
+   "axes_subset_of": [
+    "atomic_same_address_lanes",
+    "cache_line_count"
+   ]
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

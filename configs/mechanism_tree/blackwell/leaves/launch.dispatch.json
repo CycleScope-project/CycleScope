@@ -1,0 +1,79 @@
+{
+ "launch.dispatch.root": {
+  "fields": {
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mechtree.dispatch.enabled"
+    ]
+   },
+   "first_wave_interval_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "dispatch.b300.r1v1.experimental"
+    ]
+   },
+   "serial_ns_per_cta": {
+    "model": {
+     "kind": "constant",
+     "value": 0.513613
+    },
+    "sources": [
+     "fullgpu.mechtree.m4.dispatch_a1",
+     "dispatch.b300.r1v1"
+    ]
+   },
+   "slot_free_to_entry_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 159.4
+    },
+    "sources": [
+     "dispatch_refill.b300.r1",
+     "dispatch_refill.b300.r2",
+     "dispatch_refill.b300.r4"
+    ]
+   },
+   "slot_free_to_entry_slow_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 250.9
+    },
+    "sources": [
+     "dispatch_refill.b300.r1",
+     "dispatch_refill.b300.r2",
+     "dispatch_refill.b300.r4"
+    ]
+   },
+   "slow_gpc_mask": {
+    "model": {
+     "kind": "constant",
+     "value": 228
+    },
+    "sources": [
+     "dispatch_refill.b300.r1",
+     "dispatch_refill.b300.r2",
+     "dispatch_refill.b300.r4"
+    ]
+   },
+   "dependents_launch_serial_ns": {
+    "model": {
+     "kind": "constant",
+     "value": 0.513613
+    },
+    "sources": [
+     "dispatch_refill.b300.r1",
+     "dispatch_refill.b300.r2",
+     "dispatch_refill.b300.r4"
+    ]
+   }
+  },
+  "scope": "launch"
+ }
+}

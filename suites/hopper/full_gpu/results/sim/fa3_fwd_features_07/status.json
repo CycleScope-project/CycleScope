@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "fa3_fwd_features_07",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 37379,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 8654678,
+ "completed": 8654678,
+ "cycles": 56434,
+ "hard": 0,
+ "walls": {
+  "convert": 15.7,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 13.0,
+  "total": 29.6
+ },
+ "rss_kb": {
+  "convert": 358920,
+  "segments": 358920,
+  "build": 358920,
+  "sim": 784936
+ },
+ "hw_cycles": 62359.0,
+ "reference_cache_control": "all",
+ "placement_digest": "937cc6867de7ae46",
+ "shards": 9
+}

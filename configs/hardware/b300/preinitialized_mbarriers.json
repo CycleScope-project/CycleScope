@@ -1,0 +1,25 @@
+{
+  "schema": "reserved-smem-mbarriers/1",
+  "note": "mbarriers in the CTA reserved shared window that are valid at CTA launch without any traced init. The converter emits a launch-time preinit (job MBPI block) for a barrier object at one of these offsets only when the cluster trace carries no SYNCS.EXCH init for it; any other uninitialized object is MissingFact.",
+  "reserved_window_bytes": 1024,
+  "identity": {
+    "gpu": "NVIDIA B300 SXM6 AC",
+    "compute_capability": "10.3",
+    "driver": "580.159.03",
+    "nvcc": "13.2.78",
+    "cuda_gdb": "13.2"
+  },
+  "barriers": [
+    {
+      "offset": 72,
+      "expected_arrivals": 1,
+      "phase": 0,
+      "role": "ptxas tcgen05.alloc.cta_group::2 peer handshake (SYNCS.PHASECHK [R+URZ+0x8] with R -> CTA shared 0x40)",
+      "evidence": "measured",
+      "method": "cuda-gdb 13.2 break_on_launch on the semantic-suite tc02 cubin; x/8wx (@shared unsigned int *)0x40 in both CTAs at kernel entry reads 0x001ffffe 0x7ffff800 at 0x48 (expected 1, pending 1, phase 0 under the init-word ABI of tools/diagnostics/mbarrier_debug_fact)",
+      "artifact": "$BLACKWELL_ARTIFACT_ROOT/rebuild/probe/reserved-mbar-gdb-r1/out/session.log",
+      "script": "scripts/cluster/gdb_reserved_mbarrier.sh",
+      "measured_utc": "2026-10-13T02:11Z"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "wgmma_overlap",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-07",
+ "supersedes": "protocol.json v1 (h100-r3 is the data run of v1: no v1 candidate fits, nothing installed)",
+ "mechanisms": ["hopper.wgmma.register_file_issue_steal (kind 44)", "instruction.service result latency (co-resident warps)"],
+ "devices": {"h100": "sm_90a, pod"},
+ "question": "v1 r3 ($A/microbench/wgmma_overlap/h100-r3, model $A/microbench/wgmma_overlap-model/h100-r3/model.json; all values identical in run-a / run-b and across the 128 samples of a launch) showed, with 7-16 n256 ops in flight during the window: (a) the issuing warpgroup's independent streams slow from 1.01 / 1.50 to 3.84 (ilp8, 1 unserved read) / 3.31 (ilp8n, 3 reads) cycles per instruction (rs 3.96 / 3.31, QGMMA 3.84 / 3.31), while its dependent chains (stall 4) stay at 4.02 (+0.03) and its MUFU chain goes 17.1 -> 18.3; (b) another warpgroup's streams on the same SMSPs do not move (ilp8 1.01, ilp8n 1.51) while its dependent chains do (dep3r 4.92, fmnmx 4.98, imad 4.67 vs 3.98-4.00; n64 with 64 queued ops: 5.52 / 7.05 / 6.01). None of R0 / R-F / R-P / R-S fits: R-F and R-S are SM-scope (b's streams refute), R-P predicts ilp8n > ilp8 (the data are reversed), and no single k fits 3.84 and 3.31. Two further harness facts: with one warpgroup in the CTA (W = 1) the ops completed 886 cycles after the window start (of 2048 cycles of pipe work) while with two or more warpgroups they completed after 2090-2470 -- i.e. with W = 1 roughly half the ops ran during the issue phase (the HGMMA issue blocked), with W >= 2 they did not; and n64 windows were only partly covered (recorded, G chosen per form below). Questions for v2: (1) what is the issue floor F of the issuing warpgroup's streams, how does it depend on the stream's read count / reuse, on the op shape (tensor_n) and on the number of ops in flight (G)? (2) is the dependent-chain slowdown of co-resident warps caused by the in-flight ops or by a warp parked at WARPGROUP.DEPBAR on the SMSP?",
+ "engine_rules_declared_before_data": {
+  "C0 (none)": "every usable gating cell within tolerance of its control.",
+  "C1 (issue floor, issuing-warpgroup scope)": "While a warpgroup has >= 1 wgmma op in flight (issued by any of its warps, not yet complete), every instruction issued by a warp of that warpgroup pushes the warp's control floor to issue + F (max with the control-word stall and the other floors; dependent chains whose stall >= F therefore do not move). F is one value per op shape: constant if the F(N) of N = 64 / 128 / 256 agree within tolerance, otherwise a knots field over tensor_n (linear between measured N, clamped outside; no placeholder). F must not depend on the stream's read count / reuse (ilp8, ilp8n, fadd1, fmul2 within tolerance of each other at a given N and G) nor on G (in-flight count 2 / 4 / 8 within tolerance) -- if it does, C1 is refuted and the dependence is recorded under C1x (not installed). Prediction: t = max(t_ctrl, F); for W >= 2 the SMSP issue slot bound applies: t = max(t_ctrl(W), F, W).",
+  "C2 (dependent-issue latency, co-resident warps)": "While >= 1 wgmma op is in flight on the SM, a warp's instruction whose issue waits on a register produced by its own previous instruction (scoreboard / fixed-latency dependency) issues L cycles later than otherwise, for warps NOT in the issuing warpgroup (v1 r3: the issuing warpgroup's own chains did not move). L constant across kinds (dep3r, dep2, fmnmx, imad) and N within tolerance, else recorded. Streams (no dependency) do not move. C2 is installable only if the `park` control cells (warpgroup 0 parks at a CTA barrier with NO wgmma issued while warpgroup 1 runs the chain) show excess <= tolerance -- otherwise the effect belongs to a parked-warp mechanism, not to wgmma, and is recorded.",
+  "candidate order": ["C0", "C1", "C2 (independent of C1; both may be installed)"],
+  "dropped": "SM-scope floors (R-F, R-S) and read-port rules (R-P): refuted by v1 r3."
+ },
+ "probe": {
+  "file": "tools/microbench/wgmma_overlap/probe/overlap.cu (v1 role-split form of addendum 2, extended)",
+  "forms": {
+   "hgmma_bf16_n256_ss": {"cid": 190, "beat_leaf": 128, "G": [2, 4, 8], "U": {"2": 32, "4": 64, "8": 128}},
+   "hgmma_bf16_n128_ss": {"cid": 158, "beat_leaf": 64, "G": [4, 8], "U": {"4": 32, "8": 64}},
+   "hgmma_bf16_n64_ss": {"cid": 142, "beat_leaf": 32, "G": [8], "U": {"8": 32}},
+   "hgmma_bf16_n256_rs": {"cid": 191, "beat_leaf": 128, "G": [8], "U": {"8": 128}},
+   "qgmma_e4m3_n256_ss": {"cid": 318, "beat_leaf": 128, "G": [8], "U": {"8": 128}}
+  },
+  "G_U_rule": "G <= 8 so that no HGMMA issue blocks on the in-flight limit seen in v1 (W = 1: about half of 16 ops completed during the issue phase); U chosen so that the slowest expected window (chains: U x 5 cycles; streams: U x 4) ends before the ops do (G x beat_leaf x 0.8). Overlap validity per rep as v1: t_d - max active t_w > 0; a cell with > 10 % overlap failures in a launch is unusable. Warpgroup 0 additionally records t_i0 (before wgmma.fence) and t_i1 (after the last commit_group) per rep: the issue-phase duration t_i1 - t_i0 per (form, G, W) is a record-only output (wgmma issue blocking, for a later protocol).",
+  "window_kinds": {
+   "ilp8": "8 independent FFMA d[i] = fma(d[i], a, b), a / b reuse-served (1 unserved read)",
+   "ilp8n": "8 independent FFMA with 16 distinct a8[i] / b8[i] (3 reads, no reuse)",
+   "fadd1": "8 independent FADD d[i] = add(d[i], 1.0 immediate) (1 read, no reuse) -- new",
+   "fmul2": "8 independent FMUL d[i] = mul(d[i], a8[i]) (2 reads, no reuse) -- new",
+   "dep3r": "FFMA chain (stall 4)",
+   "dep2": "FFMA chain d = fma(d, a, d) (stall 4)",
+   "fmnmx": "max.NaN chain (stall 4)",
+   "imad": "mad.lo.u32 chain (stall 4)"
+  },
+  "dropped kinds": "mufu.ex2 (record-only in v1; XU latency confounds), uadd (ptxas keeps it on the vector path: unrealised:not_uniform, v1 r1-r3).",
+  "modes": {
+   "self.w1": "warpgroup 0 issues G ops then runs the window (streams and chains)",
+   "self.w2": "as self.w1 plus warpgroup 1 running the same window (secondary: the W bound of C1)",
+   "other.w2": "warpgroup 0 issues G ops and waits (wgmma.wait_group 0); warpgroup 1 runs the window (chains and streams)",
+   "park.w2": "warpgroup 0 issues NO wgmma; after the second bar.sync it parks at `bar.sync 2, 256` which warpgroup 1 joins only after its window (so warpgroup 0 sits in a CTA-barrier wait for the whole window); warpgroup 1 runs the window. Control for C2. form-independent (one kernel per kind / U)",
+   "ctrl.w<W>": "no wgmma, all 4 W warps run the window (W = 1, 2)"
+  },
+  "controls": "self.w1 -> ctrl.w1; self.w2 -> ctrl.w2; other.w2 -> ctrl.w1; park.w2 -> ctrl.w1.",
+  "cells": "forms x G x kinds(8) x {self.w1, self.w2, other.w2} + park.w2 (kinds x U in {32, 64, 128}) + ctrl (kinds x U x W); --launches 8 --reps 33, two runs.",
+  "sass_gate": "as v1 addendum 2 (window = exactly U instructions of the kind's opcode: FFMA / FADD / FMUL / FMNMX / IMAD; ilp8 .reuse on a / b except the last unit; ilp8n / fmul2 distinct GPRs, no .reuse; fadd1 immediate operand; warpgroup 0's block between its two BAR.SYNC has exactly G ops of the form and zero WARPGROUP.DEPBAR; one WARPGROUP.DEPBAR.LE gsb0, 0x0 after the window / after the second BAR.SYNC; park kernels: no wgmma anywhere, a BAR.SYNC 0x2 in both roles). Build log must contain no C7518 / C7511 for the probe."
+ },
+ "derivation": {
+  "window": "T = median over launches 1..7 of the per-launch median over reps 1..32 and active warps of (t_w - t_s) / U; overlap failures dropped first.",
+  "excess": "e = T(cell) - T(control).",
+  "two runs": "accepted when run-a / run-b agree within 3 % or 0.25 cycles per instruction.",
+  "C1 fit": "F(form, G) = median over the four stream kinds of T(self.w1); the kinds must lie within max(5 %, 0.25) of that median (else C1 refuted: C1x recorded). F(N) = median over G of F(form, G) for the ss forms; G values must agree within tolerance (else C1x). rs and QGMMA at N = 256 must agree with ss N = 256 within tolerance (else the field gets a source_mode / operation_class partition -- recorded, decided by the same rule). If F(64), F(128), F(256) agree within tolerance: constant; else knots over tensor_n.",
+  "C2 fit": "L(form, G) = median over chain kinds of e(other.w2); kinds within tolerance of the median; park.w2 chain excess must be <= tolerance for C2 to be attributed to wgmma; L across forms / G within tolerance -> constant, else recorded (no knots: the dependence is not understood).",
+  "secondary": "self.w2 streams: prediction max(t_ctrl(2), F, 2) within 25 % or 0.5; else recorded.",
+  "model": "tools/microbench/wgmma_overlap/model_v2.py <run dir> -> model.json (per-cell T / e / usable, F table, L table, decisions)."
+ },
+ "decision": "C1 is installed when its fit passes (constant or knots as above), evidence measured when every gating stream cell passed the two-run rule, experimental otherwise. C2 is installed only when its fit passes AND park.w2 chains are within tolerance of ctrl; otherwise its table is recorded. C0 only if every gating excess is within tolerance.",
+ "install": {
+  "C1": "hopper.wgmma.register_file_issue_steal re-declared (schema timing_row kept): `cycles` = F (constant or knots on tensor_n), `enabled` 1, scope warpgroup; the legacy per-launch discrete table and its three predecessor sources are replaced (quoted in the new source). Engine (HopperModule): per warp an in-flight op counter via the kWgmma async-group lane (pending ops > 0 == in flight); on_instance_issue: if the warp's warpgroup has in-flight ops, control_floor = max(control_floor, now + F(op shape of the most recent in-flight op)). The kind-44 block_sm_issue call is deleted. CTest fixtures: (a) one warpgroup, 1-cycle stream during in-flight ops -> F per instruction; (b) after completion -> 1; (c) stall-4 chain during the op -> 4 when F <= 4; (d) a second warpgroup's stream on the same SM unaffected.",
+  "C2": "new common field instruction.service.* is NOT touched; instead hopper.wgmma.register_file_issue_steal gains `dependent_extra_cycles` (L): engine adds L to the register-ready cycle (register_retry / register_ready) of warps on an SM with in-flight ops that are not in the issuing warpgroup. Fixture: dependent chain of another warpgroup during the op -> 4 + L.",
+  "after install": "tree build && tree validate --strict; CTest + pytest (CPU pod); 500 x 2 A/B against mr51 (hp + bw; bw expected unchanged); report row, status, docs/en/microbench.md."
+ },
+ "record_only": [
+  "issue phase: t_i1 - t_i0 per (form, G, W): wgmma issue blocking (v1: W = 1 blocked after about 7-8 of 16 n256 ops; W >= 2 did not)",
+  "C1x / C2 tables when refuted",
+  "self.w2 secondary cells outside 25 %"
+ ],
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, candidate or derivation change after data; the diagnostic arm k = 2 is not evidence for F.",
+ "addenda": []
+}

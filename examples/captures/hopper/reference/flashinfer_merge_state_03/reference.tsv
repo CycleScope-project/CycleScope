@@ -1,0 +1,2 @@
+case	kernel	launch_ordinal	grid	block	cluster	cycles_median	cycles_min	cycles_max	cycles_active_avg	sm_clock_khz	sm_clock_source	cache_control	clock_control	repeats	status	source
+flashinfer_merge_state_03	_ZN10flashinfer17MergeStatesKernelILj8E13__nv_bfloat16S1_EEvPT0_PfPT1_S4_jjj	7	256x1x1	16x8x1	0x0x0	16819	16610	16973		1975618	ncu	all	none	3	success	cyclescope reference

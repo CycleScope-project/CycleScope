@@ -1,0 +1,25 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "constant_launch",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "memory.constant_cache"
+ ],
+ "purpose": "The installed constant miss (h100 406.51 / b300 502.78, crossings constant_cache r2) is the first traversal of a bank-3 __constant__ table written by cudaMemcpyToSymbol. Every kernel starts by reading its parameters and driver constants from bank 0 (c[0x0][...]), and the engine charges those first reads the same cold miss. The lifecycle v3 probe shows the engine's post-marker tail at L = 0 (two dependent bank-0 misses) above the hardware's whole post-marker time on b300 (sim 1731 vs hardware 1563 cycles). This protocol measures the latency of the first dependent bank-0 reads at kernel start, next to a bank-3 control, under the reference cache control.",
+ "probe": {
+  "kernel": "k_cl<BANK, U, S>(...): every thread runs t0 = clock (CS2R SR_CLOCKLO, the kernel's first instruction as in lifecycle), then a dependent register-indexed chain of U loads idx = table[idx] starting at idx = 0 (first traversal), t1 = clock, then the same chain again (second traversal), t2 = clock; lane 0 of warp 0 stores t0, t1, t2 and the final idx. Load k (k = 0 .. U-1) reads byte offset k x S: next[k x S / 4] = (k + 1) x S / 4 for k < U - 1 and 0 for k = U - 1. BANK 0: table = a by-value kernel parameter struct of 4096 B (uint32 next[1024], the only parameter besides the output pointer); BANK 3: table = a 4096 B __constant__ array written with cudaMemcpyToSymbol before the first launch.",
+  "axes": "BANK in {0, 3}; S in {64, 256} B; U in {4, 8, 16} (U x S <= 4096 B); W = 1 warp, grid 1.",
+  "sass_gate": "per variant the window between the first and second CS2R SR_CLOCKLO contains exactly U register-indexed LDC R, c[0x<BANK>][R(+imm)] and no other memory instruction; between the second and third, exactly U again. A variant failing the gate is not measured (recorded).",
+  "runner": "ncu with the case reference metric list (python/cyclescope/capture/driver.py NCU_LAUNCH_METRICS), --cache-control all, --clock-control none, --replay-mode kernel, 34 launches per variant (launches 0 and 1 dropped); a second runner pass without ncu (plain launches, reported only). Two runs per device: $A/microbench/constant_launch/<device>-r1/run-{a,b}."
+ },
+ "derivation": "per launch: first = t1 - t0, second = t2 - t1. Per (BANK, S) and run: per-load latency = OLS slope over U of the launch means; first-traversal slope L_first, second-traversal slope L_second; intercepts reported. Device value F = mean over the two runs of bank-0 L_first at S = 256 (every load a new 64 B line at any bank-0 base alignment).",
+ "acceptance": {
+  "cell": "two runs agree within 5 % on every slope; OLS residual of each slope fit <= 5 % of the slope -> measured; else experimental (reported, not installed).",
+  "decision_declared_before_data": "Engine rule (declared now): the first access in a kernel to a bank-0 constant line returns after bank0_first_access_cycles = F instead of miss_latency_cycles, and the line is resident afterwards (later accesses follow hit / same-line as today; in-flight rule unchanged). Installed when bank-0 S = 256 is measured on that device. Reported, not used: bank-0 S = 64, bank-3 L_first vs installed miss M (a difference > 10 % is recorded; M is not changed by this protocol), L_second vs installed hit H and same_line."
+ },
+ "prerequisite": "the converter must carry the constant bank in the reference address (bank x 0x10000 + offset; today the bank is dropped and c[0x0][a] / c[0x3][a] share a line); that is a separate correctness change (py == cpp) landed before the engine rule.",
+ "install": "memory.constant_cache new field bank0_first_access_cycles (constant, both devices from their own runs; source constant_launch.<device>.r1, protocol tools/microbench/constant_launch/protocol.json); then lifecycle v3 cells re-simulated and re-derived (protocol-v3 dependence clause); one two-architecture 500-case single-cluster A/B.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold, cell or derivation change after data."
+}

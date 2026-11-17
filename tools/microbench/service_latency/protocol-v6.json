@@ -1,0 +1,40 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "service_latency",
+ "version": 6,
+ "supersedes": "protocol-v5.json (all v3 / v4 / v5 rules and addenda stay; v6 adds a b300 reproduction round for high-volume classes whose installed values cite only blackwell-prototype sources, a revised thr criterion for the NOP filler rule, and a MATCH d = 32 rerun)",
+ "frozen_before_gpu": true,
+ "date": "2026-11-06",
+ "mechanisms": [
+  "instruction.service"
+ ],
+ "corpus": "executed warp instructions, 450 single-cluster blackwell cases ($A/diag/mb4/classcount-bw.tsv): FFMA2 1.84 M (8.9 %), FADD2 1.72 M (8.3 %), MUFU.EX2 0.96 M (4.7 %), FMUL2 0.61 M (2.9 %), LEA 0.20 M, ULEA 0.18 M, FMNMX3 0.13 M, HADD2.F32 36 k. Their installed result / interval cite only blackwell-prototype records (mechtree.w3 / w5), never reproduced by a cyclescope protocol.",
+ "cells": {
+  "repro_b300": "b300 only, single cells in the alu4 / alu5 single-op harnesses (k_lat: one dependent op per U, U in {16, 32, 64}; k_thr: 8 independent chains, K in {16, 32, 64}): FFMA2 fma.rn.f32x2, FADD2 add.rn.f32x2, FMUL2 mul.rn.f32x2, MUFU.EX2 ex2.approx.ftz.f32, FMNMX3 max.f32 with three inputs, HADD2.F32 add.rn.f32.f16 (mixed-precision add, gate decides), LEA shl.b32 + add.s32 idiom (LEA_shladd of the v3 survey), ULEA the same idiom on kernel parameters (uniform harness k_ulat). The v3 composition-exact gate decides the credited class; a cell realising a different class is credited to that class only.",
+  "fp64_b300_v6": "b300 dthr.DADD_RN, dthr.DMUL_RN, dthr.DADD_RZ, dthr.DMUL_RZ (v5 bodies unchanged), rerun.",
+  "MATCH_d32": "both devices, thr.MATCH.d32 with K in {16, 24, 32, 48, 64, 96, 128} and thr.MATCH.d16 (b300) the same K set; lat cells unchanged."
+ },
+ "repro_rule": "v2 b300 control rule: a passing cell within 10 % of the installed value keeps the installed value and adds the v6 source (reproduced); outside 10 % the v6 value replaces it; a failing cell changes nothing and is recorded.",
+ "nop_filler_rule_v6_thr": "v5's thr test compared the per-SM interval with one warp's stall sum S and so treats any multi-warp unit-bound stream as stall-bound. v6 (for new data only): with c independent chains per warp, one warp's fixed stall schedule per K step is c x S; the dthr cell is stall-bound iff slope over K <= 1.05 x c x S; otherwise issue_interval = slope / N_unit (v3 divisor) - 0 (the NOPs issue on the SMSP front end, not on the fp64 unit), capped experimental. The lat rule of v5 stands (result credited only if per-op slope >= S + 2).",
+ "MATCH_rule": "per d, v3 acceptance on the OLS slope over all K of that d; d = 32 replaces the clamp if it passes (b300) / reproduces the installed 8.09 within 10 % (h100).",
+ "acceptance": "v3 verbatim",
+ "install": "sources service_latency.<device>.v6r<n>[.experimental]; A/B 500 x 2 single-cluster against the current main baseline",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no idiom search after data",
+ "addenda": [
+  {
+   "date": "2026-11-06",
+   "written": "after the v6r10b1 / v6r8 data: derivation audit of model_v6, no new run, rules unchanged",
+   "text": "(1) model_v6 divided every thr slope by 2 x N_unit. The k_thr / k_thrx2 bodies issue one target op per chain per K (SASS: 128 FADD2 / FFMA2 in the K = 16 kernel = 16 x 8), so the v3 divisor N_unit = 32 per SMSP applies: interval = slope / 32. Corrected b300 values (both runs identical): FADD2 1.991, FMUL2 1.991, FMNMX3 1.993, FFMA2 2.921 (the model printed half). Against the installed values: FADD2 1.986 / FMUL2 1.987 / FMNMX3 1.927 reproduced (<= 3.4 %), FFMA2 1.987 replaced (+47 %). (2) model_v6 compared the per-instruction interval (40.29) with the v6 thr bound 1.05 x c x S = 537.6; the rule compares the slope over K: 2577.9 cycles per K > 537.6, so the dthr cells are not stall-bound, and interval = 2577.9 / 128 (fp64_sm, 16 warps x 8 chains per SM per K) = 20.14 for DADD / DMUL (.RN and .RZ identical), capped experimental; within 10 % of the installed 18.99 / 18.994 -> reproduced, installed values kept. (3) MATCH thr d = 32 h100 8.078 reproduces the installed 8.094; b300 d = 32 still fails the residual (unrealised, clamp kept), d = 16 4.018 vs installed 3.815 reproduced within 10 %."
+  },
+  {
+   "date": "2026-11-06",
+   "written": "before any install; data = the dispatch_contention v2r1 / v3r1 / v4r1 record cells mufu.ex2 / mufu.rsqrt / mufu.lg2 / mufu.tanh (W = 1 dependent chains of U in {64, 128, 256} MUFU ops, two runs per version, six runs per device in total; SASS gate: window = exactly U MUFU.<OP>, chain real)",
+   "text": "(MUFU per-op result latency) The installed MUFU result / completion 23.0 (h100, service_latency.h100.r3r) and 24.0 (b300, r3q) come from the version-1 lat.MUFU cell, which is the rcp+add pair chain (MUFU_RCP: `rcp.approx.ftz.f32 t, x; add.rn.f32 y, t, c`) with the FADD result latency 4 subtracted -- a direct rcp chain cannot be compiled (ptxas folds rcp(rcp(x)) even from asm volatile, dispatch_contention v2r1). Direct single-op chains measured in dispatch_contention: h100 ex2 / rsqrt / lg2 / tanh = 17.00 / 17.00 / 17.00 / 17.00 cycles per step (OLS residual < 0.2 %, six runs identical); b300 ex2 13.95 (installed MUFU.EX2 14, reproduced), rsqrt / lg2 / tanh 17.95 / 17.95 / 17.95. The v3 acceptance (residual <= 5 %, runs <= 5 %) is met with margin. Install (same derivation as the lat cells: slope of the dependent chain = result latency = completion): classes MUFU.EX2 (h100: new leaf; b300 unchanged), MUFU.RSQ, MUFU.LG2, MUFU.TANH (both devices) with result_latency_cycles = completion_latency_cycles = 17.0 (h100) / 17.95 (b300), sources dispatch_contention.<device>.mufu (measured); the issue interval of the new classes is taken from the MUFU class (h100 8.259, b300 7.996; structural: same xu_smsp unit) -- the h100 ex2 chain at W = 3 / 4 (v1 r2: 24.09 / 32.15 per step = 8.03 per warp-step) reproduces 8.26, so h100 MUFU.EX2's interval is also a measured reproduction; b300 MUFU.EX2 keeps its installed 3.97 (v1 r2 W = 4: 16.07 / 4 = 4.02 reproduces). MUFU (rcp and every other op) keeps 23 / 24: the rcp latency itself is unmeasured (pair-derived) and is listed as a remaining item. Converter: hopper routes MUFU.{EX2,RSQ,LG2,TANH} to the per-op classes (blackwell already routes EX2; it gains RSQ / LG2 / TANH), python and cpp identical. A/B 500 x 2 against $A/merge/rbg38."
+  },
+  {
+   "date": "2026-11-07",
+   "written": "before the run (dispatch_contention-style probe cell set `mufu_rcp`, both devices)",
+   "text": "(MUFU rcp direct latency by calibrated pairs) A pure rcp chain is folded by ptxas; the installed MUFU 23 / 24 came from an rcp + add pair with only the FADD result latency 4 subtracted, which ignores the cross-pipe stall and any pair overhead. Cells (W = 1 dependent chains, U in {64, 128, 256}, two runs): `rcp_mul` = rcp.approx.ftz.f32 then mul.f32 by an opaque register; `ex2_mul` = ex2.approx.ftz.f32 then the same mul (calibration: ex2 = 17.00 h100 / 13.95 b300 measured directly); `rsq_mul` (rsqrt, 17.00 / 17.95 directly measured, second calibration); `sqrt_mul` (sqrt.approx), `sin_mul` -> record only (sin expands). Derivation: pair overhead o = slope(ex2_mul) - 17.00 (h100) / 13.95 (b300), cross-checked by slope(rsq_mul) - 17.00 / 17.95 (the two must agree within 1 cycle, else unrealised); rcp = slope(rcp_mul) - o. Gate: window = exactly U MUFU.RCP + U FMUL (alternating), chain real. Install: MUFU class (rcp and the remaining ops) result = completion = rcp when residual <= 2 % and runs <= 3 % (measured), source service_latency.<dev>.mufu_rcp; the per-op classes installed in round 40 unchanged. A/B 500 x 2 vs tsp50 (hp) / ns49 (bw)."
+  }
+ ]
+}

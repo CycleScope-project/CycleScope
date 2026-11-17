@@ -1,0 +1,58 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "fp_stream_mix",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-12",
+ "mechanisms": [
+  "instruction.service (MUFU / FMNMX / FFMA issue on their SMSP units)",
+  "scheduler.policy"
+ ],
+ "ownership": "cluster-local (one SM); no commit of the other lines touches these leaves since main 83ad9681.",
+ "devices": {
+  "h100": "sm_90a",
+  "b300": "sm_103a,"
+ },
+ "question": "With W warps per SMSP running an FP32 stream in which independent MUFU.EX2 instructions are interleaved with FFMA and a dependent FMNMX chain, how many cycles does a MUFU cost, as a function of W and of what stands between the MUFUs?",
+ "why": "Per-PC comparison of 46 full-GPU cases against hardware stall sampling ($A/fg-line-cold/attrib1/pcs, notes/attrib1.txt, NOTES-lead.md): in the H100 flash-attention softmax (16 warps per CTA = 4 per SMSP) MUFU.EX2 takes 10.1 cycles per issue on hardware (stall reasons wait 3.9, mio 3.1, not_selected 1.2) against 4.7 simulated (fa3_fwd_hdim_small_05, sim/ncu 0.78), FMNMX.FTZ 7.9 against 4.4; fa3_fwd_hdim_small_03 9.0 / 5.0 and 7.7 / 4.2; fa3_fwd_features_09 6.3 / 4.3. Over the 25 H100 cases MUFU is 1.43x and FMNMX 1.21x (medians). The installed leaves (h100 MUFU result 17 / interval 8.259 on xu_smsp, FMNMX 4 / 2.011 on alu_smsp) come from single-warp cells; dispatch_contention has MUFU only as a W = 1 dependent chain.",
+ "probe": "probe/fp_stream_mix.cu (harness of dispatch_contention contention_v3.cu). Variants: mufu8, ffma8 (control), mix5, mix5c (mix5 with the MUFU replaced by an FFMA), run3, mufumax; W = 1..4 warps per SMSP; U = 70 / 140 / 280 instructions; --launches 16 --reps 65, two runs.",
+ "derivation": "per cell the OLS slope of the median window over U (cycles per instruction), for the per-warp window and the CTA window; cost of a MUFU in a mix = (slope(mix) - slope(control) ) / (MUFU share of the instructions) + cost of the instruction it replaced, with mix5c as the control of mix5 and ffma8 as the control of mufu8.",
+ "prediction_of_the_installed_model": "one issue per SMSP per cycle, MUFU on xu_smsp every 8.259 cycles (h100; b300 leaf read at analysis time), FMNMX on alu_smsp every 2.011, FFMA about 1 per cycle, control-word stall as a floor. CTA window per instruction: mufu8 8.259 x W; ffma8 max(1, W x 1.05); mix5 (one MUFU in five) max(8.259 x W / 5, W) = 1.65 W for W >= 1; run3 (3 in 7) 3.54 W; mufumax (1 in 2) 4.13 W.",
+ "reading": {
+  "usable": "OLS residual <= 2 % and the two runs within 3 %; SASS check: the window holds exactly U instructions of the declared classes (MUFU.EX2 / FFMA / FMNMX), listed with their control words.",
+  "R1": "mufu8 CTA slope within 5 % of 8.259 x W for every W -> the unit interval holds for several warps; outside -> the unit interval is not what limits a multi-warp MUFU stream, report slope(W).",
+  "R2": "each mix cell within max(5 %, 0.25 cycles per instruction) of the prediction -> the installed model reproduces the softmax stream and the fa3 deficit is elsewhere (stop, report). Otherwise the per-MUFU cost table by W and mix is the result; a rule is proposed in an addendum (post hoc), judged on the cells its constant does not come from.",
+  "R3": "mix5c / ffma8 against prediction: a miss there means the non-MUFU part (FFMA / FMNMX with several warps) is off and is reported separately."
+ },
+ "not_allowed": "no value chosen by full-GPU error; no rule per kernel; criteria changed only by an addendum that says why and whether data had been seen.",
+ "addenda": [
+  {
+   "date": "2026-11-12",
+   "written": "after run 1 on both devices ($A/fg-line-cold/fpmix/{h100,b300}-r1; slopes by $A/fg-line-cold/tools/fpmix_slopes.py)",
+   "reading": {
+    "usable": "both runs agree within 0.5 % on every cell; SASS window of mix5 U = 70: h100 42 FFMA + 14 FMNMX.NAN + 14 MUFU.EX2 (ptxas sinks the first MUFUs into a run), b300 42 FFMA + 14 MUFU.EX2 + 7 FMNMX3.NAN (max pairs fused, 63 instructions).",
+    "R1": "holds. h100 mufu8 CTA slope 8.00 / 16.01 / 24.02 / 32.00 cycles per instruction at W = 1..4 (8.259 x W predicted, 3 % low: the unit interval is 8.0); b300 4.00 x W.",
+    "R2": "holds for W >= 2: h100 mix5 3.11 / 4.91 / 6.44 against 3.30 / 4.95 / 6.60, run3 7.04 / 10.56 / 14.09 against 7.08 / 10.6 / 14.2, mufumax within 4 %; at W = 1 mix5 is 1.89 against 1.65. A MUFU costs no more inside the mix than alone (mix5 minus mix5c: 0.31 cycles per instruction at W = 1, about 0 at W >= 2 on h100). So the installed unit model reproduces the multi-warp softmax-like stream and the flash-attention deficit is elsewhere: the hardware per-issue numbers there (MUFU 10.1, FMNMX 7.9 cycles) are what four warps per SMSP running the stream at once give, and the simulation's 4.7 means fewer warps run it concurrently in the simulation.",
+    "R3": "the control was predicted wrong by me: ffma8 (three distinct register sources) is 1.5 x W (h100) / 1.577 x W (b300) cycles per instruction, mix5c 1.56 x W / 1.385 x W, not max(1, 1.05 W). Whether the engine gives 1.5 for this form (operand-read rule) is to be checked; reported, nothing installed."
+   },
+   "installed": "nothing."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after replaying probe kernels in the simulator ($A/fg-line-cold/replay) and re-reading the per-warp windows of run 1, alu_forms and dispatch_contention v4; before any engine change",
+   "facts (hardware, per-warp window against CTA window)": {
+    "one warp after the other": "streams that never wait for a unit longer than a cycle or two: ffma8 per-warp 419 cycles at W = 1..4 (U = 280) with CTA windows 842 / 1268 / 1696; dispatch_contention ilp8 / ilp8n / ilp8n2 per-warp slope 1.0-1.46 at every W.",
+    "all warps together": "streams with a unit that is busy for several cycles: mufu8 per-warp 4326 at W = 2 (alone 2234, CTA 4476), 8908 / 8954 at W = 4; mix5 910 / 940, 1298 / 1462, 1734 / 1930 at W = 2 / 3 / 4; alu_forms add_rrr per-warp slope 3.99 = CTA at W = 2, imm_ax 2.02 at W = 2; wgmma_overlap seq3.nomma windows 2307 / 2228 / 2052 for the three warps of an SMSP."
+   },
+   "engine (replay of seq3.nomma)": "windows 996 / 1534 / 2054: the warp that issued last is the first candidate of the next cycle and takes a unit again the moment it frees; the warps waiting for that unit are served only when it leaves.",
+   "candidate U-FIFO": "a busy execution unit is granted to the warp that has waited for it longest; warp selection otherwise unchanged (stay on the last issued warp unless it yields or is blocked).",
+   "judging (by replay of the probe kernels, hardware numbers above)": "per-warp windows within 10 % of hardware on mufu8.w2 / w4, mix5.w2 / w3 / w4, add_rrr.w2, imm_ax.w2 / w4 and the three seq3.nomma windows; ffma8.w2 stays one-after-the-other (per-warp within 10 % of 419). Installed only if all hold; the cells that fail are listed otherwise."
+  },
+  {
+   "date": "2026-11-12",
+   "written": "after the replays with the switch off / on ($A/fg-line-cold/replay2; engine b2a2d2cb, field scheduler.unit_grant_policy)",
+   "verdict": "U-FIFO is not installed. Per-warp windows, hardware | present engine | longest-waiter-first: mufu8 W = 2: 4326 | 2306 and 4620 | 4606; W = 4: 8907 | 2309 .. 9231 | 9161-9221 (the rule fixes the MUFU-only stream); ffma8 W = 2: 419 | 419 and 843 | 692-728 (the rule breaks it: the hardware stays one-after-the-other, criterion failed); mix5 W = 2 / 3 / 4, imm_ax W = 2 and add_rrr W = 2 are within 3 % with the present engine already; imm_ax W = 4: 868 | 1053 | 1057 (CTA window right, per-warp spread not). seq3.nomma: the simulated total (31012 cycles for two reps, period about 2580) equals the hardware period 2575 with the present engine; the uneven windows I quoted in the previous addendum were from the first rep.",
+   "what remains": "a MUFU-only stream of several warps on one SMSP is served in turn on hardware and one warp after the other in the engine; no kernel-level consequence shown; the switch stays in the engine, off."
+  }
+ ]
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FAF-MLA-CAUSAL-2C-C05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 330946,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 2948044,
+ "completed": 2948044,
+ "cycles": 57428,
+ "hard": 0,
+ "walls": {
+  "convert": 7.4,
+  "segments": 0.0,
+  "build": 0.6,
+  "sim": 7.5,
+  "total": 15.5
+ },
+ "rss_kb": {
+  "convert": 414696,
+  "segments": 414696,
+  "build": 414696,
+  "sim": 605296
+ },
+ "hw_cycles": 44373.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 7
+}

@@ -1,0 +1,25 @@
+{
+ "storage.tma.reduce.root": {
+  "fields": {
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "tma_store_loaded.b300.store_dest"
+    ]
+   },
+   "sector_cost_ratio": {
+    "model": {
+     "kind": "constant",
+     "value": 1.25
+    },
+    "sources": [
+     "tma_store_loaded.b300.store_dest"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

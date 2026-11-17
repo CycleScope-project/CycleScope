@@ -1,0 +1,33 @@
+{
+  "case_id": "cutlass_083_sparse_wgmma_cluster_sm",
+  "invocation": {
+    "argv": [
+      "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example62_sparse",
+      "--m=128",
+      "--n=256",
+      "--k=35584",
+      "--iterations=1"
+    ],
+    "carveout": "auto",
+    "env": {
+      "CUTLASS_CLUSTER_SHAPE": "1x2x1",
+      "CUTLASS_CLUSTER_SM_COUNT": "2",
+      "CUTLASS_DELIVERY_ALGORITHM": "sparse_wgmma",
+      "CUTLASS_DELIVERY_CASE_ID": "cutlass_083_sparse_wgmma_cluster_sm",
+      "CUTLASS_DELIVERY_MODE": "cluster_sm",
+      "CUTLASS_DELIVERY_SAMPLE_COUNT": "1",
+      "CUTLASS_DELIVERY_TRACE": "1",
+      "CUTLASS_DELIVERY_TRACE_ONLY": "1",
+      "GEMM_DELIVERY_GPU": "h100"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+      "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/example62_sparse",
+    "source_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/upstream/examples/62_hopper_sparse_gemm/62_hopper_sparse_gemm.cu",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+  },
+  "schema_version": "hopper.capture-case-invocation.v1"
+}

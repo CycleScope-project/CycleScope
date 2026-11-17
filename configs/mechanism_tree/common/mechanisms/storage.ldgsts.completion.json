@@ -1,0 +1,26 @@
+{
+ "doc": "imported from legacy mechanism storage.ldgsts.completion (promoted from hopper.ldgsts.completion; core applies max(level finish, issue + cycles) for kind 39)",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "LDGSTS"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "storage_ldgsts_group_completion"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device",
+   "scope": "warp"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "linear",
+   "axis": "copies_per_group"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

@@ -1,0 +1,26 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "crossings",
+  "version": 3,
+  "supersedes": "tools/microbench/crossings/protocol-v2.json (v2 cells and installs stay as they are; v3 adds one cell)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "purpose": "Per-SM memory port fields still carried by predecessor placeholders on h100: memory.l2.service l2.sector_bytes_per_cycle (118.06), memory.dram.service dram.sector_bytes_per_cycle (72.46), memory.store_l2.service store_l2.sector_bytes_per_cycle (32.00). b300 carries blackwell-prototype values for the same fields (l2 124.57 experimental mechtree.w3, dram 115.55 experimental sm_dram_port.r1.read, store_l2 32.19 experimental mechtree.w3). The engine (cpp/core/memory_hierarchy.cpp) charges each sector sector_bytes / <level>_bytes_per_cycle on the issuing SM's port of that level: these are cluster-local (per-SM) fields.",
+  "cells": {
+    "memory_port": {
+      "probe": "the crossings v2 l1_bandwidth build unchanged (tools/microbench/crossings/l1_bandwidth/probe/mem.cu = blackwell-prototype mem.cu verbatim): default cell set and --cells smport, both devices, --launches 8 --reps 33, two runs (run-a, run-b), SASS gate = the existing l1_bandwidth sass_check.py",
+      "derivation": {
+        "l2.sector_bytes_per_cycle": "blackwell-prototype mechtree.w3 definition: 32 warps x 32 lanes x 16 B / OLS slope over K in {16, 32, 64} of the per-K median of stream.l2.v16.w32.one (L2-hit LDG.E.128, one CTA on one SM)",
+        "dram.sector_bytes_per_cycle": "blackwell-prototype sm_dram_port read definition: 32 x 32 x 16 B / OLS slope over K of stream.dram.v16.w32.d8.one (smport cell set, fresh data, one SM); plateau check: stream.dram.v16.w16.d16.one must agree within 5 % (same in-flight count, different warp split), else experimental",
+        "store_l2.sector_bytes_per_cycle": "blackwell-prototype mechtree.w3 definition: 32 x 32 x 16 B / OLS slope over K of store.l2.v16.w32.one (STG.E.128 to an L2-resident region, one SM)"
+      },
+      "acceptance": "OLS max relative residual <= 5 % and run agreement <= 3 % -> measured; within 10 % / 10 % -> experimental; else not installed. b300 is a control: within 10 % of the installed value -> the installed value is kept and the run is cited as reproduction (evidence raised to measured if the cell is measured); beyond 10 % with the cell measured -> replaced, the old value recorded in the source description.",
+      "not_derived": "outstanding_requests (the probe's in-flight ceiling 256 per SM is below any cap it could detect: the b300 rows say so and the h100 values stay as they are), store_l2.latency (the memq ack cell is st + fence.sc.gpu and the store acknowledgment is hidden in the fence cost: on h100 ack 632-636 vs MEMBAR.SC.GPU 655), l2 / dram issue_interval (the engine ignores them when sector_bytes_per_cycle > 0)"
+    }
+  },
+  "devices": {"h100": "sm_90a (1 GPU)", "b300": "sm_103a (1 GPU)"},
+  "runs": "RUN=r3 (two runs a/b inside the job)",
+  "install": "sources crossings.memory_port.<device>.r3 (.experimental); artifact $A/microbench/crossings/<device>-r3/memory_port/ and $A/microbench/crossings-model/<device>-r3/memory_port.json; A/B 500 x 2 single-cluster per architecture after install",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data",
+  "addenda": []
+}

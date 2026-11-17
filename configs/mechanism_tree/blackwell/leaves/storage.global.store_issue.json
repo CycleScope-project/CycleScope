@@ -1,0 +1,45 @@
+{
+ "storage.global.store_issue.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "axis": "width_bytes",
+     "kind": "linear",
+     "points": [
+      [
+       2,
+       3.0
+      ],
+      [
+       4,
+       3.0
+      ],
+      [
+       8,
+       6.0
+      ],
+      [
+       16,
+       23.0
+      ]
+     ]
+    },
+    "sources": [
+     "lsu_accept.b300.v5r1",
+     "store_scatter.b300.r1"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "lsu_accept.b300.v5r1",
+     "store_scatter.b300.r1"
+    ]
+   }
+  },
+  "scope": "smsp"
+ }
+}

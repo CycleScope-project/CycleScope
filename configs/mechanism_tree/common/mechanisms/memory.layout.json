@@ -1,0 +1,83 @@
+{
+ "doc": "imported from legacy mechanism memory.layout",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory_level",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": {
+    "line_bytes": {
+     "model": {
+      "kind": "constant",
+      "value": 128
+     },
+     "sources": [
+      "hopper.bafa180da2b95e6d4ad726f8",
+      "mechtree.w9.l2cnt.line_bytes"
+     ]
+    },
+    "load_cache_policy": {
+     "model": {
+      "kind": "constant",
+      "value": 0
+     },
+     "sources": [
+      "hopper.35e1e5260af5c5df83095820",
+      "mechtree.w6.memory.default_load_cache_policy"
+     ]
+    },
+    "sector_bytes": {
+     "model": {
+      "kind": "constant",
+      "value": 32
+     },
+     "sources": [
+      "hopper.5662cb6ebc2fb6b270317ec8",
+      "mechtree.w6.memory.sector_bytes"
+     ]
+    },
+    "store_path": {
+     "model": {
+      "kind": "constant",
+      "value": 0
+     },
+     "sources": [
+      "hopper.a49a44669eb00191a4caca97",
+      "mechtree.w9.memq.store_path"
+     ]
+    },
+    "version": {
+     "model": {
+      "kind": "constant",
+      "value": 1
+     },
+     "sources": [
+      "hopper.placeholder.13b31106cc7ccab4a3fa0939",
+      "structural.v10.memory.model_version"
+     ]
+    }
+   },
+   "scope": "sm"
+  }
+ },
+ "field_models": {
+  "line_bytes": {
+   "kind": "constant"
+  },
+  "load_cache_policy": {
+   "kind": "constant"
+  },
+  "sector_bytes": {
+   "kind": "constant"
+  },
+  "store_path": {
+   "kind": "constant"
+  },
+  "version": {
+   "kind": "constant"
+  }
+ }
+}

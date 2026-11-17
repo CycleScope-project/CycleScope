@@ -1,0 +1,410 @@
+{
+ "doc": "imported from legacy mechanism storage.tma.completion Shape unified 2026-11-04: operation_class -> destination_count (single | multicast) -> leaf, cycles linear in transfer_bytes; the predecessor rank / tma_form / cta_group / box_planes partitions were dropped (tma protocol pending). tma_form partition under UTMALDG (tile | gather4 | im2col) and UTMASTG (tile | scatter4 | im2col) added 2026-11-04: the flattening had moved GATHER4 / im2col / scatter4 ops onto the plain-tile measurement (ML3 attribution, mechanism-merge-report r7).",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "UBLKCP",
+   "UBLKRED",
+   "UTMALDG",
+   "UTMAREDG",
+   "UTMASTG"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "tma_operation_completion"
+ },
+ "root": {
+  "children": [
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "bulk_direction",
+       "operator": "eq",
+       "value": "store"
+      },
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ],
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       1
+      ]
+     },
+     {
+      "guard": {
+       "axis": "bulk_direction",
+       "operator": "eq",
+       "value": "load"
+      },
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          2,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ],
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       4294967295
+      ]
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "UBLKCP"
+    },
+    "partition_axis": "bulk_direction",
+    "partition_domain": [
+     "load",
+     "store"
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "destination_count",
+       "operator": "range",
+       "value": [
+        0,
+        1
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "UBLKRED"
+    },
+    "partition_axis": "destination_count",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "tile"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       4294967295
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          2,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     },
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "gather4"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       4294967295
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          2,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     },
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "im2col"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       4294967295
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       },
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          2,
+          4294967295
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "UTMALDG"
+    },
+    "partition_axis": "tma_form",
+    "partition_domain": [
+     "tile",
+     "gather4",
+     "im2col"
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "destination_count",
+       "operator": "range",
+       "value": [
+        0,
+        1
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "UTMAREDG"
+    },
+    "partition_axis": "destination_count",
+    "partition_domain": [
+     0,
+     1
+    ]
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "tile"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       1
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     },
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "scatter4"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       1
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     },
+     {
+      "guard": {
+       "axis": "tma_form",
+       "operator": "eq",
+       "value": "im2col"
+      },
+      "partition_axis": "destination_count",
+      "partition_domain": [
+       0,
+       1
+      ],
+      "children": [
+       {
+        "guard": {
+         "axis": "destination_count",
+         "operator": "range",
+         "value": [
+          0,
+          1
+         ]
+        },
+        "parameter": {
+         "fields": "device"
+        }
+       }
+      ]
+     }
+    ],
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "UTMASTG"
+    },
+    "partition_axis": "tma_form",
+    "partition_domain": [
+     "tile",
+     "scatter4",
+     "im2col"
+    ]
+   }
+  ],
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "UBLKCP",
+   "UBLKRED",
+   "UTMALDG",
+   "UTMAREDG",
+   "UTMASTG"
+  ]
+ },
+ "field_models": {
+  "cold_extra_cycles": {
+   "kind": "linear",
+   "axis": "transfer_bytes"
+  },
+  "cycles": {
+   "kind": "linear",
+   "axis": "transfer_bytes"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "cut_extra_cycles": {
+   "kind": "linear",
+   "axis": "cut_rows"
+  }
+ }
+}

@@ -1,0 +1,33 @@
+{
+ "memory.l2_partition.root": {
+  "fields": {
+   "far_hit_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 97.0
+    },
+    "sources": [
+     "blackwell.l2_partition.w4_nearfar"
+    ]
+   },
+   "pool_count": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "blackwell.l2_partition.w4_nearfar"
+    ]
+   },
+   "replicate_read_lines": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "blackwell.l2_partition.w4_nearfar"
+    ]
+   }
+  }
+ }
+}

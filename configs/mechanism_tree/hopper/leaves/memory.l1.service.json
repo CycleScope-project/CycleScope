@@ -1,0 +1,52 @@
+{
+ "memory.l1.service.root": {
+  "fields": {
+   "l1.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "crossings.l1_bandwidth.h100.r2"
+    ]
+   },
+   "l1.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 52.5
+    },
+    "sources": [
+     "memlat.h100.r1"
+    ]
+   },
+   "l1.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 126.969
+    },
+    "sources": [
+     "crossings.l1_bandwidth.h100.r2"
+    ]
+   },
+   "l1.local_frame_interleaved": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "load_after_copies.h100.v3"
+    ]
+   },
+   "l1.local_hit_latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 32.4
+    },
+    "sources": [
+     "load_after_copies.h100.v3"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

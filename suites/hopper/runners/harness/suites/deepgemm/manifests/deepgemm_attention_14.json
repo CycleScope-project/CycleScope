@@ -1,0 +1,626 @@
+{
+  "cases": [
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d128_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "c4c65373f59cf74e27d35d7fab783ce3d4cd87489cdfebb263808572af505cea"
+      ],
+      "cv_percent_round1": 0.24120763061837605,
+      "cv_percent_round2": 0.2691079007022432,
+      "cycles_round1": 474707.29812963837,
+      "cycles_round2": 474475.5170789856,
+      "delivery_group": 2,
+      "delivery_index": 86,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "c4c65373f59cf74e27d35d7fab783ce3d4cd87489cdfebb263808572af505cea"
+        ],
+        "smxx_clean_logits": [
+          "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 474591.40760431194,
+      "round_drift_percent": 0.048838020861522974,
+      "seq_len": 4096,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq2048_sk16384_h32_d32_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "b849f2d4666d2efd4948742ef65435387edc144d0a38448107f0baf76d8f76c6",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.389125516601035,
+      "cv_percent_round2": 0.6240990097073501,
+      "cycles_round1": 225709.276427556,
+      "cycles_round2": 224615.37183765683,
+      "delivery_group": 3,
+      "delivery_index": 87,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "b849f2d4666d2efd4948742ef65435387edc144d0a38448107f0baf76d8f76c6"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 225162.32413260642,
+      "round_drift_percent": 0.48582932074148183,
+      "seq_len": 2048,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h32_d64_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "89baced026ce9e5fae0a0fd9d11a1a2cbd46b0f013028f2ff13e76182fb0c49d",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.425764943507116,
+      "cv_percent_round2": 0.5079355472777713,
+      "cycles_round1": 493571.911817708,
+      "cycles_round2": 492906.8553804445,
+      "delivery_group": 0,
+      "delivery_index": 88,
+      "head_dim": 64,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "89baced026ce9e5fae0a0fd9d11a1a2cbd46b0f013028f2ff13e76182fb0c49d"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 493239.38359907625,
+      "round_drift_percent": 0.13483441496717166,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk8192_h64_d32_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3",
+        "827a9c6f5a9cc966401ecaf603f8de894a8137d37b47cec4af658c78b1a35bd6"
+      ],
+      "cv_percent_round1": 0.20806141338203027,
+      "cv_percent_round2": 0.3258684041866453,
+      "cycles_round1": 337156.73607262823,
+      "cycles_round2": 337114.6538929279,
+      "delivery_group": 1,
+      "delivery_index": 89,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "827a9c6f5a9cc966401ecaf603f8de894a8137d37b47cec4af658c78b1a35bd6"
+        ],
+        "smxx_clean_logits": [
+          "196e208df13389c4972019bbb72f3aad81dfa77ba236990323c6362206691bb3"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 337135.69498277805,
+      "round_drift_percent": 0.012482267622971562,
+      "seq_len": 4096,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d32_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "1abcf60429ec77d4bb133ff4f50b6ad8107009c5abbc3c61423d18912a88740a",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.44407315041892725,
+      "cv_percent_round2": 0.1691279344363242,
+      "cycles_round1": 680227.3531945919,
+      "cycles_round2": 680390.3627821308,
+      "delivery_group": 2,
+      "delivery_index": 90,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "1abcf60429ec77d4bb133ff4f50b6ad8107009c5abbc3c61423d18912a88740a"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 680308.8579883614,
+      "round_drift_percent": 0.02396111495900631,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_clean_sq4096_sk16384_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "86d75d2aa8fa51203600928108f0f36a7accd212e089c40915378f61a2122828",
+        "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+      ],
+      "cv_percent_round1": 0.26738612278951057,
+      "cv_percent_round2": 0.2145253443096528,
+      "cycles_round1": 953690.3265355598,
+      "cycles_round2": 951619.282413665,
+      "delivery_group": 3,
+      "delivery_index": 91,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits",
+        "smxx_clean_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.clean_logits",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits",
+        "smxx.clean_logits"
+      ],
+      "mode": "prefill_clean",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "86d75d2aa8fa51203600928108f0f36a7accd212e089c40915378f61a2122828"
+        ],
+        "smxx_clean_logits": [
+          "fa0023aa362129984aff177939c6f2f71c54352fe21e52c7ced0b24dd174681b"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 952654.8044746125,
+      "round_drift_percent": 0.21739712140926495,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_compressed_sq4096_sk16384_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "4bbf79e992edfb47102511a1d67bc5d040d45379bb9bc1e083a1efd222bb32fa"
+      ],
+      "cv_percent_round1": 0.19048179640205182,
+      "cv_percent_round2": 0.17469078888660022,
+      "cycles_round1": 902190.5484814656,
+      "cycles_round2": 901953.569392644,
+      "delivery_group": 0,
+      "delivery_index": 92,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.compressed_window",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits"
+      ],
+      "mode": "prefill_compressed",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "4bbf79e992edfb47102511a1d67bc5d040d45379bb9bc1e083a1efd222bb32fa"
+        ]
+      },
+      "num_heads": 64,
+      "reference_cycles": 902072.0589370548,
+      "round_drift_percent": 0.026270527556391237,
+      "seq_len": 4096,
+      "seq_len_kv": 16384,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "case_id": "deepgemm_prefill_compressed_sq2048_sk8192_h32_d32_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "f345e76064a32d5b21394fd9dc7c9224f914d80d862ecef31572939581b3e5ce"
+      ],
+      "cv_percent_round1": 0.3295709908974499,
+      "cv_percent_round2": 0.24325567580141555,
+      "cycles_round1": 108079.68334370406,
+      "cycles_round2": 108230.13593032619,
+      "delivery_group": 1,
+      "delivery_index": 93,
+      "head_dim": 32,
+      "implementation_entries": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.compressed_window",
+        "mqa.logits.prefill",
+        "sm90.fp8_mqa_logits"
+      ],
+      "mode": "prefill_compressed",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "f345e76064a32d5b21394fd9dc7c9224f914d80d862ecef31572939581b3e5ce"
+        ]
+      },
+      "num_heads": 32,
+      "reference_cycles": 108154.90963701512,
+      "round_drift_percent": 0.13910842062285053,
+      "seq_len": 2048,
+      "seq_len_kv": 8192,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q1_kv8192_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "9a2676bc700e49c2f5bfe53cadd49c4f8780c92dd873d849e982e1fbb072ff8a"
+      ],
+      "cv_percent_round1": 0.1817288668928662,
+      "cv_percent_round2": 0.16419152971688744,
+      "cycles_round1": 701878.9991588743,
+      "cycles_round2": 701202.3906668901,
+      "delivery_group": 2,
+      "delivery_index": 94,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "9a2676bc700e49c2f5bfe53cadd49c4f8780c92dd873d849e982e1fbb072ff8a"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 64,
+      "reference_cycles": 701540.6949128822,
+      "round_drift_percent": 0.0964460788790332,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h32_d128_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "a36044c3b52e3a2220ce417c37c158817cb02a79b47587f94e7323b4bc18d584"
+      ],
+      "cv_percent_round1": 0.2882807823796354,
+      "cv_percent_round2": 0.3109079276301912,
+      "cycles_round1": 187188.35150676448,
+      "cycles_round2": 188800.2942024747,
+      "delivery_group": 3,
+      "delivery_index": 95,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "a36044c3b52e3a2220ce417c37c158817cb02a79b47587f94e7323b4bc18d584"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 32,
+      "reference_cycles": 187994.3228546196,
+      "round_drift_percent": 0.8574422201870314,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h32_d128_fp32",
+      "collection_group": 1,
+      "core_sass_signatures": [
+        "893313ea71c7b4851c25826d76f9ae852ea31d7c56162593cd0f32aa15f746f8"
+      ],
+      "cv_percent_round1": 0.3475406588082945,
+      "cv_percent_round2": 0.23045239683358926,
+      "cycles_round1": 719400.3685296007,
+      "cycles_round2": 713354.418040593,
+      "delivery_group": 0,
+      "delivery_index": 96,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "893313ea71c7b4851c25826d76f9ae852ea31d7c56162593cd0f32aa15f746f8"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 32,
+      "reference_cycles": 716377.3932850969,
+      "round_drift_percent": 0.8439616528493001,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q2_kv8192_h32_d128_bf16",
+      "collection_group": 0,
+      "core_sass_signatures": [
+        "317a63ddb46d7448ef7945863232874f001b7d57828d45adce49f801df94b8d1"
+      ],
+      "cv_percent_round1": 0.3546373344152203,
+      "cv_percent_round2": 0.310176090918417,
+      "cycles_round1": 192175.1592106752,
+      "cycles_round2": 194238.72880841105,
+      "delivery_group": 1,
+      "delivery_index": 97,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "317a63ddb46d7448ef7945863232874f001b7d57828d45adce49f801df94b8d1"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 32,
+      "reference_cycles": 193206.9440095431,
+      "round_drift_percent": 1.06806181750586,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 256,
+      "case_id": "deepgemm_paged_small_b256_q1_kv8192_h64_d128_bf16",
+      "collection_group": 2,
+      "core_sass_signatures": [
+        "216a3487f4b72582c74dfbf697df3f779f3e8745ef6aa532f0d8595f90f0e46b"
+      ],
+      "cv_percent_round1": 0.6869071465396638,
+      "cv_percent_round2": 0.5087363177772566,
+      "cycles_round1": 189618.02475755292,
+      "cycles_round2": 188096.2630037134,
+      "delivery_group": 2,
+      "delivery_index": 98,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "bf16",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "216a3487f4b72582c74dfbf697df3f779f3e8745ef6aa532f0d8595f90f0e46b"
+        ]
+      },
+      "next_n": 1,
+      "num_heads": 64,
+      "reference_cycles": 188857.14388063317,
+      "round_drift_percent": 0.8057739953969414,
+      "suite_part": "attention"
+    },
+    {
+      "active_sm_count_min": 132,
+      "avg_kv": 8192,
+      "batch_size": 1024,
+      "case_id": "deepgemm_paged_large_b1024_q2_kv8192_h64_d128_fp32",
+      "collection_group": 3,
+      "core_sass_signatures": [
+        "794f5e89b75e785caee6ac1e7aff7002dd5aa1d460fb09ac2aa3b168a69de8d1"
+      ],
+      "cv_percent_round1": 0.29866054153969085,
+      "cv_percent_round2": 0.18751366324288873,
+      "cycles_round1": 723580.6490910334,
+      "cycles_round2": 732797.4752726177,
+      "delivery_group": 3,
+      "delivery_index": 99,
+      "head_dim": 128,
+      "implementation_entries": [
+        "sm90_fp8_paged_mqa_logits"
+      ],
+      "implementation_modules": [
+        "sm90_fp8_mqa_logits"
+      ],
+      "logits_dtype": "fp32",
+      "measurement_status": "historical",
+      "mechanisms": [
+        "mqa.logits.paged",
+        "sm90.fp8_paged_mqa_logits"
+      ],
+      "mode": "paged",
+      "module_core_sass_signatures": {
+        "sm90_fp8_mqa_logits": [
+          "794f5e89b75e785caee6ac1e7aff7002dd5aa1d460fb09ac2aa3b168a69de8d1"
+        ]
+      },
+      "next_n": 2,
+      "num_heads": 64,
+      "reference_cycles": 728189.0621818255,
+      "round_drift_percent": 1.2657188442200016,
+      "suite_part": "attention"
+    }
+  ],
+  "coverage_scope": "single_gpu_hopper",
+  "schema_version": "deepgemm-full-gpu-attention-delivery-v2",
+  "selection": {
+    "maximum_cv_percent": 3.0,
+    "maximum_cycles": 5000000,
+    "minimum_active_sm_fraction": 0.97,
+    "minimum_cycles": 100000,
+    "trials": 9,
+    "warmups": 3
+  },
+  "supported_gpu_profiles": [
+    "h20",
+    "h100",
+    "h200"
+  ],
+  "upstream": {
+    "name": "DeepGEMM",
+    "revision": "559d79fb6994a58b8a15b4b93bf13ccc16edf247",
+    "version": "2.6.1"
+  }
+}

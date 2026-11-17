@@ -1,0 +1,50 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "mma_sync",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanisms": [
+    "instruction.service"
+  ],
+  "classes": [
+    "DMMA",
+    "HMMA",
+    "IMMA",
+    "HMMA.SPARSE",
+    "IMMA.SPARSE"
+  ],
+  "fields": [
+    "result_latency_cycles",
+    "completion_latency_cycles",
+    "issue_interval_cycles"
+  ],
+  "purpose": "Warp-level mma.sync classes are bound to matrix_smsp and are not covered by tensor.pipe (wgmma / tcgen05 only), so their instruction.service leaf is the only time source. Today: b300 HMMA / IMMA / HMMA.SPARSE / IMMA.SPARSE are placeholder 1 / 1 / 0 (placeholder.p0), DMMA is placeholder 1 / 1 / 0 on both devices (placeholder.dmma.unmeasured, added for the cuBLASLt F64 cases), h100 HMMA 29 / 6.05 and IMMA 28 / 1 are the service_latency v1 'table collapse' experimental values. The new cuBLASLt single-cluster cases BL3-F64 (DMMA) run at sim/ncu 0.15-0.20 and BL3-I8 (IMMA, sm_80 cutlass kernel) at 0.29-0.33 with these placeholders.",
+  "definitions": "service_latency protocol v1 definitions, applied to accumulator chains: result_latency_cycles = OLS slope over U of the median window (two clock reads) of U dependent mma.sync instances in one warp, each instance's D feeding the next instance's C (the A / B fragments are loop-invariant registers; ptxas cannot fold the chain because the accumulator changes); completion_latency_cycles = result_latency_cycles (fixed-latency class rule of v1: the scoreboard releases the destination at result); issue_interval_cycles = slope over K of the per-warp window of 8 independent accumulator chains x K steps, run by 4 x wps warps (one per SMSP at wps = 1) between two bar.sync, divided by 8 x wps -- cycles per instance per SMSP.",
+  "probe": "tools/microbench/mma_sync/probe/mma.cu, written for this protocol on the service_latency alu.cu harness (same mb.cuh clock-read window, same k_lat / k_thr structure, same output lines so service_latency/model.py's parsers apply). Cells (PTX -> expected SASS root, verified by the gate): dmma = mma.sync.aligned.m8n8k4.row.col.f64.f64.f64.f64 (DMMA); hmma_f16 = mma.sync.aligned.m16n8k16.row.col.f32.f16.f16.f32 (HMMA.16816.F32); hmma_bf16 = mma.sync.aligned.m16n8k16.row.col.f32.bf16.bf16.f32 (HMMA.16816.F32.BF16); imma_s8 = mma.sync.aligned.m16n8k32.row.col.satfinite.s32.s8.s8.s32 (IMMA.16832.S8); hmma_sp = mma.sp.sync.aligned.m16n8k32.row.col.f32.f16.f16.f32 with metadata register and selector 0 (HMMA ... .SP -> class HMMA.SPARSE); imma_sp = mma.sp.sync.aligned.m16n8k64.row.col.satfinite.s32.s8.s8.s32 (IMMA ... .SP -> IMMA.SPARSE). lat U in {4, 8, 16, 32}; thr K in {4, 8, 16} at wps = 1; --reps 64 launches x window medians; two runs (run-a, run-b) per device in one job.",
+  "sass_gate": "cuobjdump (h100: -xelf all then -sass per cubin) of every k_lat / k_thr instantiation: between the two SR_CLOCKLO reads exactly U (lat) or 8 x K (thr) instructions whose opcode root is the cell's class root (DMMA / HMMA / IMMA) with the cell's shape token (8x8x4 / 16816 / 16832 / 16864), the .SP modifier present iff the cell is sparse (if cuobjdump prints no .SP for sparse mma.sync on a toolchain, the sparse cells are gated on the shape token 16832-for-HMMA / 16864-for-IMMA which only the sparse forms carry, and the fact is recorded), and nothing else except NOP / MOV / BAR / clock reads; 0 kernels matched = gate failure of the binary; a cell whose kernels fail the gate is unrealised on that device.",
+  "acceptance": {
+    "cell": "lat fit max relative residual <= 5 % and the two runs within 5 % -> measured; residual or run spread within 15 % -> experimental (installed as experimental, both run values in the source); beyond -> unrealised (leaf unchanged, listed)",
+    "class_from_cells": "HMMA installs the hmma_f16 cell; hmma_bf16 is a control: when it differs from hmma_f16 by more than 5 % the HMMA leaf is installed as experimental with both values in the source. IMMA installs imma_s8. HMMA.SPARSE / IMMA.SPARSE install their sparse cells. DMMA installs dmma.",
+    "h100_control": "the h100 HMMA 29 / 6.05 and IMMA 28 / 1 table-collapse values are compared with the measured cells and reported; the protocol value replaces them whenever the cell is measured or experimental (a value with an in-repo probe is not kept over one without)",
+    "unrealised": "a class the device ISA lacks (the probe does not compile for that target, or the gate finds 0 kernels) stays as it is and is reported"
+  },
+  "install": "both devices, instruction.service leaves of the five classes: result_latency_cycles = completion_latency_cycles = lat slope, issue_interval_cycles = thr slope / 8; resource / issue_group_resource / queue_class / max_inflight / backend_occupancy unchanged (class_resource.json). Source keys mma_sync.<device>.<run> (measured) and mma_sync.<device>.<run>.experimental; the placeholder sources placeholder.dmma.unmeasured (both devices) and, for the four b300 classes, placeholder.p0 are dropped from these leaves. A/B: single-cluster 450 x 2 (expected unchanged where no case issues these classes; cutlass sm_80-style kernels in the 450 may move) plus the 100 new single-cluster cases (BL3-F64 / BL3-I8 are the observation targets).",
+  "devices": {
+    "h100": "sm_90a",
+    "b300": "sm_103a"
+  },
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install without the sass gate",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "written": "after the r3 build / SASS gate on both devices, before any timing derivation (model.py not run on r3; r3 timings are not used)",
+      "text": "Gate scope, clarified from the r3 dumps: (1) the probe's thr window reloaded the accumulator pins and converted them (I2FP / I2F / LOP3) inside the clock window and the rep-loop induction (UIADD3 / VIADD) lands between the clock reads on both devices; the probe is changed so pin reload and conversion happen before the first clock read, and loop-control instructions that carry no data dependence on the chain (IADD3 / UIADD3 / VIADD / ISETP / BRA / BSSY / BSYNC / MOV) are allowed in the window exactly as the service_latency alu3 gate (sass_check_alu3.py ALLOWED) allows them -- the lat / thr slopes over U / K cancel this constant overhead. (2) sm_103a: ptxas wraps every sparse mma.sync (HMMA.SP / IMMA.SP) in `MOV Rret; CALL.REL.NOINC <metadata subroutine>; WARPSYNC.ALL` per instance (568 calls in the r3 dump; sm_90a has none). This is how the class is realised on B300 and real kernels carry the same sequence, so the b300 sparse cells are gated on the target-op count with CALL.REL.NOINC / RET / WARPSYNC / MOV additionally allowed, and whatever they measure is installed as experimental (the window is not a pure chain) with this fact in the source; sm_90a sparse cells keep the plain rule. Data runs are h100-r4 / b300-r4; r1 / r2 failed to build (type errors), r3 = gate-only."
+    },
+    {
+      "date": "2026-11-05",
+      "written": "after the r6/r7 derivation and the first A/B (nf-mma)",
+      "text": "DMMA issue_interval is NOT installed from the thr cell. Both devices give thr slope == lat slope (h100 512 / 512, b300 584 / 584): the 8 independent accumulator chains of one warp do not overlap, i.e. the warp blocks on each DMMA (latency-bound within the warp), so the wps = 1 thr cell measures the per-warp blocking, not the per-SMSP admission interval the field means ('when the instruction admission is the limit'). Installing 584 as the SMSP interval serialised every DMMA of every warp on an SMSP: BL3-F64 went from sim/ncu 0.20 to 3.9. The field needs a wps sweep (wps 1 / 2 / 4: interval = slope / (8 x wps) once two warps per SMSP overlap) -- a protocol v2 item. Until then DMMA keeps result = completion = lat slope (measured) and issue_interval = 0 with source placeholder.dmma.issue_interval_unmeasured on both devices. HMMA / IMMA thr slopes (6-8 cycles per instance, far below their latency) do show admission-limited behaviour and stay installed."
+    }
+  ]
+}

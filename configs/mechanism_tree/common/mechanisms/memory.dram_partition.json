@@ -1,0 +1,25 @@
+{
+ "doc": "memory.dram_partition: a DRAM miss costs the near latency when the page's home side (page-index parity per home_page_bytes) equals the SM's gpc side (bit gpc of far_side_gpc_mask; SMs without a gpc on side 0), near + far_latency_extra_cycles otherwise (row_gather run 3)",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.dram_partition",
+  "target_index": 0
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "far_latency_extra_cycles": {
+   "kind": "constant"
+  },
+  "far_side_gpc_mask": {
+   "kind": "constant"
+  },
+  "home_page_bytes": {
+   "kind": "constant"
+  }
+ }
+}

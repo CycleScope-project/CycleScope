@@ -1,0 +1,527 @@
+{
+ "doc": "imported from legacy mechanism storage.tmem.store",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "STTM"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "blackwell_tmem_store"
+ },
+ "root": {
+  "children": [
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x1"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 11.976086956521739
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x1"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x1"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x2"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 12.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x2"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x2"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x4"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 13.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x4"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x4"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x8"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 15.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x8"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x8"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x16"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 19.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x16"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x16"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x32"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 27.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x32"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x32"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x64"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 43.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x64"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.x64"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "16dp256bit"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 19.0
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.16dp256bit"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w1.tmem.store.tmem_shape.16dp256bit"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   },
+   {
+    "children": [
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x1"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 11.976086956521739
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x2"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 12.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x4"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 13.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x8"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 15.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x16"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 19.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x32"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 27.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     },
+     {
+      "guard": {
+       "axis": "tmem_repeat",
+       "operator": "eq",
+       "value": "x64"
+      },
+      "parameter": {
+       "fields": {
+        "cycles": {
+         "model": {
+          "kind": "constant",
+          "value": 43.0
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        },
+        "enabled": {
+         "model": {
+          "kind": "constant",
+          "value": 1
+         },
+         "sources": [
+          "mechtree.tmem.16x32bx2"
+         ]
+        }
+       },
+       "scope": "warp"
+      }
+     }
+    ],
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "16dp32bit"
+    },
+    "partition_axis": "tmem_repeat",
+    "partition_domain": [
+     "x1",
+     "x2",
+     "x4",
+     "x8",
+     "x16",
+     "x32",
+     "x64"
+    ]
+   },
+   {
+    "guard": {
+     "axis": "tmem_shape",
+     "operator": "eq",
+     "value": "x128"
+    },
+    "parameter": {
+     "fields": {
+      "cycles": {
+       "model": {
+        "kind": "constant",
+        "value": 75.0
+       },
+       "sources": [
+        "mechtree.w8.tmem2.st_w"
+       ]
+      },
+      "enabled": {
+       "model": {
+        "kind": "constant",
+        "value": 1
+       },
+       "sources": [
+        "mechtree.w8.tmem2.st_w"
+       ]
+      }
+     },
+     "scope": "warp"
+    }
+   }
+  ],
+  "partition_axis": "tmem_shape",
+  "partition_domain": [
+   "x1",
+   "x2",
+   "x4",
+   "x8",
+   "x16",
+   "x32",
+   "x64",
+   "16dp256bit",
+   "16dp32bit",
+   "x128"
+  ]
+ }
+}

@@ -1,0 +1,17 @@
+{
+  "schema_version": "flashinfer-source-v1",
+  "repository": "https://github.com/flashinfer-ai/flashinfer",
+  "tag": "v0.6.17",
+  "revision": "a0a6b019b9b27d49d209f85d028a1ae5a9b347d7",
+  "package": "flashinfer-python==0.6.17",
+  "target_cases": 100,
+  "architecture": "sm_90a",
+  "gpu_scope": "complete multi-CTA kernel on all available device SMs",
+  "selection": "mechanism_first",
+  "cycle_filter": {
+    "applied_to_selection": false,
+    "historical_note": "100000-3000000 was a prior H100 occupancy/window screen; mechanism-first selection does not apply it"
+  },
+  "measurement_status": "unmeasured_new_set",
+  "qualification_status": "mechanism_selected_unmeasured"
+}

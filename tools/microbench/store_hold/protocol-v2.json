@@ -1,0 +1,33 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "store_hold",
+  "version": 2,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: does a pending global store keep its address / data register from being rewritten (loop form); no workload-based fitting",
+  "question": "In a loop whose stores are issued faster than the SM takes them, does advancing the pointer register (or changing the data register) that a store D stores earlier used wait until the SM has taken that store?",
+  "probe": "store_hold.cu, kernels k_loop<X, D, G>: one CTA on one SM, W = 1 warp (the store path is then loaded only by this warp), bar.sync + fence.sc.gpu before every window. Window: t0 = clock; a counted loop (#pragma unroll 1) of N iterations whose body is D + 1 stores on D + 1 loop-carried pointer variables p_0 .. p_D (data variables v_0 .. v_D), written in rotation so that after store j the instruction X_j acts on the variable of store j (D = 0) or, for D > 0, the body is: store on p_0; ..; store on p_D; then X on p_0, .., X on p_D (every X then follows the store that used its register by D other stores); t1 = clock after the loop; lane 0 records t1 - t0. X: addr = p_j += stride of the request region (the next iteration's store uses it); data = v_j = v_j + 1 with pointers advanced through a separate offset register added in the address expression - if ptxas cannot keep the store's address unchanged without rewriting a register, the data cells advance the pointer of the NEXT rotation slot only (stated per cell in the SASS dump); none = control: stores use p_j + constant offsets that never change (the same lines are rewritten every iteration) and a dummy counter is advanced instead. Geometries: line32 (width 4, lane stride 128: service 63.9 cycles per request on h100, 31.9 on b300 in this single-CTA small-smem kernel), full16 (width 16, 16 whole sectors: service 15.9, issue interval 23). D in {0, 1, 3}; N in {4, 8, 16, 24} (total stores N x (D + 1) <= 40 for the cells used in the fit, i.e. before the store buffer is full); 8 launches x 33 repetitions, repetition 0 discarded; runs a and b; h100 and b300.",
+  "controls": {
+    "sass": "loop body: exactly D + 1 STG of the declared width and D + 1 instructions of kind X (addr: an add whose destination is the address register of one of the loop's STG; data: an add whose destination is the data register of one of the loop's STG), the loop counter update and one backward branch; nothing else; no load. The register identity is checked in the SASS and the body is dumped per cell.",
+    "timing": "control cells: slope of t1 - t0 over N per store = the store issue interval of the width within max(2 cycles, 20 %) (3-4 cycles width 4, 23 width 16); runs a and b within max(3 cycles, 10 %)."
+  },
+  "derivation": "period(X, D, G) = least-squares slope of median(t1 - t0) over N, divided by D + 1 = cycles per store. extra = period(X) - period(none).",
+  "predictions_before_data": {
+    "engine_today": "extra = 0 in every cell (operands are free once the store has issued).",
+    "hold_until_taken": "line32: addr / data cells at D = 0 run at about the SM service per request (64 h100 / 32 b300) per store instead of 3-4; D = 1 and D = 3 the same per store (the SM takes one request per service time and the rewrite needs the request D back to be gone: steady state one store per service time), i.e. the buffer no longer absorbs the burst. full16: service 15.9 is below the issue interval 23: extra about 0.",
+    "fixed_latency": "extra equal for line32 and full16 and independent of D beyond the latency."
+  },
+  "outcomes_before_data": {
+    "queue": "If line32 addr (or data) cells read within 25 % of the service time per store at D = 0 and full16 shows no extra: rule = a global store keeps its address (data) register reserved until the SM store port has finished the request; a writer of that register waits. Engine: per warp and register a block time set by the store; structural field per device; experimental until the replay passes.",
+    "fixed": "If extra is a constant: install as an operand-hold latency of the store class.",
+    "none": "If extra < 3 cycles in every cell: no operand hold; the kernels' stalls after stores have another cause."
+  },
+  "prediction_check": "H100 replay of line32 addr D = 0 / 1 and none at N = 16: cycles per store within max(3 cycles, 20 %); then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-gb).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled.",
+  "addenda": [
+    {
+      "when": "after h100-v2r3 and b300-v2r3 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/store_hold/{h100-v2r3,b300-v2r3} (table.txt, build/sass-loops.txt, dropped.txt)",
+      "text": "All addr cells were dropped again: ptxas keeps the loop-carried pointer in one register pair and copies it into a fresh pair for the STG, so the add never writes the register the store reads. Kept: none and data cells (the data add writes the STG's data register, checked in the SASS). Cycles per store before the buffer fills (slope over N / (D + 1)): h100 line32 D = 0 control 29, data 36; full16 control 30, data 42; D = 1: 15.5 -> 26 (full16), about 15 -> 20 (line32); D = 3: 13.75 -> 16.75 (full16). b300: line32 24 -> 34, full16 24 -> 38 at D = 0. Once the buffer is full (line32, D = 3, N >= 16) control and data cells have the same slope (64 cycles per store on h100). Reading: rewriting a store's data register costs 7-14 cycles per store, far from the service time of the request (64 / 32): prediction hold_until_taken is rejected for the data register; the address register could not be tested. Controls: the timing control of this protocol (issue interval 3-4 cycles) was mis-specified - the control loop itself takes 24-30 cycles per iteration. Outcome 'none' for a hold until the store is taken; a small fixed cost on the data register is recorded and not installed (it cannot be separated from the loop's own cost with these cells). The long_scoreboard stalls after stores in the kernels are not explained by this probe."
+    }
+  ]
+}

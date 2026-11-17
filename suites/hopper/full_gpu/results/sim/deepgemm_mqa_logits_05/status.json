@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "deepgemm_mqa_logits_05",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 346478,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 37401882,
+ "completed": 37401882,
+ "cycles": 83569,
+ "hard": 0,
+ "walls": {
+  "convert": 39.0,
+  "segments": 0.1,
+  "build": 2.9,
+  "sim": 59.0,
+  "total": 101.0
+ },
+ "rss_kb": {
+  "convert": 919168,
+  "segments": 919168,
+  "build": 919168,
+  "sim": 2811080
+ },
+ "hw_cycles": 109015.0,
+ "reference_cache_control": "all",
+ "placement_digest": "60c8e6a612ba2d5f",
+ "shards": 16
+}

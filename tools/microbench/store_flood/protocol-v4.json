@@ -1,0 +1,32 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "store_flood",
+  "version": 4,
+  "frozen_before_gpu": true,
+  "kind": "bisection: which difference between the v1 kernel and the v2 grid kernel switches the SM store path between 'sectors' and 'sectors + partly written lines' on B300; no workload-based fitting",
+  "question": "On B300 the request line32 (width 4, stride 128, 32 lanes: 32 partly written sectors in 32 lines) at W = 4 on one SM costs 31.9 cycles in the v1 kernel k_flood (two units: b300-r1, b300-r2) and 62.0 in the v2 kernel k_floodx (b300-v2r1). Both kernels issue the same 384 requests per warp between the same clock reads. Which of their differences selects the regime?",
+  "probe": "store_flood.cu: one new kernel template k_bisect<MASK> built from k_flood (v1) with independent switches, each adding exactly one property of k_floodx: bit 0 GRID = launched as a grid of one CTA per SM with the large dynamic shared memory of v2 and an active set of one SM (other CTAs read %smid and return); bit 1 POLL = before every window lane 0 of every warp does the atomicAdd on the global arrival counter and spins on a volatile load of it until all warps of the CTA arrived, then the shfl of the stop flag; bit 2 STAMPS = after the window all 32 lanes store the 49 stamps (v2) instead of lane 0 only (v1), followed by the extra bar.sync of v2; bit 3 SLICE = the v2 address computation and destination buffer (slice = slot x 8 warps x 8 MiB, same request offsets); bit 4 BOUNDS = __launch_bounds__(32 x 8, 1) and the %smid read without the grid. Cells: MASK in {0 (must equal v1), each single bit, all bits (must equal v2), all bits minus each single bit} = 12 kernels, geometry line32, W = 4, plus the unchanged v1 cell w4.s128.l32.x4 and v2 cell line32.sm1.x4 as anchors; 8 launches x 17 repetitions, runs a and b. B300 and H100.",
+  "controls": {
+    "sass": "window of every k_bisect kernel: 49 clock reads, 8 STG.E between neighbours, nothing else (as v1).",
+    "anchors": "B300: v1 anchor within 5 % of 31.9, v2 anchor within 5 % of 62.0, MASK 0 within 5 % of the v1 anchor, MASK all within 5 % of the v2 anchor; H100: both anchors within 5 % of 63.9. Runs a and b within 5 %."
+  },
+  "derivation": "T = (steady group gap - control 2) / 8 / W per cell.",
+  "predictions_before_data": {
+    "none_known": "No mechanism predicts the switch. Ranking of suspects written before the data: STAMPS (32 lanes storing 49 times to one address right before the next window's fence), POLL (loads of a global between windows), GRID (shared-memory configuration), SLICE, BOUNDS.",
+    "h100": "every cell 63.9 (the regime is 'on' in both kernels there); a cell that reads about 32 on H100 would show how to switch it off."
+  },
+  "outcomes_before_data": {
+    "single": "If on B300 exactly one bit moves MASK 0 to about 62 and its removal moves MASK all to about 32: that property selects the regime; a follow-up protocol characterises it (what in a real kernel corresponds to it) before any engine rule.",
+    "several": "If several bits each switch it, or only combinations do: report the table; follow-up protocol on the smallest switching set.",
+    "anchors_fail": "If MASK 0 / MASK all do not reproduce the anchors, the switch lies in something the bits do not cover (template instantiation, code placement): report, then diff the SASS of the two kernels outside the window."
+  },
+  "prediction_check": "none at this stage (bisection only).",
+  "not_allowed": "No leaf or engine change from this run; no tuning to the full-gpu error.",
+  "addenda": [
+    {
+      "when": "after b300-v4r5 and h100-v4r4 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/store_flood/{b300-v4r5,h100-v4r4} (table.txt; anchors and SASS gate passed; earlier rN are failed rounds)",
+      "text": "B300, T per request: MASK 0 31.94 and the v1 anchor 31.94; GRID alone 62.07; every mask containing GRID 62.09-62.16 (v2 anchor 62.02); POLL, STAMPS, SLICE, BOUNDS alone 31.94; all bits except GRID 31.94. Outcome 'single': the launch form of v2 - a grid of one CTA per SM with the large dynamic shared memory, an active set of one SM, the other CTAs returning at once - selects the regime 'sectors + partly written lines' on B300; without it the same stream costs its sectors only. H100: 63.94 in every cell (regime on in both forms). The GRID bit bundles two things: the size of the CTA's dynamic shared memory and the presence of sibling CTAs. Protocol v5 separates them."
+    }
+  ]
+}

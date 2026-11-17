@@ -1,0 +1,13 @@
+--- a/examples/cute/tutorial/blackwell/01_mma_sm100.cu
++++ b/examples/cute/tutorial/blackwell/01_mma_sm100.cu
+@@ -495,8 +495,8 @@
+     return -1;
+   }
+ 
+-  if ((props.major != 10) || (props.major == 10 && props.minor > 1)) {
+-    std::cerr << "This example requires NVIDIA's Blackwell Architecture GPU with compute capability 100a." << std::endl;
++  if (props.major != 10) {
++    std::cerr << "This example requires NVIDIA Blackwell (compute capability 10.x)." << std::endl;
+     std::cerr << "  Found " << props.major << "." << props.minor << std::endl;
+     return -1;
+   }

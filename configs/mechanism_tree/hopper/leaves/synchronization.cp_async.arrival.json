@@ -1,0 +1,25 @@
+{
+ "synchronization.cp_async.arrival.root": {
+  "fields": {
+   "cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 15.5
+    },
+    "sources": [
+     "barrier_release.h100.r4.experimental"
+    ]
+   },
+   "enabled": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "barrier_release.h100.r4"
+    ]
+   }
+  },
+  "scope": "warp"
+ }
+}

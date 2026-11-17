@@ -1,0 +1,8 @@
+# upstream third-party source snapshots are provisioned at runtime by
+# python/cyclescope/capture/driver.py as symlinks into
+# $CYCLESCOPE_ARTIFACT_ROOT/tools/hopper-<lib>-source (see configs/capture_tools.json)
+suites/cutlass/upstream
+suites/deepgemm/upstream
+suites/flashattention3/upstream
+suites/flashinfer/upstream
+suites/flashmla/upstream

@@ -1,0 +1,39 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "gather_hit",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: return time of gather loads whose lines are resident in L2 (and of cold ones) by warps, loads per round and lines per load; no workload-based fitting",
+  "question": "How long does a warp wait for the data of K back-to-back 128-bit gather loads (every lane 16 B from its own row, L distinct 128-B lines per load) when W warps of the SM gather at once and the rows are L2 hits, compared with DRAM-cold rows, on one SM and on all SMs?",
+  "motivation": "flashmla_sparse_decode (6 full-gpu cases at 0.76-0.80, single-cluster equally off): the 4 gather warps of a CTA issue 9 gathers of 16-20 lines per loop iteration; the consumer of the gathered data waits ~1500 cycles per iteration on hardware (long_scoreboard, PC sampling) against ~320 in the engine ($A/fg-over20/notes/NOTES.md, lead D). Engine today: one cycle of SM load port per distinct line (memory.load_port.line_granular), L2-hit latency, DRAM latency near / far. Earlier probes (gather_latency, load_port_lines, row_gather) measured cold gathers and found a one-warp cold gather 22-27 % low; L2-hit gathers were never measured (the l2 cells started cold in the replay, the all-SM pass was spoiled).",
+  "probe": "gather_hit.cu, built from the gather_latency / row_gather probe kernels (same mb.cuh helpers). One CTA per participating SM, W warps (warp w on SMSP w % 4), all CTAs meet on a global arrival counter. Round: bar.sync; clock t0; every warp issues K LDG.E.128 (ld.global.v4.u32) back to back, lane l of load k reading 16 B at row r(w, k, l, round) of a table of 128-B rows (L distinct rows per load: lanes l and l + L share a row when L = 16); then one xor of all loaded words into a register (the consumer); clock t1 (lane 0 records t1 - t0); bar.sync. Rows of a round are never reused inside a launch and no two warps / CTAs share a row. Modes: hit = 24 MiB table, a first discarded launch touches every row so the table is resident in L2, and every measured round reads rows last touched by that earlier launch (not in L1: the table is far larger than L1 and each row is read once per launch); cold = 1 GiB table, L2 evicted by a 512 MiB memset before each launch. Cells: W in {1, 2, 4} x K in {1, 4, 8} x L in {16, 32} x mode {hit, cold} x N in {1, all SMs}; control K = 0. 64 rounds per launch, 8 launches, runs a and b; round 0 of a launch discarded.",
+  "controls": {
+    "sass": "per kernel exactly K LDG.E.128 between the two clock reads, no other memory instruction, no branch.",
+    "counters": "for W = 4, K = 8, L = 32, N = 1 in both modes one ncu pass (cache-control none): dram__bytes_read.sum per round near 0 in hit mode and near W * K * L * 32 B .. 128 B in cold mode; lts__t_sectors_srcunit_tex_op_read_lookup_hit / miss recorded.",
+    "timing": "runs a and b agree within 10 %; K = 0 control is the round overhead and is subtracted."
+  },
+  "derivation": "T(mode, W, K, L, N) = median(t1 - t0) - control. Per-line slope within a mode: least squares of T over W * K * L (total distinct lines of the round on the SM) at N = 1; intercept = latency of the mode.",
+  "predictions_before_data": {
+    "engine_today": "hit, N = 1: T = L2 latency (h100 ~330, b300 ~320) + 1.0 x W x K x L cycles (shared SM load port, one cycle per line), e.g. W = 4, K = 8, L = 16: about 840; cold: DRAM near latency 583 / 616 (far +190 / +395) + the same port term.",
+    "hardware": "from the flashmla reading (W = 4, about 9 loads of 16-20 lines, ~1500 cycles): hit-mode T at W = 4, K = 8, L = 16 exceeds the engine's 840 by more than 30 %; the excess grows with the number of lines (a larger per-line cost for scattered L2 hits), not with W alone."
+  },
+  "outcomes_before_data": {
+    "per_line": "If hit-mode T is linear in total lines (max residual 15 %) with slope s > 1.3: install s as the SM load-port cost per line of an L2-hit sector fill for lane loads (new field of memory.load_port, experimental until the replay passes); same reading for cold with its own slope if it differs.",
+    "latency": "If the slope is ~1 and the intercept is far above the installed L2 latency: the L2-hit latency of scattered lines is the term; report, addendum before install.",
+    "none": "If hardware matches the engine prediction within 15 % in every cell: the flashmla deficit is elsewhere (to be re-attributed); nothing installed."
+  },
+  "prediction_check": "H100 replay (tracer -> convert -> engine) of hit W = 4, K = 8, L = 16 and W = 1, K = 8, L = 16 with the candidate rule: T within 15 %; then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-sf4).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled with their reason.",
+  "addenda": [
+    {
+      "when": "after h100-r1 (data seen); b300 not yet run",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/gather_hit/h100-r1 (table.txt; runs a / b within 1.4 %; SASS gate passed, LDG.E.128)",
+      "text": "Hit mode, T in cycles (control subtracted), K = 1 / 4 / 8, N = 1 (N = 132 within 5 % of it): L = 16: W1 349 / 462 / 618, W2 364 / 573 / 852, W4 400 / 800 / 1335; L = 32: W1 365 / 485 / 649, W2 390 / 605 / 896, W4 431 / 843 / 1385. Reading: T = about 311 + 32-38 cycles per load instruction of the SM (W x K loads served one after another), and a 16-line load costs as much as a 32-line load (34 against 36). The declared outcome 'per_line' (cost linear in distinct lines, slope > 1.3) is therefore NOT what the data show, and neither is the engine's present rule (one cycle per distinct line: 16 against 32). Form adopted after seeing the data (stated as such): the SM load port serves a lane load lane by lane and pays one cycle whenever the line changes from one active lane to the next (line switches in lane order). In this probe L = 16 puts lanes 0-15 on rows 0-15 and lanes 16-31 on the same rows again: 32 switches, like L = 32. The same count reproduces the load_port_lines cells that fixed the present rule (stride 128: 32 switches, 32-40 cycles; stride 32 with four consecutive lanes per line: 8 switches, 9-12 cycles; contiguous: 1). Cold mode N = 1: 833-909 at K = 1 and 34-68 per further load; N = 132 higher (W4 K8 L32 3848): not read further here. Install (experimental until the replay passes): memory.load_port.lane_order = 1 on h100 (b300 after its run): port occupancy of a lane load = line switches in lane order x one line slot, instead of distinct lines; loads without lane masks (TMA, bulk) unchanged."
+    },
+    {
+      "when": "after b300-r2 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/gather_hit/b300-r2 (GPU-eb0631cd.., B300; SASS gate passed; table via table.py)",
+      "text": "b300, hit mode, T in cycles at K = 1 / 4 / 8, N = 1 (N = 148 within 7 %): L = 16: W1 382 / 502 / 657, W2 392 / 597 / 886, W4 422 / 817 / 1343; L = 32: W1 402 / 528 / 695, W2 424 / 654 / 946, W4 468 / 887 / 1433. As on h100: about 35-39 cycles per load instruction of the SM, a 16-line load (two lanes per line, lanes l and l + 16) costs nearly what a 32-line load costs (ratio 0.93-0.95) where distinct lines would give 0.5. Install: memory.load_port.lane_order = 1 on b300 (source gather_hit.b300.r2, experimental). Cold mode: K = 1 1085-1177 (N = 1), not read further. No b300 replay exists (no blackwell/microbench suite); the check is the b300 full-gpu regression."
+    }
+  ]
+}

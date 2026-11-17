@@ -1,0 +1,7 @@
+{
+ "architecture": "hopper",
+ "device": "h100",
+ "schema_version": "cyclescope.device.v1",
+ "sm_arch": "sm_90a",
+ "smsps_per_sm": 4
+}

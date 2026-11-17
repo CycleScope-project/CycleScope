@@ -1,0 +1,38 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "reconvergence",
+  "version": 2,
+  "supersedes": "P4b run of the verbatim blackwell-prototype ctrl.cu on H100 (crossings/reconvergence/h100-r1): the div variants failed the SASS gate 9/9 because ptxas on sm_90a rematerialises the per-lane predicate from the kernel argument inside the timed loop (LDC c[0x0][0x228] in the window); uni residual 68 reported, leaf unchanged (report 'P4b')",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "mechanism": "control.reconvergence control_envelope (common field_models: affine over control_path_count; engine: at a bound BSYNC instance the warp's control floor is pushed to issue + envelope; the converter binds the use to regions whose BSYNC covered >= 2 lane paths, axis = sequential_region_count when a compound selector is present, else the number of paths)",
+  "installed": "b300 slope 35.0 / intercept 0 (blackwell-prototype mechtree.w5.ctrl_model: div_region_residual 35 at 8 / 16 / 32 FFMA per path, uni residual 0); h100 affine -6.99 + 39.9991 x (hopper-prototype fit, form.reexpressed)",
+  "probe": "new tools/microbench/crossings/reconvergence/probe/ctrl2.cu (ctrl.cu of version 1 is kept verbatim for provenance and is not run). One warp, N iterations between two clock64 reads, slope over N in {64, 128, 256} = cycles per iteration. Every value derived from a kernel argument (the per-lane predicate `odd`, the warp-uniform toggle seed, the FFMA multiplier m) is pinned in a register before the timed loop with mb_pin (volatile shared slot round trip) so ptxas cannot rematerialise it from constant memory inside the window. Variants, B in {8, 16, 32} FFMA per path: div.bB = per-lane if (odd) path A else path B (BSSY / BRA / BSYNC, two serialised paths every iteration); uni.bB = the same if/else on a warp-uniform predicate toggled each iteration (control: no divergence); div2.bB = two sequential independent divergent if/else regions per iteration on different per-lane predicates (lane & 1, lane & 2) (diagnostic for the sequential_region_count axis); div3.bB = three-way divergence on lane % 3 (if / else if / else, three serialised paths; diagnostic for the path-count axis). Launch: 1 CTA x 32 threads, --launches 8 --reps 33, two runs per device.",
+  "sass_gate": "per kernel the single CS2R window must contain only {FFMA, BSSY, BSYNC, BRA, WARPSYNC, ISETP, IADD3, VIADD, IMAD, LOP3, PLOP3, MOV, SEL, BMOV, NOP, YIELD}; no LDC / ULDC / LDCU / S2R / loads / stores / local memory; FFMA count = 2B (div, uni), 4B (div2), 3B (div3), none predicated (an if-converted body fails); div variants contain >= 1 BSSY and >= 1 BSYNC (div2 >= 2 of each), uni variants contain no BSSY (a uni kernel with BSSY is reported and still derived). 0 kernels matched = gate failure. The gate output records the loop body (instructions, stall counts) as in version 1.",
+  "derivation": {
+    "per_iteration": "OLS slope over N of the median (t1 - t0) of the variant (three N)",
+    "stalls": "sum of the SASS control-word stall counts of the loop body (from the first instruction after the entry setup to the back-edge BRA.U, body() of derive.py verbatim from blackwell-prototype ctrl_model.py); uni: minus half the FFMA stalls (one path runs per iteration)",
+    "residual": "D(variant) = per_iteration - stalls",
+    "leaf": "slope = mean of D(div.bB) over B in {8, 16, 32}; intercept 0 (the quantity is one divergent two-path region's cost beyond its instructions' stalls, the same definition as the installed b300 35)",
+    "diagnostics": "D(div2.bB) / D(div.bB) (expected 2 if the axis is the region count), D(div3.bB) / D(div.bB) (path-count scaling), D(uni.bB) (expected 0; the h100 v1 uni residual 68 is a taken-branch redirect cost, not reconvergence, and is reported here, not installed)"
+  },
+  "acceptance": {
+    "measured": "all three div.bB pass the SASS gate; D(div.bB) within 10 % of their mean for every B; two runs within 5 %; -> install slope on the device",
+    "experimental": "gate passes but spread over B or run agreement exceeds the bounds: installed as experimental with the per-B values in the source",
+    "unrealised": "gate failure on any div.bB: leaf unchanged, reported",
+    "b300_control": "b300 is re-run with the same probe: within 10 % of 35.0 -> the installed value is confirmed and replaced by this run's value (in-repo protocol value, same rule as crossings v2); beyond 10 % both numbers are reported and the run's value is installed when it passes"
+  },
+  "devices": {
+    "h100": "sm_90a",
+    "b300": "sm_103a"
+  },
+  "install": "control.reconvergence.root control_envelope on both devices: {kind affine, axis control_path_count, intercept 0.0, slope D, domain as installed}; h100 replaces the hopper-prototype affine -6.99 + 39.9991 x; source keys reconvergence.<device>.<run> with protocol tools/microbench/crossings/reconvergence/protocol-v2.json; one two-architecture 450 A/B round",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install of a device whose SASS gate fails",
+  "addenda": [
+    {
+      "date": "2026-11-05",
+      "written": "after the r3 data of both devices were derived (not before): recorded as such, the install is therefore marked experimental",
+      "text": "Loop-body delimitation. The derivation text says 'stall counts of the loop body' and names the blackwell-prototype body() rule (up to the last BRA.U, drop leading LDCU / NOP). ctrl2's loops (opaque start value, pinned trip count) compile on both devices to a guarded loop: ISETP / BSSY B0 / @P BRA guard, then the body (counter, BSSY B1, @!P BRA, path A, BRA, path B, BSYNC B1), back-edge @!P BRA to the body start, BSYNC B0 after the loop; there is no BRA.U. Applied literally the predecessor rule counts the once-per-rep guard (25 stall cycles) as per-iteration stalls and gives B-dependent residuals (h100 32 / 40 / 56, b300 46 / 54 / 70 at B 8 / 16 / 32). model.py therefore delimits the body as the instructions from the back-edge's target address to the back-edge inclusive; under that rule the residual is B-independent (h100 33 / 33 / 33, b300 34 / 34 / 34; both runs identical). Both rules' numbers are kept in model.json (residual / residual_predecessor_rule). No threshold changed."
+    }
+  ]
+}

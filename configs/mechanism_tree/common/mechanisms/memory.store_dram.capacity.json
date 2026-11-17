@@ -1,0 +1,21 @@
+{
+ "doc": "imported from legacy mechanism memory.store_dram.capacity",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory_level"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "store_dram.outstanding_requests": {
+   "kind": "constant"
+  },
+  "store_dram.outstanding_semantics": {
+   "kind": "constant"
+  }
+ }
+}

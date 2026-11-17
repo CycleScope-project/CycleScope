@@ -1,0 +1,37 @@
+--- a/examples/89_sm103_fp4_ultra_gemm/89_sm103_fp4_ultra_gemm.cu
++++ b/examples/89_sm103_fp4_ultra_gemm/89_sm103_fp4_ultra_gemm.cu
+@@ -230,6 +230,7 @@
+ 
+   bool verification = true;
+   int batch = 1;
++  int sm = 0;  // 0=both, 1=1Sm, 2=2Sm
+ 
+   Options():
+     help(false),
+@@ -263,6 +264,7 @@
+       verification = false;
+     }
+     cmd.get_cmd_line_argument("batch", batch);
++    cmd.get_cmd_line_argument("sm", sm);
+   }
+ 
+   /// Prints the usage statement.
+@@ -587,10 +589,14 @@
+   // Evaluate CUTLASS kernels
+   //
+ #if defined(CUTLASS_ARCH_MMA_SM103_SUPPORTED)
+-  std::cout << "Running kernel with 1SM MMA config:" << std::endl;
+-  run<Gemm1Sm>(options);
+-  std::cout << "Running kernel with 2SM MMA config:" << std::endl;
+-  run<Gemm2Sm>(options);
++  if (options.sm == 0 || options.sm == 1) {
++    std::cout << "Running kernel with 1SM MMA config:" << std::endl;
++    run<Gemm1Sm>(options);
++  }
++  if (options.sm == 0 || options.sm == 2) {
++    std::cout << "Running kernel with 2SM MMA config:" << std::endl;
++    run<Gemm2Sm>(options);
++  }
+ #endif // defined(CUTLASS_ARCH_MMA_SM103_SUPPORTED)
+ 
+   return 0;

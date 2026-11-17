@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-TUT-BLOCKSCALED-MXFP8-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1687296,
+ "completed": 1687296,
+ "cycles": 31578,
+ "hard": 0,
+ "walls": {
+  "convert": 9.9,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 4.2,
+  "total": 14.5
+ },
+ "rss_kb": {
+  "convert": 464864,
+  "segments": 464864,
+  "build": 464864,
+  "sim": 464864
+ },
+ "hw_cycles": 35312.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

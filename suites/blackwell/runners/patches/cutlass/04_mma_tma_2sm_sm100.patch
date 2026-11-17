@@ -1,0 +1,22 @@
+--- a/examples/cute/tutorial/blackwell/04_mma_tma_2sm_sm100.cu
++++ b/examples/cute/tutorial/blackwell/04_mma_tma_2sm_sm100.cu
+@@ -523,7 +523,7 @@
+   //
+ 
+   // The cluster shape and layout
+-  auto cluster_shape = make_shape(Int<4>{}, Int<4>{}, Int<1>{});
++  auto cluster_shape = make_shape(Int<2>{}, Int<1>{}, Int<1>{});
+   Layout cluster_layout_vmnk = tiled_divide(make_layout(cluster_shape),
+                                             make_tile(typename decltype(tiled_mma)::AtomThrID{}));
+ 
+@@ -619,8 +619,8 @@
+     return -1;
+   }
+ 
+-  if ((props.major != 10) || (props.major == 10 && props.minor > 1)) {
+-    std::cerr << "This example requires NVIDIA's Blackwell Architecture GPU with compute capability 100a." << std::endl;
++  if (props.major != 10) {
++    std::cerr << "This example requires NVIDIA Blackwell (compute capability 10.x)." << std::endl;
+     std::cerr << "  Found " << props.major << "." << props.minor << std::endl;
+     return -1;
+   }

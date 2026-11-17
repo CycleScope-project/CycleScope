@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "DGF-MQA-LOGITS-FP8FP4-R03",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 8133,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1168083,
+ "completed": 1168083,
+ "cycles": 33833,
+ "hard": 0,
+ "walls": {
+  "convert": 4.4,
+  "segments": 0.0,
+  "build": 0.2,
+  "sim": 1.6,
+  "total": 6.2
+ },
+ "rss_kb": {
+  "convert": 263928,
+  "segments": 263928,
+  "build": 263928,
+  "sim": 263928
+ },
+ "hw_cycles": 35767.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

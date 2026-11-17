@@ -1,0 +1,53 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "crossings",
+  "version": 2,
+  "supersedes": "tools/microbench/crossings/protocol.json (version 1: trywait_timeout and constant_cache cells not installable, report P4c)",
+  "frozen_before_gpu": true,
+  "date": "2026-11-05",
+  "purpose": "Close the evidence crossings of live common mechanisms (measured on one device, placeholder on the other) with one probe per quantity run on BOTH devices; the previously measured side is re-measured as the control and replaced by the in-repo protocol value (the hopper-prototype / blackwell-prototype numbers have no probe in this repository). Mechanisms whose fields the engine does not read (candidates from the liveness audit: memory.constant_fill, register.operand_pressure) are not measured here; they are removed or kept by the audit's verdict. memory.l2_merge is a GPU-shared (full-GPU loop) mechanism and is not part of this protocol.",
+  "cells": {
+    "trywait_timeout": {
+      "mechanism": "synchronization.mbarrier.trywait_timeout.cycles (engine: a failed poll that the warp abandons suspends the warp until min(phase release, issue + cycles))",
+      "why_v1_failed": "one suspending try_wait.parity on a never-arrived barrier returned after 2 (H100) / 16 (B300) cycles: the default form does not hold the warp for a fixed bound, so the quantity the engine needs is the period of an unsatisfied poll loop, not one instruction",
+      "probe": "new tools/microbench/crossings/trywait_timeout/probe/trywait_loop.cu (replaces trywait.cu): warp 0 lane 0 polls a never-completing mbarrier phase in a loop of N iterations of { mbarrier.try_wait.parity (no hint) ; branch } and reads clock64 before and after; variants: hint in {none, 1000 ns, 100000 ns} via the .suspendTimeHint operand; control loop with mbarrier.test_wait (non-suspending) of the same structure; N in {16, 64, 256}; plus a release cell: warp 1 completes the phase after a jittered delay D in {2000, 20000} cycles while warp 0 sits in the no-hint loop, t_w = loop exit",
+      "derivation": "period(variant) = OLS slope over N of (t_after - t_before); cycles = period(no hint) - period(test_wait control) + issue cycles of one test_wait iteration from the SASS control words (sass_ctrl.py); the hint variants and the release cell (t_w - (t_s + D) = wake-up latency, compared with synchronization.mbarrier.release) are reported",
+      "acceptance": "fit residual <= 5 % and two runs within 5 % -> measured; the H100 value replaces the hopper-prototype 7892 when it passes (both numbers in the source description); if the no-hint period equals the test_wait period within 5 % the leaf is 0 (measured: the hardware does not suspend an unsatisfied try_wait beyond its issue), enabled stays 1"
+    },
+    "constant_cache": {
+      "mechanism": "memory.constant_cache.{same_line,hit,miss}_latency_cycles, line_bytes (capacity_bytes is not read by the engine and is reported only)",
+      "why_v1_failed": "the ldc chain compiled to a form whose latency did not depend on footprint (34.1 everywhere, zero variance)",
+      "probe": "new tools/microbench/crossings/constant_cache/probe/ldc_chain.cu (replaces v1): __constant__ uint32 table (64 KiB) holding a random cyclic permutation at stride S; inline PTX chain { ld.const.u32 %r, [%r_offset] } with the next offset computed from the loaded value only (shl + and mask), so the SASS is LDC R, c[0x3][R] with a register index; SASS gate: exactly U LDC with a register index in the window and no other memory instruction. Cells: S in {4, 64, 128, 256} B, footprint F in {256 B, 1, 2, 4, 8, 16, 32, 64} KiB; warm = second traversal in the same launch; cold = first traversal of a launch after cudaMemcpyToSymbol rewrote the table (fresh launch); U in {64, 256}",
+      "derivation": "per-load latency = OLS slope over U; same_line = warm S = 4, F = 256 B; hit = warm plateau below the capacity knee at S >= line; miss = cold first traversal at S >= line with F <= knee (constant miss served from L2), line_bytes = the smallest S at which warm S-stride latency equals the hit plateau within 5 % of the S = 4 to plateau step; capacity knee reported",
+      "acceptance": "fit residual <= 5 %, runs within 5 %; the H100 run replaces hopper-prototype 93.9 / 382.4 / 28.0 / 256 when it passes; b300 enabled = 1 with the measured values"
+    },
+    "l1_residency": {
+      "mechanism": "memory.l1.residency l1.data_array_bytes, l1.reserved_bytes (engine: L1 data lines = (data_array - reserved - launch static + dynamic shared bytes) / line)",
+      "probe": "new tools/microbench/crossings/l1_residency/probe/l1cap.cu: one CTA with dynamic shared allocation S (cudaFuncAttributeMaxDynamicSharedMemorySize, the kernel touches its smem so the carveout is real), lane 0 runs the memlat dependent LDG.E (ld.global.ca) chase over a footprint F of 128 B lines in random cyclic order, warm traversal; S in {0, 32, 64, 96, 128, 160, 192} KiB, F swept in 8 KiB steps from 16 KiB to 256 KiB",
+      "derivation": "for each S the knee F*(S) = the largest F whose warm per-load latency is within 10 % of the L1 hit latency (memlat l1); A = mean over S of (F*(S) + S); the engine only uses data_array - reserved, so the leaf is installed as data_array_bytes = A, reserved_bytes = 0 (no vendor capacity figure is assumed); carveout steps (F*(S) + S not constant) are reported",
+      "acceptance": "F*(S) + S constant within one 8 KiB step over S, two runs equal -> measured; otherwise the knee table is reported and the leaf stays (with the knee table in the source description)"
+    },
+    "descriptor_refetch": {
+      "mechanism": "storage.tma.descriptor_refetch.cycles (engine: added to the TMA service start on the first use of a tensor map in a launch and after a tensormap acquire / UTMACCTL.IV)",
+      "probe": "new tools/microbench/crossings/descriptor_refetch/probe/tmap.cu built on the tma.cu xw scheme (L2-hot 16 KiB tile box): cells first (tensor map in global memory, first UTMALDG of the launch), reuse (second UTMALDG with the same map), acquire (fence.proxy.tensormap::generic.acquire.gpu on the map, then UTMALDG), param (__grid_constant__ map, first use)",
+      "derivation": "refetch(cell) = E[completion | cell] - E[completion | reuse]; installed cycles = refetch(first) (the engine's first-use case); acquire / param reported",
+      "acceptance": "se <= 3 %, runs within 5 % -> measured; H100 replaces 447 when it passes; b300 enabled = 1 with the measured value"
+    },
+    "l1_bandwidth": {
+      "mechanism": "memory.l1.service l1.sector_bytes_per_cycle and l1.issue_interval_cycles (h100 placeholders)",
+      "probe": "blackwell-prototype tools/microbench/probes/mem.cu (default cells: l1 sector bytes per cycle) and memq.cu (ld.l1 request rate) copied verbatim into tools/microbench/crossings/l1_bandwidth/probe/, both devices",
+      "derivation": "the blackwell-prototype definitions quoted in the b300 source records (mem.cu: warps x 32 lanes x vec bytes / slope over K at the LDG.E.128 L1-hit plateau; memq.cu: 1 / saturated L1-hit 1-sector request rate -> issue interval, values within 3 % of 1 cycle map to 0 = the engine's per-request floor)",
+      "acceptance": "runs within 3 % -> measured; b300 control within 10 % of 127.7 B/cycle and 0.97 cycles, else reported and replaced by the protocol value"
+    },
+    "store_dram_port": {
+      "mechanism": "memory.store_dram.service store_dram.sector_bytes_per_cycle (h100 placeholder; latency / issue_interval fields are validation sentinels with store_path = 0 and are left structural)",
+      "probe": "mem.cu --cells smport (same copy as l1_bandwidth), both devices",
+      "derivation": "the blackwell-prototype sm_dram_port write definition (one CTA on one SM storing fresh data with STG.E.128, plateau B/cycle)",
+      "acceptance": "runs within 3 % and the plateau confirmed by the two alternative warp x in-flight cells within 3 % -> measured"
+    }
+  },
+  "devices": {"h100": "sm_90a", "b300": "sm_103a"},
+  "runs": "two runs per device per cell (run-a, run-b), --launches 8 --reps 33 unless the probe's own defaults are verbatim",
+  "install": "per cell as stated; source keys crossings.<cell>.<device>.<run> with protocol tools/microbench/crossings/protocol-v2.json; one two-architecture 450 A/B round for all installed cells",
+  "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; no install of a cell whose SASS gate fails"
+}

@@ -1,0 +1,52 @@
+{
+ "doc": "imported from legacy mechanism memory.instruction_fetch",
+ "doc_blackwell": "imported from legacy mechanism instruction.fetch",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "instruction.fetch"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "capacity_l0_bytes": {
+   "kind": "constant"
+  },
+  "capacity_l1_bytes": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  },
+  "fetch_parallelism": {
+   "kind": "constant"
+  },
+  "l0_ways": {
+   "kind": "constant"
+  },
+  "launch_prefetch_bytes": {
+   "kind": "constant"
+  },
+  "line_bytes": {
+   "kind": "constant"
+  },
+  "prefetch_depth_lines": {
+   "kind": "constant"
+  },
+  "sharing": {
+   "kind": "constant"
+  },
+  "stream_cold_cycles_per_line": {
+   "kind": "constant"
+  },
+  "stream_l1_cycles_per_line": {
+   "kind": "constant"
+  },
+  "stream_l2_cycles_per_line": {
+   "kind": "constant"
+  }
+ }
+}

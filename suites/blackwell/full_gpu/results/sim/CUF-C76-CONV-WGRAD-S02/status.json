@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "CUF-C76-CONV-WGRAD-S02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 2604273,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 13128046,
+ "completed": 13128046,
+ "cycles": 198456,
+ "hard": 0,
+ "walls": {
+  "convert": 27.9,
+  "segments": 0.1,
+  "build": 3.5,
+  "sim": 73.4,
+  "total": 104.8
+ },
+ "rss_kb": {
+  "convert": 831200,
+  "segments": 831200,
+  "build": 831200,
+  "sim": 3505900
+ },
+ "hw_cycles": 178497.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 16
+}

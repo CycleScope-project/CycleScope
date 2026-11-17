@@ -1,0 +1,936 @@
+{
+ "schema": "cyclescope.sm_topology.v1",
+ "device": "h100",
+ "sm_count": 132,
+ "provenance": {
+  "placement_domain": "hopper-prototype configs/topology/h100_sm132_placement_domains.json",
+  "l2_partition": "hopper-prototype configs/topology/h100_sm132_l2_sides.json",
+  "gpc": "tools/microbench/l2_merge/protocol-v2.json addendum read_domain_result (fg-line-mem/domain/h100): the SMs of one placement domain share L2 reads; ids 124..131 share with the domain of SM 0"
+ },
+ "rows": [
+  {
+   "sm": 0,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 1,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 2,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 3,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 4,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 5,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 6,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 7,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 8,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 9,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 10,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 11,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 12,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 13,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 14,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 15,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 16,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 17,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 18,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 19,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 20,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 21,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 22,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 23,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 24,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 25,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 26,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 27,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 28,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 29,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 30,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 31,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 32,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 33,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 34,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 35,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 36,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 37,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 38,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 39,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 40,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 41,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 42,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 43,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 44,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 45,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 46,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 47,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 48,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 49,
+   "placement_domain": 0,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 50,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 51,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 52,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 53,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 54,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 55,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 56,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 57,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 58,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 59,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 60,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 61,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 62,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 63,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 64,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 65,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 66,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 67,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 68,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 69,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 70,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 71,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 72,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 73,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 74,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 75,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 76,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 77,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 78,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 79,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 80,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 81,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 82,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 83,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 84,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 85,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 86,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 87,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 88,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 89,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 90,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 91,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 92,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 93,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 94,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 95,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 96,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 97,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 98,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 99,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 100,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 101,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 102,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 103,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 104,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 105,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 106,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 107,
+   "placement_domain": 1,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 1
+  },
+  {
+   "sm": 108,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 109,
+   "placement_domain": 2,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 2
+  },
+  {
+   "sm": 110,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 111,
+   "placement_domain": 3,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 3
+  },
+  {
+   "sm": 112,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 113,
+   "placement_domain": 4,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 4
+  },
+  {
+   "sm": 114,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 115,
+   "placement_domain": 5,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 5
+  },
+  {
+   "sm": 116,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 117,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 118,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 119,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 120,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 121,
+   "placement_domain": 6,
+   "l2_partition": 1,
+   "tpc_pair": 4294967295,
+   "gpc": 6
+  },
+  {
+   "sm": 122,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 123,
+   "placement_domain": 7,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 7
+  },
+  {
+   "sm": 124,
+   "placement_domain": 8,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 125,
+   "placement_domain": 8,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 126,
+   "placement_domain": 9,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 127,
+   "placement_domain": 9,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 128,
+   "placement_domain": 10,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 129,
+   "placement_domain": 10,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 130,
+   "placement_domain": 11,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  },
+  {
+   "sm": 131,
+   "placement_domain": 11,
+   "l2_partition": 0,
+   "tpc_pair": 4294967295,
+   "gpc": 0
+  }
+ ]
+}

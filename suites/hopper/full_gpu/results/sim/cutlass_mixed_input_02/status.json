@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "cutlass_mixed_input_02",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 55736,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 10671703,
+ "completed": 10671703,
+ "cycles": 71610,
+ "hard": 0,
+ "walls": {
+  "convert": 16.4,
+  "segments": 0.0,
+  "build": 1.6,
+  "sim": 21.0,
+  "total": 39.0
+ },
+ "rss_kb": {
+  "convert": 330220,
+  "segments": 330220,
+  "build": 330220,
+  "sim": 1575812
+ },
+ "hw_cycles": 74938.0,
+ "reference_cache_control": "all",
+ "placement_digest": "9977973ef05e2751",
+ "shards": 14
+}

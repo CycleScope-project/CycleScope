@@ -1,0 +1,6 @@
+{
+  "src.measured": {"evidence": "measured", "description": "measured fixture"},
+  "src.structural": {"evidence": "structural", "description": "structural fixture"},
+  "src.experimental": {"evidence": "experimental", "description": "experimental fixture"},
+  "src.placeholder": {"evidence": "placeholder", "description": "placeholder fixture"}
+}

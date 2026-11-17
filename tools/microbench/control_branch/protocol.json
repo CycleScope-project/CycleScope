@@ -1,0 +1,35 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "control_branch",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": [
+  "control.branch"
+ ],
+ "fields": [
+  "control_envelope discrete over branch_taken {0, 1}"
+ ],
+ "devices": {
+  "h100": "sm_90a (1 GPU)",
+  "b300": "sm_103a (1 GPU)"
+ },
+ "motivation": "Round 24 (single-cluster loop): ncu warp-stall sampling at 32-cycle period on cutlass_stream_k_splitk_01 puts 13.4 % of all samples on BRA PCs (+2.1 % on the BPT.TRAP fall-through of asserted branches, reason branch_resolving) against 0.8 % of the engine's issue gaps; cutlass_fp8_dense_08 7-8 %. Both trees charge a BRA 1 cycle (structural) and the predecessors' control.turnover was a placeholder, so the warp-PC redirect / predicate resolution of a branch has never been measured. The engine already has the application path: an instance bound to an instance_timing program with event control_transition pushes WarpState::control_floor (used by control.reconvergence for BSSY).",
+ "engine_rule_declared_before_data": "control.branch binds every BRA instance; its control_envelope(branch_taken) is a floor on the warp's next issue after the BRA (control_floor, existing rule). branch_taken is a converter axis = 1 when the warp's next dynamic instance is not at pc + 16 (16 B SASS), else 0 (last instance of a warp: 0). The leaf excludes instruction fetch of the target: the probe window is L0-resident by construction, and a cold target line keeps being charged by instruction.fetch.",
+ "probe": "tools/microbench/control_branch/probe/branch.cu, one CTA, W warps in {1, 4} (W = 4 puts one warp per SMSP), timing thread warp 0 lane 0, t_s / t_w clock64 around a window of U units, U in {16, 32, 64, 128}, straight-line (no loop) unless stated. Predicates p (true) and q (false) come from a kernel argument read once before t_s (opaque to the compiler). Unit variants: taken: `@p bra NEXT; <1 FFMA on a dead register>; NEXT: FFMA chain step` (predicated-taken forward branch over 16 B, predicate ready long before); nottaken: `@q bra FAR` with the same body (predicated, falls through; FAR is a single exit block after the window); uncond: `bra NEXT` without predicate (the gate requires the BRA to survive ptxas; a folded variant is unrealised); taken_dep: `setp` producing p from the chain value immediately before `@p bra NEXT` (predicate dependency on the critical path); loop: a counted loop of U iterations whose body is one FFMA chain step and the counter update (back edge taken U-1 times). The FFMA chain step is `d = fma(d, a, b)` on one register so the body cost is the installed FFMA result latency per unit. --launches 16 --reps 257, two runs (run-a, run-b) in one job per device.",
+ "sass_gate": "between t_s and t_w the kernel must contain exactly U BRA (loop: 1 BRA, U iterations verified by the counter), exactly U FFMA of the chain (plus the dead FFMA per unit for taken / uncond), no BSSY / BSYNC / WARPSYNC / ELECT / YIELD / NOP padding beyond what ptxas inserts for alignment (listed), and the predicate source must not be re-materialised inside the window; the whole window must fit 16 KiB (L0-resident on both devices); kernels that fail are unrealised and listed.",
+ "derivation": {
+  "E(variant, W, U)": "mean over samples of t_w - t_s",
+  "slope(variant, W)": "OLS slope of E over U in {16, 32, 64, 128} (cycles per unit)",
+  "body(variant)": "installed FFMA result_latency_cycles of the device (dependent chain step) + the issue cost of the unit's other non-branch instructions summed from the SASS control words (sass_ctrl.py o_s convention)",
+  "branch(variant, W)": "slope - body",
+  "install values": "control_envelope(branch_taken = 1) = branch(taken, W = 1); control_envelope(branch_taken = 0) = branch(nottaken, W = 1); uncond, taken_dep, loop and the W = 4 cells are reported (uncond vs taken = predicate cost, taken_dep - taken = predicate resolution on the critical path, loop vs taken = back-edge vs forward)"
+ },
+ "acceptance": {
+  "cell": "max relative fit residual <= 2 % and run agreement <= 3 % (or <= 1 cycle) -> measured; <= 5 % / <= 8 % -> experimental and listed; else unrealised",
+  "negative": "a negative branch() within 2 se of 0 installs 0; beyond -> reported, not installed",
+  "both devices": "each device installs its own values; no cross-device fill"
+ },
+ "install": "common/mechanisms/control.branch.json (program event control_transition, operation_classes [BRA], parameter_schema instance_timing, field_models control_envelope discrete over branch_taken); common/axes.json gains branch_taken (converter axis, both builders); <arch>/leaves/control.branch.json with the two points; sources control_branch.<device>.<run>. tree build && tree validate --strict must pass; one two-architecture 500 A/B round.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold or derivation change after data; BRX / JMP / CALL / RET / EXIT are out of scope (reported if they appear in the census)."
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "FIF-FMHA-FP8-C06",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 405779,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 6826432,
+ "completed": 6826432,
+ "cycles": 56806,
+ "hard": 0,
+ "walls": {
+  "convert": 11.0,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 13.3,
+  "total": 25.2
+ },
+ "rss_kb": {
+  "convert": 324184,
+  "segments": 324184,
+  "build": 324184,
+  "sim": 728308
+ },
+ "hw_cycles": 53964.0,
+ "reference_cache_control": "all",
+ "placement_digest": "6d472b172f821283",
+ "shards": 11
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "TRF-GLUON08-WARP-SPECIALIZED-C04",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 64076,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 1134199,
+ "completed": 1134199,
+ "cycles": 31310,
+ "hard": 0,
+ "walls": {
+  "convert": 6.8,
+  "segments": 0.0,
+  "build": 0.5,
+  "sim": 3.7,
+  "total": 10.9
+ },
+ "rss_kb": {
+  "convert": 277224,
+  "segments": 277224,
+  "build": 277224,
+  "sim": 416560
+ },
+ "hw_cycles": 28319.0,
+ "reference_cache_control": "all",
+ "placement_digest": "d410559533b03c47",
+ "shards": 2
+}

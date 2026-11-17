@@ -1,0 +1,31 @@
+{
+ "suite": "hopper/full_gpu",
+ "case": "triton_matmul_fp16_13",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 13205504,
+ "completed": 13205504,
+ "cycles": 78870,
+ "hard": 0,
+ "walls": {
+  "convert": 19.6,
+  "segments": 0.1,
+  "build": 3.9,
+  "sim": 52.4,
+  "total": 76.1
+ },
+ "rss_kb": {
+  "convert": 341272,
+  "segments": 341272,
+  "build": 341272,
+  "sim": 3393704
+ },
+ "hw_cycles": 73332.0,
+ "reference_cache_control": "all",
+ "placement_digest": "1dbfb30512781e0c",
+ "shards": 16
+}

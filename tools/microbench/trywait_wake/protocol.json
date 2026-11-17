@@ -1,0 +1,27 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "trywait_wake",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-09",
+ "mechanisms": [
+  "synchronization.mbarrier.release"
+ ],
+ "fields": [
+  "suspended_wake_cycles (new field of synchronization.mbarrier.release, cluster-local): completion -> resume for a warp that was suspended in mbarrier.try_wait when the phase completed"
+ ],
+ "question": "The installed synchronization.mbarrier.release (87.9 / 87.8 cycles, barrier_release protocol) was measured with same-thread op -> try_wait chains that never block. Every pipelined kernel (cutlass / CuTe-DSL / fa3 / deepgemm) waits with a try_wait + BRA loop while another warp or a TMA completes the phase, so the waiter is suspended when the completion lands. tma_loaded v1 (single handler thread, try_wait per slot) showed ~406 cycles per handled completion; the full-gpu DSL GEMMs spend 25-50 % of HW samples in those loops while the HW tensor pipe is 18-41 % busy, and the sim releases every waiter at completion + 88. How long after the phase completes does a suspended try_wait waiter resume, for the plain try_wait form, the suspendTimeHint form (NANOSLEEP.SYNCS), and the test_wait spin control; for arrive and complete_tx completions; as a function of where in the waiter's suspend the completion lands (delay D after the waiter started)?",
+ "probe": "tools/microbench/trywait_wake/probe/trywait_wake.cu: one CTA, two warps. Per repetition both warps bar.sync and read clock64 (base); warp 1 lane 0 waits on the mbarrier phase in the chosen form; warp 0 lane 0 spins until base + D, reads t_a, completes the phase (mbarrier.arrive, or arrive.expect_tx 16 + mbarrier.complete_tx 16); the waiter reads t_w as its first instruction after the loop. wake = t_w - t_a. Cells: form in {trywait, trywait_hint(10 ms), testwait} x completion in {arrive, tx} x D in {0, 50, 100, 200, 400, 800, 1600, 3200, 6400} cycles; 4 launches x 256 reps (rep 0 of each launch dropped); two runs. SASS gate: the trywait kernels contain SYNCS.PHASECHK.TRANS64.TRYWAIT, the hint form NANOSLEEP.SYNCS (counts written next to the run).",
+ "derivation": "tools/microbench/trywait_wake/model.py: per cell median / p10 / p90 of wake. control = testwait median (any D), must reproduce the installed release leaf within 25 % (the leaf's chain had no second warp; a 10-20 cycle difference is expected). For each try_wait form: wake(D) table; suspended_wake_cycles = mean over D >= 200 of the cell medians (D < 200 can land before the waiter has suspended and is reported separately as the 'not yet suspended' regime). The D-dependence itself is reported (quantised suspend windows show as a sawtooth in D).",
+ "acceptance": "control passes; runs agree per cell within 10 % or 20 cycles; the D >= 200 cells of a form agree with each other within 30 % of their mean (else the wake is window-phase dependent and the mean is installed as experimental with the spread recorded); arrive and tx completions agree within 15 % (else the field is split by completion kind and both reported).",
+ "engine_rule_declared_before_data": "mbarrier wait (engine.md §13.3 wait rule): a wait that is not ready when issued (the warp blocks, i.e. the HW thread suspends in try_wait) releases at phase completion + suspended_wake_cycles instead of + release cycles; a wait issued at or after the phase completion keeps release cycles. Failed observed polls and the NANOSLEEP.SYNCS polling-region rule are unchanged except that the retry that succeeds after a suspension also uses suspended_wake_cycles. The field is cluster-local; single-cluster cases will move (the gate is sc and full MAPE, not bit identity).",
+ "install": "common/mechanisms/synchronization.mbarrier.release.json field_models + schema field suspended_wake_cycles (float64 cycles); <arch>/leaves/synchronization.mbarrier.release.json; sources trywait_wake.<device>.<run>.",
+ "not_allowed": "no case tuning; cells, derivation and the rule are fixed above; a device failing acceptance gets no field and is reported.",
+ "addenda": [
+  {
+   "date": "2026-11-09",
+   "written": "after h100-r1 / b300-r1",
+   "text": "(reading) Runs agree on both devices; arrive and complete_tx agree; the suspendTimeHint form is flat over D (194 / 208 h100, 148 / 168 b300) and the plain try_wait form varies +-40 without a sawtooth. The test_wait control measures 173.5 (h100) / 156.0 (b300), 2x the installed release leaf 87.9 / 87.8: the control criterion was mis-specified -- the barrier_release leaf came from a same-thread arrive -> try_wait chain, and the cross-warp completion -> resume path is itself ~160-175 even for a spinning waiter. Per the frozen derivation suspended_wake_cycles = mean of the try_wait D >= 200 cells: h100 228.3, b300 145.6, installed as experimental (control failed by construction, not by noise). Follow-up declared: a barrier_release v2 must re-measure `cycles` with a two-warp waiter so the non-suspended cross-warp release (test_wait control: 173.5 / 156.0) replaces the same-thread 88; until then the engine keeps 88 for ready-at-issue waits."
+  }
+ ]
+}

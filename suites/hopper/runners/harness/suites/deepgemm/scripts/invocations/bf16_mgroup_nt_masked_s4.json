@@ -1,0 +1,27 @@
+{
+  "case_id": "bf16_mgroup_nt_masked_s4",
+  "invocation": {
+    "allow_missing_lineinfo": true,
+    "argv": [
+      "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/deepgemm/harness/run_once_case.py",
+      "--case-id",
+      "bf16_mgroup_nt_masked_s4",
+      "--qualification-root",
+      "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920"
+    ],
+    "carveout": "auto",
+    "cwd": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/deepgemm/harness",
+    "env": {
+      "DG_DELIVERY_FORCE_MULTICAST": "1",
+      "GEMM_DELIVERY_GPU": "h100"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+      "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/deepgemm/harness/run_once_case.py",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+  },
+  "schema_version": "hopper.capture-case-invocation.v1"
+}

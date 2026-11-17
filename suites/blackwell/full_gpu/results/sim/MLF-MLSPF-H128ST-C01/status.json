@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "MLF-MLSPF-H128ST-C01",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 283837,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 3393523,
+ "completed": 3393523,
+ "cycles": 34195,
+ "hard": 0,
+ "walls": {
+  "convert": 8.7,
+  "segments": 0.0,
+  "build": 0.8,
+  "sim": 7.5,
+  "total": 17.0
+ },
+ "rss_kb": {
+  "convert": 349672,
+  "segments": 349672,
+  "build": 349672,
+  "sim": 530068
+ },
+ "hw_cycles": 34934.0,
+ "reference_cache_control": "all",
+ "placement_digest": "a5d1a116272d8661",
+ "shards": 6
+}

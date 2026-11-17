@@ -1,0 +1,35 @@
+{
+  "case_id": "cutlass_016_fp8_fastacc_pingpong_cluster_sm",
+  "invocation": {
+    "argv": [
+      "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/dense_algorithms",
+      "--m=128",
+      "--n=128",
+      "--k=24448",
+      "--variant=fp8_nt_fastacc_pingpong_128x128",
+      "--warmups=1",
+      "--trials=1"
+    ],
+    "carveout": "auto",
+    "env": {
+      "CUTLASS_CLUSTER_SHAPE": "1x1x1",
+      "CUTLASS_CLUSTER_SM_COUNT": "1",
+      "CUTLASS_DELIVERY_ALGORITHM": "fp8_fastacc_pingpong",
+      "CUTLASS_DELIVERY_CASE_ID": "cutlass_016_fp8_fastacc_pingpong_cluster_sm",
+      "CUTLASS_DELIVERY_MODE": "cluster_sm",
+      "CUTLASS_DELIVERY_SAMPLE_COUNT": "1",
+      "CUTLASS_DELIVERY_TRACE": "1",
+      "GEMM_DELIVERY_GPU": "h100",
+      "HOPPER_TENSOR_MAP_DIRECT_DRIVER_PRELOAD": "1"
+    },
+    "kernel_range": "",
+    "marker_contract": {
+      "clock_marker_policy": "outermost_pair"
+    },
+    "program_file": "/path/to/hopper-prototype/artifacts/cluster_sm_400_20260920/cutlass/build/dense_algorithms",
+    "source_file": "/path/to/hopper-prototype-wt/T0016-stage56-capture/suites/cutlass/harness/cutlass_full_gpu_runner.cu",
+    "tma_recorder": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/libtma_tensor_map_recorder.so",
+    "tracer_root": "/path/to/hopper-prototype/artifacts/cluster_sm_296_flow_20260921/common/tracer_root"
+  },
+  "schema_version": "hopper.capture-case-invocation.v1"
+}

@@ -1,0 +1,87 @@
+{
+  "doc": "int-axis partition mechanism",
+  "program": {
+    "event": "issue",
+    "parameter_schema": "timing_row",
+    "operation_classes": [
+      "Y"
+    ],
+    "timing_kind": "nanosleep_warp_delay"
+  },
+  "root": {
+    "partition_axis": "width_bytes",
+    "partition_domain": [
+      0,
+      8
+    ],
+    "children": [
+      {
+        "guard": {
+          "axis": "width_bytes",
+          "operator": "range",
+          "value": [
+            0,
+            4
+          ]
+        },
+        "parameter": {
+          "scope": "instruction",
+          "fields": {
+            "cycles": {
+              "model": {
+                "kind": "linear",
+                "axis": "width_bytes",
+                "points": [
+                  [
+                    0,
+                    2.0
+                  ],
+                  [
+                    4,
+                    6.0
+                  ]
+                ]
+              },
+              "sources": [
+                "src.experimental"
+              ]
+            }
+          }
+        }
+      },
+      {
+        "guard": {
+          "axis": "width_bytes",
+          "operator": "range",
+          "value": [
+            5,
+            8
+          ]
+        },
+        "parameter": {
+          "scope": "instruction",
+          "fields": {
+            "cycles": {
+              "model": {
+                "kind": "constant",
+                "value": 9.0
+              },
+              "sources": [
+                "src.placeholder"
+              ]
+            },
+            "enabled": {
+              "model": {
+                "kind": "constant",
+                "value": 1
+              },
+              "sources": [
+                "src.placeholder"
+              ]
+            }
+          }
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+ "suite": "blackwell/full_gpu",
+ "case": "BLF-I8-C07",
+ "stage": "done",
+ "class": "ok",
+ "records": 0,
+ "dropped_polls": 0,
+ "missing": 0,
+ "unsupported": 0,
+ "issued": 4726784,
+ "completed": 4726784,
+ "cycles": 72540,
+ "hard": 0,
+ "walls": {
+  "convert": 6.0,
+  "segments": 0.0,
+  "build": 0.7,
+  "sim": 5.7,
+  "total": 12.5
+ },
+ "rss_kb": {
+  "convert": 245924,
+  "segments": 245924,
+  "build": 245924,
+  "sim": 711232
+ },
+ "hw_cycles": 73200.0,
+ "reference_cache_control": "all",
+ "placement_digest": "c3bb804b2974b1c3",
+ "shards": 7
+}

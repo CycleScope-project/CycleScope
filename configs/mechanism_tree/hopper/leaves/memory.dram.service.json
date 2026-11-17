@@ -1,0 +1,85 @@
+{
+ "memory.dram.service.root": {
+  "fields": {
+   "dram.issue_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0
+    },
+    "sources": [
+     "hopper.839e233bd403c194e34c7f58"
+    ]
+   },
+   "dram.latency_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 583
+    },
+    "sources": [
+     "row_gather.h100.r3"
+    ]
+   },
+   "dram.sector_bytes_per_cycle": {
+    "model": {
+     "kind": "constant",
+     "value": 121.84
+    },
+    "sources": [
+     "crossings.memory_port.h100.r3.experimental"
+    ]
+   },
+   "dram.loaded_latency_extra_cycles": {
+    "model": {
+     "axis": "shared_utilization",
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       0.0
+      ],
+      [
+       244,
+       55.8
+      ],
+      [
+       266,
+       53.2
+      ],
+      [
+       473,
+       60.1
+      ],
+      [
+       486,
+       59.5
+      ],
+      [
+       747,
+       199.8
+      ],
+      [
+       794,
+       171.4
+      ],
+      [
+       922,
+       710.5
+      ],
+      [
+       934,
+       435.3
+      ],
+      [
+       974,
+       887.1
+      ]
+     ]
+    },
+    "sources": [
+     "memlat_loaded.h100.r1"
+    ]
+   }
+  },
+  "scope": "sm"
+ }
+}

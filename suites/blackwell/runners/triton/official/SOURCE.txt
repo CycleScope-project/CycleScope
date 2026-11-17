@@ -1,0 +1,192 @@
+Triton tag: v3.7.0
+Triton commit: 5f3f125e8f63c24613f1f73b937442864f263f94
+Upstream source: /path/to/blackwell-prototype/artifacts/tools/src/triton-3.7.0/python/tutorials
+Extraction: retain imports, kernels/helpers/wrappers, module docstrings, and literal constants;
+remove top-level device probes, benchmark/test functions, and __main__ code.
+
+python/examples/gluon/01-attention-forward.py -> tutorial_01_attention_forward.py
+  stripped 986-1001: def test_op(Z, H, N_CTX, HEAD_DIM, causal, dtype, use_tmem_red, profile=False):
+  stripped 1013-1013: N_CTX = [2**i for i in range(10, 17)]
+  stripped 1014-1014: use_tmem_reds = [False, True] if is_blackwell_ultra() else [False]
+  stripped 1017-1035: for Z, H, D, is_causal, use_tmem_red in itertools.product(BATCH, N_HEADS, HEAD_DIM, causal, use_tmem
+  stripped 1073-1074: if __name__ == "__main__":
+python/tutorials/01-vector-add.py -> tutorial_01_vector_add.py
+  stripped 26-26: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 84-84: torch.manual_seed(0)
+  stripped 86-86: x = torch.rand(size, device=DEVICE)
+  stripped 87-87: y = torch.rand(size, device=DEVICE)
+  stripped 88-88: output_torch = x + y
+  stripped 89-89: output_triton = add(x, y)
+  stripped 90-90: print(output_torch)
+  stripped 91-91: print(output_triton)
+  stripped 92-93: print(f'The maximum difference between torch and triton is '
+  stripped 120-129: def benchmark(size, provider):
+  stripped 135-135: benchmark.run(print_data=True, show_plots=True)
+python/tutorials/02-fused-softmax.py -> tutorial_02_fused_softmax.py
+  stripped 30-30: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 115-115: properties = driver.active.utils.get_device_properties(DEVICE.index)
+  stripped 116-116: NUM_SM = properties["multiprocessor_count"]
+  stripped 117-117: NUM_REGS = properties["max_num_regs"]
+  stripped 118-118: SIZE_SMEM = properties["max_shared_mem"]
+  stripped 119-119: WARP_SIZE = properties["warpSize"]
+  stripped 120-120: target = triton.runtime.driver.active.get_current_target()
+  stripped 186-186: torch.manual_seed(0)
+  stripped 187-187: x = torch.randn(1823, 781, device=DEVICE)
+  stripped 188-188: y_triton = softmax(x)
+  stripped 189-189: y_torch = torch.softmax(x, axis=1)
+  stripped 190-190: assert torch.allclose(y_triton, y_torch), (y_triton, y_torch)
+  stripped 215-226: def benchmark(M, N, provider):
+  stripped 229-229: benchmark.run(show_plots=True, print_data=True)
+python/tutorials/03-matrix-multiplication.py -> tutorial_03_matrix_multiplication.py
+  stripped 157-157: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 361-361: torch.manual_seed(0)
+  stripped 362-362: a = torch.rand((512, 512), device=DEVICE, dtype=torch.float16) - 0.5
+  stripped 363-363: b = torch.rand((512, 512), device=DEVICE, dtype=torch.float16) - 0.5
+  stripped 364-364: triton_output = matmul(a, b)
+  stripped 365-365: torch_output = torch.matmul(a, b)
+  stripped 366-366: print(f"triton_output_with_fp16_inputs={triton_output}")
+  stripped 367-367: print(f"torch_output_with_fp16_inputs={torch_output}")
+  stripped 369-372: if torch.allclose(triton_output, torch_output, atol=1e-2, rtol=0):
+  stripped 374-374: TORCH_HAS_FP8 = hasattr(torch, "float8_e5m2")
+  stripped 375-390: if TORCH_HAS_FP8 and is_cuda():
+  stripped 402-402: ref_lib = 'cuBLAS' if is_cuda() else 'rocBLAS'
+  stripped 405-422: for fp8_inputs in [False, True]:
+  stripped 426-439: def benchmark(M, N, K, provider, fp8_inputs):
+  stripped 442-442: benchmark.run(show_plots=True, print_data=True)
+python/tutorials/04-low-memory-dropout.py -> tutorial_04_low_memory_dropout.py
+  stripped 41-41: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 76-76: x = torch.randn(size=(10, ), device=DEVICE)
+  stripped 79-79: x_keep = (torch.rand(size=(10, ), device=DEVICE) > p).to(torch.int32)
+  stripped 81-81: output = dropout(x, x_keep=x_keep, p=p)
+  stripped 82-86: print(tabulate.tabulate([
+  stripped 143-143: x = torch.randn(size=(10, ), device=DEVICE)
+  stripped 145-145: output = seeded_dropout(x, p=0.5, seed=123)
+  stripped 146-146: output2 = seeded_dropout(x, p=0.5, seed=123)
+  stripped 147-147: output3 = seeded_dropout(x, p=0.5, seed=512)
+  stripped 149-155: print(
+python/tutorials/05-layer-norm.py -> tutorial_05_layer_norm.py
+  stripped 37-43: try:
+  stripped 45-45: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 297-297: layer_norm = LayerNorm.apply
+  stripped 300-323: def test_layer_norm(M, N, dtype, eps=1e-5, device=DEVICE):
+  stripped 338-371: def bench_layer_norm(M, N, dtype, provider, mode='backward', eps=1e-5, device=DEVICE):
+  stripped 374-374: test_layer_norm(1151, 8192, torch.float16)
+  stripped 375-375: bench_layer_norm.run(save_path='.', print_data=True)
+python/tutorials/06-fused-attention.py -> tutorial_06_fused_attention.py
+  stripped 24-24: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 621-621: attention = _attention.apply
+  stripped 623-623: TORCH_HAS_FP8 = hasattr(torch, 'float8_e5m2')
+  stripped 634-690: def test_op(Z, H, N_CTX, HEAD_DIM, causal, warp_specialize, mode, provider, dtype=torch.float16):
+  stripped 693-698: try:
+  stripped 700-700: TORCH_HAS_FP8 = hasattr(torch, 'float8_e5m2')
+  stripped 704-731: for HEAD_DIM in [64, 128]:
+  stripped 735-770: def bench_flash_attention(BATCH, H, N_CTX, HEAD_DIM, causal, warp_specialize, mode, provider, device
+  stripped 773-775: if __name__ == "__main__":
+python/tutorials/07-extern-functions.py -> tutorial_07_extern_functions.py
+  stripped 28-28: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 52-52: torch.manual_seed(0)
+  stripped 54-54: x = torch.rand(size, device=DEVICE)
+  stripped 55-55: output_triton = torch.zeros(size, device=DEVICE)
+  stripped 56-56: output_torch = torch.asin(x)
+  stripped 57-57: assert x.is_cuda and output_triton.is_cuda
+  stripped 58-58: n_elements = output_torch.numel()
+  stripped 59-59: grid = lambda meta: (triton.cdiv(n_elements, meta['BLOCK_SIZE']), )
+  stripped 60-60: asin_kernel[grid](x, output_triton, n_elements, BLOCK_SIZE=1024)
+  stripped 61-61: print(output_torch)
+  stripped 62-62: print(output_triton)
+  stripped 63-64: print(f'The maximum difference between torch and triton is '
+  stripped 79-79: current_file = inspect.getfile(inspect.currentframe())
+  stripped 80-80: current_dir = Path(os.path.dirname(os.path.abspath(current_file)))
+  stripped 82-92: if is_cuda():
+  stripped 94-94: output_triton = torch.empty_like(x)
+  stripped 95-95: asin_kernel[grid](x, output_triton, n_elements, BLOCK_SIZE=1024, extern_libs=extern_libs)
+  stripped 96-96: print(output_torch)
+  stripped 97-97: print(output_triton)
+  stripped 98-99: print(f'The maximum difference between torch and triton is '
+python/tutorials/08-grouped-gemm.py -> tutorial_08_grouped_gemm.py
+  stripped 35-35: DEVICE = triton.runtime.driver.active.get_active_torch_device()
+  stripped 378-378: assert len(group_m) == len(group_n)
+  stripped 379-379: assert len(group_n) == len(group_k)
+  stripped 380-380: group_size = len(group_m)
+  stripped 381-390: for i in range(group_size):
+  stripped 392-392: tri_out = group_gemm_fn(group_A, group_B)
+  stripped 393-393: ref_out = [torch.matmul(a, b) for a, b in zip(group_A, group_B)]
+  stripped 394-395: for i in range(group_size):
+  stripped 397-400: if supports_tma():
+  stripped 445-490: def benchmark_square_matrices(N, provider):
+  stripped 511-561: def benchmark_batches(M, provider):
+  stripped 564-564: benchmark_square_matrices.run(show_plots=True, print_data=True)
+  stripped 565-565: benchmark_batches.run(show_plots=True, print_data=True)
+python/tutorials/09-persistent-matmul.py -> tutorial_09_persistent_matmul.py
+  stripped 43-52: if is_cuda():
+  stripped 85-85: HAS_TENSOR_DESC = supports_tma() and hasattr(tl, "make_tensor_descriptor")
+  stripped 86-86: HAS_HOST_TENSOR_DESC = supports_tma() and hasattr(triton.tools.tensor_descriptor, "TensorDescriptor"
+  stripped 87-87: HAS_WARP_SPECIALIZE = supports_ws() and HAS_TENSOR_DESC
+  stripped 644-651: def bench_fn(label, reps, warmup_reps, fn, *args):
+  stripped 731-758: if __name__ == "__main__":
+python/tutorials/10-block-scaled-matmul.py -> tutorial_10_block_scaled_matmul.py
+  adaptation: initialize optional cuBLAS scales for the MXFP4-only path
+  stripped 143-148: if is_cuda() and torch.cuda.get_device_capability()[0] in [10, 11]:
+  stripped 456-486: def bench_block_scaled(K, block_scale_type="nvfp4", reps=10, warmup_reps=10):
+  stripped 695-711: def bench_block_scaled_amd(K, block_scale_type="mxfp4", reps=10, mfma_nonkdim=16):
+  stripped 714-749: if __name__ == "__main__":
+python/tutorials/11-programmatic-dependent-launch.py -> tutorial_11_programmatic_dependent_launch.py
+  stripped 96-107: def benchmark(size, provider):
+  stripped 110-116: if __name__ == "__main__":
+python/tutorials/gluon/07-persistence.py -> tutorial_07_persistence.py
+  stripped 56-61: if torch.cuda.is_available():
+  stripped 63-63: t5 = importlib.import_module("05-wgmma")
+  stripped 71-72: if __name__ == "__main__" and not is_hopper_or_newer():
+  stripped 74-74: profiling_with_ncu = len(sys.argv) > 1 and sys.argv[1] == "profile"
+  stripped 282-288: def test_pipelined_matmul(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps):
+  stripped 296-300: if __name__ == "__main__":
+  stripped 302-316: if __name__ == "__main__" and not profiling_with_ncu:
+  stripped 446-446: schedulers = [PersistentTileScheduler]
+  stripped 455-461: def test_persistent_matmul(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, SchedulerImpl
+  stripped 464-475: if __name__ == "__main__" and not profiling_with_ncu:
+  stripped 491-493: if __name__ == "__main__" and profiling_with_ncu:
+  stripped 564-564: schedulers += [GroupedPersistentTileScheduler(1), GroupedPersistentTileScheduler(8)]
+  stripped 566-580: if __name__ == "__main__" and not profiling_with_ncu:
+  stripped 754-760: def test_persistent_matmul_pipelined(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, num_warps, Sch
+  stripped 763-790: if __name__ == "__main__":
+python/tutorials/gluon/08-warp-specialization.py -> tutorial_08_warp_specialization.py
+  stripped 43-48: if torch.cuda.is_available():
+  stripped 51-51: t3 = importlib.import_module("03-async-copy")
+  stripped 52-52: t4 = importlib.import_module("04-tma")
+  stripped 53-53: t7 = importlib.import_module("07-persistence")
+  stripped 66-67: if __name__ == "__main__" and not is_hopper_or_newer():
+  stripped 317-323: def test_elementwise_add_warp_specialized(xnumel, ynumel, XBLOCK, YBLOCK, num_load_buffers, num_stor
+  stripped 326-347: if __name__ == "__main__":
+  stripped 629-636: def test_matmul_warp_specialized(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, SUBTILE_FACTOR, nu
+  stripped 639-662: if __name__ == "__main__" and is_blackwell():
+python/tutorials/gluon/09-tma-gather-scatter.py -> tutorial_09_tma_gather_scatter.py
+  stripped 59-60: if __name__ == "__main__" and not is_blackwell():
+  stripped 63-63: t7 = importlib.import_module("07-persistence")
+  stripped 152-209: if __name__ == "__main__":
+  stripped 298-321: def test_async_gather(BLOCK_X, BLOCK_Y, y_offset, dtype, X_MAX, Y_MAX, fresh_knobs):
+  stripped 329-339: if __name__ == "__main__":
+  stripped 415-439: def test_async_scatter(BLOCK_X, BLOCK_Y, y_offset, dtype, X_MAX, Y_MAX, fresh_knobs):
+  stripped 623-643: def test_matmul_fused_gather_scatter(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers):
+python/tutorials/gluon/10-tcgen05-copy.py -> tutorial_10_tcgen05_copy.py
+  stripped 106-107: if __name__ == "__main__" and not is_blackwell():
+  stripped 110-110: t7 = importlib.import_module("07-persistence")
+  stripped 111-111: t8 = importlib.import_module("08-warp-specialization")
+  stripped 183-187: for TMEM_BLOCK_N in [1, 2, 4, 8, 16, 32, 64, 128, 256]:
+  stripped 194-206: def test_tcgen05_copy_nvmma_shared(M, N, TMEM_BLOCK_N, dtype, swizzle):
+  stripped 427-433: def test_matmul_accumulate(M, N, K, BLOCK_M, BLOCK_N, BLOCK_K, num_buffers, dtype):
+python/tutorials/gluon/11-tcgen05-mma-scaled.py -> tutorial_11_tcgen05_mma_scaled.py
+  stripped 93-94: if __name__ == "__main__" and not is_blackwell():
+  stripped 97-97: t7 = importlib.import_module("07-persistence")
+  stripped 98-98: t8 = importlib.import_module("08-warp-specialization")
+  stripped 341-352: def test_simple_mma_scaled(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+  stripped 369-389: if __name__ == "__main__":
+  stripped 564-578: def test_mma_scaled_contig(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+  stripped 581-603: if __name__ == "__main__":
+  stripped 808-818: def test_mma_scaled_packed_block(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+  stripped 821-843: if __name__ == "__main__":
+  stripped 890-900: if __name__ == "__main__":
+  stripped 935-941: if __name__ == "__main__":
+  stripped 1085-1095: def test_mma_scaled_tcgen05_copy(M, N, K, a_format, b_format, BLOCK_N, BLOCK_K):
+  stripped 1098-1120: if __name__ == "__main__":
+  stripped 1525-1536: def test_mma_scaled_pipelined(M, N, K, a_format, b_format, impl_kernel):
+  stripped 1539-1566: if __name__ == "__main__":

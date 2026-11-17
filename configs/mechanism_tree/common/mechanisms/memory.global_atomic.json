@@ -1,0 +1,24 @@
+{
+ "doc": "imported from legacy mechanism memory.global_atomic",
+ "program": {
+  "event": "initialization",
+  "operation_classes": [],
+  "parameter_schema": "memory.global_atomic"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "dependent_round_trip_ns": {
+   "kind": "constant"
+  },
+  "release_to_acquire_ns": {
+   "kind": "constant"
+  },
+  "same_address_service_ns": {
+   "kind": "constant"
+  }
+ }
+}

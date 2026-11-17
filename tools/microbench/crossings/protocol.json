@@ -1,0 +1,23 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "crossings",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "purpose": "Fill the evidence crossings whose measured side came from a hopper-prototype harness fit (mechanism-leaf-alignment-plan.md section 7): the same quantity is measured on BOTH devices with one new minimal probe per quantity, the H100 cell is the control against the installed Hopper leaf (10 % rule), the B300 cell fills the placeholder.",
+ "cells": {
+  "trywait_timeout": {
+   "mechanism": "synchronization.mbarrier.trywait_timeout.cycles",
+   "probe": "one warp, mbarrier initialised with expected count 1 and never arrived on; lane 0 reads clock64, issues ONE suspending mbarrier.try_wait.parity (no explicit suspendTimeHint, the ISA default bound), reads clock64 after it returns false; 64 repetitions x 8 launches, fresh mbarrier object per repetition",
+   "derivation": "median of (t_after - t_before) minus the two clock-read stalls (SASS control words of the window); installed Hopper 7892 (hopper-prototype v2acc) is the control",
+   "acceptance": "spread (P90 - P10) / median <= 10 % and two runs within 5 % -> measured; H100 must reproduce 7892 within 10 % else both numbers reported and the H100 leaf left unchanged"
+  },
+  "constant_cache": {
+   "mechanism": "memory.constant_cache.{hit,miss,same_line}_latency_cycles, capacity_bytes, line_bytes",
+   "probe": "dependent LDC pointer chase over a __constant__ array: index chain i = c[i] with stride S bytes over footprint F; warm pass (second traversal) for hit, first traversal under ncu --cache-control all for miss; S = 64 / 256 B, F in {512 B, 2, 8, 32, 64, 128 KiB}; 1024 dependent loads per sample, 32 samples; same_line = chain that stays inside one 256 B line",
+   "derivation": "hit = median warm cycles per load on the flat footprint plateau; capacity = largest F whose warm cycles stay within 5 % of the smallest-F warm value; line_bytes = smallest stride at which the cold pass costs one miss per load (cold/warm ratio flattens); miss = median cold cycles per load at stride 256 B beyond the capacity plateau; same_line = median of the one-line chain",
+   "acceptance": "plateau visible on >= 3 footprints; spread <= 5 % per cell; H100 must reproduce the installed 93.9 / 382.4 / 28.0 / 64 KiB / 256 B within 10 % else both numbers reported and the H100 leaf left unchanged; B300 installed as measured when its own cells pass"
+  }
+ },
+ "install": "<arch>/leaves/<mechanism>.json, source keys crossings.<cell>.<device>.r1; artifact $A/microbench/crossings/<cell>/<device>-r1/",
+ "not_allowed": "no values from other machines; no threshold change after data; no case tuning"
+}

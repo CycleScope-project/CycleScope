@@ -1,0 +1,346 @@
+{
+ "access_kind": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "async_copy",
+   "async_reduce",
+   "atomic",
+   "load",
+   "none",
+   "prefetch",
+   "read",
+   "reduction",
+   "store",
+   "write"
+  ]
+ },
+ "accumulator_dtype": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "f16",
+   "f32",
+   "s32"
+  ]
+ },
+ "active_producer_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "active_warpgroups": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "actual_participant_ctas": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "address_stride_bytes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "bytes"
+ },
+ "backward_loop_class": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "mixed_or_stateful",
+   "pure_integer_register_control"
+  ]
+ },
+ "branch_direction": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "backward",
+   "forward"
+  ]
+ },
+ "cache_hit_level": {
+  "kind": "enum",
+  "owner": "engine",
+  "unit": "enum",
+  "values": [
+   "l1",
+   "l2",
+   "dram",
+   "mixed"
+  ]
+ },
+ "cache_line_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "cache_policy": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "ca",
+   "cg"
+  ]
+ },
+ "completed_tx_bytes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "bytes"
+ },
+ "control_participating_warps": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "declared_math_warpgroups": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "launch",
+  "unit": "count"
+ },
+ "dependency_consumer_class": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "address_generation",
+   "fp32",
+   "integer",
+   "special_function",
+   "store",
+   "uniform_register_transfer"
+  ]
+ },
+ "dependency_source_role": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "address",
+   "data",
+   "store_data"
+  ]
+ },
+ "dram_sectors": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "execution_unit": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "address_generation",
+   "compute",
+   "constant",
+   "control",
+   "fp32",
+   "fp64",
+   "integer",
+   "ordinary",
+   "special",
+   "storage",
+   "store",
+   "synchronization",
+   "tensor",
+   "uniform",
+   "unknown",
+   "warpgroup"
+  ]
+ },
+ "expected_tx_bytes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "bytes"
+ },
+ "group_depth": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "group_member_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "input_dtype": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "bf16",
+   "e4m3",
+   "e5m2",
+   "f16",
+   "s8",
+   "tf32",
+   "u8"
+  ]
+ },
+ "l1_sectors": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "l2_sectors": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "loop_body_bytes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "bytes"
+ },
+ "loop_instruction_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "memory_active_lanes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "memory_space": {
+  "kind": "enum",
+  "owner": "capture",
+  "unit": "enum",
+  "values": [
+   "constant",
+   "generic",
+   "global",
+   "global_to_shared",
+   "local",
+   "none",
+   "shared",
+   "shared_to_global",
+   "shared_to_shared"
+  ]
+ },
+ "memory_width_bytes": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "bytes"
+ },
+ "occupied_capacity": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "operand_facts_available": {
+  "kind": "int",
+  "maximum": 1,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "outstanding_transactions": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "pending_groups": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "queue_depth": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "count"
+ },
+ "registers_per_thread": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "same_body_reuse": {
+  "kind": "int",
+  "maximum": 1,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "sector_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "shared_data_result_domain": {
+  "kind": "int",
+  "maximum": 1,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ },
+ "store_exact_unique_bytes": {
+  "kind": "int",
+  "maximum": 1,
+  "minimum": 0,
+  "owner": "engine",
+  "unit": "bytes"
+ },
+ "transaction_count": {
+  "kind": "int",
+  "maximum": 4294967295,
+  "minimum": 0,
+  "owner": "capture",
+  "unit": "count"
+ }
+}

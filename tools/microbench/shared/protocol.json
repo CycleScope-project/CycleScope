@@ -1,0 +1,24 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "shared",
+ "frozen_before_gpu": true,
+ "date": "2026-11-05",
+ "mechanisms": ["instruction.service (LDS/LDSM/LDC result latency)", "storage.shared.issue", "storage.shared.acceptance_sm", "storage.shared.visibility"],
+ "devices": {"h100": "sm_90a", "b300": "sm_103a (control)"},
+ "purpose": "One owner per shared-memory quantity on both devices (mechanism-leaf-alignment-plan.md P2): dependent LDS latency in the LDS service leaf (same dependent-chain definition as every other class), per-SMSP issue cost in storage.shared.issue, per-SM acceptance per 128 B wavefront in storage.shared.acceptance_sm, STS -> barrier visibility in storage.shared.visibility. Today Hopper carries 30-91 cycle LDS tables and multi-axis shared tables, Blackwell LDS = 1 plus ~2-cycle issue leaves: shared loads complete in ~3 cycles on B300 and the two devices disagree by 10x.",
+ "probe": "blackwell-prototype tools/microbench/probes/smem.cu + mb.cuh verbatim into tools/microbench/shared/probe/: lds_chain W (one warp, U dependent ld.shared of W bytes, W in {4, 8, 16}); issue OP D (W warps on SMSP 0 only or on all 4 SMSPs, K independent LDS / STS with D lanes on bank 0 at D rows = D wavefronts, D = 0 broadcast); vis S NW (last-arriver STS x S then bar.sync, t_w on warp 1). SASS gate sass_check.py check_smem verbatim. --launches 8 --reps 33, two runs per device.",
+ "derivation": {
+  "LDS result_latency (instruction.service)": "slope over U of the lds_chain medians at W = 4 (dependent LDS issue -> dependent issue); W = 8 / 16 reported; completion = result",
+  "storage.shared.issue.cycles (constant per class)": "issue OP D=1 cell with warps on SMSP 0 only: slope over K / wps = cycles per op per SMSP (LDS, STS; LDSM/STSM take the LDS/STS value until measured, experimental)",
+  "storage.shared.acceptance_sm.cycles linear(shared_wavefronts)": "issue OP D cells with warps on all 4 SMSPs: slope over K / (wps x 4) = cycles per op per SM at D wavefronts; knots at D in {1, 2, 4, 8, 16, 32} (D = 0 broadcast maps to 1); the per-SMSP issue cost is NOT subtracted (acceptance is the SM-level limit the engine serializes on; the engine takes max(issue chain, acceptance chain) via two separate rows)",
+  "storage.shared.visibility.cycles (constant)": "E[t_w - t_s | vis S=1] - o_s(t_s -> STS) - o_w, minus the no-store barrier release (vis S=0 cell) when present; otherwise listed as the raw difference",
+  "runs": "two runs per device; a cell is measured when fit residual <= 5 % and the runs agree within 5 %"
+ },
+ "acceptance": {
+  "cell": "fit max relative residual <= 5 % and run agreement <= 5 % -> measured, else experimental and listed",
+  "b300_control": "LDS issue 1.88 / STS issue 4.39 / acceptance degree table / visibility 13 must be reproduced within 10 %; a failing field is reported with both numbers and installed as experimental on b300",
+  "h100": "install every passing cell; the predecessor LDS table base cell (30) is replaced by the chain slope"
+ },
+ "install": "hopper + blackwell leaves: instruction.service LDS result/completion; storage.shared.issue constants (field_models changes to constant); storage.shared.acceptance_sm linear(shared_wavefronts) knots; storage.shared.visibility constant. Source keys shared.<device>.r1.",
+ "not_allowed": "no case-cycle tuning; no values from other machines; no threshold change after data"
+}

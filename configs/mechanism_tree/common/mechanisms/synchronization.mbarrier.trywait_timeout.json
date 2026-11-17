@@ -1,0 +1,22 @@
+{
+ "doc": "imported from legacy mechanism synchronization.mbarrier.trywait_timeout",
+ "program": {
+  "event": "issue",
+  "operation_classes": [],
+  "parameter_schema": "timing_row",
+  "timing_kind": "mbarrier_trywait_timeout"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "cycles": {
+   "kind": "constant"
+  },
+  "enabled": {
+   "kind": "constant"
+  }
+ }
+}

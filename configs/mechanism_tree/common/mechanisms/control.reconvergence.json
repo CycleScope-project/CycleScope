@@ -1,0 +1,21 @@
+{
+ "doc": "control_envelope: extra cycles of a BSSY/BSYNC reconvergence region (reconvergence v2 protocol: per-region residual over the body's SASS stalls, affine in control_path_count). Bound to the BSSY that opens the region: the converter attaches the region facts (control_path_count, sequential_region_count, control_selector_present) to the opening BSSY record (convert/control_flow.py); the engine applies the value as a floor on the warp's next issue after the bound instance (InstanceTiming.control_envelope -> WarpState::control_floor).",
+ "program": {
+  "event": "control_transition",
+  "operation_classes": [
+   "BSSY"
+  ],
+  "parameter_schema": "instance_timing"
+ },
+ "root": {
+  "parameter": {
+   "fields": "device"
+  }
+ },
+ "field_models": {
+  "control_envelope": {
+   "kind": "affine",
+   "axis": "control_path_count"
+  }
+ }
+}

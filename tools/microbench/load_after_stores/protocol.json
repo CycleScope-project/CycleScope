@@ -1,0 +1,31 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "load_after_stores",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-10",
+ "kind": "attribution run; no leaf value installed from it",
+ "question": "hp cutlass_dense_cpasync_05: instructions waiting for a stack reload (LDL) cost ~191 cycles per LDL on hardware against ~24 simulated, and instructions after the per-element epilogue stores (STG.E.U16, every lane its own sector) ~51 against ~16; the LDLs sit between those stores. L1 eviction by LDGSTS (ldgsts_l1) and a per-thread stack footprint (load_lines) do not explain it. Does an L1-hit load issued after K scattered stores wait until those stores have drained through the SM's store path, and is that per warp or per SM?",
+ "probe": "tools/microbench/load_after_stores/probe/load_after_stores.cu (header comment). K in {0,1,2,4,8,16,32,64} store instructions (32 sectors each) issued by the timing warp (same_warp) or by the other warp of the CTA (other_warp), then 8 dependent L1-hit loads timed; 16 x 7 samples; runs a and b.",
+ "derivation": "C(mode, K) = median chain cycles (8 loads). extra(mode, K) = C(mode, K) - C(mode, 0).",
+ "acceptance": "Control: C(same_warp, 0) / 8 within 15 % of the L1 hit latency measured by ldgsts_l1 r2 (36.1 b300 / 36.2 h100); runs a / b within 5 %.",
+ "outcomes_declared_before_data": {
+  "loads_wait_same_warp": "extra(same_warp, 64) >= 200 cycles and extra grows with K: a load waits behind the stores its own warp has pending.",
+  "loads_wait_sm": "additionally extra(other_warp, 64) >= 0.5 x extra(same_warp, 64): the wait is per SM (one store / load path).",
+  "no_wait": "extra(same_warp, 64) < 40: loads do not wait behind pending stores; the LDL waits stay unexplained.",
+  "other": "recorded only. Whatever the outcome, the engine rule and its occupancy law are declared in an addendum before any further data and before any install."
+ },
+ "not_allowed": "no case-cycle tuning; no threshold change after data.",
+ "addenda": [
+  {
+   "date": "2026-11-10",
+   "after_run": "r1 (b300-r1, h100-r1; $A/microbench/load_after_stores/)",
+   "text": "Chain of 8 L1-hit loads after K store instructions (32 sectors each), median cycles, runs a / b equal: b300 same_warp 344 / 361 / 359 / 378 / 533 / 858 / 1320 / 1324 for K = 0 / 1 / 2 / 4 / 8 / 16 / 32 / 64, other_warp 344 / 346 / 344 / 357 / 513 / 838 / 1287 / 1288; h100 same_warp 337 / 354 / 347 / 457 / 574 / 808 / 1276 / 1386, other_warp 337 / 337 / 337 / 423 / 540 / 774 / 1242 / 1461. Control by its letter misses (C(0) / 8 = 43.0 / 42.1 against 36.1 / 36.2, 19 % / 16 %: the chain holds the add of the dependence); the effect is 4x the baseline and identical on both runs, so the outcome is read. Outcomes loads_wait_same_warp and loads_wait_sm both hold on both devices: an L1-hit load issued after scattered stores waits until those stores have left the SM, whichever warp issued them; the extra is about one cycle per pending store sector between K = 8 and K = 32 (b300 +189 / +514 / +976 for 256 / 512 / 1024 sectors) and saturates near 1000 cycles. No engine rule is declared here yet; it needs its occupancy law (onset between K = 4 and 8, saturation) written in an addendum before any install."
+  },
+  {
+   "date": "2026-11-10",
+   "before": "any engine change",
+   "text": "Engine rule declared from r1 (structural, no new leaf value): the SM's load / store unit serves in issue order. A plain load (access kind load; global, local or generic space; not shared-memory, not constant, not an async copy or TMA / bulk transfer) issued on an SM starts its memory access (L1 lookup, port acquisition) no earlier than the time the SM's store port has finished the store sectors issued before it on that SM (the per-SM store port's busy-until, the installed store_l2.sector_bytes_per_cycle drain). L1 hits and misses alike; whichever warp issued the stores. Enabled by a structural field store_l2.orders_loads (memory.store_l2.service, cluster-local, source load_after_stores.<device>.r1); absent = off, results byte-identical. Check before the gate: the probe replayed through the engine (b300: same_warp and other_warp at K = 0, 8, 32) must give extra(K = 32) within 30 % of the measured 976 / 943 cycles and extra(K = 0) = 0; the measured saturation near 1000 cycles is expected from the existing store-buffer backpressure (rule S) and is not a separate rule. Gate: full-gpu 500 x 2 and single-cluster 500 x 2 against $A/fg-gemm/{full-r15,sc-r15} (sc MAPE must not get worse), CTest, pytest, tree validate --strict."
+  }
+ ]
+}

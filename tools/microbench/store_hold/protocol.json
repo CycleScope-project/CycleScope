@@ -1,0 +1,34 @@
+{
+  "schema": "cyclescope.microbench-protocol.v1",
+  "name": "store_hold",
+  "version": 1,
+  "frozen_before_gpu": true,
+  "kind": "service-axis measurement: how long a global store keeps its address and data registers unavailable to a later writer; no workload-based fitting",
+  "question": "After a global store has issued, when can the same warp issue an instruction that overwrites the store's data register or its address register? Does the wait follow the time the SM store path needs to take that request (requests pending ahead of it times their service), and does an instruction that only reads the register wait?",
+  "motivation": "PC sampling of full-gpu cases ($CYCLESCOPE_ARTIFACT_ROOT/fg-over20/notes/NOTES.md, 2026-11-14): the instruction right after a global store stalls in long_scoreboard when it rewrites an operand register of a store - B300 CUF-DSL-MIXED-INT4-R05: STG.E.ENL2.256 with data R4..R11 followed by IMAD.MOV into R4, about 400-500 cycles each, 17.6 % of warp time (engine 0.3 %); H100 cutlass_dense_cpasync_03 / 04 / 05 / 06: IADD3 into the address register of a neighbouring STG.E.U16, 5.9-8.4 % (engine 0.7-1.5 %). The engine releases a store's operands when the store issues.",
+  "probe": "store_hold.cu (mb.cuh helpers, one CTA on one SM, W warps, bar.sync + fence.sc.gpu before every window, everything in the window unrolled, operands in registers). Window of the timing warp: t0 = clock; K prior stores (each its own address and data registers, never rewritten; geometry G); the test store st [pa], va (geometry G); ts = clock; the probe instruction X; t1 = clock; lane 0 records ts - t0 and t1 - ts. X: none (control); ovw_data: va = vb + vc (writes the test store's data register without reading it); ovw_addr: pa = pb + c (writes its address register without reading it); ovw_prior_data / ovw_prior_addr: the same for the registers of prior store number 1 (the oldest pending one) instead of the test store; read_data: x = va + 1 and read_addr: y = pa + 8 (read only). Geometry G of all stores of a cell: full16 (width 16, 32 lanes contiguous: 16 whole sectors) or line32 (width 4, stride 128: 32 sectors in 32 lines); every store its own fresh 32-KiB region. K in {0, 1, 4, 16, 40}. W = 1, and W = 4 with the three other warps running the store_flood stream of the same geometry over the whole window (saturated SM). 8 launches x 33 repetitions (repetition 0 discarded), runs a and b. H100 and B300.",
+  "controls": {
+    "sass": "window: K + 1 STG of the declared width, three clock reads, exactly one instruction of the declared kind between the second and third clock read (none for the control), no load, no branch; the overwrite's destination register is the register the store used (checked in the SASS), and it is not among the overwrite's sources.",
+    "timing": "control cells: t1 - ts equals the clock-read gap of store_flood (2 cycles) within 2 cycles for every K; ts - t0 at K = 0 reproduces one store issue (store_issue leaf of the width) within 4 cycles; runs a and b within max(3 cycles, 10 %)."
+  },
+  "derivation": "hold(X, G, K, W) = median(t1 - ts) - control(G, K, W). Service per request T(G) from store_flood (h100 full16 15.9, line32 63.9; b300 15.9 and 31.9 / 62.0).",
+  "predictions_before_data": {
+    "engine_today": "hold = 0 for every X, K, W.",
+    "hypothesis": "ovw_data and ovw_addr at W = 1: hold = time until the SM has taken the test store = about (K + 1) x T(G) minus the time already spent issuing the K + 1 stores (so growing linearly in K with slope T(G) minus the issue interval of the width), up to the store-buffer bound; ovw_prior_*: about T(G) at any K (the oldest request leaves first); read_data / read_addr: 0; W = 4: hold larger by the other warps' share (about 4 x).",
+    "alternative": "hold independent of K (a fixed latency of the store instruction on its operands, like a result latency)."
+  },
+  "outcomes_before_data": {
+    "queue": "If hold(ovw) grows with K with a slope within 20 % of T(G) minus the issue interval on both geometries and read cells are 0: rule = a global store keeps the registers it reads (address and / or data, whichever cells show it) reserved until the SM store port has finished that request; an instruction that writes such a register cannot issue before. Engine: per warp and register a writer-block time set by the store to its port completion; no new leaf value (structural field enabling it per device, evidence experimental until the replay passes).",
+    "fixed": "If hold is a constant C(width) independent of K: install it as an operand-hold latency of the store class (new field of the store's instruction.service leaf).",
+    "none": "If hold is 0 within 5 cycles everywhere: the kernels' stalls after a store are not an operand hold; re-attribute."
+  },
+  "prediction_check": "H100 replay (tracer -> convert -> engine) of ovw_data and ovw_addr at K = 4 and 16, W = 1, both geometries: hold within max(5 cycles, 20 %); then the full-gpu 500 x 2 regression against main's baseline (fg-over20/full-gb).",
+  "not_allowed": "No family / case / shape specific timing; no tuning to the full-gpu error; post-data changes of a criterion are labelled with their reason.",
+  "addenda": [
+    {
+      "when": "after h100-r9 and b300-r11 (data seen)",
+      "runs": "$CYCLESCOPE_ARTIFACT_ROOT/microbench/store_hold/{h100-r9,b300-r11} (table.txt, dropped.txt, build/sass-cells.txt)",
+      "text": "The probe did not produce the cells: 107 of 132 were dropped by the SASS check because ptxas never lets the probe instruction write the physical register the store used (it copies store operands into temporaries or splits the live range of the overwritten value), in three rounds of rewrites. Kept: all controls (t1 - ts = 2 cycles on h100; on b300 two W = 4 controls read 33 and 64, i.e. the W = 4 window is not clean there) and read_addr.full16 at W = 4: h100 hold 0 at every K; b300 36 / 94 / 194 / 256 at K = 1 / 4 / 16 / 40, not usable given the control. No outcome can be read; nothing installed. Protocol v2 (protocol-v2.json) uses loop-carried registers, which keep one physical register across iterations as in the kernels that showed the stall."
+    }
+  ]
+}
