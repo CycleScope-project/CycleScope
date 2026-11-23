@@ -20,6 +20,7 @@
   <a href="#工作原理">工作原理</a> ·
   <a href="#快速开始">快速开始</a> ·
   <a href="#文档">文档</a> ·
+  <a href="#进行中的工作">进行中的工作</a> ·
   <a href="#精度">精度</a> ·
   <a href="README.md">English</a>
 </p>
@@ -160,6 +161,12 @@ cyclescope run     --suite hopper/local --case my_kernel --out out/mine
 | `tests/` | Python 测试 |
 
 </details>
+
+## 进行中的工作
+
+stall 归因的优化正在 [`stall-attribution`](https://github.com/CycleScope-project/CycleScope/tree/stall-attribution) 分支上进行。目标是让仿真结果与 Nsight Compute 的结果不只在总周期数上对齐：warp 为什么在等、这次等待落在哪条指令上，都要与 `ncu` 对同一次 launch 的报告一致。这样你可以在自己关心的粒度上，把 CycleScope 的仿真和 `ncu` 的 profile 放在一起对照：整个 kernel、某一类 stall，或者单条指令。
+
+该分支仍在开发中，目前的周期精度低于 `main`。
 
 ## 精度
 

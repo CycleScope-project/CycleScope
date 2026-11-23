@@ -20,6 +20,7 @@
   <a href="#how-it-works">How it works</a> ·
   <a href="#quick-start">Quick start</a> ·
   <a href="#documentation">Documentation</a> ·
+  <a href="#in-progress">In progress</a> ·
   <a href="#accuracy">Accuracy</a> ·
   <a href="README.zh-CN.md">中文</a>
 </p>
@@ -196,6 +197,19 @@ available in Chinese under [docs/zh](docs/zh/README.md).
 | `tests/` | Python tests |
 
 </details>
+
+## In progress
+
+Stall attribution is being calibrated on the
+[`stall-attribution`](https://github.com/CycleScope-project/CycleScope/tree/stall-attribution) branch. The goal is to bring the simulation
+in step with Nsight Compute beyond the total cycle count: why a warp
+waits, and which instruction that wait lands on, should match what
+`ncu` reports for the same launch. You can then put a CycleScope run
+next to an `ncu` profile at whatever granularity you work at: the
+whole kernel, a stall class, or a single instruction.
+
+The branch is work in progress, and its cycle accuracy currently
+trails `main`.
 
 ## Accuracy
 
