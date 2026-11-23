@@ -39,6 +39,7 @@ void BlackwellModule::on_load(Simulator& s) {
 bool BlackwellModule::instance_ready(
     Simulator& s, WarpState& w, const InstructionInstance& inst,
     const InstanceSemantics& sema) {
+  stall_detail_ = nullptr;
   switch (sema.kind) {
     case kSemaTmemAlloc:
       return tmem_alloc_ready(s, w, sema);
@@ -48,6 +49,7 @@ bool BlackwellModule::instance_ready(
         w.last_wait = WaitBucket::kCollective;
         w.retry_at = it->second;
         ++tele_[kTmemWaitStalls];
+        stall_detail_ = "tmem_wait_store";
         return false;
       }
       return true;

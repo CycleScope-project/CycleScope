@@ -326,14 +326,15 @@ def convert_capture(case_dir, arch: str, out_dir, *, launch=None,
         used_maps: set = set()
         # two passes per CTA: control_participating_warps needs all warps
         for (cta, warp), recs in sorted(by_warp[_key].items()):
-            folded, dropped = poll_folding.fold_warp(recs, static_of)
+            folded, dropped, origins = poll_folding.fold_warp(
+                recs, static_of)
             dropped_polls += dropped
             patches = control_flow.flow_patches(
                 recs, static_of, static_by_pc_of, cta)
-            warps_done.append((cta, warp, recs, folded, patches))
+            warps_done.append((cta, warp, recs, folded, patches, origins))
         # participating warps per loop key
         patches_map = {f"{cta}-{warp}": p
-                       for cta, warp, _r, _f, p in warps_done}
+                       for cta, warp, _r, _f, p, _o in warps_done}
         control_flow.fill_participating(patches_map)
 
         if cta_info:
@@ -357,7 +358,7 @@ def convert_capture(case_dir, arch: str, out_dir, *, launch=None,
             rank_of = {c: i for i, c in enumerate(cluster_rank_list)}
             cluster_size = len(cluster_rank_list)
 
-        for cta, warp, recs, folded, patches in warps_done:
+        for cta, warp, recs, folded, patches, origins in warps_done:
             sm, wslot = headers[(cta, warp)]
             cl_linear = _cta_linear(cta, grid)
             if cta not in ctas_f:
@@ -400,6 +401,10 @@ def convert_capture(case_dir, arch: str, out_dir, *, launch=None,
                     if ops is None:
                         ops = model.SemanticOperands()
                     ops.uniform.update(patch)
+                if pos in origins:
+                    if ops is None:
+                        ops = model.SemanticOperands()
+                    ops.uniform["wait_origin"] = origins[pos]
                 gsyncs, glane = _gsync.observations(rec, srow)
                 if ops is None and glane:
                     ops = model.SemanticOperands(lane=glane)

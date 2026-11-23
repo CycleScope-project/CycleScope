@@ -46,6 +46,7 @@ FLAG_BRANCH = 1 << 3
 FLAG_ASYNC = 1 << 4
 FLAG_TENSOR = 1 << 5
 FLAG_PREDICATED = 1 << 6
+FLAG_DEFER_BLOCKING = 1 << 9    # BAR.*.DEFER_BLOCKING (placement v2 rule B)
 
 
 def operation_class(static, dynamic=None) -> str:
@@ -151,6 +152,8 @@ def instruction_flags(static) -> int:
         flags |= FLAG_TENSOR
     if static.predicate is not None:
         flags |= FLAG_PREDICATED
+    if root == "BAR" and "DEFER_BLOCKING" in static.opcode.upper().split(".")[1:]:
+        flags |= FLAG_DEFER_BLOCKING
     return flags
 
 

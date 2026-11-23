@@ -152,6 +152,9 @@ def h7():
     s.inst.append((fill, NONE, NONE, len(s.inst)))
     s.warps.append((0, 0, 0, 0, first, 6))
     s.cta(0, 0, 0, 1, 0)
+    # code map for the stall-ledger pc assertion (fence at 0x1040)
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
     # schema-29 leaf: latency 10, drains 128 / 51.2 B/c, cap 19405
     s.uses.append((s.leaf_node(
         29, {0: 1.0, 1: 10.0, 2: 128.0, 3: 51.2, 4: 19405.0}),
@@ -704,15 +707,21 @@ def _queue_warp(s, mq_class, delay=38.0, count=8):
     # a second warpgroup's warp on SMSP 0: a single latency-`delay`
     # producer parks the warp's first queue-class evaluation inside
     # the owner's held window without consuming SMSP issue slots,
-    # then `count` queue-class instances (register dependency on r9)
+    # then `count` queue-class instances.  issue_rules v1: the
+    # dependency rides write barrier 1 (R1 dropped register
+    # tracking); the NOP puts the first evaluation at delay + 2 so
+    # R3 sees the raise
     delay_t = s.template("FILL", svc={1: delay, 2: 1.0, 7: 1.0},
-                         dst=[9])
-    mqt = s.template(mq_class, svc=SVC4, src=[9])
+                         dst=[9], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    mqt = s.template(mq_class, svc=SVC4, src=[9],
+                     scoreboard_wait_mask=0x2)
     first = len(s.inst)
     s.instance(delay_t)
+    s.instance(nop)
     for _ in range(count):
         s.instance(mqt)
-    s.warps.append((0, 4, 4, 0, first, 1 + count))
+    s.warps.append((0, 4, 4, 0, first, 2 + count))
 
 
 def w1():

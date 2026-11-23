@@ -22,6 +22,8 @@ SEMA_FLAG_GROUP_COMMIT = 0x10    # wgmma operand carries gsb0 (closes unit)
 SEMA_FLAG_STAT = 0x20            # LDTM.STAT variant
 SEMA_FLAG_CTA_PAIR = 0x80        # TMA .2CTA: completions post on the
                                  # destination rank's pair leader (rank & ~1)
+SEMA_FLAG_WAIT_ORIGIN = 0x200     # mbarrier_wait: earliest_issue = the absolute code
+                                 # address of the first waiter of the folded poll sequence
 SEMA_FLAG_COMPLETE_TX = 0x100    # mbarrier_arrive: transaction_bytes are
                                  # complete_tx (0 arrivals), not expect_tx
 SEMA_FLAG_SYNCS = 0x40           # NANOSLEEP.SYNCS: wakes on the last

@@ -4,16 +4,36 @@
    "cycles": {
     "model": {
      "axis": "requested_sleep_cycles",
-     "domain": [
-      0,
-      4294967295
-     ],
-     "intercept": 12082.8,
-     "kind": "affine",
-     "slope": 1.044
+     "kind": "linear",
+     "points": [
+      [
+       0,
+       46.6
+      ],
+      [
+       100,
+       244.35
+      ],
+      [
+       1000,
+       2024.14
+      ],
+      [
+       10000,
+       31999.47
+      ],
+      [
+       100000,
+       254192.25
+      ],
+      [
+       1000000,
+       1881736.06
+      ]
+     ]
     },
     "sources": [
-     "nanosleep.h100.v2r1"
+     "sync_basic.h100.v2"
     ]
    },
    "enabled": {

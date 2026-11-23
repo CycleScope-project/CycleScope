@@ -19,7 +19,8 @@ from .model import DynamicInstruction, StaticInstruction
 
 from .sass_decode import decode_mbarrier_init_expected_arrivals
 from ..job.semantics import (SEMA_FLAG_CTA_PAIR, SEMA_FLAG_IMPLICIT_COMMIT,
-                             SEMA_FLAG_SYNCS, SEMA_FLAG_COMPLETE_TX)
+                             SEMA_FLAG_SYNCS, SEMA_FLAG_COMPLETE_TX,
+                             SEMA_FLAG_WAIT_ORIGIN)
 
 # SEMA.flags bits
 FLAG_AFTER_READY = 0x1          # mbarrier_wait: after_ready_mask operand present
@@ -120,6 +121,7 @@ class SemanticRow:
     fields: dict = field(default_factory=dict)      # named slots -> u64
     object_list: tuple[int, ...] | None = None      # -> MBOL rows
     split: tuple[tuple[int, int, int], ...] | None = None  # (rank, credit, pad) -> SPLT
+    earliest_issue: int = 0                         # SEMA.earliest_issue
 
 
 @dataclass(slots=True)
@@ -496,8 +498,13 @@ def _d_mbarrier_wait(static, dyn, ctx, cta, wslot):
     timeout = _uniform_value(dyn, "timeout_hint", "suspend_time_hint")
     if timeout:
         fields["timeout_hint"] = timeout
+    origin = _uniform_value(dyn, "wait_origin")
+    earliest = 0
+    if origin:
+        flags |= SEMA_FLAG_WAIT_ORIGIN
+        earliest = origin
     return SemanticRow(SemanticsKind.mbarrier_wait, flags=flags,
-                       fields=fields)
+                       fields=fields, earliest_issue=earliest)
 
 
 def _d_mbarrier_inval(static, dyn, ctx, cta, wslot):

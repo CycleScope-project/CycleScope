@@ -1,35 +1,22 @@
 {
  "kernel.lifecycle.root": {
   "fields": {
-   "envelope_cycles": {
+   "exit_branch_resolve_cycles": {
     "model": {
-     "axis": "launch_warps_per_cta",
-     "kind": "linear",
-     "points": [
-      [
-       1,
-       269.8
-      ],
-      [
-       4,
-       293.1
-      ],
-      [
-       8,
-       294.0
-      ],
-      [
-       16,
-       330.3
-      ],
-      [
-       32,
-       406.6
-      ]
-     ]
+     "kind": "constant",
+     "value": 8
     },
     "sources": [
-     "lifecycle.b300.v3r4"
+     "kernel_boundary.b300.v1"
+    ]
+   },
+   "exit_drain_tail_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 6
+    },
+    "sources": [
+     "kernel_boundary.b300.v1"
     ]
    }
   }

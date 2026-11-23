@@ -56,6 +56,10 @@ class TimingKind(IntEnum):
     # acceptance backlog (storage.shared.fence, tma_store_loaded
     # protocol-v2 addendum)
     shared_fence_drain = 66
+    # per-warp queue of ten entries behind mio_throttle / lg_throttle:
+    # admission at issue, serial release per warp, stores in the return
+    # chain (instruction.warp_queue, warp_queue protocol)
+    warp_queue_entry = 67
     # per-SMSP acceptance of a synchronous shared store by wavefront
     # count (storage.shared.acceptance_smsp, shared protocol-v3
     # store_step addendum)

@@ -49,10 +49,10 @@ Version 1 remains readable.
 | META | 120 | tree_digest[32], program_digest[32], converter_digest[32], cluster_id, cta_count, warp_count u32, instruction_count u64, flags u32 (bit0 model_complete) |
 | CTAS | 56 | cta_index, cta_x/y/z, cluster_rank, cluster_shape_x/y/z, sm_id, peer_sm_id, multicast_mask u32; cta_group, is_pair_leader u8; tmem_columns u16; first_warp, warp_count u32 |
 | WARP | 32 | cta_index, warp_in_cta, warp_slot, smsp u32; first_instance, instance_count u64 |
-| TMPL | 68 | operation_class u32 (STRS offset), flags u32, resource u32, issue_group_resource u32; source_begin u64, source_count u32, destination_begin u64, destination_count u32; scoreboard_read/write/wait_mask u8, control u8 (bit0-3 stall, bit4 yield); timing_begin u64, timing_count u32, semantic_kind u32, semantic_u64 u64 |
+| TMPL | 68 | operation_class u32 (STRS offset), flags u32 (`instruction_flags` of the arch rules: bit0 memory, 1 atomic, 2 barrier, 3 branch, 4 async, 5 tensor, 6 predicated, 7 tmem (Blackwell), 8 clc (Blackwell), 9 DEFER_BLOCKING: a `BAR` whose opcode text carries the modifier `DEFER_BLOCKING`, set by the Python and the C++ converter; the operation class stays `BAR`; read by the stall ledger's rule B only), resource u32, issue_group_resource u32; source_begin u64, source_count u32, destination_begin u64, destination_count u32; scoreboard_read/write/wait_mask u8, control u8 (bit0-3 stall, bit4 yield); timing_begin u64, timing_count u32, semantic_kind u32, semantic_u64 u64 |
 | INST | 16 | template, semantics, memory_access, code_line u32 |
 | REGS | 4 | register u32: bits 0-23 register id (namespaces: R<n>→n, UR<n>→256+n, P<n>→512+n, UP<n>→768+n, B<n>→1024+n; hardwired or special names such as RZ/URZ/PT/UPT/SR_* are never issued and never enter template keys), bits 24-31 flags (bit0 reuse_served: the static instruction at pc-16 carries a reuse flag on the same operand slot of the same register; bit2 reuse_carrier: this instruction's own control-word reuse_mask bit on that source slot; bit1 pair: a 64-bit source operand (a `.64`/`.F32x2` suffix, or a DADD/DMUL/DFMA/DSETP/DMNMX class, or an FFMA2/FADD2/FMUL2-class token without the `.F32` suffix — `.F32` broadcasts a scalar, not a pair); destination-register rows have flags=0. Source-slot order = operand text minus the destination register and any following plain predicate destinations (PT/UPT/P<n>/UP<n>); non-register tokens occupy slots too and correspond to the reuse bits position-wise) |
-| SEMA | 60 | kind u16, flags u16, earliest_issue u64, field[6] u64 (§5) |
+| SEMA | 60 | kind u16, flags u16, earliest_issue u64, field[6] u64 (§5); mbarrier_wait: flags 0x200 = wait origin, `earliest_issue` then holds the absolute code address (in the code-address table's space) of the first waiter of the poll sequence the surviving poll stands for (the optional uniform operand fact `wait_origin`, written by the poll fold when the first folded poll's address differs from the survivor's); the engine reads it for the stall ledger only; facts without it mean no origin and no facts-tag change |
 | MACC | 48 | sector_begin u64, sector_count u32, flags u32 (low 3 bits = space: 1 shared, 3 constant; bit5 remote; bits 6-8 = access_kind: 0x0 load / 0x40 store / 0x80 atomic / 0xC0 async_copy / 0x100 async_reduce / 0x140 prefetch; bit9 = LDGSTS without .BYPASS fills the L1); facts space `shared_cluster` resolves to 1 — bit5 set when the reference carries a remote rank — `global_system` to 0, `param` to 4), sequence u64, shape u64, timing_begin u64, timing_count u32, cache_hint u32 (bit field, Blackwell L1/L2 hints) |
 | MSEC | 16 | address u64, byte_mask u32, lane_mask u32 (sector rows merge lanes only within one access; different accesses keep separate rows even on the same sector) |
 | TIME | 40 | kind, selector_a, selector_b, ready_warps u32; selector_c u64; cycles f64; enabled u8, pad[7] |
@@ -244,6 +244,7 @@ One mechanism program corresponds to one kind.
 | 64 | `tensor_result_latency` | `tensor.completion` | both |
 | 65 | `global_store_issue_interval_smsp` | `storage.global.store_issue` | both |
 | 66 | `shared_fence_drain` | `storage.shared.fence` | both |
+| 67 | `warp_queue_entry` | `instruction.warp_queue` | both |
 | 80 | `shared_store_acceptance_smsp` | `storage.shared.acceptance_smsp` | both |
 | 81 | `tma_reduce_store` | `storage.tma.reduce` | both |
 
@@ -253,7 +254,10 @@ uses it.
 
 ## 7. Result `GSIMRES` / `GSIMJNL` / `GSIMWLG`
 
-RSLT (one row): cycles, issued, completed, hard_constraint_failures u64,
+RSLT (one row): cycles (the largest count of active cycles of any SM —
+the union of its warps' residency intervals [entry, done); the former
+last-completion-plus-envelope value is TELE group 2
+`last_completion_cycle`), issued, completed, hard_constraint_failures u64,
 flags u32. SMSP: sm, smsp u32, first_active, last_active u64. WAIT:
 scope, cause_kind u32, cycles u64. RWAIT: resource, cause_kind u32,
 cycles u64. TELE: group, counter u32, value u64.

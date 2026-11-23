@@ -56,6 +56,10 @@ class Resolved:
     main_regex: re.Pattern | None = None
     env_profile: str = ""
     family: str = ""
+    # resolved from an argv row in suites/<arch>/<sset>/cases.tsv
+    # (kernel_regex@occurrence launch selection); False for the
+    # blackwell adapter path (main-last selection)
+    argv_row: bool = False
     spec: dict = field(default_factory=dict)
     # fixed launch table row (suites/<arch>/<set>/launches.tsv): the
     # exact (mangled, occurrence) pair to trace, plus the raw row for
@@ -114,8 +118,8 @@ def _provision_harness_upstreams() -> None:
             pass  # a concurrent shard created it first
 
 
-def _hopper_row(suite: str, case_id: str) -> dict:
-    tsv = REPO / "suites" / "hopper" / suite / "cases.tsv"
+def _argv_row(arch: str, sset: str, case_id: str) -> dict:
+    tsv = REPO / "suites" / arch / sset / "cases.tsv"
     rows = list(csv.DictReader(tsv.open(), delimiter="\t"))
     for r in rows:
         if r["case_id"] == case_id:
@@ -156,8 +160,9 @@ def _ensure_link(link: Path, target: Path) -> None:
 def resolve_case(suite: str, case_id: str, workdir: Path) -> Resolved:
     site.export_environment()
     arch, sset = suite.split("/", 1)
-    if arch == "hopper":
-        row = _hopper_row(sset, case_id)
+    argv_tsv = REPO / "suites" / arch / sset / "cases.tsv"
+    if arch == "hopper" or argv_tsv.is_file():
+        row = _argv_row(arch, sset, case_id)
         argv = json.loads(row["argv_json"].replace('""', '"'))
         argv = [_expand(a) for a in argv]
         env = json.loads(row["env_json"].replace('""', '"')) \
@@ -171,8 +176,8 @@ def resolve_case(suite: str, case_id: str, workdir: Path) -> Resolved:
         # goes FIRST on PYTHONPATH, and `python -m tools.*` argv is
         # wrapped in a -c shim that inserts the mirror at sys.path[0]
         # and aliases modules that moved under tools/microbench/deepgemm/.
-        hop_clone = _harness_root()
-        if hop_clone.is_dir():
+        hop_clone = _harness_root() if arch == "hopper" else None
+        if hop_clone is not None and hop_clone.is_dir():
             _provision_harness_upstreams()
             env["PYTHONPATH"] = (str(hop_clone) + ":"
                                  + env.get("PYTHONPATH", "")).rstrip(":")
@@ -236,6 +241,7 @@ def resolve_case(suite: str, case_id: str, workdir: Path) -> Resolved:
                         kernel_regex=row["kernel_regex"] or None,
                         occurrence=occ,
                         env_profile=row.get("env_profile") or "",
+                        argv_row=True,
                         spec=row, launch_key=lkey, launch_row=lrow)
     # blackwell: adapters under suites/blackwell/runners
     rroot = REPO / "suites" / "blackwell" / "runners"
@@ -441,7 +447,7 @@ def _ncu_launch_pass(out: Path, resolved: Resolved, env: dict,
 
 def _select_launch(resolved: Resolved, out: Path) -> str:
     """Return the CYCLESCOPE_CAPTURE_LAUNCHES value."""
-    if resolved.arch == "hopper":
+    if resolved.argv_row:
         # verify the occurrence exists in the ncu census
         rows = [json.loads(l) for l in
                 (out / "ncu_launches.jsonl").read_text().splitlines()
@@ -653,11 +659,11 @@ def _capture_selection(resolved: Resolved, out: Path,
         # a partial census must never feed launch selection
         if (out / "ncu_launches.jsonl").is_file() and                 ncu.get("status") != "ncu_missing":
             (out / "ncu_launches.jsonl").unlink()
-        if resolved.arch != "hopper":
+        if not resolved.argv_row:
             # main-last selection needs the census: fail closed
             raise _CensusFailed(ncu.get("status"))
-        # hopper selects by kernel_regex@occurrence; the census is only a
-        # cross-check and its absence is recorded, not fatal
+        # argv-row cases select by kernel_regex@occurrence; the census is
+        # only a cross-check and its absence is recorded, not fatal
     return _select_launch(resolved, out), "census"
 
 
@@ -770,7 +776,7 @@ def capture_case(suite: str, case_id: str, out: Path, *,
     if dry_run:
         rec["launch_selection"] = (
             f"{resolved.kernel_regex}@{resolved.occurrence}"
-            if resolved.arch == "hopper" else "main-last")
+            if resolved.argv_row else "main-last")
         print(json.dumps(rec, indent=2, default=str))
         return rec
 

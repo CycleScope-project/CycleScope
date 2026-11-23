@@ -24,6 +24,8 @@
   <a href="README.zh-CN.md">中文</a>
 </p>
 
+> **Branch `stall-attribution` — work in progress.** This branch calibrates *where* waits land: the engine's per-instruction wait attribution is compared with hardware stall sampling, mechanism by mechanism. Cycle accuracy on this branch is currently H100 10.91 % / B300 9.81 % MAPE (`suites/*/full_gpu/expected.tsv`). The Accuracy section and figures below and `suites/*/full_gpu/results/` describe `main`.
+
 ---
 
 CycleScope is a cycle-level simulator that reconstructs a real execution

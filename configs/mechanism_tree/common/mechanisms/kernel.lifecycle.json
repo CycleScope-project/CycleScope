@@ -15,6 +15,12 @@
   "envelope_cycles": {
    "kind": "linear",
    "axis": "launch_warps_per_cta"
+  },
+  "exit_branch_resolve_cycles": {
+   "kind": "constant"
+  },
+  "exit_drain_tail_cycles": {
+   "kind": "constant"
   }
  }
 }

@@ -1,0 +1,79 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "constant_paths",
+ "version": 1,
+ "frozen_before_gpu": false,
+ "date": "2026-11-15",
+ "kind": "install from readings already taken (warp_issue v1, family c): rules and values are declared here before the engine is changed and before any replay with the changed engine; no new GPU data",
+ "mechanisms": [
+  "memory.constant_cache"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "ownership": "The per-SM resident sets are cluster-local. The 256 B block state in front of L2 is one per GPC (b300 counters gcc__*); it is shared by the SMs of a GPC and belongs to the full-GPU loop.",
+ "why": "warp_issue v1: the two constant paths (uniform: sm_90a ULDC / sm_103a LDCU; vector: LDC) keep separate resident sets on both devices, a first touch and a re-read cost what the tables below say, and the wait sits at the load when the load has no write barrier (h100 ULDC, class imc_miss) and at the reader otherwise (short_scoreboard). The engine has one resident set per SM for both paths, a flat 30 cycles for vector bank-0 loads, and same-line / hit / miss latencies of 37 / 107 / 407 (h100) and 37 / 105 / 503 (b300) for the rest, all on the reader.",
+ "data_seen_before_freezing": [
+  "warp_issue protocol v1 with all addenda; $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/derive-{h100,b300}.txt, section c (cycles per warp at each load pc + at its reader pc, two sampling passes averaged, base shape = 8 warps per CTA on every SM unless a suffix says otherwise).",
+  "kernel_start protocols v2-v4 with addenda (the h100 rules installed from them were removed from the leaf at the start of this branch; v3 reported the h100 uniform first touch as 55 / 58 / 126 / 127 / 125 / 124 for 1 / 2 / 4 / 8 / 16 / 32 warps per SM)."
+ ],
+ "rules": {
+  "C1 two resident sets": "Each SM keeps one resident set per path (uniform, vector), lines of 64 B, each with the capacity the leaf has today (capacity_bytes; not measured per path). A line is resident in a path's set from the cycle its fill through that path completes.",
+  "C2 latency": "Access through path p to line l at cycle t: resident and filled -> the result is ready at t + reread_p. Fill in flight -> at max(t + reread_p, fill ready). Not resident -> a fill starts and is ready at max(t, block ready) + first_touch_p, and not before the path's previous fill on this SM + fill_interval_p (pipelined service: a batch costs one first touch plus an interval per further line).",
+  "C3 blocks": "Banks other than the parameter bank (bank 0) are fetched in 256 B blocks by the GPC's cache: the first fill of a line whose block that GPC has not fetched starts the block fetch, ready block_fetch cycles later; a block in flight is waited for; a fetched block stays. Bank-0 blocks are present at launch.",
+  "C4 where the wait sits": "A uniform-path load without a write barrier (sm_90a ULDC) is held at issue until its line is resident and filled (ledger reason constant_hold) and its result is ready at issue. Every other constant load issues at once and its result (destination registers, write barrier) is ready at the cycle C2 gives; a vector load without a write barrier holds nobody and its outstanding fill is part of the exit drain as today.",
+  "C5 h100 uniform path, few warps": "On h100 the uniform first touch costs uniform_first_touch_few_warps when at most 2 warps are resident on the SM at the start of the fill, uniform_first_touch otherwise. The mechanism behind the step is not identified (it is not queueing: 4 to 32 warps cost the same); the field is experimental and a 3-warp cell is in the next survey.",
+  "superseded": "With the new fields present the fields same_line_latency_cycles, hit_latency_cycles, miss_latency_cycles, bank0_access_cycles and the per-warp last-line state are not used; they and the kernel_start v2-v4 rule code are removed afterwards in a refactor commit that must leave every result byte-identical."
+ },
+ "values": {
+  "definition": "first touch / re-read of the vector path and of the b300 uniform path = the wait at the reader pc (the reader is the instruction after the load; its residency runs from the load's issue). h100 uniform = the wait at the load pc. Means over the loads listed, integer readings of the derive tables.",
+  "h100": {
+   "uniform_first_touch_cycles": "129.0 = mean of the 28 first-touch loads of c.u0.first8 (117 133 141 138 135 132 139 130), c.u0.batch4 (109 127 129 129), c.u0.batch8 (109 132 125 131 132 145 124 127), c.u0.reread loads 1-4 (121 124 149 124), c.u0_then_v0 loads 1-4 (117 133 135 126)",
+   "uniform_first_touch_few_warps_cycles": "60.25 = mean of c.u0.first8.w1 (58 60 61 61 60 61 61 60); uniform_few_warps_limit = 2",
+   "uniform_reread_cycles": "0 (c.u0.reread loads 5-8: 3 2 4 1 at the load, inside the load's stall)",
+   "vector_first_touch_cycles": "92.15 = mean of 20 loads: c.v0.first8 (92 92 92 90 95 90 93 94), c.v0.reread 1-4 (89 89 91 91), c.u0_then_v0 5-8 (99 91 92 94), c.v0_then_u0 1-4 (90 92 89 98)",
+   "vector_reread_cycles": "22.75 = c.v0.reread 5-8 (23 21 24 23)",
+   "vector_fill_interval_cycles": "27.0 = (4 + 169 - 92.15) / 3 from c.v0.batch4 (four loads one cycle apart, first reader waits 169)",
+   "uniform_fill_interval_cycles": "0 (the loads are held one after the other by C4; no further spacing seen: c.u0.batch4 / batch8 cost a first touch each)",
+   "block_bytes": 256,
+   "block_fetch_cycles": "491.1 = mean of (first line of a block) - (first touch): c.u3.first8 loads 1, 4, 8 at the load 695 537 539 - 129.0; c.v3.first8 loads 1, 4, 8 at the reader 656 574 609 - 92.15"
+  },
+  "b300": {
+   "uniform_first_touch_cycles": "69.05 = mean of 20 loads: c.u0.first8 (66 70 71 72 70 71 71 71), c.u0.reread 1-4 (68 72 73 72), c.u0_then_v0 1-4 (62 68 69 65), c.v0_then_u0 5-8 (65 67 69 69)",
+   "uniform_reread_cycles": "19.0 = c.u0.reread 5-8 (20 19 19 18)",
+   "uniform_fill_interval_cycles": "20.9 = mean of (4 + 115 - 69.05) / 3 = 16.7 (c.u0.batch4) and (8 + 237 - 69.05) / 7 = 25.1 (c.u0.batch8); the two disagree, experimental",
+   "vector_first_touch_cycles": "100.1 = mean of 20 loads: c.v0.first8 (98 95 94 100 96 91 101 93), c.v0.reread 1-4 (111 112 102 111), c.u0_then_v0 5-8 (103 97 102 97), c.v0_then_u0 1-4 (102 98 97 102)",
+   "vector_reread_cycles": "27.5 = c.v0.reread 5-8 (29 25 30 26)",
+   "vector_fill_interval_cycles": "20.3 = (4 + 157 - 100.1) / 3 from c.v0.batch4",
+   "block_bytes": 256,
+   "block_fetch_cycles": "594.6 = mean of c.u3.first8 loads 1, 4, 8 (672 642 635) - 69.05 and c.v3.first8 loads 1, 4, 8 (656 841 629) - 100.1"
+  },
+  "evidence": "first touch and re-read: measured (two passes, at least 1700 samples per row, 20-28 loads). fill intervals, block_fetch (three blocks per path, spread 408-566 on h100, 529-741 on b300), the h100 few-warps value and limit: experimental. capacity per path: the installed value, not measured per path."
+ },
+ "judgement": {
+  "gates": "The seven gates; tree build and tree validate --strict; changed fixture expectations listed with the rule that changes them.",
+  "replay of the warp_issue v1 captures with the new engine and trees": [
+   "location: h100 uniform loads carry at least 0.9 of (load + reader) wait at the load under constant_hold; every other constant load at least 0.9 at the reader under barrier:<load class>;",
+   "per cell, sum over the body's loads of (wait at the load + wait at the reader) within 15 % of hardware for c.u0.first8, c.v0.first8, c.u0.reread, c.v0.reread, c.u0_then_v0, c.v0_then_u0, c.u0.batch4, c.u0.batch8, c.v0.batch4, c.u3.first8, c.v3.first8 (the cells the values come from: this checks the implementation, it is not evidence for the rule), and c.u0.first8.w1 on h100;",
+   "reported without a criterion: the w32, head and tail512 cells (the head loads of a large kernel are slower on hardware: code fetch and constant requests share a path; that interaction is declared with the code-fetch install), d.visible, the stack load's part of the exit drain in a.* / b.*."
+  ],
+  "other device": "The engine structure is common; each device's leaf takes its own values. With the fields absent the engine keeps today's behaviour byte for byte (checked on the 25-case subset of each device with the fields removed).",
+  "full GPU": "500 x 2 with issue_rules and constant_paths installed: cycles per case against full-base reported (not a criterion); cyclescope stall compare: site and per-pc residency, the constant-load pcs outside loops, both devices."
+ },
+ "install": "memory.constant_cache gets the fields named under values on both devices (h100 source constant_paths.h100.v1, b300 constant_paths.b300.v1); the engine rules C1-C5.",
+ "not_allowed": "No full-GPU case decides a value or a rule. No value from the other device, another machine or the literature.",
+ "open (next survey)": [
+  "h100 uniform first touch at 3 warps per SM and with warps that arrive staggered (what makes the step between 2 and 4 warps);",
+  "constant operands c[..] of instructions that are not loads (which path, where the wait sits);",
+  "capacity of each path's set and of the GPC block cache; whether a block fetched for one SM serves the other SMs of the GPC without their own wait;",
+  "the first block of a kernel costs 120-150 cycles more than later blocks on h100;",
+  "32 warps per SM (the first load is cheaper, the wait partly moves to no_instruction)."
+ ],
+ "addenda": [
+  {
+   "when": "2026-11-15, install (engine + leaves 7fe3b1b9; build $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/build-7fe3b1b9, seven gates 0; replay warp_issue/{h100,b300}/sim-const, tables warp_issue/derive-<device>-const.txt)",
+   "text": "Installed on both devices with the declared values. Fields absent: the same engine with the trees of the previous commit replays all 140 cells with the cycles of the previous engine (sim-const-nofields against sim-issue, 70 / 70 per device); the 25-case full-GPU subset named in the protocol was replaced by this check. Location: h100 uniform loads wait at the load under constant_hold (128 per first touch, 60 at one warp per SM), every other load at its reader under barrier:<LDC|LDCU>:{first,inflight,block}. Sum over the body's loads, replay / hardware: h100 c.u0.first8 0.98, c.u0.first8.w1 1.02, c.u0.reread 1.01, c.u0.batch4 1.04, c.u0.batch8 1.00, c.u3.first8 0.98, c.v0.first8 0.98, c.v0.reread 0.99, c.v0.batch4 0.98, c.v3.first8 0.90, c.u0_then_v0 0.99, c.v0_then_u0 1.09; b300 c.u0.first8 0.97, c.u0.reread 0.96, c.u0.batch4 1.02, c.u0.batch8 0.74, c.u3.first8 0.99, c.v0.first8 1.03, c.v0.reread 0.92, c.v0.batch4 0.93, c.v3.first8 0.98, c.u0_then_v0 1.01, c.v0_then_u0 1.00. ONE CELL IS OUTSIDE THE 15 %: b300 c.u0.batch8 (217 against 295). The implementation gives what the rule says (69 + 7 x 20.9); the rule's constant interval does not hold over 8 loads (the two batch readings gave 16.7 and 25.1, and hardware shows mio_throttle on loads 5-7). uniform_fill_interval stays installed as experimental; batches of 2 / 4 / 8 / 16 go to the next survey. Reported without criterion: 32 warps per SM 1.22 / 0.86 (h100 uniform / vector), 1.07 / 0.85 (b300); loads at the kernel head 0.94 / 0.93 (h100), 0.86 / 0.94 (b300); head loads with 512 code lines behind 0.69 (h100) / 0.57 (b300) and late loads with that tail 0.92 / 0.93 (the code-fetch interaction, not modelled); the stack load's part of the exit drain of a.empty 89 against 97-111 (h100)."
+  }
+ ]
+}

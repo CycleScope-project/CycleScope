@@ -1,0 +1,207 @@
+{
+ "doc": "Per-warp queue behind mio_throttle / lg_throttle (warp_queue protocol Q1-Q4). A member instruction (STS, LDS, SHFL.IDX, SHFL.BFLY, LDG, STG; not predicated off, not a remote shared access) is an entry of its warp's queue from issue until its release; it cannot issue while queue_depth_count entries are unreleased. One release server per warp: start = max(free, issue + start_latency_cycles + start_interval_ratio * release_interval_cycles), release = start + release_interval_cycles, free = release (fractions kept). is_global_entry selects the ledger reason (warp_queue:lg when the waiting instruction and every unreleased entry are global, else warp_queue:mio). has_chain_turn: the entry also takes a turn of release_interval_cycles in the warp's return chain 1 (stores; the result time of the store itself is unchanged). The width partition is the operand width of the lane (bytes) from the capture; LDS / LDG / SHFL release intervals do not depend on it. SM level (warp_queue v2 S1-S4): sm_start_interval_cycles is the length of the slot a release needs in its (SM, operation class) server (0 = none; an STG takes it only on the store fast path: a global store of at least 4 bytes per lane inside one 128-byte line, the line the warp's previous global store wrote, which skips the store buffer); sm_depth_count bounds the unreleased entries of all warps of an SM (0 = no bound); result_after_release_cycles floors the result of a member load at release + c (0 = none).",
+ "program": {
+  "event": "issue",
+  "operation_classes": [
+   "STS",
+   "LDS",
+   "SHFL.IDX",
+   "SHFL.BFLY",
+   "LDG",
+   "STG"
+  ],
+  "parameter_schema": "timing_row",
+  "timing_kind": "warp_queue_entry"
+ },
+ "root": {
+  "partition_axis": "operation_class",
+  "partition_domain": [
+   "STS",
+   "LDS",
+   "SHFL.IDX",
+   "SHFL.BFLY",
+   "LDG",
+   "STG"
+  ],
+  "children": [
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STS"
+    },
+    "partition_axis": "width_bytes",
+    "partition_domain": [
+     0,
+     4294967295
+    ],
+    "children": [
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        0,
+        4
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        5,
+        8
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        9,
+        4294967295
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ]
+   },
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LDS"
+    },
+    "parameter": {
+     "fields": "device"
+    }
+   },
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "SHFL.IDX"
+    },
+    "parameter": {
+     "fields": "device"
+    }
+   },
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "SHFL.BFLY"
+    },
+    "parameter": {
+     "fields": "device"
+    }
+   },
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "LDG"
+    },
+    "parameter": {
+     "fields": "device"
+    }
+   },
+   {
+    "guard": {
+     "axis": "operation_class",
+     "operator": "eq",
+     "value": "STG"
+    },
+    "partition_axis": "width_bytes",
+    "partition_domain": [
+     0,
+     4294967295
+    ],
+    "children": [
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        0,
+        4
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        5,
+        8
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     },
+     {
+      "guard": {
+       "axis": "width_bytes",
+       "operator": "range",
+       "value": [
+        9,
+        4294967295
+       ]
+      },
+      "parameter": {
+       "fields": "device"
+      }
+     }
+    ]
+   }
+  ]
+ },
+ "field_models": {
+  "enabled": {
+   "kind": "constant"
+  },
+  "queue_depth_count": {
+   "kind": "constant"
+  },
+  "release_interval_cycles": {
+   "kind": "constant"
+  },
+  "start_latency_cycles": {
+   "kind": "constant"
+  },
+  "start_interval_ratio": {
+   "kind": "constant"
+  },
+  "is_global_entry": {
+   "kind": "constant"
+  },
+  "has_chain_turn": {
+   "kind": "constant"
+  },
+  "sm_start_interval_cycles": {
+   "kind": "constant"
+  },
+  "sm_depth_count": {
+   "kind": "constant"
+  },
+  "result_after_release_cycles": {
+   "kind": "constant"
+  }
+ }
+}

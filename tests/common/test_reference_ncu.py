@@ -12,7 +12,8 @@ from cyclescope.reference import ncu_runner
 
 def _hopper(kernel_regex="nvjet", occurrence=2):
     return Resolved(argv=[], env={}, cwd=None, arch="hopper",
-                    kernel_regex=kernel_regex, occurrence=occurrence)
+                    kernel_regex=kernel_regex, occurrence=occurrence,
+                    argv_row=True)
 
 
 def _row(ordinal, mangled, cycles=None):
@@ -108,7 +109,8 @@ def test_run_reference_reuses_capture_scratch(tmp_path, monkeypatch):
         return 0, [_ncu_rec("nvjet_a", 10)]
 
     r = Resolved(argv=["app", "--out", "<CAPTURE>/scratch/r.json"], env={},
-                 cwd=None, arch="hopper", kernel_regex="nvjet", occurrence=1)
+                 cwd=None, arch="hopper", kernel_regex="nvjet", occurrence=1,
+                 argv_row=True)
     monkeypatch.setattr(ncu_runner, "resolve_case", lambda suite, cid, work: r)
     monkeypatch.setattr(ncu_runner, "_run_once", fake_run_once)
     monkeypatch.setattr(ncu_runner, "_gpu_info", lambda: {"gpu": "x"})
@@ -145,7 +147,7 @@ def test_run_group_kills_process_group(tmp_path):
 def test_case_command_capture_and_far(tmp_path):
     r = Resolved(argv=["app", "--out", "<CAPTURE>/res.json"], env={},
                  cwd=None, arch="hopper", kernel_regex="k",
-                 occurrence=1)
+                 occurrence=1, argv_row=True)
     argv, env = driver.case_command(r, tmp_path / "t", {"A": "1"})
     assert argv == ["app", "--out", str(tmp_path / "t") + "/res.json"]
     assert env == {"A": "1", "CYCLESCOPE_RUNNER_ROOT": env["CYCLESCOPE_RUNNER_ROOT"]}
@@ -214,7 +216,7 @@ def test_tracer_env_leaves_module_loading_to_nvbit():
 def test_run_env_json_redacts_secret_keys(tmp_path):
     out = tmp_path / "cap"
     r = Resolved(argv=["true"], env={}, cwd=None, arch="hopper",
-                 kernel_regex="k")
+                 kernel_regex="k", argv_row=True)
     env = {"PATH": "/usr/bin:/bin",
            "AWS_ACCESS_KEY_ID": "AKIA-SECRET",
            "AWS_SECRET_ACCESS_KEY": "shhh",
@@ -244,7 +246,8 @@ def test_run_env_json_skips_unrelated_parent_var(tmp_path, monkeypatch):
 
 
 def test_placement_failure_fails_capture(tmp_path, monkeypatch):
-    r = Resolved(argv=["true"], env={}, cwd=None, arch="hopper")
+    r = Resolved(argv=["true"], env={}, cwd=None, arch="hopper",
+                 argv_row=True)
     monkeypatch.setattr(driver, "resolve_case", lambda *a, **k: r)
     monkeypatch.setattr(driver, "prepare_case",
                         lambda *a, **k: {"status": "not_needed", "rc": 0})

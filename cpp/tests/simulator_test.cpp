@@ -19,9 +19,18 @@ int main(int argc, char** argv) {
   assert(st.issued == st.completed);
   assert(st.issued > 0);
   assert(st.hard_failures == 0);
-  // S1: completed arrives at the completion event; cycles must reach
-  // the last completion (fixture completion latency = 99).
-  assert(st.cycles >= 99);
+  // S1 (kernel_boundary K2): cycles is the busiest SM's active-span
+  // union — the fixture's single warp is resident only until its
+  // done cycle, so the 99-cycle completion no longer extends
+  // cycles; the last completion stays in telemetry group 2
+  // last_completion_cycle.
+  assert(st.cycles >= 1);
+  bool last_completion_99 = false;
+  for (const auto& t : st.tele)
+    if (t.group == 2 && t.counter == cyclescope::kTele2LastCompletionCycle &&
+        t.value >= 99)
+      last_completion_99 = true;
+  assert(last_completion_99);
   std::printf("ok issued=%llu cycles=%llu\n",
               (unsigned long long)st.issued,
               (unsigned long long)st.cycles);

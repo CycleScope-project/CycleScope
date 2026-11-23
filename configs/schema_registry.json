@@ -73,6 +73,16 @@
      "type": "uint64",
      "unit": "cycles"
     },
+    "fallthrough_hold_cycles": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "resolve_cycles": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "cycles"
+    },
     "unreused_additional": {
      "id": 2,
      "retired": true,
@@ -109,6 +119,11 @@
      "id": 14,
      "type": "uint64",
      "unit": "count"
+    },
+    "launch_first_line_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
     },
     "launch_prefetch_bytes": {
      "id": 11,
@@ -196,6 +211,26 @@
      "id": 12,
      "type": "float64",
      "unit": "cycles"
+    },
+    "return_interval_cycles": {
+     "id": 13,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "return_chain": {
+     "id": 14,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "sm_service_interval_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "warp_inflight_group": {
+     "id": 16,
+     "type": "uint64",
+     "unit": "count"
     }
    },
    "id": 1,
@@ -215,6 +250,16 @@
     },
     "envelope_cycles": {
      "id": 2,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "exit_branch_resolve_cycles": {
+     "id": 4,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "exit_drain_tail_cycles": {
+     "id": 5,
      "type": "float64",
      "unit": "cycles"
     },
@@ -366,6 +411,81 @@
      "id": 3,
      "type": "float64",
      "unit": "cycles"
+    },
+    "uniform_bank0_cold_hold_cycles": {
+     "id": 8,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_cold_hold_cycles": {
+     "id": 9,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_resident_hold_cycles": {
+     "id": 10,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_bank0_cold_latency_cycles": {
+     "id": 11,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_first_touch_cycles": {
+     "id": 12,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_reread_cycles": {
+     "id": 13,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_fill_interval_cycles": {
+     "id": 14,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_first_touch_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_reread_cycles": {
+     "id": 16,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_fill_interval_cycles": {
+     "id": 17,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "block_bytes": {
+     "id": 18,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "block_fetch_cycles": {
+     "id": 19,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_first_touch_few_warps_cycles": {
+     "id": 20,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_few_warps_limit": {
+     "id": 21,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "uniform_first_touch_min_smsps": {
+     "id": 22,
+     "type": "uint64",
+     "unit": "count"
     }
    },
    "id": 27,
@@ -1082,10 +1202,69 @@
      "type": "float64",
      "unit": "cycles"
     },
+    "service_interval_cycles": {
+     "id": 16,
+     "type": "float64",
+     "unit": "cycles"
+    },
     "sector_cost_ratio": {
      "id": 20,
      "type": "float64",
      "unit": "ratio"
+    },
+    "defer_stop_distance_cycles": {
+     "id": 21,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "origin_hold_cycles": {
+     "id": 22,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "queue_depth_count": {
+     "id": 23,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "release_interval_cycles": {
+     "id": 24,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "start_latency_cycles": {
+     "id": 25,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "start_interval_ratio": {
+     "id": 26,
+     "type": "float64",
+     "unit": "ratio"
+    },
+    "is_global_entry": {
+     "id": 27,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "has_chain_turn": {
+     "id": 28,
+     "type": "uint64",
+     "unit": "boolean"    },
+    "sm_start_interval_cycles": {
+     "id": 29,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "sm_depth_count": {
+     "id": 30,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "result_after_release_cycles": {
+     "id": 31,
+     "type": "float64",
+     "unit": "cycles"
     }
    },
    "id": 4,

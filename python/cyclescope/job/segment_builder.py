@@ -599,7 +599,7 @@ class _Builder:
                     (index, rank, credit, pad))
         slots = sem_mod.pack_fields(row.kind, **fields)
         self.tables["SEMA"] += sf.SEMA.pack_row(
-            (row.kind, row.flags, 0, *slots))
+            (row.kind, row.flags, row.earliest_issue, *slots))
         self.sema_count += 1
         return index
 

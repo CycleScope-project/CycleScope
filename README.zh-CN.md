@@ -24,6 +24,8 @@
   <a href="README.md">English</a>
 </p>
 
+> **`stall-attribution` 分支 — 开发中。** 本分支校准等待落在何处：引擎的逐指令等待归因与硬件 stall 采样逐机制对比。当前本分支的全卡周期精度为 H100 10.91 % / B300 9.81 % MAPE（`suites/*/full_gpu/expected.tsv`）。下文的精度一节与图示以及 `suites/*/full_gpu/results/` 描述的是 `main`。
+
 ---
 
 CycleScope 是一个逐周期仿真器，重建 kernel 在 NVIDIA GPU 上的一次真实执行。Profiler 告诉你 kernel 跑了多久、warp 停顿了多少次；CycleScope 告诉你**每条指令何时发射、等了多久、在等什么**。

@@ -23,7 +23,7 @@ bool in(const std::string &s, std::initializer_list<const char *> l) {
 
 constexpr int FLAG_MEMORY = 1, FLAG_ATOMIC = 2, FLAG_BARRIER = 4,
               FLAG_BRANCH = 8, FLAG_ASYNC = 16, FLAG_TENSOR = 32,
-              FLAG_PREDICATED = 64;
+              FLAG_PREDICATED = 64, FLAG_DEFER_BLOCKING = 512;
 
 const std::set<std::string> kSemanticRoots = {
     "BAR",  "MBAR",   "SYNCS",   "ARRIVES",  "DEPBAR",  "LDGDEPBAR",
@@ -157,6 +157,10 @@ struct HopperRules final : cyclescope_convert::ConvertRules {
     if (kAsyncRoots.count(root)) flags |= FLAG_ASYNC;
     if (kMatrixRoots.count(root)) flags |= FLAG_TENSOR;
     if (s.has_predicate) flags |= FLAG_PREDICATED;
+    if (root == "BAR" &&
+        std::find(toks.begin() + 1, toks.end(), "DEFER_BLOCKING") !=
+            toks.end())
+      flags |= FLAG_DEFER_BLOCKING;
     return flags;
   }
 

@@ -18,6 +18,12 @@
    "axes_subset_of": [
     "branch_taken"
    ]
+  },
+  "fallthrough_hold_cycles": {
+   "kind": "constant"
+  },
+  "resolve_cycles": {
+   "kind": "constant"
   }
  }
 }

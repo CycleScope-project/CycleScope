@@ -110,6 +110,15 @@
     "sources": [
      "ifetch.b300.v3"
     ]
+   },
+   "launch_first_line_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 546.3
+    },
+    "sources": [
+     "kernel_boundary.b300.v1"
+    ]
    }
   }
  }

@@ -66,7 +66,9 @@ The engine writes up to three files:
 `cyclescope run` writes `result.bin` under
 `sim/<case>/out-<builder>/`; `--ledgers` adds `journal.bin` and
 `wait.bin` in the same directory. By hand they come from
-`cyclescope-engine simulate --journal <path> --wait-ledger <path>`.
+`cyclescope-engine simulate --journal <path> --wait-ledger <path>`;
+`--stall-ledger <path>` additionally writes a per-PC stall ledger
+(`stall.tsv`, schema `cyclescope.stall-ledger.v1`; engine.md §4).
 
 The issue journals and wait ledgers of all 1,000 suite kernels are
 published in [CycleScope-records](https://github.com/CycleScope-project/CycleScope-records),

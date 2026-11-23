@@ -84,13 +84,19 @@ void InstructionFetch::launch_prefetch(std::uint32_t sm,
   (void)channel;
   const std::uint64_t first = code_addr / cfg_.line_bytes;
   // launch prefetch: line j arrives at entry + (j+1)*stream_l1 as
-  // prefetch_only and does NOT advance any channel's last_arrival
+  // prefetch_only and does NOT advance any channel's last_arrival;
+  // with launch_first_line (kernel_boundary K3) the first line pays
+  // the measured cold latency and the chain streams from that arrival
   const std::uint64_t n = cfg_.launch_prefetch / cfg_.line_bytes;
   for (std::uint64_t j = 0; j < n; ++j) {
     const std::uint64_t line = first + j;
     if (s.inflight.count(line) || s.l2code.count(line)) continue;
-    s.inflight.emplace(line, Inflight{
-        now + (j + 1) * cfg_.stream_l1, true, false, smsp});
+    const std::uint64_t arrival =
+        cfg_.launch_first_line
+            ? now + cfg_.launch_first_line + j * cfg_.stream_l1
+            : now + (j + 1) * cfg_.stream_l1;
+    s.inflight.emplace(line, Inflight{arrival, true, false, smsp});
+    if (j == 0) s.launch_head_arrival = arrival;
   }
 }
 
@@ -143,9 +149,14 @@ std::uint64_t InstructionFetch::ready(std::uint32_t sm,
   // demand miss: the line pays its level's stream slot on the channel
   std::uint64_t arrival =
       std::max(now, s.last_arrival[level][ch]) + stream(level);
+  // K3: until the launch chain's head line lands, no demand on this
+  // SM can arrive earlier; the chain's later lines keep the original
+  // "chain first wins" comparison and can be out-raced by a demand
+  if (cfg_.launch_first_line && arrival < s.launch_head_arrival)
+    arrival = s.launch_head_arrival;
   if (pv0 != nullptr && pv0->arrival <= arrival) {
-    // the launch-prefetch chain gets there first: take its arrival and
-    // land the line in the L0 without spending a channel slot
+    // the launch-prefetch chain gets there first: take its arrival
+    // and land the line in the L0 without spending a channel slot
     arrival = pv0->arrival;
     it->second = Inflight{arrival, false, false, smsp};
   } else {

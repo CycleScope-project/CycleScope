@@ -1,0 +1,45 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "mio_basic",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-17",
+ "kind": "survey, supplement to version 1: which producers the per-SM server holds, the depth of the bound in front of it, the scope of the LDS / SHFL spacing; installs nothing",
+ "mechanisms": [
+  "instruction.service (S2R, S2UR, LDC, LDCU, LDS, SHFL.*, CS2R, VOTE)",
+  "MIO queue (mio_throttle)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "Version 1 addendum, OPEN list: S2R and resident LDC saturate one server per SM at 2.0 cycles per instruction (16 warps x 8), S2UR and LDC show mio_throttle from 8 producers per warp on, LDS and SHFL.BFLY do not saturate per SM. An installation needs: the members of the per-SM server, the queue depth, and whether the LDS / SHFL spacing is per warp or per SMSP.",
+ "data_seen_before_freezing": [
+  "mio_basic v1 addendum and tables ($CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/mio_basic-readings). No new GPU data."
+ ],
+ "probe": {
+  "chain": "as version 1 (frame m.loop.ptx of commit b3dba748, gen_m.py pattern, set mio_basic, same build dir); new cells only, run into $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/mio_basic-v2/<device>; replay build 68702860.",
+  "cells": {
+   "m.nop.w32": "the frame at 32 warps per CTA (8 warps per SMSP).",
+   "members of the per-SM server (runs of 8 at 4 / 8 / 16 warps)": "m.s2ur.n8.w4 / .w8 / .w16; m.uldc.n8.w4 / .w8 / .w16 (LDCU on b300, the fixed-latency ULDC on h100); m.shfl_idx.n8.w16; m.cs2r.n8.w16; m.vote.n8.w16.",
+   "sharing at 16 warps": "m.mix.s2r_lds.n8.w16, m.mix.ldc_s2r.n8.w16, m.mix.s2r_s2ur.n8.w16, m.mix.lds_shfl.n8.w16.",
+   "scope of the LDS / SHFL spacing": "m.lds.n16.w16, m.lds.n16.w32, m.shfl_bfly.n16.w16, m.shfl_bfly.n16.w32, m.s2r.n16.w32 (reference: a per-SM kind at the same shape).",
+   "queue depth (1 warp)": "m.s2ur.n6, .n10, .n12; m.ldc.n6, .n10, .n12; m.s2r.n24, m.lds.n24 (do S2R and LDS show the bound at all within one warp)."
+  }
+ },
+ "derivation": "As version 1: T = extended sample total - m.nop of the same shape + 3 (n + 1), clock period, classes on the reader and summed over the producers. Per-SM saturation test: period against (producers on the SM) x 2.0; per-SMSP test: period against (producers on the SMSP) x 2.0. Queue depth: the largest n at which the producers carry no mio_throttle, and mio_throttle per iteration against n.",
+ "questions_before_data": {
+  "Q1": "S2UR and LDCU at 16 warps x 8: period 257 (members of the per-SM server) or not? SHFL.IDX, CS2R, VOTE at 16 warps: per-SM, per-SMSP or per-warp?",
+  "Q2": "Mixed runs at 16 warps: 128 producers of two kinds on the SM give 257 if the kinds share the server (S2R + LDC expected; S2R + LDS: if LDS is not a member the period falls towards the 64 S2R x 2 = 128 plus frame).",
+  "Q3": "LDS / SHFL.BFLY, 16 per warp: at 32 warps per CTA a per-SMSP server would need 8 x 16 x 2 = 256 cycles per iteration, a per-warp spacing 32; a per-SM server 1024.",
+  "Q4": "Depth d of the bound: mio_throttle on the producers appears at n = d + 1; candidates from version 1: 5-7 (present at 8, absent at 4)."
+ },
+ "install": "Nothing.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case used to choose a rule or a value; no cell dropped after its data is seen.",
+ "addenda": [
+  {
+   "when": "2026-11-17, h100 and b300 runs (27 cells each: 23 in $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/mio_basic-v2/<device>, the four 32-warp cells in mio_basic-v2w32/<device>; table mio_basic-readings/T-table-v2.txt; m.nop of 1-16 warps from mio_basic-r3; replay build 68702860) - readings; nothing installed",
+   "text": "VALIDITY. All 27 cells of both devices have right check words, complete traces and ledgers. The first attempt of the four 32-warp cells faulted (2048 B of shared memory for 1024 threads; rows corrected to 4096 B, 0e2c381c) and left void files in mio_basic-v2/<device>/{capture,reference-*}/mb-sb-m.*.w32, which are not used; those cells were run into their own root. Periods are clocks per iteration, P = producers per SM per iteration. Q1 / Q3 (servers per SM). S2R: 8 x 16 warps (P = 128) 257 (version 1), 16 x 32 warps (P = 512) 1015.5 / 1014.5: 2.0 cycles per instruction per SM. S2UR 8 x 16: 257.3 / 259.3, the same rate (mio_throttle 69 / 74 per iteration on the producers). Resident LDC 8 x 16: 258 (version 1). LDS and SHFL.BFLY: 16 x 16 (P = 256) 256.6 / 258.4 and 256.9 / 258.9, 16 x 32 (P = 512) 509.2 / 508.0 and 509.1 / 508.2: 1.0 cycle per instruction per SM (not per SMSP and not per warp: Q3 answered), with mio_throttle 84 / 247 per iteration on the producers and not_selected 29 / 113. SHFL.IDX 8 x 16: 177.5 / 178.7 (no saturation at P = 128: its 4-cycle spacing is not a per-SM server at 2). CS2R and VOTE 8 x 16: 148.5 / 150.8 = the frame: no server, math_pipe_throttle and not_selected only. LDCU (b300) 8 x 4 / 8 / 16 warps: 149.4 / 145.0 / 163.1 with mio_throttle 13.5 / 11.6 / 8.3 on the producers and T 38 / 36 / 42 against 22 at one warp: slower with several warps but not a 2-cycle per-SM server (P = 128 would give 257). ULDC (h100) at 16 warps: T 25 with no wait class (issue slots). Q2 (sharing), 4 + 4 per warp at 16 warps (P = 64 + 64): S2R + LDS 194.0 / 195.8, LDC + S2R 166.9 / 169.6, S2R + S2UR 173.2 / 175.5, LDS + SHFL.BFLY 171.7 / 174.3 - none reaches the 257 that 128 instructions of one 2-cycle kind give, and no mio_throttle appears: S2R, S2UR and LDC do not share one 2-cycle server; each kind saturates only against itself (one server per kind per SM, or one SM pipeline that needs 2 cycles between two instructions of the same of these kinds and 1 otherwise - not separated). LDS + SHFL.BFLY (P = 128 at 1.0 per instruction) is below saturation either way. Q4 (bound within one warp). S2UR and resident LDC, mio_throttle on the producers per iteration at n = 4 / 6 / 8 / 10 / 12 / 16: 0 / 4 / 4 / 8 / 8 / 12 on both devices for both kinds = 4 x (ceil(n / 4) - 1): after every four producers the warp waits 4 cycles at issue (a bound of 4 in flight, released in groups). LDS: 0 up to n = 8, 3 at 16, 11 at 24. S2R: none up to n = 24 (reader wait 44.8 = 21 + n). T (h100 / b300): S2UR n6 39.3 / 40.0, n10 43.9 / 46.5, n12 47.2 / 48.6; LDC n6 30.1 / 30.7, n10 33.8 / 34.2, n12 36.4 / 36.7; S2R n24 44.6 / 45.4; LDS n24 44.6 / 44.9. REPLAY against these (T, h100 | b300): S2UR 8 x 16 47 | 48 against 135 / 140; S2R 16 x 32 185 | 51 against 780 / 785; LDS 16 x 16 160 | 60 against 159 / 161 and 16 x 32 281 | 51 against 277 / 278 (the h100 replay has the LDS rate right); SHFL.BFLY 16 x 16 167 on both against 158 / 161, 16 x 32 296 against 277; CS2R 8 x 16 184 | 23 against 27 / 28; S2R + LDS at 16 warps 37 | 38 against 72.5 / 74.3; LDC n12 22 | 27 against 36.4 / 36.7. FOR THE INSTALLATION PROTOCOL: (1) result spacing within a run 2 cycles for S2R, LDS, SHFL.BFLY, S2UR, LDC, LDCU (4 for SHFL.IDX), first latency from the version 1 tables; (2) per-SM service S2R 2.0, S2UR 2.0, LDC 2.0 (separate per kind as far as measured), LDS 1.0, SHFL.BFLY 1.0; (3) the in-flight bound of 4 for S2UR and LDC with the wait booked at issue as mio_throttle; (4) CS2R and VOTE as 2-cycle unit instructions without a reader wait. Open: the same-kind / other-kind rule of the SM pipeline, LDCU with several warps, the b300 step of LDS / SHFL.BFLY at 4 warps (version 1), R2UR (unrealised)."
+  }
+ ]
+}

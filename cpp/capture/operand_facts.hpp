@@ -68,6 +68,8 @@ const StaticDerived &derived_of(const StaticRow &row,
                                 const CaptureRules &rules);
 void uput_wrap(SemanticOperands &o, const std::string &k,
                std::int64_t v);
+std::optional<std::int64_t> poll_barrier_word(const DynRecord &rec,
+                                              const StaticRow &row);
 void uput_str(SemanticOperands &o, const std::string &k,
               const std::string &v);
 

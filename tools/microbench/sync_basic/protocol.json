@@ -1,0 +1,60 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "sync_basic",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-16",
+ "kind": "survey: per-instruction cost and stall class of the synchronisation instructions in the smallest kernels; installs nothing",
+ "mechanisms": [
+  "synchronization.cta (bar.sync)",
+  "synchronization.mbarrier (arrive, try_wait)",
+  "memory barrier (membar)",
+  "nanosleep"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "Full-GPU time sits mostly on mbarrier waits, warpgroup / tensor waits and CTA barriers (ledger shares 16-32 %, 13 %, 6-10 %); their leaves come from compiled C++ probes whose windows mix several instructions. Before the producer / consumer shapes, the uncontended cost of each instruction and where hardware books it are read from kernels that contain nothing else.",
+ "data_seen_before_freezing": [
+  "warp_issue v1-v3 and exec_units v1 addenda; dev/design/stall-attribution.md section 6 (where the full-GPU samples of barrier / sleeping sit); the full-base and full-y2c2b ledgers."
+ ],
+ "probe": {
+  "chain": "hand-written PTX compiled by ptxas as is (pass-through build of tools/microbench/ptx_kernel: loops and branches cannot be re-ordered by plans). SASS gate per cell: the nvdisasm listing of the loop body is recorded next to the cubin and must contain exactly the instructions listed for the cell (the listing decides; a body with other instructions is recorded as unrealised).",
+  "frame": "every thread: output address, clock t0, loop of N = 64 iterations with a run-time bound read from a parameter (so ptxas keeps the loop), clock t1, store t0 / t1 / a check word; the loop counter is a register add and a compare-and-branch.",
+  "cells": {
+   "s.loop": "empty loop (counter and branch only): the frame's own cost per iteration.",
+   "s.bar": "bar.sync 0 in the loop; every warp of the CTA takes part. Shapes: 1, 2, 4, 8, 16 warps per CTA (one CTA per SM).",
+   "s.mbar_self": "shared-memory mbarrier initialised once with count 1; per iteration mbarrier.arrive then mbarrier.try_wait.parity on the phase just completed (returns true at once), parity toggled; one warp per CTA. Check word = number of true results (must be 64).",
+   "s.mbar_arrive": "count 2^20 - 1 (never completes): 64 x mbarrier.arrive only; one warp.",
+   "s.mbar_trywait_fail": "64 x mbarrier.try_wait.parity on a phase that never completes (returns false at once); one warp. Check word = number of true results (must be 0).",
+   "s.membar_cta / s.membar_gl": "64 x membar.cta / membar.gl with no store outstanding; one warp.",
+   "s.sleep100 / s.sleep1000": "64 x nanosleep.u32 with 100 ns / 1000 ns; one warp.",
+   "shapes": "one warp per CTA on every SM unless the cell says otherwise; the per-warp cells (mbarrier, membar, sleep, loop) also at 4 warps per CTA (the mbarrier cells with one barrier per warp in shared memory)."
+  }
+ },
+ "runner": "direct runs first (value checks, clocks), then tools/microbench/ptx_kernel/run_rows.sh (capture, two sampling passes with the metric list, replay with the engine build recorded in the run directory); output $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/sync_basic/<device>.",
+ "derivation": {
+  "clock": "per warp (t1 - t0) / 64, launch 0 and launch 2; cost per instruction = the cell's value minus s.loop's at the same shape (for s.mbar_self the pair).",
+  "samples": "per pc of the loop body: cycles per warp by class (each class scaled by its own counter), next to the replay's reasons.",
+  "usable": "clock readings from rows with right check words; sampling rows with at least 2000 samples in both passes."
+ },
+ "questions_before_data": {
+  "cost": "Reported per cell: cycles per iteration by the clocks, by the samples, and replayed. No alternative is named for the costs.",
+  "where": "For each instruction the pc and class that carry the wait on hardware: B1 = the class named after the mechanism (barrier for bar.sync, membar for membar, sleeping for nanosleep) on the instruction after it; B2 = on the instruction itself; otherwise reported. For the mbarrier instructions (SYNCS forms) the class is reported; a scoreboard class on the reader of try_wait's predicate is the expectation.",
+  "bar.sync by warps": "cost per barrier against warps per CTA: flat, or a step per warp, reported with the fit.",
+  "replay": "Per cell replay / hardware of the cycles per iteration, and whether the replay books the wait on the same pc."
+ },
+ "install": "Nothing is installed from this version.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case.",
+ "addenda": [
+  {
+   "when": "2026-11-16, h100 run (21 cells, loop gate passed for all, 0 unrealised, values right; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/sync_basic/h100, table sync_basic/derive-h100.txt; replay with engine build 74ce8aab) — readings; nothing installed. b300: the first pod was removed by the scheduler, the second has been queued for hours; its readings follow in a later addendum.",
+   "text": "ptxas unrolls the loops four times (16 trips of 4 instructions); all numbers are per instruction (per pair for s.mbar_self), clocks at launch 2, the frame's loop cost (2.8 per instruction slot) subtracted. bar.sync, cost per barrier by warps per CTA 1 / 2 / 4 / 8 / 16: 2.1 / 2.6 / 2.9-3.6 / 5.6 / 9.7 cycles: about 1.6 + 0.5 per warp; class barrier, on the instruction after the BAR (B1), plus the BAR's own stall as wait. Replay: 3.75-4.5 per barrier at every warp count (flat). mbarrier.arrive that completes the phase followed by try_wait of the same warp: 21 cycles per pair at one warp per CTA, 38 at four warps (each with its own barrier); the wait is long_scoreboard on the instruction after the try_wait (17 / 36), nothing on the SYNCS instructions themselves. Replay: 102 per pair, 83.5 of it semantic:mbarrier_wait on the try_wait: the replay makes the warp's own completed phase visible only after the release latency (87.9, measured between warps). mbarrier.arrive alone (phase never completes): 17-19 cycles per arrive; replay about 37 (a control floor of 35 behind the arrive). try_wait on a phase that never completes: 3876 cycles per call (1.96 microseconds), long_scoreboard on the instruction after it; the call does not return at once. Replay: 0 (failed polls carry no time; in full-GPU replays polls are folded, so this is the fact behind the fold, not a full-GPU error by itself). membar.cta 15.6 (replay 23.0 per iteration against 22.0 by samples: agrees). membar.gl 667 (replay 674: agrees; hardware class membar on ERRBAR 535 and CCTL.IVALL 85, wait on CGAERRBAR 27). nanosleep: 244 cycles for 100 ns, 2024 for 1000 ns = 46 + 1.978 cycles per ns (the SM clock); class sleeping, half on the NANOSLEEP and half on the two instructions after it. Replay: 12190 and 13130 cycles per sleep: about fifty times too long for a short sleep (a constant of about 12000 cycles). Largest disagreements, in the order they matter for full-GPU time: same-warp phase visibility (102 against 21), bar.sync against warps per CTA (flat against linear), nanosleep (12190 against 244), arrive (37 against 18)."
+  },
+  {
+   "when": "2026-11-16, CORRECTION of the bar.sync numbers of the previous addendum (my scaling error) and the b300 run (21 cells, gate passed, values right; table sync_basic/derive-b300.txt)",
+   "text": "The clock columns are per loop iteration and an iteration holds one barrier (64 barriers in 16 unrolled trips); I divided the bar.sync costs by 4 once too often. Correct cost per bar.sync (iteration minus the loop frame of the same shape; frames for 2 and 8 warps from version 2), warps per CTA 1 / 2 / 4 / 8 / 16: h100 8.2 / 8.9 / 12.2 / 21 / 37, b300 7.9 / 12 / 16 / 24 / 40: about 6 + 2 cycles per participating warp on both devices. Replay: 16.5 per barrier up to 4 warps, 18 at 8, 21 at 16 (the installed release latency of 16, flat): twice the hardware at one warp, half at sixteen. The other numbers of that addendum were per instruction already and stand. b300, same cells: arrive + try_wait of the same warp 18.0 per pair (one warp) / 42.6 (four); arrive alone 18.6-20.7; try_wait on a phase that never completes 3875-3878 (the same 1.96 microsecond timeout); membar.cta 16.2-18.3; membar.gl 270-277 (h100 667); nanosleep 100 ns 249-252, 1000 ns 2059-2064 (45-50 + 2.01 per ns)."
+  }
+ ]
+}

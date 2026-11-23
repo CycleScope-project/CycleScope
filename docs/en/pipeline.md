@@ -68,7 +68,8 @@ cyclescope convert    --capture <dir> --arch <arch> --out <facts>
 cyclescope convert    --facts <facts> --arch <arch> --out <dir>
 cyclescope build      <dir> --out job.bin
 cyclescope-engine simulate --job job.bin --out result.bin \
-    [--journal j.bin] [--wait-ledger w.bin] [--progress]
+    [--journal j.bin] [--wait-ledger w.bin] [--stall-ledger stall.tsv]
+    [--progress]
 cyclescope report     <out>
 ```
 
@@ -94,6 +95,11 @@ Auxiliary commands, one line each:
   ([design/mechanism-tree.md](design/mechanism-tree.md)).
 - `cyclescope-engine validate|info|dump --job <file>` — inspect a job
   without simulating it.
+- `cyclescope stall compare|summarize|calibrate` — compare the
+  engine's per-PC stall ledger (`--stall-ledger`, engine.md §4)
+  against ncu warp-stall sampling (`cyclescope reference --metrics
+  --source-stalls`), case by case, then summarize a suite or print
+  the mapping-calibration table.
 
 ## 3. What a run writes
 

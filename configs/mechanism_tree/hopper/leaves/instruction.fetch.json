@@ -108,6 +108,15 @@
     "sources": [
      "ifetch.h100.v3"
     ]
+   },
+   "launch_first_line_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 246.3
+    },
+    "sources": [
+     "kernel_boundary.h100.v1"
+    ]
    }
   }
  }

@@ -945,7 +945,8 @@ std::uint64_t MemoryHierarchy::store(std::uint32_t sm, std::uint64_t now,
                                      std::size_t n, bool atomic,
                                      std::uint64_t address0,
                                      std::uint64_t* fill_done_out,
-                                     double cost_ratio, bool lane_store) {
+                                     double cost_ratio, bool lane_store,
+                                     bool merged) {
   double when = static_cast<double>(now);
   if (atomic) {
     ++tele.atomics;
@@ -1055,6 +1056,7 @@ std::uint64_t MemoryHierarchy::store(std::uint32_t sm, std::uint64_t now,
     l2_touch(line, l2, static_cast<std::uint64_t>(when));
     l2_account(l2);
     l2_ensure_capacity(line, static_cast<std::uint64_t>(when));
+    if (merged) continue;
     if (cfg_.l2_write_gpc_bpc > 0 &&
         sm < cfg_.sm_gpc.size() &&
         cfg_.sm_gpc[sm] != 0xFFFFFFFFu)
@@ -1080,6 +1082,11 @@ std::uint64_t MemoryHierarchy::store(std::uint32_t sm, std::uint64_t now,
   // same per-request floor as the load path, on lane stores only:
   // at most one warp-level lane-store request per issue_interval on
   // the store port (other store kinds keep the 1-cycle floor)
+  if (merged) {
+    if (fill_done_out) *fill_done_out = fill_done;
+    return static_cast<std::uint64_t>(std::ceil(accept)) +
+        static_cast<std::uint64_t>(cfg_.store_l2_latency);
+  }
   const double s_floor =
       lane_store ? std::max(1.0, cfg_.store_l2_issue_interval) : 1.0;
   if (occ > 0.0 && occ < s_floor)
@@ -1103,13 +1110,114 @@ std::uint64_t MemoryHierarchy::store_issue_block(
   return q.size() >= cfg_.store_l2_outstanding ? q.front() : now;
 }
 
+// constant_paths v1 miss path shared by constant() and
+// constant_uniform_hold(): start (or join) the line's fill through
+// `path` (0 vector, 1 uniform) and return its ready cycle.  C2/C3:
+// a non-resident line pays max(t, block ready) + first_touch_p, and
+// not before the path's previous fill on this SM + fill_interval_p;
+// a bank != 0 line whose 256 B block the GPC has never fetched also
+// pays the block fetch.  Telemetry counts the miss exactly once:
+// `count` is the caller's first-evaluation flag.
+std::uint64_t MemoryHierarchy::const_paths_fill(
+    std::uint32_t sm, std::uint32_t path, std::uint64_t now,
+    std::uint64_t address, std::uint64_t line, std::uint64_t gpc,
+    std::uint64_t sm_warps, std::uint64_t sm_smsps,
+    std::uint8_t* hit_kind, bool count) {
+  std::uint64_t block_ready = now;
+  bool fetched = false;
+  if ((address >> 32) != 0 && cfg_.const_block_bytes) {
+    const std::uint64_t block = address / cfg_.const_block_bytes;
+    auto& blocks = const_blocks_[gpc];
+    const auto it = blocks.find(block);
+    if (it == blocks.end()) {
+      block_ready =
+          now + static_cast<std::uint64_t>(cfg_.const_block_fetch);
+      blocks[block] = block_ready;
+      fetched = true;
+    } else if (it->second > now) {
+      block_ready = it->second;
+    }
+  }
+  double first = path ? cfg_.const_ufirst : cfg_.const_vfirst;
+  if (path && cfg_.const_ufirst_min_smsps && cfg_.const_smsps_per_sm &&
+      sm_smsps != ~0ull) {
+    // constant_paths v2 C5: the fill is served per occupied SMSP,
+    // at least min_smsps at a time
+    const std::uint64_t n =
+        std::max(cfg_.const_ufirst_min_smsps, sm_smsps);
+    first = cfg_.const_ufirst * static_cast<double>(n) /
+            cfg_.const_smsps_per_sm;
+  } else if (path && cfg_.const_ufirst_few >= 0.0 &&
+             sm_warps != ~0ull &&
+             sm_warps <= cfg_.const_few_warps_limit)
+    first = cfg_.const_ufirst_few;
+  std::uint64_t ready =
+      std::max(now, block_ready) + static_cast<std::uint64_t>(first);
+  const std::uint64_t key = (std::uint64_t(sm) << 1) | path;
+  const double interval =
+      path ? cfg_.const_ufill_interval : cfg_.const_vfill_interval;
+  auto& last = const_last_fill_[key];
+  if (interval > 0.0 && last)
+    ready = std::max(ready,
+                     last + static_cast<std::uint64_t>(interval));
+  last = ready;
+  auto& set = const_resident_p_[key];
+  const std::size_t cap = cfg_.const_line_bytes
+      ? static_cast<std::size_t>(cfg_.const_capacity /
+                                 cfg_.const_line_bytes)
+      : 0;
+  if (cap) {
+    if (set.size() >= cap) {
+      auto victim = set.begin();
+      for (auto it = set.begin(); it != set.end(); ++it)
+        if (it->second.tick < victim->second.tick) victim = it;
+      set.erase(victim);
+    }
+    set[line] = {++const_tick_, ready};
+  }
+  if (count) ++tele.const_misses;
+  if (hit_kind) *hit_kind = fetched ? 6 : 5;
+  return ready;
+}
+
 std::uint64_t MemoryHierarchy::constant(std::uint32_t sm,
                                         std::uint32_t warp,
                                         std::uint64_t now,
                                         std::uint64_t address,
                                         std::size_t bytes,
-                                        bool uniform) {
+                                        bool uniform,
+                                        std::uint8_t* hit_kind,
+                                        std::uint64_t gpc,
+                                        std::uint64_t sm_warps,
+                                        std::uint64_t sm_smsps,
+                                        std::uint64_t reread_from) {
   if (!cfg_.const_enabled) return now;
+  if (reread_from == ~0ull) reread_from = now;
+  if (cfg_.const_paths()) {
+    // C1/C2: the line's resident set is this path's own; a filled
+    // resident line costs reread_p, an in-flight line waits for its
+    // fill ready, a missing line fills through const_paths_fill
+    const std::uint64_t path = uniform ? 1 : 0;
+    const std::uint64_t line = cfg_.const_line_bytes
+        ? address / cfg_.const_line_bytes : address;
+    auto& set = const_resident_p_[(std::uint64_t(sm) << 1) | path];
+    const auto hit = set.find(line);
+    if (hit != set.end()) {
+      const double reread =
+          uniform ? cfg_.const_ureread : cfg_.const_vreread;
+      ++tele.const_hits;
+      hit->second.tick = ++const_tick_;
+      if (hit->second.ready <= now) {
+        if (hit_kind) *hit_kind = 3;
+        return reread_from + static_cast<std::uint64_t>(reread);
+      }
+      if (hit_kind) *hit_kind = 4;
+      return std::max(reread_from + static_cast<std::uint64_t>(reread),
+                      hit->second.ready);
+    }
+    return const_paths_fill(sm, path, now, address, line, gpc,
+                            sm_warps, sm_smsps, hit_kind, true);
+  }
   const std::uint64_t line = cfg_.const_line_bytes
       ? address / cfg_.const_line_bytes : address;
   // bank-0 rules (optional fields, per path): flat access latency,
@@ -1117,10 +1225,54 @@ std::uint64_t MemoryHierarchy::constant(std::uint32_t sm,
   if ((address >> 32) == 0) {
     const double f = uniform ? cfg_.const_bank0_uniform : cfg_.const_bank0;
     if (f >= 0.0) {
+      // kernel_start v4 (vector path only): a non-resident bank-0
+      // line starts a fill with the field's cold latency; resident
+      // and in-flight lines keep the flat access latency.  The
+      // resident set is shared with the uniform path; the per-warp
+      // last-line is untouched
+      if (!uniform && cfg_.const_vbank0_cold >= 0.0) {
+        auto& set = const_resident_[sm];
+        const auto hit = set.find(line);
+        if (hit == set.end()) {
+          ++tele.const_misses;
+          if (hit_kind) *hit_kind = 2;
+          const std::size_t cap = cfg_.const_line_bytes
+              ? static_cast<std::size_t>(cfg_.const_capacity /
+                                         cfg_.const_line_bytes)
+              : 0;
+          if (cap) {
+            if (set.size() >= cap) {
+              auto victim = set.begin();
+              for (auto it = set.begin(); it != set.end(); ++it)
+                if (it->second.tick < victim->second.tick) victim = it;
+              set.erase(victim);
+            }
+            set[line] = {++const_tick_,
+                         now + static_cast<std::uint64_t>(
+                             cfg_.const_vbank0_cold)};
+          }
+          return now +
+                 static_cast<std::uint64_t>(cfg_.const_vbank0_cold);
+        }
+        ++tele.const_hits;
+        if (hit_kind) *hit_kind = 1;
+        if (hit->second.ready > now)
+          return std::max(now + static_cast<std::uint64_t>(f),
+                          hit->second.ready);
+        hit->second.tick = ++const_tick_;
+        return now + static_cast<std::uint64_t>(f);
+      }
       ++tele.const_hits;
+      if (hit_kind) *hit_kind = 1;
       return now + static_cast<std::uint64_t>(f);
     }
   }
+  // kernel_start v3: a resident line costs a uniform load nothing
+  // (or the field's value) once the cold-hold rule owns cold lines;
+  // state updates below are unchanged
+  const bool ures = uniform && cfg_.const_uresident_hold >= 0.0 &&
+                    cfg_.const_ubank0_hold >= 0.0 &&
+                    cfg_.const_uhold >= 0.0;
   auto& last = const_last_line_[sm];
   const auto lit = last.find(warp);
   auto& set = const_resident_[sm];
@@ -1129,21 +1281,26 @@ std::uint64_t MemoryHierarchy::constant(std::uint32_t sm,
   // line is still resident its fill may not have completed yet
   if (lit != last.end() && lit->second == line) {
     ++tele.const_same_line;
+    if (hit_kind) *hit_kind = 0;
+    const double lat = ures ? cfg_.const_uresident_hold
+                            : cfg_.const_same_line;
     const std::uint64_t ready = hit != set.end() ? hit->second.ready : now;
-    return std::max(now + static_cast<std::uint64_t>(cfg_.const_same_line),
-                    ready);
+    return std::max(now + static_cast<std::uint64_t>(lat), ready);
   }
   // 2) resident in this SM's constant cache (possibly still in flight)
   if (hit != set.end()) {
     ++tele.const_hits;
+    if (hit_kind) *hit_kind = 1;
     hit->second.tick = ++const_tick_;
     last[warp] = line;
-    return std::max(now + static_cast<std::uint64_t>(cfg_.const_hit),
+    const double lat = ures ? cfg_.const_uresident_hold : cfg_.const_hit;
+    return std::max(now + static_cast<std::uint64_t>(lat),
                     hit->second.ready);
   }
   // 3) miss: fill the line (LRU when at capacity); capacity 0 keeps
   // `enabled` semantics but never retains a line
   ++tele.const_misses;
+  if (hit_kind) *hit_kind = 2;
   const std::size_t cap = cfg_.const_line_bytes
       ? static_cast<std::size_t>(cfg_.const_capacity /
                                  cfg_.const_line_bytes)
@@ -1160,6 +1317,99 @@ std::uint64_t MemoryHierarchy::constant(std::uint32_t sm,
   }
   last[warp] = line;
   return now + static_cast<std::uint64_t>(cfg_.const_miss);
+}
+
+std::uint64_t MemoryHierarchy::constant_uniform_hold(
+    std::uint32_t sm, std::uint32_t warp, std::uint64_t now,
+    std::uint64_t address, std::uint8_t* hold_class, bool count,
+    std::uint64_t gpc, std::uint64_t sm_warps,
+    std::uint64_t sm_smsps) {
+  if (cfg_.const_paths()) {
+    // C4: a uniform load without a write barrier is held at issue
+    // until its line is resident and filled; a resident fill-done
+    // line returns now and the caller runs constant() for it
+    if (!cfg_.const_enabled || !cfg_.const_line_bytes) return now;
+    const std::size_t cap = static_cast<std::size_t>(
+        cfg_.const_capacity / cfg_.const_line_bytes);
+    if (!cap) return now;
+    const std::uint64_t line = address / cfg_.const_line_bytes;
+    auto& set = const_resident_p_[(std::uint64_t(sm) << 1) | 1];
+    const auto hit = set.find(line);
+    if (hit != set.end()) {
+      if (hit->second.ready > now) {
+        if (count) ++tele.const_hits;
+        if (hold_class) *hold_class = 4;
+        return hit->second.ready;
+      }
+      return now;
+    }
+    std::uint8_t k = 5;
+    const std::uint64_t ready =
+        const_paths_fill(sm, 1, now, address, line, gpc, sm_warps,
+                         sm_smsps, &k, count);
+    if (hold_class) *hold_class = k;
+    return ready;
+  }
+  // the fixed-latency bank-0 uniform rule, when present, owns the
+  // access; a disabled or capacity-0 cache can never hold a resident
+  // line (constant() returns the miss latency on every access)
+  if (((address >> 32) == 0 && cfg_.const_bank0_uniform >= 0.0) ||
+      !cfg_.const_enabled || !cfg_.const_line_bytes)
+    return now;
+  const std::size_t cap = static_cast<std::size_t>(
+      cfg_.const_capacity / cfg_.const_line_bytes);
+  if (!cap) return now;
+  const std::uint64_t line = address / cfg_.const_line_bytes;
+  auto& set = const_resident_[sm];
+  const auto hit = set.find(line);
+  if (hit != set.end()) {
+    if (hit->second.ready > now) {
+      // fill still in flight (started by a uniform or a vector
+      // load): wait for it, counted as a hit on this access --
+      // only at its first blocked evaluation (`count`), since a
+      // held warp may be re-evaluated before the fill is ready
+      if (count) ++tele.const_hits;
+      if (hold_class) *hold_class = 1;
+      return hit->second.ready;
+    }
+    return now;
+  }
+  // cold line: start the fill with the same capacity / LRU logic as
+  // the constant() miss branch; the warp retries at fill-ready
+  if (count) ++tele.const_misses;
+  if (hold_class) *hold_class = 2;
+  if (set.size() >= cap) {
+    auto victim = set.begin();
+    for (auto it = set.begin(); it != set.end(); ++it)
+      if (it->second.tick < victim->second.tick) victim = it;
+    set.erase(victim);
+  }
+  const double hold = (address >> 32) == 0 ? cfg_.const_ubank0_hold
+                                         : cfg_.const_uhold;
+  const std::uint64_t ready =
+      now + static_cast<std::uint64_t>(hold);
+  set[line] = {++const_tick_, ready};
+  const_last_line_[sm][warp] = line;
+  return ready;
+}
+
+void MemoryHierarchy::constant_post_hold(std::uint32_t sm,
+                                         std::uint32_t warp,
+                                         std::uint64_t address) {
+  if (!cfg_.const_line_bytes) return;
+  const std::uint64_t line = address / cfg_.const_line_bytes;
+  if (cfg_.const_paths()) {
+    // the held load's line lives in the uniform path's set
+    auto& set =
+        const_resident_p_[(std::uint64_t(sm) << 1) | 1];
+    if (auto it = set.find(line); it != set.end())
+      it->second.tick = ++const_tick_;
+    return;
+  }
+  auto& set = const_resident_[sm];
+  if (auto it = set.find(line); it != set.end())
+    it->second.tick = ++const_tick_;
+  const_last_line_[sm][warp] = line;
 }
 
 void MemoryHierarchy::l1_insert(std::uint32_t sm, std::uint64_t sector,

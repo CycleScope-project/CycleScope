@@ -48,10 +48,10 @@ def main() -> int:
         suite = SUITES[short]
         arch, sset = suite.split("/", 1)
         import csv
-        if arch == "hopper":
+        cases_tsv = DRIVER_REPO / "suites" / arch / sset / "cases.tsv"
+        if arch == "hopper" or cases_tsv.is_file():
             rows = [r["case_id"] for r in csv.DictReader(
-                (DRIVER_REPO / "suites" / arch / sset / "cases.tsv").open(),
-                delimiter="\t")]
+                cases_tsv.open(), delimiter="\t")]
         else:
             rows = [l.split()[-1] for l in
                     (DRIVER_REPO / "suites" / arch / sset / "cases.txt")

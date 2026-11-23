@@ -1,0 +1,62 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "kernel_boundary",
+ "version": 1,
+ "frozen_before_gpu": false,
+ "date": "2026-11-15",
+ "kind": "install from readings already taken (warp_issue v1, families a and b): rules and values are declared here before the engine is changed and before any replay with the changed engine; no new GPU data",
+ "mechanisms": [
+  "kernel.lifecycle",
+  "instruction.fetch (first code line of a launch)",
+  "result cycles (what the engine reports against sm__cycles_active.max)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "The engine closes every kernel with a fitted block: kernel.lifecycle envelope_cycles (h100 724-893, b300 270-407 by warps per CTA) added to the time of the last completion counted from the start of the launch. On hardware an empty kernel is the wait for the cold first code line (shared by the warps that start together on an SM), its few issue cycles, and after EXIT about 20 cycles plus whatever variable-latency instruction is still outstanding. The replay of the empty kernel is 1209 cycles against 397 mean / 479 max (h100) and 344 against 688 / 894 (b300). The reference is sm__cycles_active.max, the active cycles of the busiest SM, not the time since launch.",
+ "data_seen_before_freezing": [
+  "warp_issue protocol v1 with all addenda; derive-{h100,b300}.txt sections a / b.",
+  "Per launch id and counter group of the same runs (read for this protocol, tools/microbench/kernel_boundary/analysis/{pass_levels,start_levels,clock_spread}.py over $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/{h100,b300}/reference-{a,b}): ncu collects the SM group (sm__cycles_active), the SMSP group (warps_active, warp latency) and the stall group in separate replays of the kernel, so every (cell, pass, launch id) holds three executions. Against the cell median an execution is 130-520 cycles longer in 9 % (h100, 138 of 1656) / 14 % (b300, 228 of 1656) of the cases, on every SM alike (avg and max of sm__cycles_active move together), with no dependence on the cell or the launch id; the extra is no_instruction on the first pc. This is the `two levels` of warp_issue v1: a property of the execution, not of the kernel. Not modelled; the values below are the common level.",
+  "no_instruction per warp on the first pc at the common level, stall group, launch ids 0-3 of both passes, cells a.empty, a.exit_only, a.nop_exit, a.empty.w1, a.empty.w32, a.empty.g4, b.sled.l1 (56 executions per device; the common level = executions below the median + 100): h100 50 executions, median 246.3 (cell medians 213-258); b300 45 executions, median 546.3 (cell medians 511-571).",
+  "After EXIT with nothing outstanding (a.exit_only, a.nop_exit, sleds of 8+ lines; counters): branch_resolving 8 on both devices in every cell, drain 7-8 (h100) / 5-6 (b300), wait 3-6 (EXIT's own stall is 5). With the stack load outstanding the drain runs to the load's completion: a.stack_nop16_exit 70 / 69 after 16 NOPs, i.e. the load completes 94 cycles after its issue on both devices.",
+  "SR_CLOCKLO read by the kernels is common to the SMs of a group of about 16 (h100) and offset by arbitrary amounts between groups (direct runs of d.nop.s8.y1): clock differences between SMs are usable inside a group only. Within a group the SMs reach the body 170 (h100) / 75 (b300) cycles apart; sm__cycles_active max - min is about 150 (h100) / 380 (b300) on the empty kernels. Which part is a staggered start and which a staggered arrival of the first line is not decided by these data."
+ ],
+ "rules": {
+  "K1 no envelope": "kernel.lifecycle.envelope_cycles is removed from both leaves; nothing is added after the last completion.",
+  "K2 what is reported": "The engine's cycles = the largest number of active cycles of any SM, an SM being active in a cycle when at least one warp is resident on it (from the warp's entry to the cycle it is done, exit and drain included). The time of the last completion since launch stays in the telemetry.",
+  "K3 first code line": "The first code line demanded on an SM that is in none of its caches and not in flight arrives launch_first_line_cycles after the demand; the lines behind it stream as today, starting from that arrival. Warps that enter while it is in flight wait for the same arrival; later waves find the line. This replaces the first slot of the launch-prefetch chain (one stream_l1 interval today).",
+  "K4 exit": "A warp whose last instruction (EXIT) issued at t is done at max(t + EXIT's stall count + exit_branch_resolve_cycles, completion of its outstanding instructions as today) + exit_drain_tail_cycles. Ledger: the stall part stays control_floor, then exit_branch (class branch_resolving), then exit_drain.",
+  "not changed here": "Dispatch (first-wave interval, serial entry, refill), the per-line stream cadences, prefetch depth and cache sizes of instruction.fetch, the spread between SMs. The executions with the extra start delay are not modelled."
+ },
+ "values": {
+  "instruction.fetch.launch_first_line_cycles": "h100 246.3, b300 546.3 (medians above); measured",
+  "kernel.lifecycle.exit_branch_resolve_cycles": "8 on both devices; measured (counter, every cell)",
+  "kernel.lifecycle.exit_drain_tail_cycles": "h100 7, b300 6; measured (counter, cells with nothing outstanding)"
+ },
+ "judgement": {
+  "gates": "The seven gates; changed fixture expectations listed with the rule that changes them.",
+  "replay of the warp_issue v1 captures (a and b cells) with issue_rules, constant_paths and this install": [
+   "first pc: fetch wait per warp within 10 % of launch_first_line_cycles in every cell whose warps start together (all but a.empty.g16);",
+   "after EXIT: a.exit_only, a.nop_exit and the sleds of 8+ lines 19-21 cycles per warp; a.empty and b.sled.l1 within 15 % of hardware (h100 111 / 99, b300 119 / 118);",
+   "reported, no criterion: replayed cycles against sm__cycles_active avg and max per cell. Expected before the run: near the hardware mean and under the hardware max by the spread between SMs (h100 about 100, b300 about 200), which this install does not model."
+  ],
+  "full GPU": "500 x 2: cycles per case against full-base reported (h100 loses about 775 - 230 cycles and the first-wave stagger per case, b300 gains about 530 - 294; not a criterion); cyclescope stall compare: site and per-pc residency, outside-loop no_instruction and exit sites.",
+  "other device": "Each device takes its own values; the rules are common."
+ },
+ "install": "Rules K1-K4 on both devices; the three fields above; kernel.lifecycle.envelope_cycles removed.",
+ "not_allowed": "No full-GPU case decides a value or a rule.",
+ "open (next survey)": [
+  "what spreads the SMs (per-SM values of sm__cycles_active with ncu's metric instances; clocks inside a group at the first instruction);",
+  "the cause of the extra start delay in 9-14 % of executions (all SMs alike, 130-520 cycles);",
+  "first line with 16 CTAs per SM (mean 80 / 238 on hardware: the later waves);",
+  "branch_resolving after a taken BRA (is EXIT's 8 the general branch cost);",
+  "the larger early lines (h100 line 5, b300 lines 2 and 5) and the 256 B unit of the GPC cache; code fetch against constant requests at the head of large kernels."
+ ],
+ "addenda": [
+  {
+   "when": "2026-11-15/16, install (engine ba8f8187 + 47d701d6 + e22714ef, K3 corrected in a0bce24f, drain settle fix 2fcf1c85; final build $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/build-1a08913a, seven gates 0; small-kernel replays warp_issue/{h100,b300}/sim-boundary2, tables derive-<device>-boundary2.txt; full GPU full-kb3)",
+   "text": "Installed on both devices with the declared values. K2 changed no expected value of an existing test: assertions on `cycles` that meant the time of the last completion now read the telemetry counter last_completion_cycle. K3 AS FIRST IMPLEMENTED WAS WIDER THAN THIS PROTOCOL (my instruction, not the protocol): every demand for a line of the launch chain waited for the chain, so a jump to a far line of the 64 KiB window waited for the stream to reach it; full-GPU fetch share rose to 7.6 % / 12.8 % and no_instruction outside loops went from -1.1 / -3.0 points to +2.7 / +5.0 (run full-kb, kept). Corrected in a0bce24f: only the chain head is protected (no demand of the SM arrives before the first line); afterwards a demand uses its own slot as before. A latent engine fault surfaced with the changed timing (one b300 case deadlocked in full-kb2): a warp parked on its exit drain was only settled when the SMSP sweep reached it, and a sibling spending the issue slot earlier in the sweep left it parked for good; fixed in 2fcf1c85 with the instrumented evidence in the commit message (against full-kb2, 34 h100 cases changed cycles by at most 2.9 % and 21 b300 cases by at most 1.5 %: their draining warps had been settled late). Replay criteria (sim-boundary2): first pc fetch = 246 (h100) / 546 (b300) per warp in every cell. After EXIT with nothing outstanding: control_floor 4 + exit_branch 8 + exit_drain 7 = 19 (h100), 4 + 8 + 6 = 18 (b300) plus the issue cycle, hardware 19-21 / 19-20. a.empty after EXIT 96 (h100) / 103 (b300) against 111 / 119 (0.87 both; inside the 15 %). Cycles against sm__cycles_active (max / avg / min): a.empty 345 against 479 / 397 / 322 (h100), 652 against 894 / 688 / 498 (b300); a.exit_only 267 against 389 / 303 / 229, 566 against 796 / 597 / 412; sleds of 128 lines 2694 against 3430 / 2983 / 2733, 2866 against 3864 / 3373 / 3071: at or under the hardware mean, under the max by the spread between SMs, as declared. Full GPU (full-kb3 against full-base = main; 500 / 500 ok on both devices, issue_rules + constant_paths + this install together): stall attribution, mean over cases: (region, class) attribution error h100 0.408 -> 0.376, b300 0.370 -> 0.352; site residency error 0.296 -> 0.286, 0.309 -> 0.313; per-pc residency error 0.996 -> 0.928, 1.243 -> 1.220; outside-loop no_instruction -1.05 -> under 0.6 points (h100), -3.00 -> -0.89 (b300); h100 outside-loop imc_miss -2.48 -> -1.76. Exposed: h100 short_scoreboard is now short (outside loops +0.61 -> -1.76, in loops -0.32 -> -1.35: the reader waits behind ULDC that the old model produced were mapped to this class), b300 long_scoreboard -1.5 -> -2.2 outside and -1.1 -> -1.8 in loops. Cycles (not a criterion): h100 MAPE 7.93 % -> 11.07 %, median sim / hardware 0.947 -> 0.903, 486 of 500 cases faster; b300 7.64 % -> 9.54 %, 0.952 -> 0.919, 461 faster. The replay is now faster than hardware almost everywhere: waits the old model had in the wrong place are gone and the mechanisms that carry that time on hardware (same-warp interval of the arithmetic units, scheduler choice, MIO producers, the spread between SMs at start) are not installed yet."
+  }
+ ]
+}

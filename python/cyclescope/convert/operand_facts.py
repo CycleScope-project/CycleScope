@@ -68,6 +68,26 @@ def _bracket_word(operands_text: str, uniform: dict, lane: dict):
     return total
 
 
+def poll_barrier_word(rec, row):
+    """The barrier word a poll addresses: bracket register sum of the
+    first executing lane + displacement (what the converter resolves the
+    mbarrier object from); the tracer's mref address where a register
+    value is not captured; None for a predicated-off record."""
+    if not rec.exec_mask:
+        return None
+    uniform: dict = {}
+    lane: dict = {}
+    for name, value in (rec.ops or {}).items():
+        if _is_ur_token(name):
+            uniform[name] = int(_first(value))
+        elif name.startswith("R") and not name.startswith("RANK"):
+            lane[name] = _lane_values(value)
+    word = _bracket_word(row.operands_text, uniform, lane)
+    if word is None and rec.mrefs and rec.mrefs[0]:
+        word = int(rec.mrefs[0][0])
+    return word
+
+
 def _bracket_words_per_lane(operands_text: str, uniform: dict,
                             lane: dict):
     """Per-executing-lane bracket addresses (None when the bracket has

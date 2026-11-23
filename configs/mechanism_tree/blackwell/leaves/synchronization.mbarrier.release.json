@@ -28,6 +28,15 @@
     "sources": [
      "trywait_wake.b300.r1"
     ]
+   },
+   "service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 5.68
+    },
+    "sources": [
+     "sync_basic.b300.v2"
+    ]
    }
   },
   "scope": "cta"

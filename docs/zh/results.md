@@ -50,7 +50,7 @@ verdict 把这次运行与随发的 `expected.tsv` 比较：
 | `journal.bin` | `GSIMJNL` | 每条发射实例一行：warp、SMSP、实例、发射周期、operation class、模板、等待桶、等待周期、同步对象 |
 | `wait.bin` | `GSIMWLG` | 等待账本：按 warp 与原因的总周期数与次数 |
 
-`cyclescope run` 把 `result.bin` 写到 `sim/<case>/out-<builder>/`；`--ledgers` 在同目录加上 `journal.bin` 与 `wait.bin`。手工运行则来自 `cyclescope-engine simulate --journal <path> --wait-ledger <path>`。
+`cyclescope run` 把 `result.bin` 写到 `sim/<case>/out-<builder>/`；`--ledgers` 在同目录加上 `journal.bin` 与 `wait.bin`。手工运行则来自 `cyclescope-engine simulate --journal <path> --wait-ledger <path>`；`--stall-ledger <path>` 再写出逐 PC 的 stall 账本（`stall.tsv`，schema `cyclescope.stall-ledger.v1`；engine.md §4）。
 
 全部 1,000 个套件 kernel 的发射日志与等待账本发布在 [CycleScope-records](https://github.com/CycleScope-project/CycleScope-records)，不用运行就能研究。
 

@@ -29,6 +29,7 @@ class HopperModule : public ArchitectureModule {
   bool instance_ready(Simulator&, WarpState&,
                       const InstructionInstance&,
                       const InstanceSemantics&) override;
+  const char* stall_detail() const override { return stall_detail_; }
   void on_instance_issue(Simulator&, WarpState&,
                          const InstructionInstance&,
                          const InstanceSemantics&,
@@ -37,6 +38,9 @@ class HopperModule : public ArchitectureModule {
   void collect_tele(std::vector<TelemetryRow>&) override;
 
  private:
+  // stall ledger: which rule produced the last blocking
+  // instance_ready verdict (statistics-only, never read for timing)
+  const char* stall_detail_ = nullptr;
   // one rendezvous per (cta, warpgroup): members arrive at their
   // wgmma instance; the last arrival is the collective launch cycle
   struct Rendezvous {

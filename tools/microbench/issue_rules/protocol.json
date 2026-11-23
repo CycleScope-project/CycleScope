@@ -1,0 +1,56 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "issue_rules",
+ "version": 1,
+ "frozen_before_gpu": false,
+ "date": "2026-11-15",
+ "kind": "install from readings already taken (warp_issue v1, family d): the engine rules are declared here before the engine is changed and before any replay with the changed engine; no new GPU data",
+ "mechanisms": [
+  "instruction issue (register readiness, dependency barriers, control word)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "dev/design/mechanism-recalibration.md section 2: the hardware does not track register readiness. A reader is held only by its warp's stall counter and by the dependency counters its wait mask names. The engine additionally holds every reader until the result latency of each source register's producer has passed (ledger reason reg:<class>), which the hardware never does, and it stores one release time per barrier that a later producer on the same barrier overwrites.",
+ "data_seen_before_freezing": [
+  "warp_issue protocol v1 with all addenda ($CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/{h100,b300}, derive-<device>.txt), replay of engine build a45851a8.",
+  "d.add (64 in-place VIADD, stall 1..4), both devices: stall 1 and 2 leave every thread with +32 or +33, stall 3 loses an add in some threads, stall 4 is right: the reader of a fixed-latency result is never held, it computes with the old value. Replay: reg:VIADD 3.9 cycles per add at stall 1 on h100.",
+  "d.visible (LDC with write barrier and stall s, g NOPs, reader waiting on the barrier), both devices: only s1.g0 gives wrong values (every thread): a counter increment is not seen by the instruction issued in the next cycle.",
+  "c.*.batch cells (n loads on one barrier, one NOP, n readers): the first reader waits for the whole batch (h100 LDC 169 against 92 for one load; b300 LDCU 115 / 237 for 4 / 8 loads), the other readers 3-4 cycles: a barrier is a counter of outstanding producers.",
+  "Full-GPU ledgers of the branch base ($CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/full-base, cycles equal to main): mean share of warp residency under reg:* 11.5 % (h100) / 7.4 % (b300), of which the producers without a write barrier other than ULDC are about 0.5 %; reg:ULDC:* 4.6 % on h100 (ULDC has no write barrier on sm_90a)."
+ ],
+ "rules": {
+  "R1 no register tracking": "Source-register readiness is removed from issue readiness for every instruction on both devices. An instruction may issue when its warp's control floor (stall count and the other floors that exist today) has passed and every dependency barrier named by its wait mask is free, next to the semantic / resource / fetch / architecture gates that exist today. Result latencies of producers without a write barrier therefore no longer hold anything; a result that the compiler's stall count does not cover is used stale on hardware and simply not waited for in the replay (the replay carries no values).",
+  "R2 barriers are counters": "A barrier is free when every producer that raised it has released it: a write barrier at the producer's data-ready cycle, a read barrier at the cycle the engine releases it today (issue, or SM-side acceptance for the rows that release there). Raising a barrier never lowers its release cycle (max with the outstanding one).",
+  "R3 increment visibility": "A barrier raised by an instruction issued at cycle t does not hold an instruction of the same warp that issues at cycle t + 1; from t + 2 on it does. Releases owed to earlier producers on the same barrier still hold at t + 1.",
+  "ledger": "The reason reg:<class>[:level] disappears. A wait on a barrier is recorded as barrier:<class of the producer whose release is the latest>[:level] (level as today: l1 / l2 / dram, or the constant-path suffix). scoreboard_slot is no longer emitted. configs/stall/class_mapping.json: the reg: rules are rewritten for barrier: with the same classes and their evidence carried over (reg:LDG / reg:LDL calibrations name the same wait).",
+  "not changed here": "The stall rule (floor = issue + stall for stall > 1), the scheduler order, the yield bit, execution-unit resources and every architecture-module rule. The hopper co-resident dependent penalty keys on a source register's ready cycle; that bookkeeping is kept for it and for diagnostics only. It is a fitted rule and is revisited with the tensor pipeline."
+ },
+ "values": "None. No leaf and no schema field changes.",
+ "judgement": {
+  "gates": "The seven gates. Fixture expectations that change are listed one by one with the rule that changes them; a change no rule explains stops the install.",
+  "replay of the warp_issue v1 captures (both devices, 70 cells each, new engine)": [
+   "no reg:* reason in any ledger;",
+   "d.add.s{1..4}: no wait on a register or barrier in the body (issued + control_floor + unit + fetch only);",
+   "d.visible.s1.g0: the readers are not held by the barrier of the load before them (body time per instruction under 5 cycles); d.visible s1.g1, s1.g2, s2.g*: the readers are held under barrier:LDC;",
+   "c.v0.batch4 on both devices and c.u0.batch{4,8} on b300: the first reader carries at least 0.9 of the readers' wait."
+  ],
+  "known and accepted before the run": "d.add at stall 1 / 2 replays faster than hardware (hardware 3.9 cycles per add with math_pipe_throttle 1.6 and not_selected 0.6; the replay has no throttle of that size): the execution-unit throughput is the next survey (one warp per SMSP shapes), not part of this install. On h100 the uniform constant loads (no write barrier) stop holding their readers; where that time sits on hardware (at the load) is installed by protocol constant_paths, and the full-GPU comparison is taken after both.",
+  "full GPU": "Run after constant_paths is installed as well: cycles per case against full-base reported (not a criterion), and cyclescope stall compare against the hardware references for site and per-pc residency, both devices."
+ },
+ "install": "Engine rules R1-R3 on both devices (the data are from both). No value.",
+ "not_allowed": "No full-GPU case decides a rule. No value from another machine or from the literature.",
+ "open (next survey, warp_issue v2 cells)": [
+  "yield bit 0 with stall 1 costs 2 cycles per instruction (class misc) at two warps per SMSP: whether the warp itself skips a cycle or only gives way needs a one-warp-per-SMSP cell;",
+  "stall 0 with yield bit 0 costs 33.4 cycles per NOP (class wait): cells for the opcodes that carry it in real code (BRA, EXIT, ERRBAR, padding NOP);",
+  "d.add at one warp per SMSP and one warp per SM (pipe throughput against the two-warp reading 3.9), other fixed-latency classes;",
+  "which warp the scheduler picks when the slot holder is not ready (d.nop.s4 at 8 warps per SMSP: 5.2-5.6 cycles per NOP on hardware, 7.9-8.3 replayed)."
+ ],
+ "addenda": [
+  {
+   "when": "2026-11-15, install (engine 25257a92 + 82f62d66; build $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/build-82f62d66, seven gates 0; replays warp_issue/{h100,b300}/{sim-base,sim-issue,sim-const}, tables warp_issue/derive-<device>-{base,issue,const}.txt)",
+   "text": "Installed on both devices. Fixture expectations changed by the rules (all listed in the two commit messages): sync a25 / b6l / b6n and the A26 family, op5 operand collector, arch_hopper queue-warp fixtures (H14 / H18 / W2), resource F3 / F4: readers that waited on a source register now issue at once (R1) or were given the write barrier / wait mask and a gap instruction the compiler would emit (R3). Replay criteria: (1) no reg:* or scoreboard_slot reason in any of the 280 ledgers. (2) d.add: body per add = issued + issue_slot + fetch + unit only: h100 1.70 / 2.56 / 3.44 / 4.41 at stall 1-4 (hardware 3.2 / 3.2 / 4.0 / 4.6), b300 1.55 / 2.34 / 3.28 / 4.25 (hardware 3.3 / 3.3 / 4.0 / 4.0); the gap at stall 1-2 is the same-warp interval of the add unit (2 cycles, mechanism-recalibration.md section 6), declared as accepted. (3) d.visible.s1.g0: THE CRITERION WAS WRONG AS WRITTEN (`under 5 cycles per instruction`): hardware itself takes 27-28 cycles per instruction in this cell, because only each load's own increment is invisible to the reader behind it; the reader still waits for the previous pair's load, whose release is outstanding on the same counter, and by then sees its own load's increment. The engine rule reproduces exactly this (first reader not held, later readers held): with constant_paths installed the replay gives 29.5 (h100) / 31.1 (b300) per instruction against 28.0 / 28.1, and the other five d.visible cells 24.1-48.2 / 26.0-52.1 against 24.3-48.5 / 26.3-51.2. The rule stands; the sentence of the criterion is withdrawn. (4) batches (with constant_paths): the first reader carries 160 of about 170 (h100 c.v0.batch4), 150 of about 160 (b300 c.v0.batch4), 194 of about 215 (b300 c.u0.batch8) cycles of the readers' wait."
+  }
+ ]
+}

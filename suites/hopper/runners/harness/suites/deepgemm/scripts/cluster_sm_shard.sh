@@ -33,7 +33,7 @@ if libs:
 PY
 export LIBRARY_PATH="${WORK}/cuda-links${LIBRARY_PATH:+:${LIBRARY_PATH}}"
 
-cd /home/hopper-prototype
+cd /path/to/hopper-prototype
 if [[ "${ROLE}" == "build" ]]; then
   bash suites/deepgemm/scripts/build_cluster_sm.sh h100
   exit 0

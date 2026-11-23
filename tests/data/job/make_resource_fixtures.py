@@ -106,17 +106,21 @@ def f3() -> bytes:
     s.macc.append((0, 1, 0x0, 0, 0, 0, 0, 0))  # space 0, kind 0 = load
     s.instance(ldg, macc=0)
     s.instance(fma)
-    # pair 2: LDG dst reg 5 write_barrier 1 -> FFMA wait_mask bit1
+    # pair 2: LDG dst reg 5 write_barrier 1 -> FFMA wait_mask bit1;
+    # issue_rules v1 R3 needs one gap instruction for the raise to be
+    # visible at the consumer's first evaluation
     ldg2 = s.template("LDG", svc={F_RESULT: 1.0, F_COMPLETION: 1.0},
                       dst=[5])
     s.tmpl[ldg2][9] = 1  # write_barrier
+    nop = s.template("NOP")
     fma2 = s.template("FFMA", svc={F_RESULT: 4.0}, src=[6], dst=[7])
     s.tmpl[fma2][10] = 2  # wait_mask = barrier 1
     s.msec.append((0x2000, 0xFFFFFFFF, 0xFFFFFFFF))
     s.macc.append((1, 1, 0x0, 0, 0, 0, 0, 0))
     s.instance(ldg2, macc=1)
+    s.instance(nop)
     s.instance(fma2)
-    s.warps.append((0, 0, 0, 0, 0, 4))
+    s.warps.append((0, 0, 0, 0, 0, 5))
     s.cta(0, 0, 0, 1, 0)
     return s.build()
 
@@ -124,15 +128,21 @@ def f3() -> bytes:
 def f4() -> bytes:
     s = Seg(1, 1)
     # template-level kind-6 TIME row with cycles=200
+    # issue_rules v1: the dependency rides write barrier 1 (R1
+    # dropped register tracking); a gap NOP makes R3's raise visible
     lds = s.template("LDS", timing=((6, {TR_CYCLES: 200.0,
                                         TR_ENABLED: 1.0}),),
                      svc={F_RESULT: 1.0, F_COMPLETION: 2.0}, dst=[1])
+    s.tmpl[lds][9] = 1  # write_barrier
+    nop = s.template("NOP")
     fma = s.template("FFMA", svc={F_RESULT: 4.0}, src=[1], dst=[2])
+    s.tmpl[fma][10] = 2  # wait_mask = barrier 1
     s.msec.append((0x0, 0xFFFFFFFF, 0xFFFFFFFF))
     s.macc.append((0, 1, 0x1, 0, 0, 0, 0, 0))  # space 1 = shared
     s.instance(lds, macc=0)
+    s.instance(nop)
     s.instance(fma)
-    s.warps.append((0, 0, 0, 0, 0, 2))
+    s.warps.append((0, 0, 0, 0, 0, 3))
     s.cta(0, 0, 0, 1, 0)
     return s.build()
 

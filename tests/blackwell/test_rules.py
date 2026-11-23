@@ -64,3 +64,14 @@ def test_operation_class_arrive_state() -> None:
     assert rules.operation_class(_static_ops(
         "SYNCS.ARRIVE.TRANS64.RED.A1T0",
         ["RZ", "[R5+URZ]", "R2"])) == "SYNCS"
+
+
+def test_defer_blocking_flag() -> None:
+    """placement v2 rule B: only a BAR carrying the DEFER_BLOCKING
+    modifier is marked; the operation class stays BAR."""
+    for op in ("BAR.SYNC.DEFER_BLOCKING", "BAR.RED.POPC.DEFER_BLOCKING"):
+        assert rules.instruction_flags(_static(op)) & rules.FLAG_DEFER_BLOCKING
+        assert rules.operation_class(op) == "BAR"
+    for op in ("BAR.SYNC", "BAR.ARV", "BAR.SYNC.DEFER", "LDG.DEFER_BLOCKING"):
+        assert not rules.instruction_flags(_static(op)) \
+            & rules.FLAG_DEFER_BLOCKING

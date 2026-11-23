@@ -24,6 +24,10 @@ struct FetchConfig {
   std::uint64_t capacity_l1 = 0;
   std::uint64_t stream_l1 = 0, stream_l2 = 0, stream_cold = 0;
   std::uint64_t launch_prefetch = 0;   // bytes streamed at stream_l1
+  // kernel_boundary K3: when nonzero, launch-chain line j arrives at
+  // entry + launch_first_line + j * stream_l1; the head arrival also
+  // floors every demand on this SM until it lands
+  std::uint64_t launch_first_line = 0;
   std::uint64_t sharing = 0;           // 0: L0 per SM, 1: L0 per SMSP
   std::uint64_t parallelism = 1;       // arrival channels per SM
   // 0 -> one LRU of capacity_l0 lines per owner; >0 -> that many ways,
@@ -82,6 +86,9 @@ class InstructionFetch {
     std::unordered_set<std::uint64_t> staged;
     // last_arrival[level][channel]: level 0=l1, 1=l2, 2=cold
     std::vector<std::vector<std::uint64_t>> last_arrival;
+    // kernel_boundary K3: arrival of the launch chain's head line;
+    // a demand on this SM cannot land earlier while it is in flight
+    std::uint64_t launch_head_arrival = 0;
   };
 
   // per-warp demand stream state: a non-sequential demand opens a

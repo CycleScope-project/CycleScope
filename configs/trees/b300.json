@@ -1343,9 +1343,9 @@
    "unit": "count"
   }
  },
- "content_digest": "825bd87f82adf4c2867e3b61697e27960727ce61af2359eb46ab7003898cd2f2",
+ "content_digest": "d7c729f94e87319972a2c16d405aefeeadcd4acf356dff7f7dabd8428db59cb4",
  "device": "b300",
- "leaf_count": 476,
+ "leaf_count": 486,
  "nodes": [
   {
    "children": [],
@@ -3442,14 +3442,40 @@
         ],
         [
          1,
-         5.784974424552429
+         10.33
         ]
        ]
       },
       "schema_id": 5,
       "sources": [
        "control_branch.structural.not_taken_fallthrough",
-       "control_branch.b300.r2"
+       "branch_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "cycles"
+     },
+     "fallthrough_hold_cycles": {
+      "field_id": 6,
+      "model": {
+       "kind": "constant",
+       "value": 4
+      },
+      "schema_id": 5,
+      "sources": [
+       "placement.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "cycles"
+     },
+     "resolve_cycles": {
+      "field_id": 7,
+      "model": {
+       "kind": "constant",
+       "value": 3
+      },
+      "schema_id": 5,
+      "sources": [
+       "placement.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -3470,17 +3496,37 @@
       "field_id": 0,
       "model": {
        "axis": "requested_sleep_cycles",
-       "domain": [
-        0,
-        4294967295
-       ],
-       "intercept": 12416.4,
-       "kind": "affine",
-       "slope": 1.045
+       "kind": "linear",
+       "points": [
+        [
+         0,
+         47.67
+        ],
+        [
+         100,
+         249.33
+        ],
+        [
+         1000,
+         2064.23
+        ],
+        [
+         10000,
+         32622.53
+        ],
+        [
+         100000,
+         243709.0
+        ],
+        [
+         1000000,
+         1944673.03
+        ]
+       ]
       },
       "schema_id": 4,
       "sources": [
-       "nanosleep.b300.v2r1"
+       "sync_basic.b300.v2"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -3551,18 +3597,18 @@
        ],
        "intercept": 0.0,
        "kind": "affine",
-       "slope": 34.0
+       "slope": 0.0
       },
       "schema_id": 5,
       "sources": [
-       "reconvergence.b300.r3"
+       "branch_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
      }
     },
     "scope": "cta",
-    "status": "experimental"
+    "status": "measured"
    },
    "parent": null
   },
@@ -3636,6 +3682,19 @@
       ],
       "type": "uint64",
       "unit": "count"
+     },
+     "launch_first_line_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 546.3
+      },
+      "schema_id": 26,
+      "sources": [
+       "kernel_boundary.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
      },
      "launch_prefetch_bytes": {
       "field_id": 11,
@@ -6090,11 +6149,11 @@
       "field_id": 2,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 49.61
       },
       "schema_id": 1,
       "sources": [
-       "structural.service_owner"
+       "branch_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -6168,18 +6227,18 @@
       "field_id": 1,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 49.61
       },
       "schema_id": 1,
       "sources": [
-       "structural.service_owner"
+       "branch_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "structural"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -7914,11 +7973,11 @@
       "field_id": 2,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 13.0
       },
       "schema_id": 1,
       "sources": [
-       "structural.service_owner"
+       "branch_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -7992,18 +8051,18 @@
       "field_id": 1,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 13.0
       },
       "schema_id": 1,
       "sources": [
-       "structural.service_owner"
+       "branch_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "structural"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -8663,11 +8722,11 @@
       "field_id": 2,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 2
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "mio_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -8689,12 +8748,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 0
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0",
-       "service_latency.b300.v5r2.unrealised"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -8742,18 +8800,18 @@
       "field_id": 1,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 2
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "mio_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "placeholder"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -13213,10 +13271,63 @@
       ],
       "type": "uint64",
       "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 2
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_service_interval_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v2"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "warp_inflight_group": {
+      "field_id": 16,
+      "model": {
+       "kind": "constant",
+       "value": 4
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1",
+       "mio_basic.b300.v2"
+      ],
+      "type": "uint64",
+      "unit": "count"
      }
     },
     "scope": "instruction",
-    "status": "structural"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -13534,6 +13645,45 @@
       ],
       "type": "uint64",
       "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_service_interval_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v2"
+      ],
+      "type": "float64",
+      "unit": "cycles"
      }
     },
     "scope": "instruction",
@@ -13691,11 +13841,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 0
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "exec_units.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -13754,23 +13904,10 @@
       ],
       "type": "uint64",
       "unit": "cycles"
-     },
-     "single_source_issue_interval_cycles": {
-      "field_id": 12,
-      "model": {
-       "kind": "constant",
-       "value": 1.0
-      },
-      "schema_id": 1,
-      "sources": [
-       "alu_forms.b300.r2"
-      ],
-      "type": "float64",
-      "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "experimental"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -13885,23 +14022,10 @@
       ],
       "type": "uint64",
       "unit": "cycles"
-     },
-     "single_source_issue_interval_cycles": {
-      "field_id": 12,
-      "model": {
-       "kind": "constant",
-       "value": 1.0
-      },
-      "schema_id": 1,
-      "sources": [
-       "alu_forms.b300.r2"
-      ],
-      "type": "float64",
-      "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "experimental"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -14052,11 +14176,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 0
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "exec_units.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -15356,7 +15480,7 @@
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -15413,6 +15537,45 @@
       ],
       "type": "uint64",
       "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_service_interval_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v2"
+      ],
+      "type": "float64",
+      "unit": "cycles"
      }
     },
     "scope": "instruction",
@@ -15465,7 +15628,7 @@
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -15522,6 +15685,59 @@
       ],
       "type": "uint64",
       "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 3
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_service_interval_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v2"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "warp_inflight_group": {
+      "field_id": 16,
+      "model": {
+       "kind": "constant",
+       "value": 4
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1",
+       "mio_basic.b300.v2"
+      ],
+      "type": "uint64",
+      "unit": "count"
      }
     },
     "scope": "instruction",
@@ -15914,13 +16130,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 3.985665457589286
+       "value": 0
       },
       "schema_id": 1,
       "sources": [
-       "service_latency.b300.r3q",
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -15980,6 +16194,45 @@
        "service_latency.b300.v3r4"
       ],
       "type": "uint64",
+      "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_service_interval_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v2"
+      ],
+      "type": "float64",
       "unit": "cycles"
      }
     },
@@ -16150,12 +16403,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 3.9906877790178577
+       "value": 0
       },
       "schema_id": 1,
       "sources": [
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -16213,6 +16465,32 @@
        "service_latency.b300.v3r4"
       ],
       "type": "uint64",
+      "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 4.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
       "unit": "cycles"
      }
     },
@@ -17737,13 +18015,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 2.3750000000000004
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "mechtree.w5.uniform",
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "exec_units.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -18986,11 +19262,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 0
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "placeholder.p0"
+       "exec_units.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -19025,7 +19301,7 @@
       "field_id": 10,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 3
       },
       "schema_id": 1,
       "sources": [
@@ -19046,23 +19322,10 @@
       ],
       "type": "uint64",
       "unit": "cycles"
-     },
-     "single_source_issue_interval_cycles": {
-      "field_id": 12,
-      "model": {
-       "kind": "constant",
-       "value": 1.0
-      },
-      "schema_id": 1,
-      "sources": [
-       "alu_forms.b300.r2"
-      ],
-      "type": "float64",
-      "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "experimental"
+    "status": "placeholder"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -19308,12 +19571,11 @@
       "field_id": 2,
       "model": {
        "kind": "constant",
-       "value": 13.000000000000002
+       "value": 2
       },
       "schema_id": 1,
       "sources": [
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "mio_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -19335,13 +19597,11 @@
       "field_id": 7,
       "model": {
        "kind": "constant",
-       "value": 2.0270647321428577
+       "value": 2.0
       },
       "schema_id": 1,
       "sources": [
-       "mechtree.w5.alu4",
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "mio_basic.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
@@ -19376,7 +19636,7 @@
       "field_id": 10,
       "model": {
        "kind": "constant",
-       "value": 6
+       "value": 1
       },
       "schema_id": 1,
       "sources": [
@@ -19389,12 +19649,11 @@
       "field_id": 1,
       "model": {
        "kind": "constant",
-       "value": 13.000000000000002
+       "value": 2
       },
       "schema_id": 1,
       "sources": [
-       "service_latency.b300.v3r4",
-       "service_latency.b300.v3r4"
+       "mio_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "cycles"
@@ -27007,10 +27266,50 @@
       ],
       "type": "uint64",
       "unit": "cycles"
+     },
+     "return_chain": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 4
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "enum"
+     },
+     "return_interval_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "warp_inflight_group": {
+      "field_id": 16,
+      "model": {
+       "kind": "constant",
+       "value": 4
+      },
+      "schema_id": 1,
+      "sources": [
+       "mio_basic.b300.v1",
+       "mio_basic.b300.v2"
+      ],
+      "type": "uint64",
+      "unit": "count"
      }
     },
     "scope": "instruction",
-    "status": "structural"
+    "status": "measured"
    },
    "parent": "instruction.service.root/predicated_on=1"
   },
@@ -32757,49 +33056,1578 @@
    "parent": "instruction.service.root/predicated_on=1"
   },
   {
+   "children": [
+    "instruction.warp_queue.root/operation_class=STS",
+    "instruction.warp_queue.root/operation_class=LDS",
+    "instruction.warp_queue.root/operation_class=SHFL.IDX",
+    "instruction.warp_queue.root/operation_class=SHFL.BFLY",
+    "instruction.warp_queue.root/operation_class=LDG",
+    "instruction.warp_queue.root/operation_class=STG"
+   ],
+   "guard": null,
+   "id": "instruction.warp_queue.root",
+   "parent": null,
+   "partition_axis": "operation_class",
+   "partition_domain": [
+    "STS",
+    "LDS",
+    "SHFL.IDX",
+    "SHFL.BFLY",
+    "LDG",
+    "STG"
+   ]
+  },
+  {
+   "children": [
+    "instruction.warp_queue.root/operation_class=STS/width_bytes=0-4",
+    "instruction.warp_queue.root/operation_class=STS/width_bytes=5-8",
+    "instruction.warp_queue.root/operation_class=STS/width_bytes=9-4294967295"
+   ],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "STS"
+   },
+   "id": "instruction.warp_queue.root/operation_class=STS",
+   "parent": "instruction.warp_queue.root",
+   "partition_axis": "width_bytes",
+   "partition_domain": [
+    0,
+    4294967295
+   ]
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     0,
+     4
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STS/width_bytes=0-4",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 4.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STS"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     5,
+     8
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STS/width_bytes=5-8",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 8.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 4.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STS"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     9,
+     4294967295
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STS/width_bytes=9-4294967295",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 10.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 4.55
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STS"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "LDS"
+   },
+   "id": "instruction.warp_queue.root/operation_class=LDS",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 14.7
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "SHFL.IDX"
+   },
+   "id": "instruction.warp_queue.root/operation_class=SHFL.IDX",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 4.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 14.7
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "SHFL.BFLY"
+   },
+   "id": "instruction.warp_queue.root/operation_class=SHFL.BFLY",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 14.7
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "LDG"
+   },
+   "id": "instruction.warp_queue.root/operation_class=LDG",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 4.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 20.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 1.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root"
+  },
+  {
+   "children": [
+    "instruction.warp_queue.root/operation_class=STG/width_bytes=0-4",
+    "instruction.warp_queue.root/operation_class=STG/width_bytes=5-8",
+    "instruction.warp_queue.root/operation_class=STG/width_bytes=9-4294967295"
+   ],
+   "guard": {
+    "axis": "operation_class",
+    "operator": "eq",
+    "value": "STG"
+   },
+   "id": "instruction.warp_queue.root/operation_class=STG",
+   "parent": "instruction.warp_queue.root",
+   "partition_axis": "width_bytes",
+   "partition_domain": [
+    0,
+    4294967295
+   ]
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     0,
+     4
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STG/width_bytes=0-4",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 6.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STG"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     5,
+     8
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STG/width_bytes=5-8",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 8.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STG"
+  },
+  {
+   "children": [],
+   "guard": {
+    "axis": "width_bytes",
+    "operator": "range",
+    "value": [
+     9,
+     4294967295
+    ]
+   },
+   "id": "instruction.warp_queue.root/operation_class=STG/width_bytes=9-4294967295",
+   "parameter": {
+    "fields": {
+     "enabled": {
+      "field_id": 1,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "has_chain_turn": {
+      "field_id": 28,
+      "model": {
+       "kind": "constant",
+       "value": 0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "is_global_entry": {
+      "field_id": 27,
+      "model": {
+       "kind": "constant",
+       "value": 1
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "boolean"
+     },
+     "queue_depth_count": {
+      "field_id": 23,
+      "model": {
+       "kind": "constant",
+       "value": 10
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "release_interval_cycles": {
+      "field_id": 24,
+      "model": {
+       "kind": "constant",
+       "value": 12.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "result_after_release_cycles": {
+      "field_id": 31,
+      "model": {
+       "kind": "constant",
+       "value": 0.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "sm_depth_count": {
+      "field_id": 30,
+      "model": {
+       "kind": "constant",
+       "value": 52
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "count"
+     },
+     "sm_start_interval_cycles": {
+      "field_id": 29,
+      "model": {
+       "kind": "constant",
+       "value": 2.0
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "start_interval_ratio": {
+      "field_id": 26,
+      "model": {
+       "kind": "constant",
+       "value": 0.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "ratio"
+     },
+     "start_latency_cycles": {
+      "field_id": 25,
+      "model": {
+       "kind": "constant",
+       "value": 5.5
+      },
+      "schema_id": 4,
+      "sources": [
+       "queue_basic.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     }
+    },
+    "scope": "warp",
+    "status": "measured"
+   },
+   "parent": "instruction.warp_queue.root/operation_class=STG"
+  },
+  {
    "children": [],
    "guard": null,
    "id": "kernel.lifecycle.root",
    "parameter": {
     "fields": {
-     "envelope_cycles": {
-      "field_id": 2,
+     "exit_branch_resolve_cycles": {
+      "field_id": 4,
       "model": {
-       "axis": "launch_warps_per_cta",
-       "kind": "linear",
-       "points": [
-        [
-         1,
-         269.8
-        ],
-        [
-         4,
-         293.1
-        ],
-        [
-         8,
-         294.0
-        ],
-        [
-         16,
-         330.3
-        ],
-        [
-         32,
-         406.6
-        ]
-       ]
+       "kind": "constant",
+       "value": 8
       },
       "schema_id": 25,
       "sources": [
-       "lifecycle.b300.v3r4"
+       "kernel_boundary.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "exit_drain_tail_cycles": {
+      "field_id": 5,
+      "model": {
+       "kind": "constant",
+       "value": 6
+      },
+      "schema_id": 25,
+      "sources": [
+       "kernel_boundary.b300.v1"
       ],
       "type": "float64",
       "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "experimental"
+    "status": "measured"
    },
    "parent": null
   },
@@ -32934,6 +34762,32 @@
       "type": "float64",
       "unit": "cycles"
      },
+     "block_bytes": {
+      "field_id": 18,
+      "model": {
+       "kind": "constant",
+       "value": 256
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1.experimental"
+      ],
+      "type": "uint64",
+      "unit": "bytes"
+     },
+     "block_fetch_cycles": {
+      "field_id": 19,
+      "model": {
+       "kind": "constant",
+       "value": 594.6
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1.experimental"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
      "capacity_bytes": {
       "field_id": 2,
       "model": {
@@ -33011,10 +34865,88 @@
       ],
       "type": "float64",
       "unit": "cycles"
+     },
+     "uniform_fill_interval_cycles": {
+      "field_id": 14,
+      "model": {
+       "kind": "constant",
+       "value": 20.9
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1.experimental"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "uniform_first_touch_cycles": {
+      "field_id": 12,
+      "model": {
+       "kind": "constant",
+       "value": 69.05
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "uniform_reread_cycles": {
+      "field_id": 13,
+      "model": {
+       "kind": "constant",
+       "value": 19.0
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "vector_fill_interval_cycles": {
+      "field_id": 17,
+      "model": {
+       "kind": "constant",
+       "value": 20.3
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1.experimental"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "vector_first_touch_cycles": {
+      "field_id": 15,
+      "model": {
+       "kind": "constant",
+       "value": 100.1
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
+     "vector_reread_cycles": {
+      "field_id": 16,
+      "model": {
+       "kind": "constant",
+       "value": 27.5
+      },
+      "schema_id": 27,
+      "sources": [
+       "constant_paths.b300.v1"
+      ],
+      "type": "float64",
+      "unit": "cycles"
      }
     },
     "scope": "instruction",
-    "status": "measured"
+    "status": "experimental"
    },
    "parent": null
   },
@@ -36159,12 +38091,13 @@
       "field_id": 1,
       "model": {
        "kind": "constant",
-       "value": 1
+       "value": 0
       },
       "schema_id": 4,
       "sources": [
        "lsu_accept.b300.v5r1",
-       "store_scatter.b300.r1"
+       "store_scatter.b300.r1",
+       "queue_basic.b300.v1"
       ],
       "type": "uint64",
       "unit": "boolean"
@@ -40361,6 +42294,19 @@
       "type": "float64",
       "unit": "cycles"
      },
+     "defer_stop_distance_cycles": {
+      "field_id": 21,
+      "model": {
+       "kind": "constant",
+       "value": 5
+      },
+      "schema_id": 4,
+      "sources": [
+       "placement.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "cycles"
+     },
      "enabled": {
       "field_id": 1,
       "model": {
@@ -40451,6 +42397,19 @@
       "type": "uint64",
       "unit": "boolean"
      },
+     "service_interval_cycles": {
+      "field_id": 16,
+      "model": {
+       "kind": "constant",
+       "value": 5.68
+      },
+      "schema_id": 4,
+      "sources": [
+       "sync_basic.b300.v2"
+      ],
+      "type": "float64",
+      "unit": "cycles"
+     },
      "suspended_wake_cycles": {
       "field_id": 8,
       "model": {
@@ -40501,6 +42460,19 @@
       ],
       "type": "uint64",
       "unit": "boolean"
+     },
+     "origin_hold_cycles": {
+      "field_id": 22,
+      "model": {
+       "kind": "constant",
+       "value": 7757
+      },
+      "schema_id": 4,
+      "sources": [
+       "poll_origin_basic.b300.v1"
+      ],
+      "type": "uint64",
+      "unit": "cycles"
      }
     },
     "scope": "instruction",
@@ -126676,7 +128648,7 @@
   },
   "control.branch": {
    "event": "control_transition",
-   "field_mask": 16,
+   "field_mask": 208,
    "operation_classes": [
     "BRA"
    ],
@@ -126707,7 +128679,7 @@
   },
   "instruction.fetch": {
    "event": "initialization",
-   "field_mask": 32715,
+   "field_mask": 65483,
    "operation_classes": [],
    "parameter_schema": "instruction.fetch",
    "root": "instruction.fetch.root",
@@ -126715,7 +128687,7 @@
   },
   "instruction.service": {
    "event": "issue",
-   "field_mask": 7398,
+   "field_mask": 126182,
    "operation_classes": [
     "ACQBULK",
     "ARRIVES",
@@ -126915,9 +128887,25 @@
    "root": "instruction.service.root",
    "schema_id": 1
   },
+  "instruction.warp_queue": {
+   "event": "issue",
+   "field_mask": 4286578690,
+   "operation_classes": [
+    "STS",
+    "LDS",
+    "SHFL.IDX",
+    "SHFL.BFLY",
+    "LDG",
+    "STG"
+   ],
+   "parameter_schema": "timing_row",
+   "root": "instruction.warp_queue.root",
+   "schema_id": 4,
+   "timing_kind": "warp_queue_entry"
+  },
   "kernel.lifecycle": {
    "event": "initialization",
-   "field_mask": 4,
+   "field_mask": 48,
    "operation_classes": [],
    "parameter_schema": "kernel.lifecycle",
    "root": "kernel.lifecycle.root",
@@ -126933,7 +128921,7 @@
   },
   "memory.constant_cache": {
    "event": "initialization",
-   "field_mask": 127,
+   "field_mask": 1044607,
    "operation_classes": [],
    "parameter_schema": "memory.constant_cache",
    "root": "memory.constant_cache.root",
@@ -127305,7 +129293,7 @@
   },
   "synchronization.cta.release": {
    "event": "barrier_release",
-   "field_mask": 3,
+   "field_mask": 2097155,
    "operation_classes": [
     "BAR"
    ],
@@ -127325,7 +129313,7 @@
   },
   "synchronization.mbarrier.release": {
    "event": "barrier_release",
-   "field_mask": 259,
+   "field_mask": 65795,
    "operation_classes": [],
    "parameter_schema": "timing_row",
    "root": "synchronization.mbarrier.release.root",
@@ -127334,7 +129322,7 @@
   },
   "synchronization.mbarrier.trywait_timeout": {
    "event": "issue",
-   "field_mask": 3,
+   "field_mask": 4194307,
    "operation_classes": [],
    "parameter_schema": "timing_row",
    "root": "synchronization.mbarrier.trywait_timeout.root",
@@ -127616,6 +129604,16 @@
      "type": "uint64",
      "unit": "cycles"
     },
+    "fallthrough_hold_cycles": {
+     "id": 6,
+     "type": "uint64",
+     "unit": "cycles"
+    },
+    "resolve_cycles": {
+     "id": 7,
+     "type": "uint64",
+     "unit": "cycles"
+    },
     "unreused_additional": {
      "id": 2,
      "type": "float64",
@@ -127650,6 +129648,11 @@
      "id": 14,
      "type": "uint64",
      "unit": "count"
+    },
+    "launch_first_line_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
     },
     "launch_prefetch_bytes": {
      "id": 11,
@@ -127731,10 +129734,30 @@
      "type": "uint64",
      "unit": "cycles"
     },
+    "return_chain": {
+     "id": 14,
+     "type": "uint64",
+     "unit": "enum"
+    },
+    "return_interval_cycles": {
+     "id": 13,
+     "type": "float64",
+     "unit": "cycles"
+    },
     "single_source_issue_interval_cycles": {
      "id": 12,
      "type": "float64",
      "unit": "cycles"
+    },
+    "sm_service_interval_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "warp_inflight_group": {
+     "id": 16,
+     "type": "uint64",
+     "unit": "count"
     }
    },
    "id": 1
@@ -127753,6 +129776,16 @@
     },
     "envelope_cycles": {
      "id": 2,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "exit_branch_resolve_cycles": {
+     "id": 4,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "exit_drain_tail_cycles": {
+     "id": 5,
      "type": "float64",
      "unit": "cycles"
     },
@@ -127816,6 +129849,16 @@
      "type": "float64",
      "unit": "cycles"
     },
+    "block_bytes": {
+     "id": 18,
+     "type": "uint64",
+     "unit": "bytes"
+    },
+    "block_fetch_cycles": {
+     "id": 19,
+     "type": "float64",
+     "unit": "cycles"
+    },
     "capacity_bytes": {
      "id": 2,
      "type": "uint64",
@@ -127843,6 +129886,71 @@
     },
     "same_line_latency_cycles": {
      "id": 3,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_bank0_cold_hold_cycles": {
+     "id": 8,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_cold_hold_cycles": {
+     "id": 9,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_few_warps_limit": {
+     "id": 21,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "uniform_fill_interval_cycles": {
+     "id": 14,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_first_touch_cycles": {
+     "id": 12,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_first_touch_few_warps_cycles": {
+     "id": 20,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_first_touch_min_smsps": {
+     "id": 22,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "uniform_reread_cycles": {
+     "id": 13,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "uniform_resident_hold_cycles": {
+     "id": 10,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_bank0_cold_latency_cycles": {
+     "id": 11,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_fill_interval_cycles": {
+     "id": 17,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_first_touch_cycles": {
+     "id": 15,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "vector_reread_cycles": {
+     "id": 16,
      "type": "float64",
      "unit": "cycles"
     }
@@ -128441,6 +130549,11 @@
      "type": "float64",
      "unit": "cycles"
     },
+    "defer_stop_distance_cycles": {
+     "id": 21,
+     "type": "uint64",
+     "unit": "cycles"
+    },
     "drain_bytes_per_cycle": {
      "id": 10,
      "type": "float64",
@@ -128448,6 +130561,16 @@
     },
     "enabled": {
      "id": 1,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "has_chain_turn": {
+     "id": 28,
+     "type": "uint64",
+     "unit": "boolean"
+    },
+    "is_global_entry": {
+     "id": 27,
      "type": "uint64",
      "unit": "boolean"
     },
@@ -128466,15 +130589,35 @@
      "type": "float64",
      "unit": "bytes/cycle"
     },
+    "origin_hold_cycles": {
+     "id": 22,
+     "type": "uint64",
+     "unit": "cycles"
+    },
     "pending_commit_groups_limit": {
      "id": 11,
      "type": "uint64",
      "unit": "count"
     },
+    "queue_depth_count": {
+     "id": 23,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "release_interval_cycles": {
+     "id": 24,
+     "type": "float64",
+     "unit": "cycles"
+    },
     "resource": {
      "id": 2,
      "type": "uint64",
      "unit": "resource"
+    },
+    "result_after_release_cycles": {
+     "id": 31,
+     "type": "float64",
+     "unit": "cycles"
     },
     "reuse_flag_floor_cycles": {
      "id": 6,
@@ -128490,6 +130633,31 @@
      "id": 20,
      "type": "float64",
      "unit": "ratio"
+    },
+    "service_interval_cycles": {
+     "id": 16,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "sm_depth_count": {
+     "id": 30,
+     "type": "uint64",
+     "unit": "count"
+    },
+    "sm_start_interval_cycles": {
+     "id": 29,
+     "type": "float64",
+     "unit": "cycles"
+    },
+    "start_interval_ratio": {
+     "id": 26,
+     "type": "float64",
+     "unit": "ratio"
+    },
+    "start_latency_cycles": {
+     "id": 25,
+     "type": "float64",
+     "unit": "cycles"
     },
     "suspended_wake_cycles": {
      "id": 8,
@@ -128508,11 +130676,6 @@
  "sm_arch": "sm_103a",
  "smsps_per_sm": 4,
  "sources": {
-  "alu_forms.b300.r2": {
-   "artifact": "$A/fg-line-cold/alu/b300-r{1,2} (slopes $A/fg-line-cold/tools/alu_slopes.py)",
-   "description": "alu_forms on B300: one register source (VIADD + LOP3 imm) 1.03 / 2.00 / 4.00 / 8.01 cycles per instruction at W = 1 / 2 / 4 / 8 = 1.0 x W; VIADD + LEA 1.07 / 2.00 / 4.00 / 8.01; IMAD with three sources 2.0 x W; two-source mix 1.63 / 2.79 / 5.14 / 10.1 (not installed).",
-   "evidence": "experimental"
-  },
   "arrive_status.b300.r3": {
    "artifact": "$A/microbench/arrive_status/b300-r3 (run-a/run-b arrive_status.jsonl; SASS gate check.json passed; protocol tools/microbench/arrive_status/protocol.json + addenda)",
    "description": "B300 arrive_status r3: result/completion latency of a SYNCS.ARRIVE whose returned state is consumed = chain slope over U minus the probe chain-step arithmetic (12 cycles from the H100 replay): SYNCS.ARRIVE.STATE 28.00 (chain 40.24/40.00 - 12), SYNCS.ARRIVE.STATE.COUNT 32.00 (44.31/44.00 - 12); classes by destination register (non-RZ general register -> STATE/COUNT, RZ stays SYNCS); the chain-step arithmetic term (12 cycles = H100 replay of the same chain on main: ARRIVE->LOP3 2, LOP3->IMAD 5, IMAD->ARRIVE 6, minus arrive result 1) is taken from the H100 replay because there is no B300 probe replay; experimental",
@@ -128583,14 +130746,25 @@
    "description": "B300 UMMA: the measured per-op pipe cadence (blackwell umma.issue table, now tensor.pipe) ends when the op completes; the commit-to-UTCBAR delay is blackwell.umma.commit. No separate result latency term.",
    "evidence": "structural"
   },
+  "branch_basic.b300.v1": {
+   "artifact": "$A/stall-attribution/branch_basic-readings/read-b300.txt",
+   "description": "branch_basic protocol v2 (tools/microbench/branch_basic/protocol-v2.json; installation from the version 1 readings, frozen before any replay with a changed engine or tree). Y1 YIELD result/completion = C + 2, C = mean over v.yield1, .s1, .y0, .alu and v.yield2 / 2 of (sample total - v.nop), 2 = stall of the NOP the YIELD replaced: (48.13 + 47.91 + 47.45 + 47.48 + 47.09) / 5 + 2 = 49.61. R1 control.reconvergence.control_envelope = affine intercept 0, slope 0: a BSSY holds the warp for its stall field only. R2 BSYNC result/completion = 13.0: next issue no earlier than the BSYNC's issue + result latency, max with its stall, every dynamic BSYNC instance alike (row behind the BSYNC in w.if.nt / w.if.t, regions 2-4, per execution: 12.9 / 12.88; in a divergent region the non-final path's share is booked a few instructions early, 12.9 extra per extra path in all). B1 control.branch.control_envelope(branch_taken = 1) = 10.33: time from the BRA's issue to the issue of its target, loop back-edges per trip: s.loop 10.06, v.nop 10.20, w.ubr.nt 10.72, w.if.nt 10.25, w.ubr.t 10.41; branch_taken = 0 stays 0.",
+   "evidence": "measured"
+  },
   "constant_launch.b300.r3": {
    "artifact": "$A/microbench/constant_launch-model/b300-r3/model.json and b300-r2/model.json (samples $A/microbench/constant_launch/b300-r{2,3}/run-{a,b}/launches.log, SASS gates checks.json)",
    "description": "B300 constant_launch protocols v2 + v3 (tools/microbench/constant_launch/protocol-v2.json, protocol-v3.json, frozen before data; probes constlaunch_v2.cu / constlaunch_v3.cu: 16 dependent constant loads per traversal, two traversals, CS2R after every load, ncu --cache-control all, 34 launches, first 2 dropped, two runs; per-load latency = clock delta minus the installed result latency of the single in-between op (IMAD / USHF 4)). Vector path (LDC R, c[0x0][R]; v2 run b300-r2, reproduced by the v3 control within 0 %): bank-0 first 30.0 / second 30.0 / load 0 30.0, measured -> bank0_access_cycles = 30.0, engine rule (protocol-v3 path split): a vector LDC to bank 0 returns now + 30 (parameter / driver bank resident at launch). Uniform path (ULDC / LDCU with UR index, v3 run b300-r3): bank-0 first 66.0 (measured), second 26.0 (measured); bank-3 first 281.0 (measured), second 26.0 (measured) -> no uniform rule (declared condition: both measured and second within 10 % of first); uniform loads keep the miss / hit / same-line / in-flight rules. Cold miss: vector bank-3 first 641.0 (experimental) vs uniform 281.0 (measured) -> miss_latency_cycles unchanged (declared condition: both measured and within 10 %). Not installed (A/B arms only): the v2 'every bank-0 access' rule (task/lifecycle-v3 913d77d, arm $A/merge/cbi).",
    "evidence": "measured"
   },
-  "control_branch.b300.r2": {
-   "description": "control_branch protocol-v2: predicated forward BRA skipping a fence.gpu block; per-unit OLS slope minus body (installed FFMA latency + scaling non-branch stall); run-agree 0%",
+  "constant_paths.b300.v1": {
+   "artifact": "$CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300",
+   "description": "B300 constant_paths v1 (tools/microbench/constant_paths/protocol.json, frozen before engine change; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300, derive-b300.txt section c, two sampling passes averaged). uniform_first_touch_cycles = 69.05 (mean of 20 loads: c.u0.first8, c.u0.reread 1-4, c.u0_then_v0 1-4, c.v0_then_u0 5-8, at the reader pc); uniform_reread_cycles = 19.0 (c.u0.reread 5-8); vector_first_touch_cycles = 100.1 (mean of 20 loads: c.v0.first8, c.v0.reread 1-4, c.u0_then_v0 5-8, c.v0_then_u0 1-4, at the reader pc); vector_reread_cycles = 27.5 (c.v0.reread 5-8).",
    "evidence": "measured"
+  },
+  "constant_paths.b300.v1.experimental": {
+   "artifact": "$CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300",
+   "description": "B300 constant_paths v1 experimental fields (tools/microbench/constant_paths/protocol.json; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300, derive-b300.txt section c). uniform_fill_interval_cycles = 20.9 = mean of (4 + 115 - 69.05) / 3 = 16.7 (c.u0.batch4) and (8 + 237 - 69.05) / 7 = 25.1 (c.u0.batch8), the two disagree; vector_fill_interval_cycles = 20.3 = (4 + 157 - 100.1) / 3 from c.v0.batch4; block_bytes = 256; block_fetch_cycles = 594.6 = mean of c.u3.first8 loads 1, 4, 8 (672 642 635) - 69.05 and c.v3.first8 loads 1, 4, 8 (656 841 629) - 100.1.",
+   "evidence": "experimental"
   },
   "control_branch.structural.not_taken_fallthrough": {
    "description": "a not-taken predicated BRA merely falls through: no PC redirect, its issue cost is already the instruction.service BRA 1-cycle charge; v1-r1 / v2-r2 nottaken slopes (0.47 h100 / 0.14 b300) failed the SASS gate via ptxas branch merging and are recorded as supporting data, not installed",
@@ -128670,6 +130844,11 @@
    "artifact": "$A/fg-line-cold/refill/b300-r4 (model $A/fg-line-cold/refill-model/b300-r4/model4.json, gpc_classes.json)",
    "description": "dispatch_refill run 4 (protocol.json addendum 5). Refill gap per SM class over the six spin cells of runs 1, 2, 4 (three cards): fast 159.4 ns (154.0-170.9), slow 250.9 ns (245.1-262.3); the slow class is four whole topology gpcs, {2,5,6,7} on two of the three cards and {1,2,6,7} on the third -- the mask is the majority set, a declared choice. PREEXIT (griddepcontrol.launch_dependents): a CTA in which it was executed occupies the GPU-wide dispatch serializer for 1.00 x serial_ns_per_cta more; per CTA not per warp (1 / 2 / 4 of 4 warps: same span), linear in the fraction of CTAs (0-1000 permille), independent of where in the CTA it executes and of the launch attribute; replay within 2 % on 17 of 18 cells. Counter-example: 512-thread CTAs with PREEXIT, span 5 % above the replay (fast-class gap 313 -> about 480 cycles). Not modelled: first-wave spread; the slow class rising to about 685 cycles when every CTA does cold global reads at a hold of 3000 cycles or less.",
    "evidence": "experimental"
+  },
+  "exec_units.b300.v1": {
+   "artifact": "$A/stall-attribution/exec_units/b300",
+   "description": "exec_units v1 (tools/microbench/exec_units/protocol.json): one warp per SMSP, resident code, 64-instruction body at stall 1 with the yield bit clear. Self cells and VIADD / LOP3 pairs on both devices: VIADD, LEA, MOV and ULOP3 measure 2.02-2.03 cycles per instruction (issue interval 2.0); LOP3, SHF, IADD3, ISETP, PRMT, SEL, FMNMX, UIADD3, USHF, IMAD near 2.0, IMAD.HI near 4.0. The 1.0 single-source interval from alu_forms does not reproduce in this protocol.",
+   "evidence": "measured"
   },
   "form.reexpressed.2026-11-05": {
    "artifact": "scripts/migration (leaf alignment P4 form pass)",
@@ -128776,6 +130955,11 @@
    "description": "STRUCTURAL: sequential prefetch depth in lines. The Blackwell leaf never carried the field; the engine default of 4 lines has been in effect for every b300 job, made explicit at the field-set unification (2026-11-04). Unmeasured on both devices (the H100 value 5 is the predecessor fit).",
    "evidence": "structural"
   },
+  "kernel_boundary.b300.v1": {
+   "artifact": "$CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300/reference-{a,b}",
+   "description": "B300 kernel_boundary v1 (tools/microbench/kernel_boundary/protocol.json, frozen before the engine change; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue/b300/reference-{a,b} per launch id and counter group). launch_first_line_cycles = 546.3 (no_instruction per warp on the first pc at the common level, stall group, launch ids 0-3 of both passes, cells a.empty, a.exit_only, a.nop_exit, a.empty.w1, a.empty.w32, a.empty.g4, b.sled.l1; the common level = executions below the median + 100: b300 median 546.3). exit_branch_resolve_cycles = 8 and exit_drain_tail_cycles = 6 (after EXIT with nothing outstanding - a.exit_only, a.nop_exit and the sleds of 8+ lines, counters: branch_resolving 8 on both devices in every cell, drain 7-8 (h100) / 5-6 (b300)).",
+   "evidence": "measured"
+  },
   "l1_residency.b300.r2": {
    "artifact": "$A/microbench/crossings-model/l1_residency/b300-r2/model.json (samples $A/microbench/crossings/l1_residency/b300-r2/run-{a,b}/l1cap.jsonl; checks.json)",
    "description": "B300 l1_residency protocol v4 (tools/microbench/crossings/l1_residency/protocol-v4.json; probe l1cap.cu v3: one CTA, lane-0 dependent ld.global.ca chase over F = 4..256 KiB in 4 KiB steps, random cyclic 128 B lines, warm then timed pass; --launches 8 --reps 33, two runs, SASS gate ok). The L1 data budget of a launch is set by the shared-memory configuration the driver selects (occupancy rule: smallest supported configuration >= n_res x (dynamic + static + 1 KiB), n_res = min(32 CTAs, 64 warps / block warps, 228 KiB / per-CTA need)), not by the launch's own shared bytes: the 10 default-hint cells (S 0 / 32 / 64 / 128 / 192 KiB x block 32 / 1024) give effective capacity E = 184 / 240 / 20 / 148 / 52 / 116 / 116 / 116 / 52 / 52 KiB with configurations 64 / 8 / 228 / 100 / 196 / 132 / 132 / 132 / 196 / 196 KiB (cudaOccupancyMaxActiveBlocksPerMultiprocessor equals n_res in every cell) and E + configuration = 248 KiB in all 10 cells of both runs (spread 0) -> data_array_bytes = 253952, reserved_bytes = 0 (measured; the 8 KiB below 256 KiB is the unusable part of the array, the same on both devices). The pinned-hint cells (v3 install path, unrealised) show that cudaFuncAttributePreferredSharedMemoryCarveout does not pin the configuration (hint 0 / 4 / 8 / >= 15 % -> 8 / 100 / 164 / 228 KiB at S = 0; 44 % -> 228 at S = 0 but 132 at S = 64 KiB). Replaces the structural placeholder 262144 / 0 (placeholder.p0.memory.structure): the B300 budget is 248 KiB like the H100's, 8 KiB less than the placeholder. Engine finding handed to the engine line: l1_cap_lines should subtract the selected configuration, not the launch's shared bytes.",
@@ -128800,11 +130984,6 @@
   "ldgsts_loaded.b300.shared_read_domain": {
    "artifact": "fg-gemm/ldgsts-share4/b300 + fg-gemm/ldgsts-share3/b300",
    "description": "L2 read sharing domain = SM ids 2k and 2k+1: one-warp lockstep cp.async cells grouped by SM-id bits, r(mask 1) 0.50-0.52, r(mask 2/4/8) 0.98-1.01, r(mask 3) = r(mask 1); far-apart groups do not share (r 0.88-1.06). Partial sharing across id bits 16 / 32 (r 0.74-0.80) is not modelled. Applied to every merging request kind; for TMA this is an assumption. Derivation and outcome in tools/microbench/ldgsts_loaded/protocol.json addenda shared_read_placement / shared_read_domain.",
-   "evidence": "experimental"
-  },
-  "lifecycle.b300.v3r4": {
-   "artifact": "$A/microbench/lifecycle-model/b300-v3r4/model.json (hardware $A/microbench/lifecycle/b300-v3r1/run-{a,b}, captures b300-v3r1/capture, engine runs sim-b300-v3r4)",
-   "description": "B300 lifecycle protocol v3 (tools/microbench/lifecycle/protocol-v3.json + addenda 2026-11-06; probe lifecyc.cu verbatim). envelope = mean over two hardware runs (v3r1: ncu --cache-control all, case reference metric list, 64 launches, first 2 dropped) of sm__cycles_active.max - marker span, minus the engine's own outside-marker time for the same probe launch (captured with tracer-072fa0a; convert / tree at task/constant-uniform 1b52311 (constant in-flight fix, bank in address, vector bank-0 rule 30); engine build-cu: core_sim - span_sim; $A/microbench/lifecycle/probe-sim-b300-v3r4.tsv). Install cells C = 1, S = 0, L = 0: W=1: 269.8 (L1024 490.6, L4096 reported 489.9, se_rel max 2.0 %, run agree 1.6 %, body diff 221 / limit 64 -> experimental); W=4: 293.1 (L1024 490.2, L4096 reported 493.3, se_rel max 2.0 %, run agree 1.4 %, body diff 197 / limit 64 -> experimental); W=8: 294.0 (L1024 500.2, L4096 reported 500.4, se_rel max 2.0 %, run agree 2.0 %, body diff 206 / limit 64 -> experimental); W=16: 330.3 (L1024 482.2, L4096 reported 550.5, se_rel max 2.0 %, run agree 0.8 %, body diff 152 / limit 64 -> experimental); W=32: 406.6 (L1024 365.1, L4096 reported 407.3, se_rel max 2.0 %, run agree 0.6 %, body diff 41 / limit 64 -> measured). The field carries the weakest cell verdict (experimental). Supersedes v2 points [[1, 1556.6], [4, 1551.4], [8, 1551.4], [16, 1574.9], [32, 1521.6]] (source lifecycle.b300.r4: subtracted only marker span and a modelled prologue fetch, so engine-simulated work was counted twice). Engine- and tree-dependent (protocol dependence clause): re-derive when the end-of-kernel rule, instruction.fetch, the store path, constant cache rules / leaves or S2R / CS2R / STG leaves change.",
    "evidence": "experimental"
   },
   "load_after_copies.b300.v3": {
@@ -129722,6 +131901,16 @@
    "description": "EXPERIMENTAL B300 L2 in-flight lower bound, memory_request protocol v2 r2: cap UNRESOLVED -- rate still growing (>3%) at N=512 requests in flight (no cap up to N in flight, rate still growing; concurrency_eff at N*=512 = ~173-177 requests under Little's law against the measured latency_unloaded). Installed value kept unchanged per protocol.",
    "evidence": "experimental"
   },
+  "mio_basic.b300.v1": {
+   "artifact": "$A/stall-attribution/mio_basic-readings/T-table.txt",
+   "description": "mio_basic installation protocol v3 (tools/microbench/mio_basic/protocol-v3.json; version-1 table, frozen before any GPU replay with a changed engine or tree). M1 return intervals: one-warp same-class runs' results return 2.0 cycles apart (SHFL.IDX 4.0) behind producers issued 1 apart (data (a)). Return chains from the mixed-kind runs (data (d)): S2R, LDS and SHFL.BFLY share chain 1; LDC's own chain 2; S2UR's own chain 3; SHFL.IDX in chain 1 and (blackwell) LDCU's own chain 4 are assumptions (only own-kind runs exist for them); Blackwell LDCU's own return chain 4 is an assumption (LDCU only ran as its own kind). M3: the group-of-four bound waits at issue until the earliest MIO instruction returns (data (b); installed on S2UR and LDC, LDCU on b300). M4 (data (f)): CS2R.CLOCK and VOTE are 2-cycle unit instructions (result/completion 2, issue interval 2.0).",
+   "evidence": "measured"
+  },
+  "mio_basic.b300.v2": {
+   "artifact": "$A/stall-attribution/mio_basic-readings/T-table-v2.txt",
+   "description": "mio_basic protocol v3 version-2 table (tools/microbench/mio_basic/protocol-v3.json v2 addendum): M2 one server per SM and operation class, service intervals from the four-warps-on-one-SM mixed-kind run (data (e)): S2R / S2UR / LDC 2.0 cycles, LDS / SHFL.BFLY 1.0, LDCU 0.0 (0.0 = no service effect); and the group-of-four bound confirmed at 4.0-4.02 for S2UR / LDC (data (b) rerun).",
+   "evidence": "measured"
+  },
   "mma_sync.b300.r6": {
    "artifact": "$A/microbench/mma_sync-model/b300-b300-r6/model.json",
    "description": "mma_sync protocol v1 b300 run b300-r6: cell dmma -> DMMA (measured); result_latency=583.5217391304348 issue_interval=584.0 lat_runs=[583.5217391304348, 583.5217391304348] thr_runs=[584.0, 584.0] control=None sparse_call_subroutine=False gate=PASS",
@@ -129751,10 +131940,22 @@
    "description": "SM103 memory/shared structure reuses Hopper MemoryHierarchy and shared timing kinds; latencies, outstanding, L2 geometry, and bank-conflict cells are unmeasured placeholders, not H100 copies and not measured. NA cache path (LDG/STG.E.NA, MEMORY_ACCESS_FLAG_NO_L1_ALLOCATE bit8: probe an existing resident L1 line, never allocate on a miss) and CONSTANT cache path (LDG.E.CONSTANT = ld.global.nc non-coherent read-only, MEMORY_ACCESS_FLAG_NONCOHERENT_READONLY bit9) are EXPERIMENTAL: policy identity and flag/selector routing (ca=1 cg=2 na=3 constant=4) are verified native facts, but the L1/L2 residency and service curves they select are the temporary placeholders above and are NOT independently measured NA/CONSTANT curves; CONSTANT reuses the existing global cache hierarchy with no independent constant cache and no forced L2 miss; a run report must not present these NC-shared curves as independent NA/CONSTANT measurements",
    "evidence": "placeholder"
   },
-  "reconvergence.b300.r3": {
-   "artifact": "$A/microbench/crossings-model/reconvergence/b300-r3/model.json (samples $A/microbench/crossings/reconvergence/b300-r3/run-{a,b}/ctrl.jsonl; SASS gate checks.json)",
-   "description": "B300 reconvergence protocol v2 (tools/microbench/crossings/reconvergence/protocol-v2.json; probe ctrl2.cu: one warp, N in {64,128,256} iterations of a divergent per-lane if/else with B in {8,16,32} FFMA per path, every argument-derived value pinned with mb_pin; --launches 8 --reps 33, two runs; SASS gate 36/36 kernels: window holds only FFMA / BSSY / BSYNC / BRA / loop control, no constant loads). control_envelope slope = per-iteration cycles (OLS over N) minus the loop body's SASS stall sum = 34.0 at every B and in both runs (B-independent; body delimited from the back-edge target to the back-edge, protocol addendum 2026-11-05 written after the data, hence experimental; the predecessor's body rule gives 46 / 54 / 70 at B 8/16/32). Diagnostics: two sequential regions 1.88 x, three-way region 1.62-1.71 x, warp-uniform if/else residual 13.5 (reported, not installed). Control: the installed blackwell-prototype 35.0 (mechtree.w5.ctrl_model, ctrl.cu div_region_residual) is reproduced within 10 % (-2.9 %) and replaced by this run's value per the protocol.",
-   "evidence": "experimental"
+  "placement.b300.v1": {
+   "artifact": "$A/stall-attribution/placement_basic-r2/b300 and $A/stall-attribution/placement_basic-v2/b300 (protocol tools/microbench/placement/protocol.json; readings $A/stall-attribution/scoreboard/mio4/b300)",
+   "description": "B300 placement v1 (tools/microbench/placement/protocol.json, frozen before any replay with a changed engine, converter or mapping; statistics only, no cycle count depends on these values). T: control.branch fallthrough_hold_cycles = 4 and resolve_cycles = 3 -- per taken back-edge of the 55 in the one-warp cells of sync_basic*, branch_basic* and mio_basic* (b300: selected 1.03 and wait 4.04 on the fall-through pc, branch_resolving 3.01 and no_instruction 2.04 on the target); the control_envelope E of branch_basic stays the end of the interval (refetch up to E, control_floor beyond). B: synchronization.cta.release defer_stop_distance_cycles = 5 (placement_basic v2 cells b.s2r.d2-d6: the barrier of BAR.SYNC.DEFER_BLOCKING is on the S2R itself from d = 5, 100 % of it here, 30 % / 29 % at d = 4: Dmin = the smallest d at which more than half of the barrier is on the S2R). P': synchronization.mbarrier.trywait_timeout origin_hold_cycles = 3877 (placement_basic v1 u.pollcute.k1024: the inline reader's long_scoreboard per wait, 3877.1; tools/microbench/placement/protocol-v4.json).",
+   "evidence": "measured",
+   "kind": "microbench"
+  },
+  "poll_origin_basic.b300.v1": {
+   "artifact": "$A/stall-attribution/poll_origin_basic/b300 (protocol tools/microbench/poll_origin_basic/protocol.json and its addendum)",
+   "description": "poll_origin_basic v1: a plain try_wait on a phase that never completes returns false 7757 cycles after the poll's issue in every configuration (alone, with arrivals, delay loops, idle and busy neighbour warps; t.timeout.* cells, n = 12 calls); synchronization.mbarrier.trywait_timeout origin_hold_cycles = 7757 (statistics only: the stall ledger books the wait up to issue + 7757 on the poll's first waiter; no cycle count depends on it).",
+   "evidence": "measured",
+   "kind": "microbench"
+  },
+  "queue_basic.b300.v1": {
+   "artifact": "$A/stall-attribution/queue_basic{,-v2}/b300 (readings: tools/microbench/queue_basic/protocol.json and protocol-v2.json addenda); installation protocol tools/microbench/warp_queue/protocol.json",
+   "description": "B300 queue_basic v1 / v2 (one warp, 64-iteration loop, producers in consecutive issue slots, per-pc samples of two reference passes against the replay ledger) and the installation protocol warp_queue v1 (rules Q1-Q5): a per-warp queue of 10 entries with one serial release per warp, release interval per kind and operand width (LDS 2, SHFL.BFLY 2, STS 4 / 8 B 8 / 16 B 10, SHFL.IDX 4, LDG 4, STG 6 / 8 B 8 / 16 B 12 cycles), start = max(free, issue + 5.5 + 0.5 r), a member waits at issue while 10 entries are unreleased (mio_throttle, lg_throttle when the waiter and all entries are global), stores take a turn of r in the return chain 1; the per-SMSP global store interval (storage.global.store_issue) is disabled because ten stores issue one cycle apart.",
+   "evidence": "measured"
   },
   "row_gather.b300.r3": {
    "artifact": "$A/fg-line-cold/rowgather/b300-r3s (cells/sweep.txt, tables $A/fg-line-cold/rowgather/tables-r3-b300.{txt,tsv}, tools $A/fg-line-cold/tools/rowgather_run3.py); $A/fg-line-cold/rowgather/b300-r2y",
@@ -129956,6 +132157,11 @@
    "description": "install_tmem_result sets result = lifecycle_start + mandatory storage.tmem.load/store row (engine.cpp ~L2484-2518; throws when the row is missing); completion = max(plan completion, result) and rows are >= 1, so the sentinel 1 never binds. STTM census wb=7. LDTM.STAT is TensorOp::TmemLoadStat and takes the same install_tmem_result path as LDTM (engine.cpp ~2495-2510: kind-13 row + kind-43 extra), so plan fields 1/2 never bind.",
    "evidence": "structural"
   },
+  "sync_basic.b300.v2": {
+   "artifact": "$A/stall-attribution/sync_basic{,-v2}/derive-b300.txt",
+   "description": "sync_basic installation protocol v5 (tools/microbench/sync_basic/protocol-v5.json) leaves: control.nanosleep.cycles points (request ns, cycles) = the clock cost per sleep of the one-warp cells (derive column 'cost', launch 2): b300 (100, 249.33), (1000, 2064.23), (10000, 32622.53), (100000, 243709.0), (1000000, 1944673.03); and a point at 0 on the line through the first two points (47.67) so that requests below 100 ns follow the short law instead of the 100 ns value; the table clamps above 1 ms (the PTX cap). synchronization.mbarrier.release.service_interval_cycles = sum_i(T_i k_i)/sum_i(k_i^2) over the saturated-server cells (s.mbar_self.w4, t.mbar_all.w4, t.mbar_self.w8), k_i = 2 x warps SYNCS instructions per iteration on the SM = 5.68.",
+   "evidence": "measured"
+  },
   "tensor_pipe.b300.r2": {
    "artifact": "$A/microbench/tensor_pipe/b300-r2",
    "description": "B300 tensor_pipe protocol v2 run b300-r2 (tools/microbench/tensor_pipe/probe/umma_cadence.cu: umma_impl.cuh kernels verbatim from blackwell-prototype, N 16..256 step 16, SWIZZLE_128B, cta_group 1/2, A from SMEM/TMEM, 6 umma kinds; GPU-e4ff6a59 driver 580.159.03; two runs). tensor.pipe = OLS slope of the cadence over U {32,64,128} (steady-state per-op pipe hold; ~N/2 cycles above N 96, floor ~44); tensor.completion = single-op latency (xw U=1 minus commit-only U=0 minus SASS o_s difference) - pipe. The installed predecessor points matched the single-op latency within 10 % at 372 of 384 cells (they held the pipe for the whole latency). Model $A/microbench/tensor_pipe-model/b300-r2/model.json. Cells passing fit residual <= 2 % and run agreement <= 3 %. Downgraded to experimental: UMMA window is wrapped in an ELECT/BRA.U.ANY loop; see tensor_pipe protocol-v2 addendum 2026-11-05. After tensor_pipe_forms b300-r2 / b300-r3 only one point still carries this run's beat (UTCOMMA mxf4nvf4 cta_group 2 smem M256 N160 K96 normal, cycles 80.0); the other v2 coordinates were replaced by the elected-form measurements.",
@@ -130100,10 +132306,10 @@
   }
  },
  "status_counts": {
-  "experimental": 154,
-  "measured": 196,
+  "experimental": 150,
+  "measured": 214,
   "placeholder": 33,
-  "structural": 83,
+  "structural": 79,
   "unsupported": 10
  }
 }

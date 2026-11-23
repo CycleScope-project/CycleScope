@@ -1,0 +1,39 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "issue_rules",
+ "version": 2,
+ "frozen_before_gpu": false,
+ "date": "2026-11-16",
+ "kind": "install from readings already taken (warp_issue v1 and v2, d.nop cells with yield bit 0): the rule is declared before the engine is changed; no new GPU data",
+ "mechanisms": [
+  "instruction issue (control word: yield bit)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "The engine uses the yield bit only to move the scheduler's cursor to another warp. On hardware the warp that issued the instruction skips the next cycle itself.",
+ "data_seen_before_freezing": [
+  "warp_issue v2 addendum: NOP with raw yield bit 0 (TMPL.control yield hint 1) and stall 1 at one warp per SMSP and at one warp per SM: 2.03 cycles per NOP on both devices, class misc 0.99 per NOP. warp_issue v1: the same at two warps per SMSP 2.05; yield bit 0 with stall 2 / 4 / 8 / 12 / 15: time per NOP = stall (2.03 ... 15.03), as without the bit.",
+  "Static code of the full-GPU captures (h100, 5.5 M instructions): yield hint with stall 1 is 0.30 % of the instructions (FFMA and other arithmetic); yield hint with stall 0 is 1.03 % (padding NOPs, BRA, EXIT, ERRBAR)."
+ ],
+ "rules": {
+  "Y1": "An instruction with the yield hint and a stall count of 1 holds its warp's next issue until issue + 2 (as a stall of 2). With a stall count of 2 or more the stall alone decides, as today. The cursor rule (the SMSP tries another warp first after a yield) is kept.",
+  "ledger": "The cycle between issue + 1 and issue + 2 is recorded under the reason yield; configs/stall/class_mapping.json maps ^yield to misc, calibrated by this data.",
+  "not installed": "Stall 0 with the yield hint (33.4 cycles per NOP on both devices at one and two warps per SMSP): measured on NOP only, and the instructions that carry it in real code are BRA / EXIT / ERRBAR and never-executed padding; it waits for the branch cells."
+ },
+ "values": "None.",
+ "judgement": {
+  "gates": "The seven gates; changed fixture expectations listed with the rule.",
+  "replay": "warp_issue v2 captures d.nop.s1.y0.w4 / .w1 and v1 d.nop.s1.y0 on both devices: body time per NOP within 0.15 of hardware (2.03-2.13 by samples) with issued + yield + fetch only; d.nop.s{2,4,8,12,15}.y0 and every yield-bit-1 cell unchanged against the previous replay (cycles per cell equal).",
+  "full GPU": "with the next full-GPU run of the branch; cycles and attribution reported, not a criterion."
+ },
+ "install": "Rule Y1 on both devices.",
+ "not_allowed": "No full-GPU case decides the rule.",
+ "addenda": [
+  {
+   "when": "2026-11-16, install (engine 9a246539; build $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/build-0c1a3a81, seven gates 0; replays warp_issue/<device>/sim-y2c2[b] and warp_issue-v2/<device>/sim-y2c2[b])",
+   "text": "Installed on both devices. No existing fixture changed. Replay: the yield cells carry the new reason (yield 0.92-0.97 per NOP, hardware misc 0.99) and issued + yield = 1.96-1.99 per NOP against 2.00-2.03 by the clocks. THE CRITERION `within 0.15 of hardware` IS NOT MET AS WRITTEN at one warp per SMSP / SM: replay 2.45 (h100) / 2.42 (b300) per NOP against 2.00-2.13, because the replay adds 0.47-0.48 of fetch wait per NOP in these shapes where hardware shows 0.00-0.08 of no_instruction; that fetch term is there before this install (the same cells replay d.add / d.nop at one warp per SMSP with fetch 0.5-0.9 per instruction) and belongs to the code-fetch work. At two warps per SMSP (v1 d.nop.s1.y0): 2.49 against 2.29. Cells whose cycles changed against the previous replay: only cells that execute a yield-hint / stall-1 instruction (the two yield cells per device in v2; on h100 also the cells whose prologue ULDC hold changed with constant_paths v2, installed in the same build); every stall >= 2 yield cell and every b300 v1 cell unchanged (70 / 70). Full GPU (full-y2c2b, both installs): b300 cycles of 4 cases change (MAPE 9.54 % unchanged), h100 see constant_paths v2."
+  }
+ ]
+}

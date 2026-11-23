@@ -10,10 +10,10 @@
      ],
      "intercept": 0.0,
      "kind": "affine",
-     "slope": 33.0
+     "slope": 0.0
     },
     "sources": [
-     "reconvergence.h100.r3"
+     "branch_basic.h100.v1"
     ]
    }
   },

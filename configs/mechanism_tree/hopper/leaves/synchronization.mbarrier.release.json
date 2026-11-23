@@ -27,6 +27,15 @@
     "sources": [
      "trywait_wake.h100.r1"
     ]
+   },
+   "service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 5.67
+    },
+    "sources": [
+     "sync_basic.h100.v2"
+    ]
    }
   },
   "scope": "cta"

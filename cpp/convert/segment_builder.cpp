@@ -1298,7 +1298,7 @@ std::uint32_t SegmentBuilder::emit_semantics(const StaticRow &s,
   auto &se = tables_[tag4("SEMA")];
   put2(se, static_cast<std::uint16_t>(row.kind));
   put2(se, static_cast<std::uint16_t>(row.flags));
-  put8(se, 0);
+  put8(se, row.earliest_issue);
   for (auto v : slots) put8(se, v);
   sema_count_++;
   return index;

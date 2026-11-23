@@ -39,6 +39,10 @@ inline constexpr std::uint32_t BACKEND_OCCUPANCY_CYCLES = 8;
 inline constexpr std::uint32_t RESOURCE = 10;
 inline constexpr std::uint32_t ISSUE_GROUP_RESOURCE = 11;
 inline constexpr std::uint32_t SINGLE_SOURCE_ISSUE_INTERVAL_CYCLES = 12;
+inline constexpr std::uint32_t RETURN_INTERVAL_CYCLES = 13;
+inline constexpr std::uint32_t RETURN_CHAIN = 14;
+inline constexpr std::uint32_t SM_SERVICE_INTERVAL_CYCLES = 15;
+inline constexpr std::uint32_t WARP_INFLIGHT_GROUP = 16;
 }
 
 namespace parameter_fields::RESOURCE {
@@ -132,7 +136,19 @@ inline constexpr std::uint32_t LAUNCH_HOLD_BLOCKS_MEMORY_QUEUE = 12;
 inline constexpr std::uint32_t MEMORY_QUEUE_HOLD_ABOVE_PENDING_OPS = 13;
 inline constexpr std::uint32_t CUT_EXTRA_CYCLES = 14;
 inline constexpr std::uint32_t CUT_SERVICE_CYCLES = 15;
+inline constexpr std::uint32_t SERVICE_INTERVAL_CYCLES = 16;
 inline constexpr std::uint32_t SECTOR_COST_RATIO = 20;
+inline constexpr std::uint32_t DEFER_STOP_DISTANCE_CYCLES = 21;
+inline constexpr std::uint32_t ORIGIN_HOLD_CYCLES = 22;
+inline constexpr std::uint32_t QUEUE_DEPTH_COUNT = 23;
+inline constexpr std::uint32_t RELEASE_INTERVAL_CYCLES = 24;
+inline constexpr std::uint32_t START_LATENCY_CYCLES = 25;
+inline constexpr std::uint32_t START_INTERVAL_RATIO = 26;
+inline constexpr std::uint32_t IS_GLOBAL_ENTRY = 27;
+inline constexpr std::uint32_t HAS_CHAIN_TURN = 28;
+inline constexpr std::uint32_t SM_START_INTERVAL_CYCLES = 29;
+inline constexpr std::uint32_t SM_DEPTH_COUNT = 30;
+inline constexpr std::uint32_t RESULT_AFTER_RELEASE_CYCLES = 31;
 }
 
 namespace parameter_fields::INSTANCE_TIMING {
@@ -142,6 +158,8 @@ inline constexpr std::uint32_t UNREUSED_ADDITIONAL = 2;
 inline constexpr std::uint32_t BANK_CONFLICT = 3;
 inline constexpr std::uint32_t CONTROL_ENVELOPE = 4;
 inline constexpr std::uint32_t EARLIEST_ISSUE = 5;
+inline constexpr std::uint32_t FALLTHROUGH_HOLD_CYCLES = 6;
+inline constexpr std::uint32_t RESOLVE_CYCLES = 7;
 }
 
 namespace parameter_fields::SCHEDULER {
@@ -206,6 +224,8 @@ inline constexpr std::uint32_t WARM_CYCLES = 0;
 inline constexpr std::uint32_t COLD_EXTRA_CYCLES = 1;
 inline constexpr std::uint32_t ENVELOPE_CYCLES = 2;
 inline constexpr std::uint32_t DUAL_SM_ENVELOPE_CYCLES = 3;
+inline constexpr std::uint32_t EXIT_BRANCH_RESOLVE_CYCLES = 4;
+inline constexpr std::uint32_t EXIT_DRAIN_TAIL_CYCLES = 5;
 }
 
 namespace parameter_fields::INSTRUCTION_FETCH {
@@ -221,6 +241,7 @@ inline constexpr std::uint32_t LAUNCH_PREFETCH_BYTES = 11;
 inline constexpr std::uint32_t SHARING = 12;
 inline constexpr std::uint32_t FETCH_PARALLELISM = 13;
 inline constexpr std::uint32_t L0_WAYS = 14;
+inline constexpr std::uint32_t LAUNCH_FIRST_LINE_CYCLES = 15;
 }
 
 namespace parameter_fields::MEMORY_CONSTANT_CACHE {
@@ -232,6 +253,21 @@ inline constexpr std::uint32_t HIT_LATENCY_CYCLES = 4;
 inline constexpr std::uint32_t MISS_LATENCY_CYCLES = 5;
 inline constexpr std::uint32_t BANK0_ACCESS_CYCLES = 6;
 inline constexpr std::uint32_t BANK0_UNIFORM_ACCESS_CYCLES = 7;
+inline constexpr std::uint32_t UNIFORM_BANK0_COLD_HOLD_CYCLES = 8;
+inline constexpr std::uint32_t UNIFORM_COLD_HOLD_CYCLES = 9;
+inline constexpr std::uint32_t UNIFORM_RESIDENT_HOLD_CYCLES = 10;
+inline constexpr std::uint32_t VECTOR_BANK0_COLD_LATENCY_CYCLES = 11;
+inline constexpr std::uint32_t UNIFORM_FIRST_TOUCH_CYCLES = 12;
+inline constexpr std::uint32_t UNIFORM_REREAD_CYCLES = 13;
+inline constexpr std::uint32_t UNIFORM_FILL_INTERVAL_CYCLES = 14;
+inline constexpr std::uint32_t VECTOR_FIRST_TOUCH_CYCLES = 15;
+inline constexpr std::uint32_t VECTOR_REREAD_CYCLES = 16;
+inline constexpr std::uint32_t VECTOR_FILL_INTERVAL_CYCLES = 17;
+inline constexpr std::uint32_t BLOCK_BYTES = 18;
+inline constexpr std::uint32_t BLOCK_FETCH_CYCLES = 19;
+inline constexpr std::uint32_t UNIFORM_FIRST_TOUCH_FEW_WARPS_CYCLES = 20;
+inline constexpr std::uint32_t UNIFORM_FEW_WARPS_LIMIT = 21;
+inline constexpr std::uint32_t UNIFORM_FIRST_TOUCH_MIN_SMSPS = 22;
 }
 
 namespace parameter_fields::MEMORY_CONSTANT_FILL {

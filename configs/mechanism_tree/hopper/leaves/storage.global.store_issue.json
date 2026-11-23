@@ -32,11 +32,12 @@
    "enabled": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 0
     },
     "sources": [
      "lsu_accept.h100.v5r1",
-     "store_scatter.h100.r1"
+     "store_scatter.h100.r1",
+     "queue_basic.h100.v1"
     ]
    }
   },

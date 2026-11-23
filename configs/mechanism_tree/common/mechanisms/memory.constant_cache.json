@@ -32,6 +32,51 @@
   },
   "bank0_access_cycles": {
    "kind": "constant"
+  },
+  "uniform_bank0_cold_hold_cycles": {
+   "kind": "constant"
+  },
+  "uniform_cold_hold_cycles": {
+   "kind": "constant"
+  },
+  "uniform_resident_hold_cycles": {
+   "kind": "constant"
+  },
+  "vector_bank0_cold_latency_cycles": {
+   "kind": "constant"
+  },
+  "uniform_first_touch_cycles": {
+   "kind": "constant"
+  },
+  "uniform_reread_cycles": {
+   "kind": "constant"
+  },
+  "uniform_fill_interval_cycles": {
+   "kind": "constant"
+  },
+  "vector_first_touch_cycles": {
+   "kind": "constant"
+  },
+  "vector_reread_cycles": {
+   "kind": "constant"
+  },
+  "vector_fill_interval_cycles": {
+   "kind": "constant"
+  },
+  "block_bytes": {
+   "kind": "constant"
+  },
+  "block_fetch_cycles": {
+   "kind": "constant"
+  },
+  "uniform_first_touch_few_warps_cycles": {
+   "kind": "constant"
+  },
+  "uniform_few_warps_limit": {
+   "kind": "constant"
+  },
+  "uniform_first_touch_min_smsps": {
+   "kind": "constant"
   }
  }
 }

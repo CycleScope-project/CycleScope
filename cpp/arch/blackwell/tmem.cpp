@@ -42,6 +42,7 @@ bool BlackwellModule::tmem_alloc_ready(
     w.last_wait = WaitBucket::kResource;
     w.retry_at = 0;  // woken by dealloc on this SM
     ++tele_[kTmemBlocks];
+    stall_detail_ = "tmem_alloc";
     return false;
   }
   free -= cols;

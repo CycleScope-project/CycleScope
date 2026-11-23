@@ -2797,6 +2797,18 @@
         },
         "single_source_issue_interval_cycles": {
             "kind": "constant"
+        },
+        "return_interval_cycles": {
+            "kind": "constant"
+        },
+        "return_chain": {
+            "kind": "constant"
+        },
+        "sm_service_interval_cycles": {
+            "kind": "constant"
+        },
+        "warp_inflight_group": {
+            "kind": "constant"
         }
     }
 }

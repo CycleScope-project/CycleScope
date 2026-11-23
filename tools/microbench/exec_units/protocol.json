@@ -1,0 +1,41 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "exec_units",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-16",
+ "kind": "survey: which instruction kinds share an execution unit and how often a unit takes an instruction of an SMSP; installs nothing",
+ "mechanisms": [
+  "instruction.service (resource, issue interval)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "warp_issue v3: with one warp per SMSP and resident code, 64 LOP3 / SHF / IMAD / VIADD take 2 cycles per instruction and FADD / FMUL / FFMA 1; alternating VIADD with IMAD stays at 2 while VIADD with LOP3 and LOP3 with IMAD run at 1 per instruction. The service leaves group VIADD, LOP3, SHF, IADD3, ISETP, LEA in one resource (alu_smsp), IMAD alone (fmaheavy_smsp), and give VIADD / LOP3 / LEA a 1-cycle interval when they have one register source. The grouping has to be measured kind by kind before it is installed.",
+ "data_seen_before_freezing": [
+  "warp_issue v2 and v3 with addenda (units part); the instruction.service leaves and configs/mechanism_tree/common/{resources,class_resource}.json; static opcode counts of the full-GPU captures (IMAD, ISETP, IADD3, SHF, LOP3, MOV, VIADD, UMOV, UIADD3, PRMT, LEA, FMNMX, SEL lead the fixed-latency kinds)."
+ ],
+ "probe": {
+  "chain": "the warp_issue generator and frame (tools/microbench/warp_issue/gen.py; cells prefixed x.; plans are the SASS gate). Body = 64 instructions at stall 1 with the yield bit clear of a hint (raw bit 1), each reading only registers no body instruction writes and writing registers no body instruction reads; the stored accumulator must come back unchanged.",
+  "kinds": "integer: IADD3 (three register sources), ISETP (writes a predicate), MOV, LEA, PRMT, SEL, IMAD.WIDE or IMAD.HI where the donor yields them; uniform: UIADD3, UMOV, ULOP3, USHF (uniform registers); float: FMNMX, F2F or I2F only if they carry no write barrier in ptxas output (kinds with a write barrier are variable-latency and belong to the MIO survey). References from warp_issue: VIADD (`VIADD R4, R5, 0x1`) and LOP3 (`LOP3.LUT R6, R5, R0, RZ, 0x3c, !PT`), SHF, IMAD, FADD.",
+  "cells": "for every new kind K: x.<k> (64 x K), x.<k>_viadd and x.<k>_lop (32 pairs K / reference); in addition x.shf_viadd, x.shf_lop, x.imad_fadd, x.uiadd3_umov. One shape: one warp per SMSP on every SM (.w4). A form the donor does not yield is recorded as unrealised and not replaced."
+ },
+ "runner": "tools/microbench/warp_issue/run.sh with the new cells only; output $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/exec_units/<device>.",
+ "derivation": {
+  "interval": "cycles per instruction = median over warps of (body clock difference) / 64, launch 2 (code resident) and launch 0, from the direct runs; stall classes on the body from the sampling passes.",
+  "usable": "clock readings from every row whose values are right; sampling rows with at least 2000 samples in both passes."
+ },
+ "questions_before_data": {
+  "table": "For every kind K: self interval s(K) (1 or 2 within 0.1), a(K) with VIADD, l(K) with LOP3. K is in VIADD's unit when s = 2 and a = 2 and l = 1; in LOP3's unit when s = 2, a = 1, l = 2; in a unit of its own when s = 2, a = 1, l = 1; unthrottled when s = 1. Any other combination (for example 1.5) is reported as measured. x.shf_viadd / x.shf_lop place SHF; x.imad_fadd and x.uiadd3_umov are reported.",
+  "use": "The table decides the resource of each kind and its interval for the install that follows (its own protocol version); kinds not in the table keep their leaves."
+ },
+ "install": "Nothing is installed from this version.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case.",
+ "addenda": [
+  {
+   "when": "2026-11-16, h100 and b300 runs (42 cells each built and measured, 4 UMOV cells unrealised: no pool instruction yields `UMOV UR9, UR4`; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/exec_units/{h100,b300}, tables intervals-<device>.txt, derive-<device>.txt) — readings; nothing installed",
+   "text": "Every value check right. Cycles per instruction of a lone warp per SMSP, code resident (launch 2); the two devices agree in every cell within 0.02. Self / with VIADD / with LOP3: IADD3, ISETP, LEA, MOV, PRMT, SEL, FMNMX, and the I2F form without a write barrier: 2.03 / 1.03 / 2.03; SHF (with warp_issue v3): 2.03 / 1.03 / 2.03; UIADD3, ULOP3, USHF: 2.02 / 1.03 / 1.05; IMAD.HI and IMAD.WIDE: 3.98 / 3.02 / 2.05; IMAD with FADD 1.03. With warp_issue v3 (VIADD 2.02, IMAD 2.02, VIADD with IMAD 2.02, LOP3 2.03, VIADD with LOP3 1.05, LOP3 with IMAD 1.03, float kinds 1.03 alone and mixed) the table reads without exception as four units per SMSP: (L) LOP3, SHF, IADD3, ISETP, LEA, MOV, PRMT, SEL, FMNMX, barrier-less I2F: one instruction every 2 cycles; (M) VIADD and IMAD every 2 cycles, IMAD.HI and IMAD.WIDE every 4 (with VIADD (4 + 2) / 2 = 3.02; with LOP3 the pair takes the 4 cycles of unit M); (U) UIADD3, ULOP3, USHF every 2 cycles; (F) FADD, FMUL, FFMA every cycle. Units do not hold each other: alternating two units costs 1 cycle per instruction. Against the leaves: VIADD sits in alu_smsp (measured: with IMAD, i.e. fmaheavy_smsp); VIADD / LOP3 / LEA carry a 1-cycle single-source interval (an artefact of alternating two units); MOV has interval 1 (h100) / 0 (b300), LEA 0 on b300, ULOP3 0 (h100) / 2.375 (b300); IADD3, ISETP, SHF, PRMT, SEL, FMNMX, UIADD3, USHF, IMAD (2.0) and IMAD.HI (4.0) agree. Not measured: UMOV, the other members of alu_smsp / uniform_smsp, kinds with a write barrier, whether another warp's instruction of a different unit can take the cycle a unit-blocked warp leaves."
+  }
+ ]
+}

@@ -2,7 +2,9 @@
 
 #include <cassert>
 #include <cstdio>
+#include <fstream>
 #include <map>
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -171,12 +173,13 @@ int main(int argc, char** argv) {
     }
   }
 
-  {  // H14 (d): issuing warpgroup's own dependent chain stays 4
+  {  // H14 (d): issue_rules v1 R1 — the chain no longer waits the
+    // 4-cycle register latency; it pays the 3-read steal floor
     auto r = run(dir + "/h14_steal_chain.job");
     for (std::uint32_t w = 0; w < 4; ++w) {
       const double cad = double(at(r, w, 32) - at(r, w, 1)) / 31.0;
-      CHECK(cad > 3.9 && cad < 4.1, "h14 w%u cadence %f want ~4", w,
-            cad);
+      CHECK(cad > 2.8 && cad < 3.0, "h14 w%u cadence %f want ~2.9",
+            w, cad);
     }
   }
 
@@ -205,12 +208,14 @@ int main(int argc, char** argv) {
     }
   }
 
-  {  // H18 (g): co-resident dependent chain pays +0.5 -> ~4.5 avg
+  {  // H18 (g): co-resident chain pays +0.5 over ~1/inst (R1
+    // dropped the register floor; the penalty still applies when the
+    // source reg's recorded ready is the issue cycle)
     auto r = run(dir + "/h18_coresident_chain.job");
     for (std::uint32_t w = 4; w < 8; ++w) {
       const std::uint64_t span = at(r, w, 31) - at(r, w, 0);
       const double cad = double(span) / 31.0;
-      CHECK(cad > 4.4 && cad < 4.6, "h18 w%u cadence %f want ~4.5",
+      CHECK(cad > 1.4 && cad < 1.6, "h18 w%u cadence %f want ~1.5",
             w, cad);
     }
   }
@@ -293,30 +298,30 @@ int main(int argc, char** argv) {
     // plus a small scheduling bound
     auto r = run(dir + "/w2_mufu_hold.job");
     const std::uint64_t l0 = at(r, 0, 0);
-    CHECK(at(r, 4, 1) >= l0 + 295,
+    CHECK(at(r, 4, 2) >= l0 + 295,
           "w2 first MUFU at +%llu want >= +295 (end of op 5)",
-          (unsigned long long)(at(r, 4, 1) - l0));
-    CHECK(at(r, 4, 1) < l0 + 360,
+          (unsigned long long)(at(r, 4, 2) - l0));
+    CHECK(at(r, 4, 2) < l0 + 360,
           "w2 first MUFU at +%llu want < +360 (end of op 6 + 10)",
-          (unsigned long long)(at(r, 4, 1) - l0));
+          (unsigned long long)(at(r, 4, 2) - l0));
   }
 
   {  // W2 twin: FFMA is not a memory-queue class -> issues right
     // after its ~38-cycle producer, long before the threshold retry
     auto r = run(dir + "/w2_ffma_twin.job");
     const std::uint64_t l0 = at(r, 0, 0);
-    CHECK(at(r, 4, 1) < l0 + 100,
+    CHECK(at(r, 4, 2) < l0 + 100,
           "w2f first FFMA at +%llu want < +100",
-          (unsigned long long)(at(r, 4, 1) - l0));
+          (unsigned long long)(at(r, 4, 2) - l0));
   }
 
   {  // W2 hold off: launch_hold_blocks_memory_queue = 0 keeps the
     // commit-group admission but not the memory-queue hold
     auto r = run(dir + "/w2_mufu_nohold.job");
     const std::uint64_t l0 = at(r, 0, 0);
-    CHECK(at(r, 4, 1) < l0 + 100,
+    CHECK(at(r, 4, 2) < l0 + 100,
           "w2o first MUFU at +%llu want < +100",
-          (unsigned long long)(at(r, 4, 1) - l0));
+          (unsigned long long)(at(r, 4, 2) - l0));
   }
 
   {  // W3: the owner's own MUFU.  Warp 0 issues the same 12 one-group
@@ -376,6 +381,45 @@ int main(int argc, char** argv) {
           "post-fence fill at %llu want >= %llu",
           (unsigned long long)at(r, 0, 5),
           (unsigned long long)(fence + 42));
+  }
+
+  {  // H7 ledger (placement v1 rule F): the proxy-fence suspension is
+     // keyed at the instance behind the FENCE (0x1050: no waiter of
+     // the fence's write barrier, so the next instance to issue), not
+     // at the FENCE's own address (0x1040)
+    const std::string tsv = dir + "/h7_proxy_fence.stall.tsv";
+    Job job = cyclescope::read_container_file(dir + "/h7_proxy_fence.job");
+    MechanismRuntime::Options ro;
+    ro.reference_sm_clock_khz = job.launch.reference_sm_clock_khz;
+    MechanismRuntime rt(job, job.launch.device, ro);
+    Simulator::Options so;
+    so.stall_ledger = tsv;
+    Simulator sim(job, rt, so);
+    sim.run();
+    std::map<std::pair<std::uint64_t, std::string>, std::uint64_t> res;
+    int issued_bad = 0;
+    std::ifstream in(tsv);
+    std::string line, kind, op, reason;
+    std::uint64_t pc, cycles, events;
+    while (std::getline(in, line)) {
+      if (line.rfind("residency", 0) != 0) continue;
+      std::istringstream ss(line);
+      ss >> kind >> std::hex >> pc >> std::dec >> op >> reason >>
+          cycles >> events;
+      res[{pc, reason}] += cycles;
+      if (reason == "issued" && cycles != events) ++issued_bad;
+    }
+    const auto own = std::make_pair(
+        static_cast<std::uint64_t>(0x1040),
+        std::string("suspended:descriptor_visibility"));
+    const auto nxt = std::make_pair(
+        static_cast<std::uint64_t>(0x1050),
+        std::string("suspended:descriptor_visibility"));
+    const auto oi = res.find(nxt);
+    CHECK(oi != res.end() && oi->second > 0,
+          "h7 desc_vis at next pc");
+    CHECK(res.count(own) == 0, "h7 desc_vis not at own pc");
+    CHECK(issued_bad == 0, "h7 issued==events");
   }
 
   {  // H8: UTMALDG is not a drain object: fence blocks latency only

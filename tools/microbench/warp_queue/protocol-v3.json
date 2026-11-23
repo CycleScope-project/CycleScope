@@ -1,0 +1,40 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "warp_queue",
+ "version": 3,
+ "frozen_before_gpu": true,
+ "date": "2026-11-22",
+ "kind": "installation, timing, correction of v2's S3 for global loads served by L1, and B300's SM interval of 16-byte shared stores",
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "evidence": "warp_queue v2 addendum (second replay): the replay's LDG readers are late because the memory hierarchy's own L1 result time (about 58 cycles after issue on H100, 46-52 on B300, from earlier CUDA-level leaves) lies above release + c, and v2 applied release + c only as a floor. Hardware, every one-warp cell with L1-resident loads (mem_basic and queue_basic v1 / v2; reader wait, hand value from release + c in brackets, H100 / B300): 2 loads 41.0 / 44.0 [42 / 44], 4 loads 49.0 / 49.7 [48 / 50], 8 loads 59.0 / 61.7 [60 / 62], 16 loads 67.1 / 68.4-69.2 [67 / 69], behind 4 STG 64.9 / 65.6 [66 / 68], behind 8 STG 84.7 / 85.9 [90 / 92 by the rule; the hardware's first two stores cost 7]. B300 q.sts128.n16.w16: 4.55 cycles per start per SM (H100 3.98).",
+ "rules": {
+  "R1": "A member LDG all of whose sectors are served by the SM's L1 (no fill from L2 or DRAM) has its result at release + c exactly: the memory hierarchy's L1 latency and L1 port service no longer set its result time (cache state, statistics and every functional effect stay). A member LDG with at least one sector not served by L1 keeps v2's rule (the later of release + c and the hierarchy's return). c as v2: 28.3 (H100), 30.2 (B300).",
+  "R2": "B300: sm_start_interval_cycles of STS wider than 8 bytes = 4.55 (H100 stays 4.0)."
+ },
+ "criteria": {
+  "K1 (readers of resident loads)": "reader wait within 3.0 of the hardware's in q.fwd.stg0_ldg2, q.ldg.n16, q.ldg.n24, q.fwd.stg4_ldg2, q.alt.lds_ldg.n24, q.seq.stg6_ldg18, mem_basic m2.ldg.n4, m2.ldg.n8, m2.ldgd.n4, m2.ldgd.n8; within 6.0 in q.fwd.stg8_ldg2, q.alt.stg_ldg.n24 and q.ldg.n16.w16.",
+  "K2 (v2's list)": "warp_queue v2's K1-K4 re-judged with the same judge: no cell that passed in the second replay fails; q.ldg.n16 (both devices) and B300's q.ldg.n24, q.alt.lds_ldg.n16 / n24, q.seq.sts10_ldg6, q.sts128.n16.w16 now pass.",
+  "K3 (no harm)": "(pc, class) error of no cell of any source rises by more than 0.05 against the second replay (warp_queue-r4); against the v1 replay the four B300 cells that v2 raised (m2.ldg.n4, m2.ldg.n8.w16, m2.ldgd.n4, q.fwd.stg4_ldg2.s) are back within 0.05.",
+  "gates and runs": "seven gates, replay of the fifteen sources, full GPU 500 x 2 with comparison; full-GPU numbers reported, not criteria."
+ },
+ "known misses (before data)": "loads not served by L1 keep the hierarchy's latencies (q.ldgfar 5-9 % short); q.sts.e3.w16; q.sts.n12.w8; wide-slot loads; two-line and wide global stores.",
+ "expectation_not_criterion": "Full GPU: L1-resident global loads return about 18 (H100) / 5-10 (B300) cycles earlier when alone and later when they queue; long_scoreboard at their readers shifts accordingly; cycles of load-heavy kernels move in both directions.",
+ "not_allowed": "No value from another machine or the literature; no full-GPU case or error used to choose a rule or a value; a failed criterion is recorded as failed.",
+ "addenda": [
+  {
+   "when": "2026-11-22, installation and first judgement (R1 + R2 = commit f349dd06; gates 0 on clean clone stall-attribution-57, build build-f349dd06; probe replay warp_queue-r5 -- B300 complete and judged (warp_queue-r1/judge5-b300.txt), H100 still replaying when this was written; full GPU full-wq5 500 / 500, compare/wq5)",
+   "text": "B300: v3's K1 FAILS -- R1 did not change the readers of the probe cells at all: q.ldg.n16 75.5 against 68.4, q.ldg.n24 75.3 against 64.5, q.fwd.stg0_ldg2 51.3 against 44.0, q.fwd.stg4_ldg2 71.8 against 65.6, q.alt.lds_ldg.n24 65.6 against 58.3, q.seq.stg6_ldg18 75.2 against 67.4, every value identical to the second replay of v2. The replay's reader wait in these cells is booked partly as barrier:LDG:l2 (5.5 of 75.5 in q.ldg.n16; 3.3 of 71.6 on H100 in the second replay), so part of the loads of a line that the probe keeps resident are served from L2 in the replay, are therefore not 'served by L1' for R1, and return late by the hierarchy's rule; whether that is L1 capacity, the fill being counted as in flight, or the sector accounting of a 4-byte-per-lane load is not traced. R2 works: q.sts128.n16.w16 passes v2's K1 on B300 (17 of 18; q.sts.e3.w16 still fails). v3's K3 against the second replay: no cell rises by more than 0.05; the four B300 cells that v2 raised were not re-checked against the v1 replay and, with unchanged readers, cannot be expected back. Full GPU against full-wq4: cycles do move (H100 141 cases faster, 81 slower; MAPE 10.72 -> 10.89 % / 9.73 -> 9.77 %), so R1 applies to loads the hierarchy does serve from L1 there. Open: the L2-served share of resident loads in the probe replays (the defect behind K1), H100's judgement of this replay, and whether R1 stays if the full-GPU attribution does not improve (compare/wq5 not read yet)."
+  },
+  {
+   "when": "2026-11-22, full-GPU comparison compare/wq5 against compare/wq4 (H100 probe replay of this build still running; not judged)",
+   "text": "Mean of 500 cases, H100 / B300: attribution 0.3283 -> 0.3287 / 0.3224 -> 0.3222; class 0.3099 -> 0.3106 / 0.2891 -> 0.2889; (site, class) 0.4378 -> 0.4356 / 0.4339 -> 0.4330; (pc, class) 0.6978 -> 0.6961 / 0.7425 -> 0.7417; site 0.2529 -> 0.2509 / 0.2503 -> 0.2495; pc 0.5801 -> 0.5783 / 0.6259 -> 0.6250; loop long_scoreboard gap -2.61 -> -2.85 / -1.47 -> -1.56 points (the replay now has less of it: L1-served loads return earlier); MAPE 10.72 -> 10.89 % / 9.73 -> 9.77 %. Mixed: the per-pc and per-site errors fall a little, the long_scoreboard deficit grows. R1 stays for now; its verdict waits for the probe defect (resident loads partly L2-served in the probe replays) to be traced."
+  },
+  {
+   "when": "2026-11-22, H100 judgement of the probe replay warp_queue-r5 (complete: 15 sources, mem_basic reporting its four cells without capture; warp_queue-r1/judge5-h100.txt; judged with v2's judge against the second replay)",
+   "text": "H100: R1 has a partial effect, unlike B300. Readers: q.ldg.n16.w16 now within 5.0 of the hardware (it was 141.9 against 71.6), q.fwd.stg0_ldg2 58.1 -> 47.2 against 41.0 (still outside), q.alt.stg_ldg.n24 81.1 against 76.1 and q.shfli.n16.w16 57.8 against 63.0 unchanged; v2's K3 14 of 17 (13 before). q.ldg.n16 is still 3.3 % long (172.7 against 167.2), so v3's K2 fails on it. v2's K1 17 of 18 (q.sts.e3.w16), K2 5 of 6 (q.sts.n12.w8), one-warp list 34 of 49 as before. v3's K3 FAILS on one cell: q.ldg128.n12 (pc, class) error 0.167 -> 0.242 (a wide-slot load, on the list of known misses; its L1-served loads now return earlier). v3's own K1 list was not judged cell by cell with a v3 judge on either device; the readings above come from v2's judge."
+  }
+ ]
+}

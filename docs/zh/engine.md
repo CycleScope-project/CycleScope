@@ -8,7 +8,8 @@
 
 ```bash
 cyclescope-engine simulate --job job.bin --out result.bin \
-    [--journal j.bin] [--wait-ledger w.bin] [--progress]
+    [--journal j.bin] [--wait-ledger w.bin] [--stall-ledger stall.tsv]
+    [--progress]
 cyclescope-engine validate --job job.bin   # 结构检查
 cyclescope-engine info     --job job.bin   # 段/实例统计
 ```
@@ -27,6 +28,8 @@ stderr 末尾打印 `LOAD=` / `RUN=`（秒）与 `cycles=/issued=/completed=/har
 - **张量核**：Hopper WGMMA 与 Blackwell UMMA 在每 SM 的张量流水线上排队。
 - **线程块分派**：线程块按采集到的放置进入；后续的块随槽位空出而进入。
 - **取指**：代码由每 SM 指令缓存加预取供给；launch 开始时为空。
+- **逐 warp 队列**（`instruction.warp_queue`）：发射的 STS、LDS、SHFL、LDG、STG 是其 warp 队列的一项，直到串行的释放服务器释放它；队列到深度上限的 warp 不能发射。
+- **kernel 边界**：`cycles` 是任一 SM 活跃周期数的最大值——其上 warp 驻留区间 [entry, done) 的并集长度；原先的「末次完成时刻 + envelope」值为遥测 `last_completion_cycle`。
 - **架构模块**：Hopper 的 warpgroup 与 WGMMA、Blackwell 的 UMMA、张量存储与 CLC，位于同一接口之后。
 
 ## 3. 输出
@@ -45,11 +48,30 @@ stderr 末尾打印 `LOAD=` / `RUN=`（秒）与 `cycles=/issued=/completed=/har
 
 计数器名是 `cpp/core/simulator.hpp` 的 `SyncTele` / `EngineTele` 枚举（第 4 组顺序固定在 `cpp/core/simulator.cpp`）。
 
-## 4. 失败
+## 4. Stall 账本
+
+`--stall-ledger <path>` 写出一份逐 PC 的 tab 分隔 stall 账本（schema `cyclescope.stall-ledger.v1`）。它只是统计：带该选项的运行产生逐字节相同的 `result.bin` 与日志，没有任何计时判定读账本状态。
+
+```
+#schema	cyclescope.stall-ledger.v1
+#warps	<变成驻留的 warp 数>
+#cycles	<kernel 周期数，与结果报告同值>
+residency	<十六进制代码地址>	<operation_class>	<reason>	<warp_cycles>	<events>
+transition	<源十六进制代码地址>	<目的十六进制代码地址>	<次数>
+```
+
+驻留 warp 被评估发射的每个周期恰好计入一个 `(其下一条指令的代码地址, reason)`；发射周期本身记 `issued`，驻留之前的周期记 `dispatch`；warp 已就绪、只因本 SMSP 的发射槽让给了别的 warp 的周期记 `issue_slot`。reason 是 `<site>[:<detail>]`，在判定处指定：`barrier:<op>[:<detail>][:read]`（等待生产者依赖 barrier）、`unit:<name>` / `unit_outbid:<name>`（`configs/mechanism_tree/common/resources.json` 的单元名）、`semantic:<kind>`、`suspended:<kind>`、`arch:<模块规则>`、`warp_queue:mio` / `warp_queue:lg`（逐 warp 队列）、控制地板 `control:branch` / `control:yield` / `control:bsync`，其余判定处各占一个 site 名（`fetch`、`cta_barrier`、`cluster_barrier`、`control_floor`、`issue_slot`、`exit_branch`、`exit_drain`、`other:<site>` 等）。`transition` 行按 warp 计每对连续发射指令（含顺序 fall-through）。
+
+逐 warp 守恒：
+
+    resident_cycles == (last_issue_cycle - first_resident_cycle + 1)
+                       + exit_drain_cycles
+
+## 5. 失败
 
 与管线其余部分相同的两个数据失败类别：作业缺模型需要的事实时报 `missing_fact:<fact> (<where>)`，模型不覆盖时报 `unsupported:<reason> (<where>)`。无法前进的运行以 `unsupported:engine:deadlock` 停止，并转储卡住的 warp 与同步对象状态。
 
-## 5. 给引擎跑基准
+## 6. 给引擎跑基准
 
 ```bash
 OUT=<dir> [SIZES="S L"] [PROFILE=1] bash scripts/pipeline/engine_perf.sh
@@ -64,7 +86,7 @@ scripts/pipeline/engine_fixture_digest.sh --compare <a.wrk> <b.wrk>
 
 对每个 `*.job` fixture 的结果与日志二进制取哈希；`--compare` 逐表对比两个这样的工作目录（除 WAIT 外每表必须一致）。
 
-## 6. 调试开关
+## 7. 调试开关
 
 `CYCLESCOPE_DEBUG_*` 环境变量向 stderr 打印诊断；不设即关：
 

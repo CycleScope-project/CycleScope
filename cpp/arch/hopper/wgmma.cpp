@@ -53,6 +53,7 @@ bool HopperModule::wgmma_ready(
   if (r.count < expected) {
     w.last_wait = WaitBucket::kCollective;
     w.retry_at = 0;  // woken when the last member arrives
+    stall_detail_ = "wgmma_rendezvous";
     return false;
   }
   // kind-44 admission fields (wgmma_overlap.h100.v6): absent or 0
@@ -83,6 +84,7 @@ bool HopperModule::wgmma_ready(
     w.retry_at = q.group_end.front();
     q.held_launch = true;
     ++tele_[kWgmmaPendingHolds];
+    stall_detail_ = "wgmma_launch_admission";
     return false;
   }
   // collective launch: this cycle is the launch for all members; the
@@ -252,6 +254,7 @@ bool HopperModule::warpgroup_wait_ready(
   w.last_wait = WaitBucket::kCollective;
   if (earliest > s.now()) w.retry_at = earliest;
   tele_[kWarpgroupWaitCycles] += 1;
+  stall_detail_ = "warpgroup_wait";
   return false;
 }
 
@@ -317,6 +320,7 @@ bool HopperModule::handoff_ready(
     w.last_wait = WaitBucket::kSemantic;
     w.retry_at = ready;
     ++tele_[kHandoffWaits];
+    stall_detail_ = "accumulator_handoff";
     return false;
   }
   acc_[w.warp_index].valid = false;  // consumed once per wgmma

@@ -1,5 +1,7 @@
 #include "capture/poll_folding.hpp"
+#include "capture/operand_facts.hpp"
 
+#include <algorithm>
 #include <optional>
 #include <string>
 
@@ -74,16 +76,60 @@ std::string upper(std::string s) {
 
 }  // namespace
 
-std::pair<std::set<int>, int>
-fold_warp(const std::vector<DynRecord> &records,
-          const StaticOf &static_of) {
-  std::set<int> folded;
+// placement v5 rule P'' (converter fact): for every kept ready poll S
+// the chain = the maximal run of failed polls directly in front of it
+// in poll order addressing the same barrier word with the same parity;
+// P1 = its first poll; W = the first record behind P1 (at most 16
+// ahead, not behind S) whose wait mask holds P1's write barrier b, the
+// search ending at a record that writes b; S -> W's absolute code
+// address
+std::map<int, std::uint64_t> wait_origins(
+    const std::vector<DynRecord> &records, const StaticOf &static_of,
+    const std::vector<int> &polls, const std::set<int> &folded) {
+  std::map<int, std::uint64_t> out;
+  std::vector<std::pair<std::optional<std::int64_t>, int>> keys;
+  keys.reserve(polls.size());
+  for (const int i : polls) {
+    const StaticRow &row = *static_of(records[i]);
+    keys.emplace_back(poll_barrier_word(records[i], row),
+                      poll_key(records[i], row).second);
+  }
+  for (std::size_t n = 0; n < polls.size(); ++n) {
+    const int i = polls[n];
+    if (poll_ready(records[i]) != true || folded.count(i)) continue;
+    std::size_t m = n;
+    while (m > 0 && poll_ready(records[polls[m - 1]]) == false &&
+           keys[m - 1] == keys[n])
+      --m;
+    if (m == n) continue;
+    const int p1 = polls[m];
+    const StaticRow &first = *static_of(records[p1]);
+    const StaticRow &own = *static_of(records[i]);
+    const int wbar = (first.inst.packed_ctrl >> 9) & 0xF;
+    if (first.inst.pc == own.inst.pc || wbar >= 7) continue;
+    for (int k = p1 + 1; k <= std::min(p1 + 16, i); ++k) {
+      const StaticRow &row = *static_of(records[k]);
+      if ((row.inst.wait_mask >> wbar) & 1) {
+        if (row.inst.code_address)
+          out[i] = row.inst.code_address;
+        break;
+      }
+      if (((row.inst.packed_ctrl >> 9) & 0xF) == wbar) break;
+    }
+  }
+  return out;
+}
+
+FoldResult fold_warp(const std::vector<DynRecord> &records,
+                     const StaticOf &static_of) {
+  FoldResult out;
+  std::set<int> &folded = out.folded;
   std::vector<int> polls;
   for (int i = 0; i < int(records.size()); ++i)
     if (upper(static_of(records[i])->inst.opcode).find("PHASECHK") !=
         std::string::npos)
       polls.push_back(i);
-  int dropped = 0;
+  int &dropped = out.dropped;
   std::size_t pos = 0;
   while (pos < polls.size()) {
     const int i0 = polls[pos];
@@ -130,7 +176,8 @@ fold_warp(const std::vector<DynRecord> &records,
     }
     pos = fold_ok ? j + 1 : j;
   }
-  return {folded, dropped};
+  out.wait_origin = wait_origins(records, static_of, polls, folded);
+  return out;
 }
 
 }  // namespace cyclescope_convert::capture

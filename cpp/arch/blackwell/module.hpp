@@ -22,6 +22,7 @@ class BlackwellModule : public ArchitectureModule {
   bool instance_ready(Simulator&, WarpState&,
                       const InstructionInstance&,
                       const InstanceSemantics&) override;
+  const char* stall_detail() const override { return stall_detail_; }
   void on_instance_issue(Simulator&, WarpState&,
                          const InstructionInstance&,
                          const InstanceSemantics&,
@@ -30,6 +31,9 @@ class BlackwellModule : public ArchitectureModule {
   void collect_tele(std::vector<TelemetryRow>&) override;
 
  private:
+  // stall ledger: which rule produced the last blocking
+  // instance_ready verdict (statistics-only, never read for timing)
+  const char* stall_detail_ = nullptr;
   // per-SM UMMA pipe next-free cycle
   // per-warp recorded UMMA op completions (UTCbar baseline)
   std::unordered_map<std::uint32_t, std::vector<std::uint64_t>>

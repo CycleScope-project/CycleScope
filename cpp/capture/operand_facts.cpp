@@ -907,4 +907,25 @@ void uput_str(SemanticOperands &o, const std::string &k,
   o.str_uniform[k] = v;
 }
 
+// the barrier word a poll addresses: the bracket operand's register sum
+// of the first executing lane plus the displacement (as the converter
+// resolves the mbarrier object), the tracer's mref address where a
+// register value is not captured
+std::optional<std::int64_t> poll_barrier_word(const DynRecord &rec,
+                                              const StaticRow &row) {
+  if (!rec.exec_mask) return std::nullopt;
+  SemanticOperands o;
+  for (const auto &name : rec.ops_order) {
+    const auto &value = rec.ops.at(name);
+    if (is_ur(name))
+      uput(o, name, value.empty() ? 0 : value[0]);
+    else if (name[0] == 'R' && name.rfind("RANK", 0) != 0)
+      lput(o, name, value);
+  }
+  auto word = bracket_word(row.operands_text, o);
+  if (!word && !rec.mrefs.empty() && !rec.mrefs[0].empty())
+    word = static_cast<std::int64_t>(rec.mrefs[0][0]);
+  return word;
+}
+
 }  // namespace cyclescope_convert::capture

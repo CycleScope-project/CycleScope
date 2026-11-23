@@ -67,21 +67,25 @@ int main(int argc, char** argv) {
     check(m.count(0) && m.count(1) && gap >= 64,
           "second DFMA waits for first completion (+64)", gap, 64);
   }
-  {  // F3: LDG level latency 300 -> dependents wait for the return
+  {  // F3: LDG level latency 300 -> dependents wait for the return.
+    // issue_rules v1 R1: the register-dependent consumer issues the
+    // next cycle; the barrier consumer (gap NOP for R3) still waits
+    // for the return
     std::printf("F3 LDG return constrains dependents (300)\n");
     auto m = issue_cycles(dir + "/res_f3.seg");
-    check(m.count(0) && m.count(1) && m[1] - m[0] >= 300,
-          "FFMA(reg dep) issue - LDG >= 300",
-          (long long)(m[1] - m[0]), 300);
-    check(m.count(2) && m.count(3) && m[3] - m[2] >= 300,
+    check(m.count(0) && m.count(1) && m[1] - m[0] == 1,
+          "FFMA(reg dep) issue - LDG == 1 (R1)",
+          (long long)(m[1] - m[0]), 1);
+    check(m.count(2) && m.count(4) && m[4] - m[2] >= 300,
           "FFMA(barrier dep) issue - LDG >= 300",
-          (long long)(m[3] - m[2]), 300);
+          (long long)(m[4] - m[2]), 300);
   }
-  {  // F4: LDS kind-6 TIME row cycles=200 -> dependent waits finish
+  {  // F4: LDS kind-6 TIME row cycles=200 -> the write barrier it
+    // raises frees the dependent when the access finishes
     std::printf("F4 LDS kind-6 TIME row (200) constrains dependent\n");
     auto m = issue_cycles(dir + "/res_f4.seg");
-    check(m.count(0) && m.count(1) && m[1] - m[0] >= 200,
-          "FFMA issue - LDS >= 200", (long long)(m[1] - m[0]), 200);
+    check(m.count(0) && m.count(2) && m[2] - m[0] >= 200,
+          "FFMA issue - LDS >= 200", (long long)(m[2] - m[0]), 200);
   }
   {  // F5: F1 through the real program-table path (tree resources ->
      // compiled NODE/LEAF/PARM/USES rows)

@@ -31,6 +31,12 @@ class MbarrierTable {
     // resume at this cycle, not at release_cycle (trywait_wake
     // protocol, full-gpu-chain-report §28)
     std::uint64_t suspended_release_cycle = 0;
+    // set at the last phase completion: the completing instruction's
+    // operation class began with SYNCS (arrive / expect_tx rows), so
+    // the phase's visible date is its completion date with no
+    // release / suspended_wake leaf (sync_basic v5 G1 iv); false =
+    // completed by a transfer / event / non-SYNCS op
+    bool completed_by_syncs = false;
     // evidence accumulated during the phase that last completed
     std::unordered_set<std::uint32_t> phase_warps;
     std::uint64_t phase_expect_bytes = 0;

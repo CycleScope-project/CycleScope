@@ -76,8 +76,12 @@ class Seg:
 
     def const_program(self, name: str, event: int, schema_id: int,
                       timing_kind: int, cycles: float,
-                      enabled: float = 1.0) -> None:
-        root = self.leaf_node(schema_id, {0: cycles, 1: enabled})
+                      enabled: float = 1.0,
+                      extra: dict | None = None) -> None:
+        fields = {0: cycles, 1: enabled}
+        if extra:
+            fields.update(extra)
+        root = self.leaf_node(schema_id, fields)
         self.prog.append((self.so(name), event, schema_id, timing_kind,
                           root, 0x3, 0, 0))
 

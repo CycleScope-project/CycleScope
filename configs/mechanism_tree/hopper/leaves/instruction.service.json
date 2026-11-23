@@ -1079,10 +1079,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 13.0
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.h100.v1"
     ]
    },
    "issue_group_resource": {
@@ -1133,10 +1133,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 13.0
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.h100.v1"
     ]
    }
   }
@@ -1420,10 +1420,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 14
+     "value": 2
     },
     "sources": [
-     "hopper.9762a2e504642190e716e6bb"
+     "mio_basic.h100.v1"
     ]
    },
    "issue_group_resource": {
@@ -1438,11 +1438,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 6.0
+     "value": 2.0
     },
     "sources": [
-     "hopper.8b529fb7021d2980996b8401",
-     "service_latency.h100.v5r2.unrealised"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -1475,10 +1474,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 14
+     "value": 2
     },
     "sources": [
-     "hopper.d0c2afbc11df65d3d3c245c4"
+     "mio_basic.h100.v1"
     ]
    }
   }
@@ -4824,6 +4823,43 @@
     "sources": [
      "structural.service_owner"
     ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v2"
+    ]
+   },
+   "warp_inflight_group": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.h100.v1",
+     "mio_basic.h100.v2"
+    ]
    }
   }
  },
@@ -5167,6 +5203,33 @@
      "shared.h100.r2d",
      "shared.h100.r3.lds_unrealised"
     ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 1.0
+    },
+    "sources": [
+     "mio_basic.h100.v2"
+    ]
    }
   }
  },
@@ -5264,10 +5327,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2
+     "value": 2.0
     },
     "sources": [
-     "service_latency.h100.r1.table_collapse"
+     "exec_units.h100.v1"
     ]
    },
    "max_inflight": {
@@ -5304,15 +5367,6 @@
     },
     "sources": [
      "service_latency.h100.r1.table_collapse"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.h100.r2"
     ]
    }
   }
@@ -5383,15 +5437,6 @@
     },
     "sources": [
      "service_latency.h100.r3r"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.h100.r2"
     ]
    }
   }
@@ -5979,10 +6024,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 2.0
     },
     "sources": [
-     "hopper.f4d7f22a4e02cf032191d8eb"
+     "exec_units.h100.v1"
     ]
    },
    "max_inflight": {
@@ -7457,10 +7502,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2
+     "value": 0
     },
     "sources": [
-     "hopper.84a7713cbfecb20521e5025a"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -7498,6 +7543,33 @@
     "sources": [
      "service_latency.h100.r3r"
     ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v2"
+    ]
    }
   }
  },
@@ -7524,10 +7596,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2
+     "value": 0
     },
     "sources": [
-     "hopper.195f263b6b0923ad0164ed90"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -7564,6 +7636,43 @@
     },
     "sources": [
      "service_latency.h100.r3r"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 3
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v2"
+    ]
+   },
+   "warp_inflight_group": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.h100.v1",
+     "mio_basic.h100.v2"
     ]
    }
   }
@@ -7866,12 +7975,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 3.993861607142857
+     "value": 0
     },
     "sources": [
-     "service_latency.h100.r3r",
-     "service_latency.h100.v3r4",
-     "service_latency.h100.v3r4"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -7910,6 +8017,33 @@
      "service_latency.h100.r3r",
      "service_latency.h100.v3r4",
      "service_latency.h100.v3r4"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 1.0
+    },
+    "sources": [
+     "mio_basic.h100.v2"
     ]
    }
   }
@@ -8012,11 +8146,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 3.9955357142857144
+     "value": 0
     },
     "sources": [
-     "service_latency.h100.v3r4",
-     "service_latency.h100.v3r4"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -8055,6 +8188,24 @@
      "service_latency.h100.r3r",
      "service_latency.h100.v3r4",
      "service_latency.h100.v3r4"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.h100.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4.0
+    },
+    "sources": [
+     "mio_basic.h100.v1"
     ]
    }
   }
@@ -9590,10 +9741,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 0
+     "value": 2.0
     },
     "sources": [
-     "structural.service_owner"
+     "exec_units.h100.v1"
     ]
    },
    "max_inflight": {
@@ -10777,10 +10928,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2
+     "value": 2.0
     },
     "sources": [
-     "hopper.c927240d4130562d28f34f67"
+     "exec_units.h100.v1"
     ]
    },
    "max_inflight": {
@@ -10804,7 +10955,7 @@
    "resource": {
     "model": {
      "kind": "constant",
-     "value": "alu_smsp"
+     "value": "fmaheavy_smsp"
     },
     "sources": [
      "structural.class_resource"
@@ -10817,15 +10968,6 @@
     },
     "sources": [
      "hopper.1ae632a8eab67b49723cfd42"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.h100.r2"
     ]
    }
   }
@@ -11044,11 +11186,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 13.000000000000002
+     "value": 2
     },
     "sources": [
-     "service_latency.h100.v3r4",
-     "service_latency.h100.v3r4"
+     "mio_basic.h100.v1"
     ]
    },
    "issue_group_resource": {
@@ -11063,11 +11204,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1.9990234375000002
+     "value": 2.0
     },
     "sources": [
-     "service_latency.h100.v3r4",
-     "service_latency.h100.v3r4"
+     "mio_basic.h100.v1"
     ]
    },
    "max_inflight": {
@@ -11091,7 +11231,7 @@
    "resource": {
     "model": {
      "kind": "constant",
-     "value": "shfl_smsp"
+     "value": "alu_smsp"
     },
     "sources": [
      "structural.class_resource"
@@ -11100,11 +11240,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 13.000000000000002
+     "value": 2
     },
     "sources": [
-     "service_latency.h100.v3r4",
-     "service_latency.h100.v3r4"
+     "mio_basic.h100.v1"
     ]
    }
   }
@@ -11382,10 +11521,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 113.15
+     "value": 50.03
     },
     "sources": [
-     "control_yield.h100.r2"
+     "branch_basic.h100.v1"
     ]
    },
    "issue_group_resource": {
@@ -11436,10 +11575,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 113.15
+     "value": 50.03
     },
     "sources": [
-     "control_yield.h100.r2"
+     "branch_basic.h100.v1"
     ]
    }
   }

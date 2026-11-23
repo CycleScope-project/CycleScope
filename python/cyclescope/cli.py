@@ -350,6 +350,48 @@ def build_parser() -> argparse.ArgumentParser:
         help="print the accuracy summary of a shipped expected table")
     p_rep.set_defaults(func=_cmd_report)
 
+    stall = sub.add_parser(
+        "stall", help="stall attribution: engine stall ledger against "
+                      "ncu warp-stall sampling")
+    stall_sub = stall.add_subparsers(dest="stall_command", required=True)
+    p_sc = stall_sub.add_parser(
+        "compare", help="per-case comparison -> <out>/cases/<case>.json")
+    p_sc.add_argument("--cases", required=True,
+        help="case id, comma list, or a cases-file path")
+    p_sc.add_argument("--ledger-root", type=Path, required=True,
+        help="chain output root (<root>/<case>/out-cpp/stall.tsv)")
+    p_sc.add_argument("--reference-root", type=Path, required=True,
+        help="`cyclescope reference --metrics --source-stalls` output root")
+    p_sc.add_argument("--captures", type=Path, required=True,
+        help="capture root (<root>/<case>/functions.jsonl)")
+    p_sc.add_argument("--mapping", type=Path, default=None,
+        help="reason -> class mapping "
+             "(default configs/stall/class_mapping.json)")
+    p_sc.add_argument("--repeat-root", type=Path, default=None,
+        help="a second `cyclescope reference` root of the same launches; "
+             "used per case when its three files exist and the kernel "
+             "name matches (reports the reference floor)")
+    p_sc.add_argument("--scope", choices=("kernel", "loops"),
+        default="kernel",
+        help="loops: both sides restricted to the launch's loop pcs "
+             "plus the pc behind each loop")
+    p_sc.add_argument("--out", type=Path, required=True)
+    p_sc.set_defaults(func=_cmd_stall_compare)
+    p_ss = stall_sub.add_parser(
+        "summarize", help="suite tables from <root>/cases/*.json")
+    p_ss.add_argument("--root", type=Path, required=True)
+    p_ss.add_argument("--label", default="")
+    p_ss.set_defaults(func=_cmd_stall_summarize)
+    p_sk = stall_sub.add_parser(
+        "calibrate", help="mapping calibration table from probe rows "
+                          "(two compare outputs: the hardware pass twice)")
+    p_sk.add_argument("--root", type=Path, required=True)
+    p_sk.add_argument("--repeat-root", type=Path, required=True)
+    p_sk.add_argument("--mapping", type=Path, default=None)
+    p_sk.add_argument("--out", type=Path, required=True,
+        help="calibration table (json)")
+    p_sk.set_defaults(func=_cmd_stall_calibrate)
+
     return parser
 
 
@@ -506,9 +548,9 @@ def _cmd_reference(args) -> int:
     spec = args.cases
     if spec == "all":
         arch, sset = args.suite.split("/", 1)
-        if arch == "hopper":
+        tsv = Path(__file__).resolve().parents[2] / "suites" / arch                 / sset / "cases.tsv"
+        if arch == "hopper" or tsv.is_file():
             import csv as _csv
-            tsv = Path(__file__).resolve().parents[2] / "suites" / arch                 / sset / "cases.tsv"
             case_ids = [r["case_id"] for r in
                         _csv.DictReader(tsv.open(), delimiter="	")]
         else:
@@ -568,6 +610,46 @@ def _cmd_report(args) -> int:
         return 2
     return _report.report(args.run_out, expected=args.expected,
                           tolerance=args.tolerance, out=args.out)
+
+
+def _cmd_stall_compare(args) -> int:
+    from .stall.batch import read_cases, run_compare
+    statuses = run_compare(read_cases(args.cases), args.ledger_root,
+                           args.reference_root, args.captures, args.out,
+                           args.mapping, repeat_root=args.repeat_root,
+                           scope=args.scope)
+    for status, count in sorted(statuses.items()):
+        print(f"{count}\t{status}")
+    return 0
+
+
+def _cmd_stall_summarize(args) -> int:
+    from .stall.batch import run_summarize
+    summary = run_summarize(args.root, args.label)
+    keys = ["label", "cases", "statuses", "overall"]
+    if summary.get("floor"):
+        keys.append("floor")
+    print(json.dumps({k: summary[k] for k in keys}, indent=1))
+    return 0
+
+
+def _cmd_stall_calibrate(args) -> int:
+    from .stall.calibrate import run_calibrate
+    from .stall.class_mapping import load_mapping
+    table = run_calibrate(args.root, args.repeat_root,
+                          load_mapping(args.mapping))
+    args.out.write_text(json.dumps(table, indent=1))
+    print(f"usable rows {table['usable']} / {len(table['rows'])}")
+    for rule in table["rules"]:
+        if rule["decision"] == "C":
+            continue
+        shares = " ".join(f"{c}={v:.2f}" for c, v in
+                          list(rule["shares"].items())[:4])
+        print(f"{rule['decision']}\t{rule['rule']}\t{rule['class']} -> "
+              f"{rule['calibrated_class'] or rule['class']}\t"
+              f"overlap {rule['mean_overlap']:.3f} rows {rule['rows']}\t"
+              f"{shares}")
+    return 0
 
 
 def _cmd_split(args) -> int:

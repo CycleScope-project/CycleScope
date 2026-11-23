@@ -51,6 +51,9 @@ enum SemanticsKind : std::uint16_t {
 };
 
 // SEMA.flags bits (semantics.py SEMA_FLAG_*)
+// InstructionTemplate.flags bit 9: BAR with the DEFER_BLOCKING modifier
+// (set by the converter, docs/formats.md)
+constexpr std::uint32_t kTemplateFlagDeferBlocking = 0x200;
 constexpr std::uint16_t kSemaFlagAfterReady = 0x1;
 constexpr std::uint16_t kSemaFlagAlsoArrives = 0x2;
 constexpr std::uint16_t kSemaFlagImplicitCommit = 0x4;
@@ -66,6 +69,9 @@ constexpr std::uint16_t kSemaFlagCtaPair = 0x80;
 // mbarrier_arrive .A<n>TX: transaction_bytes are complete_tx
 // (0 arrivals), not expect_tx
 constexpr std::uint16_t kSemaFlagCompleteTx = 0x100;
+// mbarrier_wait: earliest_issue holds the absolute code address of the
+// first waiter of the folded poll sequence (placement v4 rule P')
+constexpr std::uint16_t kSemaFlagWaitOrigin = 0x200;
 
 constexpr std::uint32_t kSemaNoObject = 0xFFFFFFFFu;
 
@@ -85,6 +91,7 @@ constexpr std::uint32_t kTimingTensorPipeBeat = 63;
 constexpr std::uint32_t kTimingTensorResultLatency = 64;
 constexpr std::uint32_t kTimingGlobalStoreIssueInterval = 65;
 constexpr std::uint32_t kTimingSharedFenceDrain = 66;
+constexpr std::uint32_t kTimingWarpQueueEntry = 67;
 constexpr std::uint32_t kTimingSharedStoreAcceptanceSmsp = 80;
 constexpr std::uint32_t kTimingTmaReduceStore = 81;
 

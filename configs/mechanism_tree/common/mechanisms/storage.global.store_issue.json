@@ -1,5 +1,5 @@
 {
- "doc": "Per-SMSP issue interval of a global / local store (STG / ST / STL) as a function of the instruction's per-lane width_bytes. store_scatter measured widths 2/4/8/16 B at 3/3/6/23 cycles on both devices, unchanged across contiguous, 32-byte and 128-byte lane strides and one/two warps. Address geometry controls downstream service/backpressure, not this early issue interval. ST / STL resolving to shared memory are vetoed by the engine (storage.shared.issue owns them).",
+ "doc": "Per-SMSP issue interval of a global / local store (STG / ST / STL) as a function of the instruction's per-lane width_bytes. store_scatter measured widths 2/4/8/16 B at 3/3/6/23 cycles on both devices, unchanged across contiguous, 32-byte and 128-byte lane strides and one/two warps. Address geometry controls downstream service/backpressure, not this early issue interval. ST / STL resolving to shared memory are vetoed by the engine (storage.shared.issue owns them). Disabled (enabled = 0) on both devices by the warp_queue protocol (Q5): ten stores issue one cycle apart; the per-warp queue of instruction.warp_queue replaces it.",
  "program": {
   "event": "issue",
   "operation_classes": [

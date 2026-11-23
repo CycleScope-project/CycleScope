@@ -55,7 +55,8 @@ cyclescope convert    --capture <dir> --arch <arch> --out <facts>
 cyclescope convert    --facts <facts> --arch <arch> --out <dir>
 cyclescope build      <dir> --out job.bin
 cyclescope-engine simulate --job job.bin --out result.bin \
-    [--journal j.bin] [--wait-ledger w.bin] [--progress]
+    [--journal j.bin] [--wait-ledger w.bin] [--stall-ledger stall.tsv]
+    [--progress]
 cyclescope report     <out>
 ```
 
@@ -67,6 +68,7 @@ cyclescope report     <out>
 - `cyclescope relink <seg|job.bin> --tree <t.json>`——把机制程序表重链到另一棵生成的树上，不重新转换。
 - `cyclescope tree build [--emit-cpp] | validate [--strict] | compile | diff | show`——机制树工具（[design/mechanism-tree.md](design/mechanism-tree.md)）。
 - `cyclescope-engine validate|info|dump --job <file>`——不仿真地检查一个作业。
+- `cyclescope stall compare|summarize|calibrate`——把引擎的逐 PC stall 账本（`--stall-ledger`，engine.md §4）与 ncu warp 停驻采样（`cyclescope reference --metrics --source-stalls`）逐 case 对比，再汇总套件或打印映射校准表。
 
 ## 3. 一次运行写什么
 

@@ -1,0 +1,52 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "sync_basic",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-16",
+ "kind": "survey: how mbarrier instructions are served (in order, per SM or per SMSP), the hand-off between two warps, and nanosleep over its range; installs nothing",
+ "mechanisms": [
+  "synchronization.mbarrier (service of SYNCS instructions, release between warps)",
+  "nanosleep"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "sync_basic v1 on h100: a warp's arrive that completes the phase followed by its own try_wait costs 21 cycles per pair alone and 38 with four warps (each on its own barrier and SMSP), all of it long_scoreboard on the reader of the try_wait; the replay charges 102 (release latency between warps applied to the warp's own phase). The 17 -> 36 step fits SYNCS instructions being served one at a time per SM at about 8.5-9 cycles each, but one shape pair cannot tell that from other readings. nanosleep costs 46 + 1.978 cycles per ns at 100 and 1000 ns while the installed leaf (12083 + 1.044 x requested cycles) was measured on long sleeps.",
+ "data_seen_before_freezing": [
+  "sync_basic v1 h100 addendum and table; the leaves synchronization.mbarrier.release (87.93 / 87.78), SYNCS.PHASECHK result latency (37.93 on h100), control.nanosleep (affine, intercept 12083 / 12416)."
+ ],
+ "probe": {
+  "chain": "as version 1 (hand-written PTX, pass-through build, loop gate, frame with t0 / t1 / check per thread, N iterations from a parameter).",
+  "cells": {
+   "t.mbar_self": "version 1's s.mbar_self at 2 and 8 warps per CTA in addition to 1 and 4 (each warp its own barrier): 2 warps = two SMSPs, 8 warps = two per SMSP.",
+   "t.mbar_all": "arrive executed by every lane (no lane predicate, barrier count 32) followed by the same warp's try_wait: the pair without the branch structure the predicate brings; 1 and 4 warps per CTA.",
+   "t.mbar_pingpong": "two warps per CTA and two barriers A and B (count 1 each). Warp 0 per iteration: arrive on B; then try_wait on A in a retry loop until true. Warp 1 per iteration: try_wait on B until true; then arrive on A. Check word = iterations completed (must be N) in both warps; a second check word counts the false try_wait results. Shapes: 2 warps per CTA (two SMSPs), and 8 warps per CTA forming four such pairs with their own barriers. N = 64.",
+   "t.sleep": "nanosleep of 10 us, 100 us and 1 ms (the PTX maximum), N = 8, one warp per CTA; and version 1's 100 ns / 1000 ns cells are the short end."
+  }
+ },
+ "runner": "as version 1; output $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/sync_basic-v2/<device>.",
+ "derivation": {
+  "clock": "per warp (t1 - t0) / N at launch 0 and 2, minus the matching loop frame; for the ping-pong per warp and per pair of hand-offs.",
+  "samples": "per pc by class next to the replay's reasons, as version 1.",
+  "usable": "as version 1."
+ },
+ "questions_before_data": {
+  "service": "Pair cost of t.mbar_self at 1 / 2 / 4 / 8 warps per CTA: Q1 one server per SM: linear in the warps of the SM (the slope is reported); Q2 one server per SMSP: the same at 1, 2 and 4 warps and doubled at 8; Q3 flat. Reported with the fit either way. t.mbar_all against t.mbar_self tells what the lane predicate's branches cost.",
+  "hand-off": "Cycles per hand-off (half an iteration of a warp) and the class and pc that carry it; whether the waiting warp shows false try_wait results (it polls) or none (the first try_wait blocks until the arrive); with four pairs on one SM whether the hand-off time grows as the service reading predicts. Compared with the installed release latency (87.9) and the replay.",
+  "sleep": "Cycles per nanosleep against the request at 100 ns, 1 us, 10 us, 100 us, 1 ms: N1 one affine law (46 + 1.978 per ns) over the whole range; N2 a second regime for long sleeps that agrees with the installed leaf above some request. Reported with the points."
+ },
+ "install": "Nothing is installed from this version.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case.",
+ "addenda": [
+  {
+   "when": "2026-11-16, h100 and b300 runs (14 cells each, gate passed for all, 0 unrealised, every check word right, no chain failure; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/sync_basic-v2/{h100,b300}, tables derive-<device>.txt; replay with engine build 74ce8aab) — readings; nothing installed",
+   "text": "SERVICE: Q1 (one server per SM), with a floor. arrive + try_wait of the same warp, cost per pair by warps per CTA 1 / 2 / 4 / 8: h100 21.0 / 24.8 / 38.1 / 76.4, b300 18.0 / 23.9 / 42.6 / 79.2 = max(about 20, 9.5-10 x warps of the SM); it is not per SMSP (four warps on four SMSPs already cost twice one warp). The wait is long_scoreboard on the reader of the try_wait; at 8 warps part of it moves onto the SYNCS instructions as mio_throttle (16 + 16 on h100, 10 + 12 on b300). With every lane arriving (no lane predicate) the pair costs the same (19.9 / 42.7, 19.5 / 45.0): the count of arriving lanes and the predicate's branches do not matter. Replay: 100-103 per pair at every shape (semantic:mbarrier_wait 83 on the try_wait). HAND-OFF between two warps (ping-pong on two barriers): 129.6 (h100) / 134.7 (b300) cycles per iteration of a warp, i.e. two hand-offs, about 65-67 cycles from one warp's arrive to the other warp's next instruction, instruction costs included; with four pairs on the SM 136.4 / 140.8. No try_wait ever returned false (second check word 0 in every warp): the waiting warp's first try_wait blocks until the arrive. Classes per iteration: long_scoreboard 63-71 on the reader of the try_wait, branch_resolving 33-35 (21 of it on the try_wait), wait 20. Replay: 284 per iteration (semantic:mbarrier_wait 180-197, control_floor 39-56): 2.1 x hardware. The installed release latency between warps (87.9 / 87.8) alone exceeds the whole hardware hand-off. SLEEP: N2, not one law. Cycles per nanosleep by request 100 ns / 1 us / 10 us / 100 us / 1 ms: h100 244 / 2024 / 32000 / 254200 / 1.88 M, b300 250 / 2062 / 32600 / 243700 / 1.94 M. Short sleeps follow about 46 + 2 per ns; from 10 us on the sleep is longer than requested and close to whole multiples of 2^15 cycles (10 us -> one unit, 100 us -> 7.4-7.8 units against 6.0 requested, 1 ms -> 57-59 units against 60.4): a timer tick of about 16.5 us is the reading (inference; eight sleeps per warp do not resolve the rounding). Replay: 12190 / 13130 / 22500 / 116500 / 1.056 M: fifty times too long at 100 ns, 0.70 / 0.46 / 0.56 of hardware from 10 us on."
+  },
+  {
+   "when": "2026-11-16, CORRECTION of the hand-off reading and of how the service numbers are stated (no new data; full reasoning in protocol-v3.json data_seen (a)-(d))",
+   "text": "HAND-OFF: the ping-pong period is not two hand-offs. Per pc, member 1 sits about 50 cycles at its try_wait before issuing it (branch_resolving behind the YIELD that ptxas places in front of the try_wait) and then waits 37 on the reader, the plain result latency: its try_wait is issued after the other warp's arrive and does not block. The period (137 by samples) is member 1's own loop; member 0, whose try_wait does block (97 on the reader), has slack. The cell bounds the hand-off (arrive issue to the blocked waiter's reader) at about 42 cycles for a waiter blocked about 60 cycles and does not measure it; '65-67 cycles from one warp's arrive to the other warp's next instruction' was half a period, not a latency. Version 4 measures it with clocks. SERVICE: the 'cost per pair' numbers subtract a loop frame whose clock value carries a per-cell constant (uncertain by 1-4 cycles per iteration); the sample totals per iteration are h100 27.68 / 32.96 / 47.24 / 86.87 and b300 27.24 / 31.27 / 49.92 / 85.96 at 1 / 2 / 4 / 8 warps. The one-warp value is what the installed SYNCS.PHASECHK result latency (37.93) gives with two try_waits in flight (readers wait 2 x 37.93 - 8 per four pairs = 16.96 per iteration, measured 16.96 / 17.03), so there is no separate 'floor of about 20'; the growth is about 5.7 cycles per SYNCS instruction of the SM (version 3 leaf)."
+  }
+ ]
+}

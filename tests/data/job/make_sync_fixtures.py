@@ -452,6 +452,87 @@ def m_control_yield() -> bytes:
     return container(s.build())
 
 
+def r2_bsync_floor() -> bytes:
+    """branch_basic v2 R2: a BSYNC joins the floor family -- the FILL
+    behind it issues at BSYNC issue + result latency (13).  The real
+    template names its B register as a destination (B0 = 1024), so
+    the floor must apply with destination_count = 1."""
+    s = Seg(1, 1)
+    b = s.template("BSYNC", svc={1: 13.0, 2: 13.0}, dst=[1024])
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(b, None), (f, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def r2_bsync_floor_stall() -> bytes:
+    """branch_basic v2 R2: the floor is a max with the stall, not a
+    sum -- a stall-5 BSYNC with result 13 still lands the FILL at
+    +13."""
+    s = Seg(1, 1)
+    b = s.template("BSYNC", control=5, svc={1: 13.0, 2: 13.0},
+                   dst=[1024])
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(b, None), (f, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def sl_control_branch() -> bytes:
+    """stall ledger: a BRA with stall 5 bound to a control_envelope
+    10 -- the 9-cycle wait behind it splits into 4 cycles
+    control_floor (the stall field) + 5 cycles control:branch."""
+    s = Seg(1, 1)
+    bra = s.template("BRA", control=5)
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(bra, None), (f, None)])
+    node = s.leaf_node(5, {4: 10.0})
+    s.uses.append((node, 2, b"\0" * 3, 0, 5, 0x1, 0, 0))
+    for i in range(2):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def sl_control_yield() -> bytes:
+    """stall ledger: a YIELD with stall 5 and service result 50 --
+    the wait behind it splits into 4 cycles control_floor + 45
+    cycles control:yield."""
+    s = Seg(1, 1)
+    y = s.template("YIELD", control=5, svc={1: 50.0, 2: 50.0})
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(y, None), (f, None)])
+    for i in range(2):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def sl_control_stall() -> bytes:
+    """stall ledger: a FILL with stall 5 only -- the wait behind it
+    stays control_floor, no control:* reason appears."""
+    s = Seg(1, 1)
+    f5 = s.template("FILL", control=5)
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(f5, None), (f, None)])
+    for i in range(2):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def r2_bssy_no_floor() -> bytes:
+    """branch_basic v2 R1: a BSSY is not in the floor family -- the
+    FILL behind it issues one cycle later whatever the service
+    result latency."""
+    s = Seg(1, 1)
+    b = s.template("BSSY", svc={1: 13.0, 2: 13.0})
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(b, None), (f, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
 def m_cpasync_anchor() -> bytes:
     """kind-39 group completion anchored at the group's FIRST copy
     issue: 4 CP.ASYNC copies issued ~10 cycles apart, leaf 300,
@@ -499,6 +580,248 @@ def a25_control_stall() -> bytes:
             (fd, None), (fu, None), (f1, None)])
     s.cta(0, 0, 0, 1, 0)
     return container(s.build())
+
+
+def ir1_no_register_tracking() -> bytes:
+    """issue_rules v1 R1: a producer without a write barrier (result
+    latency 10) followed by a stall-1 reader of its destination
+    register: the reader issues the next cycle (hardware computes
+    with the stale value; the replay does not track registers)."""
+    s = Seg(1, 1)
+    prod = s.template("VIADD", dst=[5], control=1,
+                      svc={1: 10.0, 2: 10.0, 7: 1.0})
+    rd = s.template("VIADD", src=[5], control=1)
+    s.warp(0, 0, 0, [(prod, None), (rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def ir2_barrier_latest() -> bytes:
+    """issue_rules v1 R2: two producers on barrier 1 with data_ready
+    20 / 40 apart; the wait-mask reader is held until the later of
+    the two releases."""
+    s = Seg(1, 1)
+    p1 = s.template("LDG", scoreboard_write=1, control=1,
+                    svc={1: 20.0, 2: 20.0, 7: 1.0})
+    p2 = s.template("LDG", scoreboard_write=1, control=1,
+                    svc={1: 40.0, 2: 40.0, 7: 1.0})
+    rd = s.template("FILL", scoreboard_wait_mask=0x2, control=1)
+    s.warp(0, 0, 0, [(p1, None), (p2, None), (rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def _ir3(load_stall: int, gap: int) -> bytes:
+    """issue_rules v1 R3: a write-barrier producer followed by a
+    wait-mask reader.  gap = stall-1 instructions between them: the
+    raise at t is invisible to an issue at t + 1 (gap 0 with the
+    reader's own floor met at t + 1) and visible from t + 2."""
+    s = Seg(1, 1)
+    ld = s.template("LDC", dst=[5], scoreboard_write=1,
+                    control=load_stall,
+                    svc={1: 50.0, 2: 50.0, 7: 1.0})
+    nop = s.template("NOP", control=1)
+    rd = s.template("FILL", src=[5], scoreboard_wait_mask=0x2,
+                    control=1)
+    s.warp(0, 0, 0,
+           [(ld, None)] + [(nop, None)] * gap + [(rd, None)])
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def ir3_load_s1() -> bytes:
+    return _ir3(1, 0)
+
+
+def ir4_yield_stall() -> bytes:
+    """issue_rules v2 Y1: a yield hint (TMPL.control bit4) with a
+    stall count of 1 holds the warp's next issue until issue + 2;
+    yield + stall 4 keeps +4; stall 1 without the yield bit is +1."""
+    s = Seg(1, 1)
+    fy1 = s.template("FILL", control=0x11)
+    f1 = s.template("FILL", control=1)
+    fy4 = s.template("FILL", control=0x14)
+    f0 = s.template("FILL")
+    s.warp(0, 0, 0, [(fy1, None), (f1, None), (fy4, None),
+                   (f1, None), (f0, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def ir3_load_s2() -> bytes:
+    return _ir3(2, 0)
+
+
+def ir3_load_s1g1() -> bytes:
+    return _ir3(1, 1)
+
+
+def sl_waits() -> bytes:
+    """Stall-ledger fixture: a barrier wait behind a global load
+    (barrier:LDG:*, issue_rules v1), an execution-unit wait on
+    resource 4 (unit:xu_smsp in the common resource table), a
+    NANOSLEEP suspension (suspended:sleep) and an mbarrier wait,
+    plus code addresses for every instance."""
+    s = Seg(1, 5)
+    # L2/DRAM latency 300 (res_f3's level): the consumer waits on the
+    # load's write barrier -> a barrier:LDG:* residency row (the NOP
+    # between them is what R3 needs for the raise to be visible)
+    node = s.leaf_node(3, {13: 300.0, 17: 300.0})
+    s.uses.append((node, 5, b"\0" * 3, 0, 3, 0xFFFFFFFF, 0, 0))
+    s.mbpi.append((0, 0, 0x1000, 2, 0))
+    s.const_program("synchronization.mbarrier.release", 3, 4, 22, 10.0)
+    # RESOURCE-schema row defining resource id 4 (smsp scope,
+    # initiation interval 8) -> the second XU issue waits on the unit
+    node = s.leaf_node(2, {0: 0.0, 1: 1.0, 2: 0.0, 3: 8.0})
+    s.uses.append((node, 4, b"\0" * 3, 4, 2, 0xF, 0, 0))
+    ldg = s.template("LDG", dst=[1], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    use = s.template("USE", src=[1], scoreboard_wait_mask=0x2)
+    xu = s.template("MUFU", svc={1: 18.0, 7: 8.0, 10: 4.0})
+    ns = s.template("NANOSLEEP",
+                    timing=((TK_NANOSLEEP, {0: 100.0, 1: 1.0}),))
+    f = s.template("FILL")
+    arr = s.template("MBAR.ARRIVE")
+    wt = s.template("MBAR.WAIT")
+    # warp 0: global load -> dependent USE (barrier wait on the load)
+    s.macc.append((0, 1, 0x0, 0, 0, 0, 0, 0))
+    s.msec.append((0x4000, 0xFFFFFFFF, 0xFFFFFFFF))
+    first = len(s.inst)
+    s.instance(ldg, None, 0)
+    s.instance(nop)
+    s.instance(use)
+    s.instance(f)
+    s.warps.append((0, 0, 0, 0, first, 4))
+    # warp 1: two XU ops on one unit with interval 8 -> unit wait
+    s.warp(0, 1, 1, [(xu, None), (xu, None), (f, None)])
+    # warp 2: nanosleep then a fill -> suspended:sleep
+    s.warp(0, 2, 2,
+           [(ns, s.semantic(NANOSLEEP, fields=(100,))), (f, None)])
+    # warps 3/4: mbarrier arrive/wait pair (a1_basic shape)
+    s.warp(0, 3, 3,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None)])
+    s.warp(0, 4, 0,
+           fills(f, 20)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 5, 0)
+    return container(s.build())
+
+
+def sl_loop() -> bytes:
+    """Stall-ledger transitions: a 3-instruction body replayed four
+    times per warp -> the back edge (0x1020 -> 0x1000) counts 3 per
+    warp."""
+    s = Seg(1, 2)
+    f = s.template("FILL")
+    s.warp(0, 0, 0, fills(f, 12))
+    s.warp(0, 1, 1, fills(f, 12))
+    for i in range(24):
+        s.code.append((i, 0, 0x1000 + (i % 3) * 0x10))
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def sl_issue_slot() -> bytes:
+    """Two always-ready warps pinned to one SMSP (slots 0 and 4 ->
+    smsp 0): each cycle one issues and the other accrues issue_slot
+    at its next instruction's address."""
+    s = Seg(1, 2)
+    fy = s.template("FILL", control=0x10)  # yield bit -> alternation
+    s.warp(0, 0, 0, fills(fy, 6))
+    s.warp(0, 1, 4, fills(fy, 6))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def sl_control_floor() -> bytes:
+    """A stall-count-4 control word: the span after its issue is
+    control_floor at the following instruction's address for
+    stall - 1 = 3 cycles."""
+    s = Seg(1, 1)
+    f4 = s.template("FILL", control=4)
+    f1 = s.template("FILL", control=1)
+    s.warp(0, 0, 0, [(f4, None), (f1, None), (f1, None), (f1, None)])
+    for i in range(4):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def sl_due() -> bytes:
+    """A unit wait with a finite retry time whose warp is never
+    reached once due: warp0's second XU is blocked [1, 8) under
+    unit:xu_smsp, then accrues issue_slot at the same address while
+    warp1 (same smsp, never yields) keeps the issue slot."""
+    s = Seg(1, 2)
+    # RESOURCE-schema row: resource id 4 (smsp scope, initiation
+    # interval 8) — the second XU issue waits on the unit until 8
+    node = s.leaf_node(2, {0: 0.0, 1: 1.0, 2: 0.0, 3: 8.0})
+    s.uses.append((node, 4, b"\0" * 3, 4, 2, 0xF, 0, 0))
+    xu = s.template("MUFU", svc={1: 18.0, 7: 8.0, 10: 4.0})
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(xu, None), (xu, None), (f, None)])
+    s.warp(0, 1, 4, fills(f, 20))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def sl_cta_barrier() -> bytes:
+    """CTA barrier key convention: warp0's BAR.SYNC issues at 0 and
+    its wait cycles are charged at the next instruction's address
+    (0x1010), not at the barrier instruction itself."""
+    s = Seg(1, 2)
+    bar = _cta_bar_template(s)
+    f = s.template("FILL")
+    s.warp(0, 0, 0,
+           [(bar, s.semantic(CTA_WAIT, flags=ALSO_ARRIVES,
+                             fields=(0, 0, 0)))]
+           + fills(f, 5))
+    s.warp(0, 1, 1,
+           fills(f, 10)
+           + [(bar, s.semantic(CTA_WAIT, flags=ALSO_ARRIVES,
+                               fields=(0, 0, 0))),
+              (f, None)])
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def sl_cluster_barrier() -> bytes:
+    """Cluster barrier key convention: warp0's CLUSTER.WAIT waits for
+    the other CTA's arrive; the wait cycles are charged at the wait
+    instruction's own address (0x1060), not the instruction after it."""
+    s = Seg(2, 4, cluster_shape_x=2)
+    s.guarded_program("synchronization.cluster.release", 3, 4,
+                      TK_CL_REL,
+                      [(AXID["expected_arrivals"], 0, 2, 2, 20.0),
+                       (AXID["expected_arrivals"], 0, 1, 1, 5.0)])
+    f = s.template("FILL")
+    arr = s.template("CLUSTER.ARRIVE")
+    wt = s.template("CLUSTER.WAIT")
+    for c in range(2):
+        for k in range(2):
+            s.warp(c, k, k,
+                   fills(f, 10 * (2 * c + k))
+                   + [(arr, s.semantic(CL_ARRIVE, fields=(0, 0)))]
+                   + fills(f, 5)
+                   + [(wt, s.semantic(CL_WAIT, fields=(0, 0))),
+                      (f, None)])
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 2, 0)
+    s.cta(1, 1, 1, 2, 2)
+    return container(s.build(), cluster_x=2)
 
 
 def a26_failed_poll_result() -> bytes:
@@ -1807,6 +2130,135 @@ def c9_slow_gpc() -> bytes:
                            sm_count=2, occupancy_blocks_per_sm=1)
 
 
+# ---- kernel_boundary K2/K3/K4 ----
+
+
+def kb1_active_cycles() -> bytes:
+    # K2: 1 SM x 2 slots; CTAs 0 (10 fills) / 1 (15 fills) first wave,
+    # queued CTAs 2/3 refill at +20 serial 1.  The SM is active
+    # [0, ~14) and again [~29, ~44); the 15-cycle gap does not count,
+    # so cycles ~= active union length (~29), not the last
+    # completion (~44)
+    segs = []
+    for i, n in enumerate([10, 15, 10, 10]):
+        s = Seg(1, 1)
+        node = s.leaf_node(24, {0: 0.0, 1: 20.0, 2: 1.0, 3: 1.0})
+        s.uses.append(init_use(node, 24))
+        f = s.template("FILL")
+        s.warp(i, 0, i, fills(f, n))
+        s.cta(i, 0, i if i < 2 else NONE, 1, 0)
+        segs.append(s.build())
+    pl = b"".join(cf.PLCE.pack_row(r) for r in
+                  [plce(0, 0, 0, 1, 0, 0), plce(1, 1, 0, 1, 0, 1),
+                   plce(2, 2, 0, 0, 0, 0), plce(3, 3, 0, 0, 0, 0)])
+    tp = b"".join(cf.TOPO.pack_row(r) for r in [topo(0)])
+    return container_multi(segs, placements=pl, topo=tp,
+                           sm_count=1, occupancy_blocks_per_sm=2)
+
+
+def kb2_first_line() -> bytes:
+    # K3: launch_first_line 200 + stream_l1 10 over a 32-line launch
+    # window: the first line arrives at entry + 200; a warp entering
+    # while it is in flight (CTA 1, entry 120) waits the same
+    # arrival; a CTA entering after the arrival (CTA 2, entry 240)
+    # pays only its own stream slot; its demand on launch line 20 —
+    # inside the window but not yet streamed to by the chain —
+    # arrives on its own L1 slot (entry + 10), not entry + 200 +
+    # 20 x 10.  The next 128 B line of line 0 is entry + 200 + 10
+    segs = []
+    for i in range(3):
+        s = Seg(1, 1)
+        node = s.leaf_node(24, {0: 120.0, 1: 20.0, 2: 1.0, 3: 1.0})
+        s.uses.append(init_use(node, 24))
+        fn = s.leaf_node(26, {0: 1.0, 1: 128.0, 3: 2.0, 6: 4096.0,
+                              7: 65536.0, 8: 10.0, 9: 20.0,
+                              10: 100.0, 11: 4096.0, 12: 0.0,
+                              13: 1.0, 15: 200.0})
+        s.uses.append(init_use(fn, 26))
+        f = s.template("FILL")
+        s.warp(i, 0, i, fills(f, 10))
+        base = 2560 if i == 2 else 0
+        for j in range(10):
+            s.code.append((j, 0, base + 16 * j))
+        s.cta(i, 0, i if i < 3 else NONE, 1, 0)
+        segs.append(s.build())
+    pl = b"".join(cf.PLCE.pack_row(r) for r in
+                  [plce(0, 0, 0, 1, 0, 0), plce(1, 1, 0, 1, 0, 1),
+                   plce(2, 2, 0, 1, 0, 2)])
+    tp = b"".join(cf.TOPO.pack_row(r) for r in [topo(0)])
+    return container_multi(segs, placements=pl, topo=tp,
+                           sm_count=1, occupancy_blocks_per_sm=3)
+
+
+def kb3_exit() -> bytes:
+    # K4: lifecycle fields 4/5 (branch 8 / tail 7): the last
+    # instruction is EXIT (control stall 5) issued at t ->
+    # done = t + 5 + 8 + 7; ledger control_floor 4, exit_branch 8,
+    # exit_drain 7
+    s = Seg(1, 1)
+    node = _lifecycle_node(s, {4: 8.0, 5: 7.0}, None)
+    s.uses.append(init_use(node, 25))
+    f = s.template("FILL")
+    ex = s.template("EXIT", control=5)
+    s.warp(0, 0, 0, fills(f, 3) + [(ex, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def kb3b_exit_drain() -> bytes:
+    # same EXIT shape but a cp.async group completing at first
+    # issue + 50 is still in flight when EXIT issues: done =
+    # max(t + 5 + 8, ~50) + 7
+    s = Seg(1, 1)
+    node = _lifecycle_node(s, {4: 8.0, 5: 7.0}, None)
+    s.uses.append(init_use(node, 25))
+    _mem_leaf(s)
+    iss = s.template("CP.ASYNC", timing=((39, {0: 50.0, 1: 1.0}),))
+    com = s.template("CP.COMMIT")
+    ex = s.template("EXIT", control=5)
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 16, 0, 0, 0, 0, 0, 0))
+    for j in range(16):
+        s.msec.append((j * 128, 0xFFFFFFFF, 0))
+    s.warp(0, 0, 0, [(iss, s.semantic(CP_ISSUE, fields=(0, 0, NONE))),
+                   (com, s.semantic(CP_COMMIT,
+                                    fields=(0, 0, NONE, 0))),
+                   (ex, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def kb4_drain_starve() -> bytes:
+    # drain-settle starvation (CUF-C84B-SPARSE-S05): warp 1 (slot 0)
+    # retires early into an async drain targeting ~issue+50; sibling
+    # warp 0 (slot 4, same SMSP 0) yields only while warp 1 still has
+    # instructions, then stops yielding so the single issue slot is
+    # spent ahead of warp 1 in every sweep.  Without the fix the
+    # exhausted warp is never queued for the post-sweep settle once
+    # the sibling exhausts, the drain wake lands with nothing armed
+    # to re-evaluate it, and the run deadlocks when the queue
+    # empties; with the fix it is pushed every sweep and completes
+    # at its drain target
+    s = Seg(1, 1)
+    _mem_leaf(s)
+    fy = s.template("FILL", control=16)   # yield bit: rotate cursor
+    fn = s.template("FILL")               # no yield: hold cursor first
+    iss = s.template("CP.ASYNC", timing=((39, {0: 50.0, 1: 1.0}),))
+    com = s.template("CP.COMMIT")
+    ex = s.template("EXIT")
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 16, 0, 0, 0, 0, 0, 0))
+    for j in range(16):
+        s.msec.append((j * 128, 0xFFFFFFFF, 0))
+    s.warp(0, 0, 4, fills(fy, 10) + fills(fn, 110) + [(ex, None)])
+    s.warp(0, 1, 0, [(iss, s.semantic(CP_ISSUE, fields=(0, 0, NONE))),
+                     (com, s.semantic(CP_COMMIT,
+                                      fields=(0, 0, NONE, 0))),
+                     (ex, None)])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
 def a14_stale_poll() -> bytes:
     # failed poll issued after the phase released: its result latency
     # is 0 so the dependent instruction issues on the next cycle
@@ -2112,8 +2564,9 @@ def c8c_bank0() -> bytes:
                                     3: 37.0, 4: 107.0, 5: 406.0,
                                     6: 64.0}),
                    0, b"\0" * 3, 0, 27, 0, 0, 0))
-    ldc = s.template("LDC", dst=[5])
-    dep = s.template("DEP", src=[5])
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
 
     def ld(addr):
         macc = len(s.macc)
@@ -2125,12 +2578,13 @@ def c8c_bank0() -> bytes:
     ld(0x200); ld(0x200)
     s.warps.append((0, 0, 0, 0, 0, 2))
     # w1: bank-3 miss then in-flight re-read, DEP consumer on the
-    # first value -> miss latency visible at inst 2
+    # first value -> miss latency visible at the last instance
     b3 = 0x3 << 32
     i0 = len(s.inst)
     ld(b3 | 0x300); ld(b3 | 0x300)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
     s.inst.append((dep, NONE, NONE, len(s.inst)))
-    s.warps.append((0, 1, 0, 0, i0, 3))
+    s.warps.append((0, 1, 0, 0, i0, 4))
     s.cta(0, 0, 0, 2, 0)
     return container(s.build())
 
@@ -2145,8 +2599,9 @@ def c8d_bank0_uniform() -> bytes:
                                     3: 37.0, 4: 107.0, 5: 406.0,
                                     6: 64.0, 7: 96.0}),
                    0, b"\0" * 3, 0, 27, 0, 0, 0))
-    ldc = s.template("LDC", dst=[5])
-    dep = s.template("DEP", src=[5])
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
 
     def ld(addr, uniform=False):
         macc = len(s.macc)
@@ -2156,21 +2611,24 @@ def c8d_bank0_uniform() -> bytes:
         s.inst.append((ldc, NONE, macc, len(s.inst)))
 
     # w0: two bank-0 uniform accesses (both now+96) then a dependent
-    # DEP so the latency is visible at inst 2
+    # DEP so the latency is visible at the last instance
     ld(0x200, True); ld(0x200, True)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
     s.inst.append((dep, NONE, NONE, len(s.inst)))
-    s.warps.append((0, 0, 0, 0, 0, 3))
+    s.warps.append((0, 0, 0, 0, 0, 4))
     # w1: two bank-0 vector accesses (both now+64) then dependent DEP
     i0 = len(s.inst)
     ld(0x200); ld(0x200)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
     s.inst.append((dep, NONE, NONE, len(s.inst)))
-    s.warps.append((0, 1, 0, 0, i0, 3))
+    s.warps.append((0, 1, 0, 0, i0, 4))
     # w2: bank-3 miss then DEP consumer -> miss latency kept
     b3 = 0x3 << 32
     i1 = len(s.inst)
     ld(b3 | 0x300); ld(b3 | 0x300)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
     s.inst.append((dep, NONE, NONE, len(s.inst)))
-    s.warps.append((0, 2, 0, 0, i1, 3))
+    s.warps.append((0, 2, 0, 0, i1, 4))
     s.cta(0, 0, 0, 3, 0)
     return container(s.build())
 
@@ -2188,8 +2646,9 @@ def c8b_const_inflight() -> bytes:
     s.uses.append((s.leaf_node(27, {0: 1.0, 1: 64.0, 2: 65536.0,
                                     3: 37.0, 4: 107.0, 5: 406.0}),
                    0, b"\0" * 3, 0, 27, 0, 0, 0))
-    ldc = s.template("LDC", dst=[5])
-    dep = s.template("DEP", src=[5])
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
 
     def ld(addr):
         macc = len(s.macc)
@@ -2197,16 +2656,440 @@ def c8b_const_inflight() -> bytes:
         s.msec.append((addr, 0xFFFFFFFF, 0))
         s.inst.append((ldc, NONE, macc, len(s.inst)))
 
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
     for a in (0x200, 0x300, 0x210):
         ld(a)
-    s.inst.append((dep, NONE, NONE, len(s.inst)))
+    dep_after()
     n0 = len(s.inst)
     ld(0x200)
     ld(0x200)
-    s.inst.append((dep, NONE, NONE, len(s.inst)))
+    dep_after()
     s.warps.append((0, 0, 0, 0, 0, n0))
     s.warps.append((0, 1, 1, 1, n0, len(s.inst) - n0))
     s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def _c8e(with_hold: bool, with_resident: bool) -> bytes:
+    # uniform constant cold-hold (kernel_start v2): schema-27 fields
+    # 8 (bank-0 hold) / 9 (other banks); field 10 (resident hold,
+    # kernel_start v3) replaces the same_line / hit latency on uniform
+    # re-reads when the cold rule is enabled.  with_hold=False drops
+    # 8/9/10 (rule off -> miss/in-flight behaviour identical to
+    # today); with_resident=False drops only 10.
+    # w0: cold bank-0 line (hold 119), then a cold bank-3 line
+    #     (hold 463) serial; the bank-0 fill has completed by then,
+    #     so the two uniform re-reads of it hit the resident rule
+    #     (field 10 present: result at issue) or the old hit (107) /
+    #     same-line (37) latencies; a trailing vector LDC on the same
+    #     resident line keeps 37 either way.
+    # w1: same cold bank-0 line as w0, different smsp -> held until
+    #     the same fill-ready cycle.
+    # w2: cold bank-3 line -> 463.
+    fields = {0: 1.0, 1: 64.0, 2: 65536.0, 3: 37.0, 4: 107.0, 5: 406.0}
+    if with_hold:
+        fields[8] = 119.0
+        fields[9] = 463.0
+        if with_resident:
+            fields[10] = 0.0
+    s = Seg(1, 3)
+    s.uses.append((s.leaf_node(27, fields), 0, b"\0" * 3, 0, 27,
+                   0, 0, 0))
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+    b3 = 0x3 << 32
+
+    def ld(addr, uniform):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1,
+                       3 | (0x10 if uniform else 0), 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldc, NONE, macc, len(s.inst)))
+
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
+    ld(0x200, True)
+    ld(b3 | 0x300, True)
+    ld(0x210, True)
+    ld(0x220, True)
+    dep_after()
+    ld(0x230, False)
+    dep_after()
+    s.warps.append((0, 0, 0, 0, 0, 9))
+    i0 = len(s.inst)
+    ld(0x200, True)
+    dep_after()
+    s.warps.append((0, 1, 0, 1, i0, 3))
+    i1 = len(s.inst)
+    ld(b3 | 0x400, True)
+    dep_after()
+    s.warps.append((0, 2, 0, 2, i1, 3))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 3, 0)
+    return container(s.build())
+
+
+def c8e_const_hold() -> bytes:
+    return _c8e(True, True)
+
+
+def c8f_const_hold_off() -> bytes:
+    # same job without any of the three fields: the engine must
+    # produce exactly today's cycles (miss on every cold access,
+    # in-flight hits wait for fill-ready as a data latency)
+    return _c8e(False, False)
+
+
+def c8g_const_hold_noresident() -> bytes:
+    # fields 8/9 kept, field 10 dropped: cold lines are still held at
+    # issue, but uniform re-reads of a resident line are charged the
+    # pre-v3 hit (107) / same-line (37) latencies again
+    return _c8e(True, False)
+
+
+def c8h_vbank0_cold() -> bytes:
+    # vector bank-0 cold latency (kernel_start v4): schema-27 field
+    # 11 with field 6 (flat access 30) and the uniform cold-hold rule
+    # (8/9/10) on, so the resident set is shared between paths.
+    # w0: vector LDC on cold bank-0 line A -> fill ready after 153;
+    #     a second vector read of line A hits (+30).
+    # w1: vector LDC on line A while the fill is in flight -> reader
+    #     ready at the same cycle as w0's.
+    # w2: uniform LDC on cold bank-0 line B (held to fill-ready 119),
+    #     then a vector LDC on line B -> resident hit (+30).
+    fields = {0: 1.0, 1: 64.0, 2: 65536.0, 3: 37.0, 4: 107.0, 5: 406.0,
+              6: 30.0, 8: 119.0, 9: 463.0, 10: 0.0, 11: 153.0}
+    s = Seg(1, 3)
+    s.uses.append((s.leaf_node(27, fields), 0, b"\0" * 3, 0, 27,
+                   0, 0, 0))
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+
+    def ld(addr, uniform):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1,
+                       3 | (0x10 if uniform else 0), 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldc, NONE, macc, len(s.inst)))
+
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
+    ld(0x200, False)
+    dep_after()
+    ld(0x220, False)
+    dep_after()
+    s.warps.append((0, 0, 0, 0, 0, 6))
+    i0 = len(s.inst)
+    ld(0x240, False)
+    dep_after()
+    s.warps.append((0, 1, 0, 1, i0, 3))
+    i1 = len(s.inst)
+    ld(0x400, True)
+    dep_after()
+    ld(0x420, False)
+    dep_after()
+    s.warps.append((0, 2, 0, 2, i1, 6))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 3, 0)
+    return container(s.build())
+
+
+def c8i_vbank0_cold_off() -> bytes:
+    # field 11 dropped (fields 6/8/9/10 kept): vector bank-0 reads
+    # keep the flat 30 latency and leave the resident set alone --
+    # the uniform read of the same line right after is still cold-
+    # held (~119)
+    fields = {0: 1.0, 1: 64.0, 2: 65536.0, 3: 37.0, 4: 107.0, 5: 406.0,
+              6: 30.0, 8: 119.0, 9: 463.0, 10: 0.0}
+    s = Seg(1, 1)
+    s.uses.append((s.leaf_node(27, fields), 0, b"\0" * 3, 0, 27,
+                   0, 0, 0))
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+
+    def ld(addr, uniform):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1,
+                       3 | (0x10 if uniform else 0), 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldc, NONE, macc, len(s.inst)))
+
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
+    ld(0x200, False)
+    dep_after()
+    ld(0x220, True)
+    dep_after()
+    s.warps.append((0, 0, 0, 0, 0, 6))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+# constant_paths leaf shapes (schema 27); h100 v2: field 22
+# uniform_first_touch_min_smsps replaces the v1 few-warps fields
+CP_H100 = {0: 1.0, 1: 64.0, 2: 65536.0, 12: 129.0, 13: 0.0, 14: 0.0,
+           15: 92.15, 16: 22.75, 17: 27.0, 18: 256.0, 19: 491.1,
+           22: 2.0}
+CP_B300 = {0: 1.0, 1: 64.0, 2: 65536.0, 12: 69.05, 13: 19.0, 14: 20.9,
+           15: 100.1, 16: 27.5, 17: 20.3, 18: 256.0, 19: 594.6}
+
+
+def _cp_leaf(s: Seg, fields: dict) -> None:
+    s.uses.append((s.leaf_node(27, fields), 0, b"\0" * 3, 0, 27,
+                   0, 0, 0))
+
+
+def cp1_uhold() -> bytes:
+    """constant_paths C4: a uniform load without a write barrier is
+    held at issue until its cold line's fill is ready (~129); the
+    same-line second load does not hold; the reader is free."""
+    s = Seg(1, 1)
+    _cp_leaf(s, CP_H100)
+    ldc = s.template("LDC", dst=[5])
+    dep = s.template("DEP", src=[5])
+
+    def ld(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3 | 0x10, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldc, NONE, macc, len(s.inst)))
+
+    ld(0x200)
+    ld(0x210)
+    s.inst.append((dep, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, 3))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def cp2_vbarrier() -> bytes:
+    """constant_paths C2/C4 vector path: the first reader waits the
+    write barrier for first_touch (92); the reread of the resident
+    line waits reread (22) again."""
+    s = Seg(1, 1)
+    _cp_leaf(s, CP_H100)
+    ldc = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+
+    def ld(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldc, NONE, macc, len(s.inst)))
+
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
+    ld(0x200)
+    dep_after()
+    ld(0x200)
+    dep_after()
+    s.warps.append((0, 0, 0, 0, 0, 6))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def cp3_sets() -> bytes:
+    """constant_paths C1: uniform and vector resident sets are
+    separate -- w0 fills line A through the uniform path and the
+    vector read of A still pays vector_first_touch (100); w1 fills
+    line B through the vector path and the uniform read of B is
+    held for uniform_first_touch (69)."""
+    s = Seg(1, 2)
+    _cp_leaf(s, CP_B300)
+    ldu = s.template("LDC", dst=[5])
+    ldv = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+
+    def ld(addr, uniform):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1,
+                       3 | (0x10 if uniform else 0), 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldu if uniform else ldv, NONE, macc,
+                       len(s.inst)))
+
+    # w0: uniform fill of A (held ~69), then vector first touch of A
+    ld(0x200, True)
+    ld(0x200, False)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
+    s.inst.append((dep, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, 4))
+    # w1: vector fill of B (in flight), then uniform first touch of B
+    # (held ~69)
+    i0 = len(s.inst)
+    ld(0x300, False)
+    ld(0x300, True)
+    s.warps.append((0, 1, 0, 1, i0, 2))
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def cp4_batch() -> bytes:
+    """constant_paths C2 pipelined fills: four adjacent (one cycle
+    apart) vector cold loads on one barrier complete at t0+92,
+    +119, +146, +173 (first touch then +27 fill interval each);
+    the reader waits for the last."""
+    s = Seg(1, 1)
+    _cp_leaf(s, CP_H100)
+    ldv = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+
+    def ld(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldv, NONE, macc, len(s.inst)))
+
+    for a in (0x200, 0x300, 0x400, 0x500):
+        ld(a)
+    s.inst.append((nop, NONE, NONE, len(s.inst)))
+    s.inst.append((dep, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, 6))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def cp5_block() -> bytes:
+    """constant_paths C3: a bank-3 line pays the GPC 256 B block
+    fetch plus first touch on its first line; another SM of the
+    same GPC joins the in-flight block (both readers ~block_fetch
+    + first_touch); the second line of the fetched block pays
+    first_touch only."""
+    s = Seg(1, 2)
+    _cp_leaf(s, CP_B300)
+    ldv = s.template("LDC", dst=[5], scoreboard_write=1)
+    nop = s.template("NOP", control=1)
+    dep = s.template("DEP", src=[5], scoreboard_wait_mask=0x2)
+    b3 = 0x3 << 32
+
+    def ld(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldv, NONE, macc, len(s.inst)))
+
+    def dep_after():
+        s.inst.append((nop, NONE, NONE, len(s.inst)))
+        s.inst.append((dep, NONE, NONE, len(s.inst)))
+
+    # w0 on sm0: first line of block 3 (pays the fetch), then a
+    # second line of the same block after the reader waited
+    ld(b3 | 0x300)
+    dep_after()
+    ld(b3 | 0x380)
+    dep_after()
+    s.warps.append((0, 0, 0, 0, 0, 6))
+    # w1 on sm1 (same GPC): another line of block 3, evaluated while
+    # the block is in flight
+    i0 = len(s.inst)
+    ld(b3 | 0x3C0)
+    dep_after()
+    s.warps.append((1, 0, 0, 0, i0, 3))
+    s.cta(0, 0, 0, 1, 0)
+    s.cta(1, 1, 1, 1, 1)
+    pl = b"".join(cf.PLCE.pack_row(r) for r in
+                  [plce(0, 0, 0, 1, 0, 0), plce(1, 0, 0, 1, 1, 0)])
+    tp = b"".join(cf.TOPO.pack_row((sm, 0, 0, 0, 3, 0))
+                  for sm in (0, 1))
+    return container(s.build(), topo=tp)
+
+
+def _cp6(warps: int) -> bytes:
+    """constant_paths v2 C5 (h100): the uniform first touch costs
+    uniform_first_touch x max(min_smsps, n) / smsps_per_sm with
+    min_smsps = 2, n = SMSPs of the SM holding a resident warp at
+    fill start (each extra warp below sits on its own SMSP)."""
+    s = Seg(1, warps)
+    _cp_leaf(s, CP_H100)
+    ldu = s.template("LDC", dst=[5])
+    f = s.template("FILL")
+
+    def ld(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3 | 0x10, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ldu, NONE, macc, len(s.inst)))
+
+    # w0's first uniform access starts its fill with `warps` warps
+    # resident; w1.. park on fills so the SM's resident count is
+    # `warps` at fill start
+    ld(0x200)
+    s.inst.append((f, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, 2))
+    for wi in range(1, warps):
+        first = len(s.inst)
+        for _ in range(8):
+            s.inst.append((f, NONE, NONE, len(s.inst)))
+        s.warps.append((0, wi, wi, wi % 4, first, 8))
+    s.cta(0, 0, 0, warps, 0)
+    return container(s.build())
+
+
+def cp6_smsp1() -> bytes:
+    return _cp6(1)
+
+
+def cp6_smsp2() -> bytes:
+    return _cp6(2)
+
+
+def cp6_smsp3() -> bytes:
+    return _cp6(3)
+
+
+def cp6_smsp4() -> bytes:
+    return _cp6(4)
+
+
+def cp6_smsp_retire() -> bytes:
+    """C5 resident semantics: four warps on the SM's four SMSPs;
+    w1..w3 exhaust their bodies and are set done before w0's first
+    uniform access starts its fill, so n counts only the still
+    resident SMSP (1 -> 64, not 129 for the four SMSPs that have
+    held a warp)."""
+    s = Seg(1, 4)
+    _cp_leaf(s, CP_H100)
+    ldu = s.template("LDC", dst=[5])
+    f = s.template("FILL")
+    # w0: 24 filler insts, then the cold uniform access, then a
+    # filler; its fill starts ~cycle 24, after w1..w3 are done
+    for _ in range(24):
+        s.inst.append((f, NONE, NONE, len(s.inst)))
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 1, 3 | 0x10, 0, 0, 0, 0, 0))
+    s.msec.append((0x200, 0xFFFFFFFF, 0))
+    s.inst.append((ldu, NONE, macc, len(s.inst)))
+    s.inst.append((f, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, 26))
+    for wi in range(1, 4):
+        first = len(s.inst)
+        for _ in range(2):
+            s.inst.append((f, NONE, NONE, len(s.inst)))
+        s.warps.append((0, wi, wi, wi % 4, first, 2))
+    s.cta(0, 0, 0, 4, 0)
     return container(s.build())
 
 
@@ -2467,6 +3350,1131 @@ def op5_pair_w2() -> bytes:
     return _op5(2)
 
 
+# ---- protocol-v5 G1 wait-result fixtures ------------------------------
+#
+# Leaf values are set so every installed field is distinguishable:
+# result latency 38 (svc {1,2}), release.cycles 88 (f0),
+# suspended_wake_cycles 228 (f8), syncs_wake_cycles 136 (nanosleep f4),
+# SYNCS service interval 5 where set (f9).
+#
+# A "reader" is a template with src=[512] (the wait's predicate
+# register) and scoreboard_wait_mask=0x02 (wait's write barrier is 1).
+# A FILL between the wait and the reader keeps the reader's first
+# attempt at wait+2, outside the +1 visibility window of the raise
+# (issue_rules); the assertions name the cycle the model produces.
+
+
+def _g1_common(s: Seg, service: float | None = None) -> None:
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    extra = {8: 228.0}
+    if service is not None:
+        extra[16] = service
+    s.const_program("synchronization.mbarrier.release",
+                    3, 4, 22, 88.0, extra=extra)
+
+
+def g1_self() -> bytes:
+    """One warp: SYNCS arrive completes its own phase, the wait issues
+    at once (no semantic hold), the reader lands wait-issue + 38 on
+    reason barrier:SYNCS.PHASECHK."""
+    s = Seg(1, 1)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def g1_handoff() -> bytes:
+    """Two warps: w0's wait issues long before w1's SYNCS arrive; the
+    reader lands arrive-issue + 38, independent of 88 / 228."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_late_wait() -> bytes:
+    """The wait issues after the other warp's SYNCS arrive: reader at
+    wait-issue + 38."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           fills(f, 40)
+           + [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+              (f, None),
+              (rd, None)])
+    s.warp(0, 1, 1,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_nonsyncs_pend() -> bytes:
+    """Phase completed by a non-SYNCS arrive while the wait is pending:
+    reader at completion + suspended_wake_cycles + 38."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("MBAR.ARRIVE")
+    wt = s.template("MBAR.WAIT", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_nonsyncs_late() -> bytes:
+    """Wait issued after a non-SYNCS completion: reader at
+    max(wait-issue, completion + 88) + 38."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("MBAR.ARRIVE")
+    wt = s.template("MBAR.WAIT", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           fills(f, 200)
+           + [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+              (f, None),
+              (rd, None)])
+    s.warp(0, 1, 1,
+           fills(f, 30)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_sleep_syncs() -> bytes:
+    """NANOSLEEP.SYNCS sleeper on a SYNCS-completed phase wakes at the
+    completion date — no syncs_wake_cycles / wake latency."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    ns = s.template("NANOSLEEP",
+                    timing=((TK_NANOSLEEP,
+                             {0: 10000.0, 1: 1.0, 4: 136.0}),))
+    arr = s.template("SYNCS.ARRIVE")
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (ns, s.semantic(NANOSLEEP, flags=SYNCS, fields=(10000,))),
+            (f, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_sleep_nonsyncs() -> bytes:
+    """The same sleeper on a phase completed by a non-SYNCS arrive
+    keeps today's dating: completion + suspended_wake + syncs_wake."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    wt = s.template("MBAR.WAIT", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    ns = s.template("NANOSLEEP",
+                    timing=((TK_NANOSLEEP,
+                             {0: 10000.0, 1: 1.0, 4: 136.0}),))
+    arr = s.template("MBAR.ARRIVE")
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (ns, s.semantic(NANOSLEEP, flags=SYNCS, fields=(10000,))),
+            (f, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_nobarrier() -> bytes:
+    """Wait whose template raises no dependency barrier: the warp's
+    next issue is held until the result time instead (result floor)."""
+    s = Seg(1, 1)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512],
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    s.warp(0, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def g1_nobarrier_pend() -> bytes:
+    """No-barrier wait on an incomplete phase: next issue at the
+    resolved result time (completion + 38 for a SYNCS arrive)."""
+    s = Seg(1, 2)
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512],
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_deadlock() -> bytes:
+    """Wait on a phase that never completes: the reader parks on the
+    wait's dependency barrier; the deadlock report names the
+    mbarrier object."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 2, 0))  # expects two arrivals
+    s.const_program("synchronization.mbarrier.release",
+                    3, 4, 22, 88.0, extra={8: 228.0})
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_two_pending() -> bytes:
+    """Two pending waits on the same dependency barrier: object 0
+    completes ~200 cycles before object 1; the reader stays held until
+    the later result is fixed (arrive on object 1 + 38)."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.mbpi.append((0, 1, 0x2000, 1, 0))
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (wt, s.semantic(MBAR_WAIT, fields=(1, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))]
+           + fills(f, 200)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(1, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_two_pending_rev() -> bytes:
+    """g1_two_pending with the arrive order swapped: object 1 first,
+    object 0 last; the reader follows the object-0 arrive + 38."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.mbpi.append((0, 1, 0x2000, 1, 0))
+    _g1_common(s)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (wt, s.semantic(MBAR_WAIT, fields=(1, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           fills(f, 40)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(1, 0, 0, 1)))]
+           + fills(f, 200)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_service() -> bytes:
+    """R2: service interval 5 on one SM.  Two warps issue a SYNCS
+    arrive in the same cycle; the second is served 5 later and its
+    reader lands 5 later than the first's."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.mbpi.append((0, 1, 0x2000, 1, 0))
+    _g1_common(s, service=5.0)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(1, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(1, 0))),
+            (f, None),
+            (rd, None)])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_service_frac() -> bytes:
+    """Exact copy of g1_service with a fractional service interval
+    (5.25): service starts 0, 5.25, 10.5, 15.75 land on cycles
+    0, 6, 11, 16 instead of 0, 5, 10, 15."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.mbpi.append((0, 1, 0x2000, 1, 0))
+    _g1_common(s, service=5.25)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(0, 1, 1,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(1, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(1, 0))),
+            (f, None),
+            (rd, None)])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def g1_service_2sm() -> bytes:
+    """SYNCS on different SMs do not interact: both arrives are served
+    at their own issue cycle (one segment, one object per CTA)."""
+    s = Seg(1, 1)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.mbpi.append((0, 1, 0x2000, 1, 0))
+    _g1_common(s, service=5.0)
+    f = s.template("FILL")
+    arr = s.template("SYNCS.ARRIVE")
+    wt = s.template("SYNCS.PHASECHK", dst=[512], scoreboard_write=1,
+                    svc={1: 38.0, 2: 38.0, 7: 1.0})
+    rd = s.template("USE", src=[512], scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(0, 0))),
+            (f, None),
+            (rd, None)])
+    s.warp(1, 0, 0,
+           [(arr, s.semantic(MBAR_ARRIVE, fields=(1, 0, 0, 1))),
+            (wt, s.semantic(MBAR_WAIT, fields=(1, 0))),
+            (f, None),
+            (rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    s.cta(1, 1, 1, 1, 1)
+    return container(s.build())
+
+
+# ---- mio_basic protocol v3 (M1 return chains, M2 SM-class service,
+# M3 in-flight group) ----------------------------------------------
+# instruction.service field ids used below: 13 return_interval_cycles,
+# 14 return_chain, 15 sm_service_interval_cycles, 16
+# warp_inflight_group.  Fixture shape follows the real templates: each
+# producer has one destination register, raises write barrier 0 and
+# carries stall 1; the reader has a source and wait-mask bit 0.
+
+
+def _mio_prod(s: Seg, op: str, svc: dict) -> int:
+    fields = {7: 0.0}
+    fields.update(svc)
+    return s.template(op, svc=fields, dst=[1], control=1,
+                      scoreboard_write=0)
+
+
+def _mio_reader(s: Seg) -> int:
+    return s.template("R", src=[1], control=1,
+                      scoreboard_wait_mask=0x1)
+
+
+def _mio_return_chain(r: float) -> bytes:
+    """M1: a warp's producers return one per return interval r (chain
+    1); the reader lands at the last turn start + result latency."""
+    s = Seg(1, 1)
+    p = _mio_prod(s, "P", {1: 23.0, 13: r, 14: 1.0})
+    rd = _mio_reader(s)
+    s.warp(0, 0, 0, [(p, None)] * 4 + [(rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def mio_return_chain() -> bytes:
+    return _mio_return_chain(2.0)
+
+
+def mio_return_chain_r4() -> bytes:
+    return _mio_return_chain(4.0)
+
+
+def _mio_sharing(chain_b: float) -> bytes:
+    """M1 chains: alternating kinds on one chain serialize on it; a
+    different chain is independent."""
+    s = Seg(1, 1)
+    a = _mio_prod(s, "A", {1: 23.0, 13: 2.0, 14: 1.0})
+    b = _mio_prod(s, "B", {1: 23.0, 13: 2.0, 14: chain_b})
+    rd = _mio_reader(s)
+    s.warp(0, 0, 0,
+           [(a, None), (b, None)] * 4 + [(rd, None)])
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def mio_chain_sharing() -> bytes:
+    return _mio_sharing(1.0)
+
+
+def mio_chain_sharing_b3() -> bytes:
+    return _mio_sharing(3.0)
+
+
+def _mio_sm_service(two_classes: bool) -> bytes:
+    """M2: one server per SM and operation class.  Four warps on the
+    four SMSPs of one SM, each P P R."""
+    s = Seg(1, 4)
+    pa = _mio_prod(s, "A", {1: 23.0, 15: 2.0})
+    pb = _mio_prod(s, "B", {1: 23.0, 15: 2.0})
+    rd = _mio_reader(s)
+    for w in range(4):
+        p = pb if (two_classes and w >= 2) else pa
+        s.warp(0, w, w, [(p, None), (p, None), (rd, None)])
+    s.cta(0, 0, 0, 4, 0)
+    return container(s.build())
+
+
+def mio_sm_service() -> bytes:
+    return _mio_sm_service(False)
+
+
+def mio_sm_service_2cls() -> bytes:
+    return _mio_sm_service(True)
+
+
+def mio_sm_service_gaps() -> bytes:
+    """M2 (protocol v4): the granted intervals are a set, not a
+    frontier -- warp B's turns take the cycles between warp A's.
+    Two warps on two SMSPs of one SM; B runs two stall-1 NOPs
+    first, so its producers issue t0+2 .. t0+5 (t0 = A's first).
+    A's turns t0, t0+2, t0+4, t0+6 (reader t0+6+23); B's turns
+    t0+3, t0+5, t0+7, t0+9 (reader t0+9+23)."""
+    s = Seg(1, 2)
+    p = _mio_prod(s, "P", {1: 23.0, 13: 2.0, 14: 1.0, 15: 1.0})
+    rd = _mio_reader(s)
+    nop = s.template("NOP", control=1)
+    s.warp(0, 0, 0, [(p, None)] * 4 + [(rd, None)])
+    s.warp(0, 1, 1, [(nop, None)] * 2 + [(p, None)] * 4 + [(rd, None)])
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def _mio_group(n: int, gap: bool) -> bytes:
+    """M3: after every g = 4 issues of a run the next waits at issue
+    until the fourth turn's end (mio_inflight), where the count
+    clears.  gap inserts a >100-cycle filler between two bursts."""
+    s = Seg(1, 1)
+    p = _mio_prod(s, "P", {1: 26.0, 13: 2.0, 14: 2.0, 16: 4.0})
+    rd = _mio_reader(s)
+    insts = [(p, None)] * n
+    if gap:
+        f = s.template("FILL", svc={1: 120.0, 2: 120.0, 7: 0.0},
+                       dst=[9], control=1, scoreboard_write=1)
+        p2 = s.template("P",
+                        svc={1: 26.0, 7: 0.0, 13: 2.0, 14: 2.0,
+                             16: 4.0},
+                        src=[9], dst=[1], control=1,
+                        scoreboard_write=0, scoreboard_wait_mask=0x2)
+        nop = s.template("NOP", control=1)
+        # the NOP keeps p2 out of the cycle where a barrier raised
+        # the cycle before is still judged by its previous release
+        insts += [(f, None), (nop, None), (p2, None)] + \
+            [(p, None)] * (n - 1)
+    insts += [(rd, None)]
+    s.warp(0, 0, 0, insts)
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def mio_inflight_group() -> bytes:
+    return _mio_group(8, False)
+
+
+def mio_inflight_group6() -> bytes:
+    return _mio_group(6, False)
+
+
+def mio_inflight_group_2x6() -> bytes:
+    return _mio_group(6, True)
+
+
+def mio_unit_two_cycle() -> bytes:
+    """a 2-cycle unit: producers and the reader take turns 2.0 apart
+    on one SMSP unit; the reader's wait is the unit's, no barrier
+    reason lands on it."""
+    s = Seg(1, 1)
+    node = s.leaf_node(2, {0: 0.0, 1: 1.0, 2: 0.0, 3: 1.0})
+    s.uses.append((node, 4, b"\0" * 3, 100, 2, 0xF, 0, 0))
+    c = s.template("C", svc={1: 2.0, 7: 2.0, 10: 100.0}, dst=[1],
+                   control=1, scoreboard_write=0)
+    rd = s.template("R", svc={7: 2.0, 10: 100.0}, src=[1], control=1,
+                    scoreboard_wait_mask=0x1)
+    s.warp(0, 0, 0, [(c, None)] * 4 + [(rd, None)])
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def _lds_macc(s: Seg) -> int:
+    """one shared-space load access (flags&7 == 1)."""
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 1, 0x1, 0, 0, 0, 0, 0))
+    s.msec.append((0x0, 0xFFFFFFFF, 0))
+    return macc
+
+
+def _mio_lds(stores: int) -> bytes:
+    """M1 on the storage.shared.issue row: an LDS that takes a turn
+    books result = turn_start + cycles + completion latency and
+    neither reads nor advances the SMSP frontier -- with `stores` a
+    pair of turn-less kind-5 stores behind the LDS run shows the
+    frontier untouched."""
+    s = Seg(1, 1)
+    ld = s.template("LDS", timing=((5, {0: 2.0, 1: 1.0}),),
+                    svc={1: 21.0, 2: 21.0, 7: 0.0, 13: 2.0, 14: 1.0,
+                         15: 1.0},
+                    dst=[1], control=1, scoreboard_write=0)
+    st = s.template("STS", timing=((5, {0: 10.0, 1: 1.0}),),
+                    svc={1: 30.0, 2: 30.0, 7: 0.0},
+                    scoreboard_write=0)
+    rd = _mio_reader(s)
+    first = len(s.inst)
+    for _ in range(4):
+        s.inst.append((ld, NONE, _lds_macc(s), len(s.inst)))
+    for _ in range(stores):
+        s.inst.append((st, NONE, _sts(s, 1), len(s.inst)))
+    s.inst.append((rd, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, first, len(s.inst) - first))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def mio_lds_turn() -> bytes:
+    return _mio_lds(0)
+
+
+def mio_lds_turn_frontier() -> bytes:
+    return _mio_lds(2)
+
+
+def _mio_const_turn(turn: bool) -> bytes:
+    """M1 on constant_paths C2: a vector constant re-read of a
+    resident filled line counts its reread from the turn start --
+    R(with r 2.0 chain 2) - R(without the fields) = 3."""
+    s = Seg(1, 1)
+    # first-touch fill of 4 cycles: the priming load's line is
+    # resident by the time the measured producers issue, so their
+    # re-reads run the resident path
+    cp = dict(CP_H100)
+    cp[15] = 4.0
+    _cp_leaf(s, cp)
+    svc = {1: 1.0, 7: 0.0}
+    if turn:
+        svc.update({13: 2.0, 14: 2.0})
+    ld = s.template("LDC", svc=svc, dst=[1], control=1,
+                    scoreboard_write=0)
+    rd = _mio_reader(s)
+
+    def ldc(addr):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 3, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.inst.append((ld, NONE, macc, len(s.inst)))
+
+    # cold fill of the line; the reader waits its fill so the four
+    # measured producers all hit the resident filled path
+    ldc(0x200)
+    s.inst.append((rd, NONE, NONE, len(s.inst)))
+    for _ in range(4):
+        ldc(0x200)
+    s.inst.append((rd, NONE, NONE, len(s.inst)))
+    s.warps.append((0, 0, 0, 0, 0, len(s.inst)))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def mio_constant_turn() -> bytes:
+    return _mio_const_turn(True)
+
+
+def mio_constant_turn_off() -> bytes:
+    return _mio_const_turn(False)
+
+
+# ---- instruction.warp_queue (timing kind 67; warp_queue protocol) ----
+# TIME row fields (timing_row schema ids): 1 enabled, 23
+# queue_depth_count, 24 release_interval_cycles, 25
+# start_latency_cycles, 26 start_interval_ratio, 27 is_global_entry,
+# 28 has_chain_turn.  Fixtures follow the real templates: one stall-1
+# instruction per slot, loads and S2R / MUFU carry a destination and
+# write barrier 0, the reader a source and wait-mask bit 0, memory
+# instances carry one access of their space (shared 1, global 0).
+
+TK_WARP_QUEUE = 67
+
+
+def _wq_row(r: float, is_global: int, turn: int, enabled: float = 1.0,
+            extra: dict | None = None):
+    fields = {1: enabled, 23: 10.0, 24: r, 25: 5.5, 26: 0.5,
+              27: float(is_global), 28: float(turn)}
+    fields.update(extra or {})
+    return ((TK_WARP_QUEUE, fields),)
+
+
+def _wq_access(s: Seg, flags: int, slot: int) -> int:
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 1, flags, 0, 0, 0, 0, 0))
+    s.msec.append((0x1000 * (slot + 1), 0xFFFFFFFF, 0))
+    return macc
+
+
+# name -> (operation class, MACC flags | None, row (r, global, turn)
+#          | None, service fields, has destination)
+_WQ_OPS = {
+    "STS": ("STS", 0x41, (4.0, 0, 1), {1: 1.0, 2: 1.0, 7: 0.0}, False),
+    "STSrem": ("STS", 0x61, (4.0, 0, 1), {1: 1.0, 2: 1.0, 7: 0.0},
+               False),
+    "STSoff": ("STS", 0x41, None, {1: 1.0, 2: 1.0, 7: 0.0}, False),
+    "STG": ("STG", 0x40, (6.0, 1, 0), {1: 1.0, 2: 1.0, 7: 0.0}, False),
+    "LDS": ("LDS", 0x1, (2.0, 0, 0),
+            {1: 21.0, 2: 21.0, 7: 0.0, 13: 2.0, 14: 1.0}, True),
+    "LDG": ("LDG", 0x0, (4.0, 1, 0), {1: 30.0, 2: 30.0, 7: 0.0}, True),
+    "S2R": ("S2R", None, None, {1: 23.0, 2: 23.0, 7: 0.0}, True),
+    "MUFU": ("MUFU.EX2", None, None, {1: 20.0, 2: 20.0, 7: 0.0}, True),
+    "NOP": ("NOP", None, None, {1: 1.0, 2: 1.0, 7: 0.0}, False),
+    "SHFL": ("SHFL.IDX", None, (4.0, 0, 0),
+             {1: 1.0, 2: 1.0, 7: 0.0, 13: 4.0, 14: 1.0}, True),
+}
+# warp_queue v2 fields per operation: (sm_start_interval_cycles, c);
+# sm_depth_count 46 on every row.  The v1 Q4 turn is off in v2 fixtures.
+_WQ_V2 = {"STS": (1.0, 0.0), "STG": (2.0, 0.0), "LDS": (1.0, 14.7),
+          "LDG": (1.0, 28.3), "SHFL": (1.0, 14.7), "STSrem": (1.0, 0.0)}
+
+
+def _wq(ops: list, reader: bool = False, row_enabled: float = 1.0,
+        non_member_rows: bool = False, warps: int = 1,
+        slots: tuple | None = None, v2: bool = False,
+        a_override: dict | None = None, c_override: dict | None = None,
+        warps_ops: list | None = None,
+        try_next_on_block: bool = True) -> bytes:
+    """each warp issues `ops` (names of _WQ_OPS) in consecutive
+    instructions; `reader` appends a reader of the last destination;
+    row_enabled 0 keeps the rows but disables them; non_member_rows
+    attaches a disabled row to the templates that have none."""
+    if warps_ops is not None:
+        warps = len(warps_ops)
+    s = Seg(1, warps)
+    if not try_next_on_block:
+        # scheduler row (schema 7): an SMSP's attempt ends at the first
+        # candidate that cannot issue
+        node = s.leaf_node(7, {1: 1.0, 2: 1.0, 3: 0.0})
+        s.uses.append((node, 7, b"\0" * 3, 0, 7, 0xF, 0, 0))
+    tmpl = {}
+    names = list(dict.fromkeys(
+        n for w_ops in (warps_ops or [ops]) for n in w_ops))
+    for name in names:
+        op, flags, row, svc, dst = _WQ_OPS[name]
+        timing = ()
+        if row is not None:
+            extra = None
+            if v2:
+                a, c = _WQ_V2[name]
+                a = (a_override or {}).get(name, a)
+                c = (c_override or {}).get(name, c)
+                extra = {29: a, 30: 46.0, 31: c}
+                row = (row[0], row[1], 0)
+            timing = _wq_row(*row, enabled=row_enabled, extra=extra)
+        elif non_member_rows:
+            timing = _wq_row(4.0, 0, 0, enabled=0.0)
+        tmpl[name] = s.template(
+            op, timing=timing, svc=dict(svc),
+            dst=[1] if dst else None, control=1,
+            scoreboard_write=0 if dst else 0xFF)
+    rd = _mio_reader(s)
+    for wi in range(warps):
+        first = len(s.inst)
+        w_ops = warps_ops[wi] if warps_ops is not None else ops
+        for k, name in enumerate(w_ops):
+            flags = _WQ_OPS[name][1]
+            macc = (None if flags is None
+                    else _wq_access(s, flags, wi * 64 + k))
+            s.instance(tmpl[name], None, macc)
+        if reader:
+            s.instance(rd)
+        slot = slots[wi] if slots else wi
+        s.warps.append((0, wi, slot, slot % 4, first,
+                        len(w_ops) + (1 if reader else 0)))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, warps, 0)
+    return container(s.build())
+
+
+def _wq_fixtures() -> dict:
+    def run(name, n):
+        return [name] * n
+
+    def make(ops, **kw):
+        return lambda: _wq(ops, **kw)
+    out = {
+        "wq_sts16": make(run("STS", 16)),
+        "wq_sts16_off": make(run("STS", 16), row_enabled=0.0),
+        "wq_stg16": make(run("STG", 16)),
+        "wq_lds24": make(run("LDS", 24)),
+        "wq_sts6_lds18": make(run("STS", 6) + run("LDS", 18)),
+        "wq_lds12_sts12": make(run("LDS", 12) + run("STS", 12)),
+        "wq_sts10_stg6": make(run("STS", 10) + run("STG", 6)),
+        "wq_stg6_ldg20": make(run("STG", 6) + run("LDG", 20)),
+        "wq_stg10_sts6": make(run("STG", 10) + run("STS", 6)),
+        "wq_fwd4": make(run("STS", 4) + run("LDS", 2), reader=True),
+        "wq_fwd0": make(run("LDS", 2), reader=True),
+        "wq_s2r28": make(run("S2R", 28)),
+        "wq_s2r28_off": make(run("S2R", 28), non_member_rows=True),
+        "wq_mufu12": make(run("MUFU", 12)),
+        "wq_mufu12_off": make(run("MUFU", 12), non_member_rows=True),
+        "wq_remote16": make(run("STSrem", 16)),
+        "wq_pred_off": make(run("STS", 6) + run("STSoff", 6)
+                            + run("STS", 10)),
+        "wq_two_warps_smsp": make(run("STS", 10), warps=2,
+                                  slots=(0, 4)),
+        # S1: 16 warps (4 per SMSP) each LDS + reader; the reader's
+        # issue exposes the release (S3 floor); one class / two classes
+        "wq2_s1_lds16": make([], reader=True, v2=True,
+                             warps_ops=[run("LDS", 2)] * 16),
+        "wq2_s1_two_classes": make(
+            [], reader=True, v2=True,
+            warps_ops=[run("LDS", 2)] * 8 + [run("SHFL", 2)] * 8),
+        # S2: sixteen warps, ten STS each, no SM slots (a = 0) so the
+        # releases follow from the issue cycles alone
+        "wq2_s2_sts": make([], v2=True, a_override={"STS": 0.0},
+                           warps_ops=[run("STS", 10)] * 16),
+        # late warps (12 NOPs first, no entries of their own) wait on
+        # the SM bound: STS early warps; STG late warps -> lg
+        # S2': sixteen warps, 128 STS each (steady state) with the SM bound; one
+        # warp issues only 3 STS (exits early) while the others wait
+        "wq2_s2_fair": make([], v2=True,
+                            warps_ops=[run("STS", 128)] * 16),
+        # S2' hang shape: a 32-warp CTA (8 warps per SMSP) issues 3 STS
+        # each, 96 entries against the bound of 46; the head of the
+        # waiting list must be reached although earlier candidates of
+        # its SMSP wait behind it
+        "wq2_s2_burst": make([], v2=True, try_next_on_block=False,
+                             warps_ops=[run("STS", 3)] * 32),
+        "wq2_s2_exit": make([], v2=True,
+                            warps_ops=[run("STS", 3)]
+                            + [run("STS", 16)] * 15),
+        "wq2_s2_late_stg": make(
+            [], v2=True, a_override={"STS": 0.0},
+            warps_ops=[run("STS", 10)] * 12
+            + [run("NOP", 3) + run("STG", 6)] * 4),
+        "wq2_s2_late_sts": make(
+            [], v2=True, a_override={"STS": 0.0},
+            warps_ops=[run("STS", 10)] * 12
+            + [run("NOP", 3) + run("STS", 6)] * 4),
+        # S3: result floor release + c
+        "wq2_ld2": make(run("LDS", 2), reader=True, v2=True),
+        "wq2_sts4_lds2": make(run("STS", 4) + run("LDS", 2), reader=True,
+                              v2=True),
+        "wq2_ldg2": make(run("LDG", 2), reader=True, v2=True),
+        "wq2_ldg2_c0": make(run("LDG", 2), reader=True, v2=True,
+                            c_override={"LDG": 0.0}),
+    }
+    out.update(_wq_fast_fixtures())
+    out.update({
+        "wq3_l1_res60": lambda: _wq3(True, 60.0, 28.3),
+        "wq3_l1_res5": lambda: _wq3(True, 5.0, 28.3),
+        "wq3_l1_cold": lambda: _wq3(False, 60.0, 28.3),
+        "wq3_l1_cold_c0": lambda: _wq3(False, 60.0, 0.0),
+    })
+    return out
+
+
+def _wq_store_row(s: Seg, sectors: list) -> int:
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), len(sectors), 0x40, 0, 0, 0, 0, 0))
+    for a, bm, lm in sectors:
+        s.msec.append((a, bm, lm))
+    return macc
+
+
+def _wq_fast(pattern: str, warps: int = 1, n: int = 16,
+             try_next: bool = True) -> bytes:
+    """S4: global stores with lane masks; the store-L2 leaf holds two
+    requests and drains 8 B/cycle, so a store that passes the store
+    buffer gate soon waits (store_buffer); the fast path does not."""
+    s = Seg(1, warps)
+    if not try_next:
+        node = s.leaf_node(7, {1: 1.0, 2: 1.0, 3: 0.0})
+        s.uses.append((node, 7, b"\0" * 3, 0, 7, 0xF, 0, 0))
+    node = s.leaf_node(3, {2: 32.0, 3: 128.0, 13: 100.0, 14: 8.0,
+                           21: 50.0, 22: 2.0, 42: 128.0, 44: 8.0})
+    s.uses.append((node, 5, b"\0" * 3, 0, 3, 0xFFFFFFFF, 0, 0))
+    stg = s.template(
+        "STG", timing=_wq_row(6.0, 1, 0, extra={29: 2.0, 30: 46.0}),
+        svc={1: 1.0, 2: 1.0, 7: 0.0}, control=1)
+
+    def sectors(wi, i):
+        base = 0x10000 + 0x4000 * wi
+        if pattern == "alternate":
+            base += 0x1000 * (i % 2)
+        if pattern == "two_byte":
+            return [(base, 0xFFFFFFFF, 0xFFFF),
+                    (base + 32, 0xFFFFFFFF, 0xFFFF0000)]
+        if pattern == "wide16":
+            return [(base + 32 * k, 0xFFFFFFFF, 0x3 << (2 * k))
+                    for k in range(16)]
+        return [(base + 32 * k, 0xFFFFFFFF, 0xFF << (8 * k))
+                for k in range(4)]
+    for wi in range(warps):
+        first = len(s.inst)
+        for i in range(n):
+            s.instance(stg, None, _wq_store_row(s, sectors(wi, i)))
+        s.warps.append((0, wi, wi, wi % 4, first, n))
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, 0x1000 + 16 * i))
+    s.cta(0, 0, 0, warps, 0)
+    return container(s.build())
+
+
+def _wq3(resident: bool, l1_latency: float, c: float) -> bytes:
+    """R1: two member LDG + reader on one 32 B sector; resident: an
+    earlier load fills the sector (a NANOSLEEP lets the fill land), so
+    both LDG hit L1; otherwise both miss (two different sectors).
+    The L1 data array is on, the L1 latency is `l1_latency`."""
+    s = Seg(1, 1)
+    node = s.leaf_node(3, {2: 32.0, 3: 128.0, 9: l1_latency, 10: 16.0,
+                           11: 1.0, 13: 100.0, 14: 8.0, 42: 128.0,
+                           47: 262144.0})
+    s.uses.append((node, 5, b"\0" * 3, 0, 3, 0xFFFFFFFF, 0, 0))
+    ldg = s.template(
+        "LDG", timing=_wq_row(4.0, 1, 0, extra={29: 1.0, 30: 46.0, 31: c}),
+        svc={1: 30.0, 2: 30.0, 7: 0.0}, dst=[1], control=1,
+        scoreboard_write=0)
+    ns = s.template("NANOSLEEP",
+                    timing=((TK_NANOSLEEP, {0: 300.0, 1: 1.0}),))
+    rd = _mio_reader(s)
+
+    def load(addr=0x1000):
+        macc = len(s.macc)
+        s.macc.append((len(s.msec), 1, 0, 0, 0, 0, 0, 0))
+        s.msec.append((addr, 0xFFFFFFFF, 0))
+        s.instance(ldg, None, macc)
+    first = len(s.inst)
+    if resident:
+        load()
+        s.instance(ns, s.semantic(NANOSLEEP, fields=(300,)))
+    load()
+    load(0x1000 if resident else 0x2000)
+    s.instance(rd)
+    s.warps.append((0, 0, 0, 0, first, len(s.inst) - first))
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def _wq_fast_fixtures() -> dict:
+    return {
+        "wq4_same_line": lambda: _wq_fast("same"),
+        "wq4_alternate": lambda: _wq_fast("alternate"),
+        "wq4_two_byte": lambda: _wq_fast("two_byte"),
+        "wq4_wide16": lambda: _wq_fast("wide16"),
+        "wq4_two_warps": lambda: _wq_fast("same", warps=2),
+        # S2' with the store buffer: 32 warps x 3 first-time stores (the
+        # store buffer's own waiting list and the SM bound's list must not
+        # wait for each other)
+        "wq2_s2_stg_burst": lambda: _wq_fast("alternate", warps=32, n=3,
+                                             try_next=False),
+    }
+
+
+# ---- placement v1 (ledger booking; the cycle counts do not move) ----
+
+
+def _pl_code(s: Seg, addrs: dict | None = None) -> None:
+    """code address of every instance: 0x1000 + 16 * index unless
+    `addrs` gives one."""
+    for i in range(len(s.inst)):
+        s.code.append((i, 0, (addrs or {}).get(i, 0x1000 + 16 * i)))
+
+
+def pl_branch_pieces() -> bytes:
+    """rule T: a taken BRA (stall 5, control_envelope 10) with
+    fallthrough_hold 4 and resolve 3 -- the nine cycles behind it are
+    booked 4 on the fall-through address (0x1010) as
+    control:branch_fallthrough, 3 control:branch and 2
+    control:branch_refetch on the target (0x1040)."""
+    s = Seg(1, 1)
+    bra = s.template("BRA", control=5)
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(bra, None), (f, None)])
+    node = s.leaf_node(5, {4: 10.0, 6: 4.0, 7: 3.0})
+    s.uses.append((node, 2, b"\0" * 3, 0, 5, 0x1, 0, 0))
+    _pl_code(s, {1: 0x1040})
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def pl_depbar_wait() -> bytes:
+    """rule D: m_cpasync_anchor with the wait named DEPBAR.LE and a
+    FILL behind it; async_group_wait is booked on the FILL's address."""
+    s = Seg(1, 1)
+    _mem_leaf(s)
+    iss = s.template("CP.ASYNC", timing=((39, {0: 300.0, 1: 1.0}),))
+    com = s.template("CP.COMMIT")
+    wt = s.template("DEPBAR.LE")
+    f = s.template("FILL")
+    first = len(s.inst)
+    macc = len(s.macc)
+    s.macc.append((len(s.msec), 16, 0, 0, 0, 0, 0, 0))
+    for j in range(16):
+        s.msec.append((j * 128, 0xFFFFFFFF, 0))
+    s.instance(iss, s.semantic(CP_ISSUE, fields=(0, 0, NONE)), macc)
+    s.instance(com, s.semantic(CP_COMMIT, fields=(0, 0, NONE, 0)))
+    s.instance(wt, s.semantic(CP_WAIT, fields=(0, 0)))
+    s.instance(f)
+    s.warps.append((0, 0, 0, 0, first, 4))
+    _pl_code(s)
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def _pl_defer(defer: bool, bar_stall: int, kinds: list[str]) -> bytes:
+    """rule B: one warp, a CTA barrier wait (template flag DEFER_BLOCKING
+    when `defer`, release 7, Dmin 5)
+    followed by the given instruction kinds; instances 1.. carry the
+    code addresses 0x1010...  Stall field of every kind: 1."""
+    s = Seg(1, 1)
+    bar = s.template("BAR", control=bar_stall,
+                     flags=512 if defer else 0,
+                     timing=((TK_CTA_REL, {0: 7.0, 1: 1.0, 21: 5.0}),))
+    t = {
+        "IMAD": s.template("IMAD", control=1,
+                           svc={1: 1.0, 2: 1.0, 10: 1.0}),
+        "FFMA": s.template("FFMA", control=1,
+                           svc={1: 1.0, 2: 1.0, 10: 2.0}),
+        "UIADD3": s.template("UIADD3", control=1,
+                             svc={1: 1.0, 2: 1.0, 10: 5.0}),
+        "UMOV": s.template("UMOV", control=1,
+                           svc={1: 1.0, 2: 1.0, 10: 5.0}),
+        "S2R": s.template("S2R", control=1,
+                          svc={1: 1.0, 2: 1.0, 13: 2.0, 14: 1.0}),
+        "LDC": s.template("LDC", control=1, svc={1: 1.0, 2: 1.0}),
+    }
+    sema = s.semantic(CTA_WAIT, flags=ALSO_ARRIVES, fields=(0, 0, 0))
+    s.warp(0, 0, 0, [(bar, sema)] + [(t[k], None) for k in kinds])
+    _pl_code(s)
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def pl_defer_d4() -> bytes:
+    # S2R at dist 4 is passed, IMAD passes, LDC at dist 6 stops (inst 3)
+    return _pl_defer(True, 4,
+                     ["S2R", "IMAD", "LDC", "LDC"])
+
+
+def pl_defer_d5() -> bytes:
+    # S2R at dist 5 stops (inst 1)
+    return _pl_defer(True, 5, ["S2R", "LDC"])
+
+
+def pl_defer_umov() -> bytes:
+    # UMOV (uniform unit, no MIO turn) is not a pass kind (inst 1)
+    return _pl_defer(True, 6, ["UMOV", "LDC"])
+
+
+def pl_defer_pass() -> bytes:
+    # IMAD, UIADD3, FFMA run through, LDC at dist 9 stops (inst 4)
+    return _pl_defer(True, 6,
+                     ["IMAD", "UIADD3", "FFMA", "LDC", "LDC"])
+
+
+def pl_bar_plain() -> bytes:
+    # a BAR without DEFER_BLOCKING keeps the next instance (inst 1)
+    return _pl_defer(False, 6, ["IMAD", "LDC"])
+
+
+def pl_membar_names() -> bytes:
+    """rule M, service-result floors: MEMBAR.SC.GPU (stall 5, result
+    30), MEMBAR.ALL.CTA (stall 3, result 12), FENCE.VIEW.ASYNC.S
+    (stall 2, result 20); the stall-field part stays control_floor."""
+    s = Seg(1, 1)
+    m1 = s.template("MEMBAR.SC.GPU", control=5, svc={1: 30.0, 2: 30.0})
+    m2 = s.template("MEMBAR.ALL.CTA", control=3, svc={1: 12.0, 2: 12.0})
+    m3 = s.template("FENCE.VIEW.ASYNC.S", control=2,
+                    svc={1: 20.0, 2: 20.0})
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(m1, None), (m2, None), (m3, None), (f, None)])
+    _pl_code(s)
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def pl_fence_drain() -> bytes:
+    """rule M, drain floors: b24_smsp_membar (MEMBAR.ALL.CTA held until
+    71, proxy fence until 85, clean MEMBAR until 92) with code
+    addresses."""
+    s = Seg(1, 1)
+    st = s.template("STS", timing=_st_rows())
+    mb, _ = _membar(s, 7.0)
+    fence, _ = _fence_cycles(s)
+    f = s.template("FILL")
+    first = len(s.inst)
+    for _ in range(2):
+        s.instance(st, None, _sts(s, 16))
+    s.instance(mb)
+    s.instance(fence, s.semantic(DESC_VIS, fields=(5,)))
+    s.instance(mb)
+    s.instance(f)
+    s.warps.append((0, 0, 0, 0, first, 6))
+    _pl_code(s)
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def pl_fence_waiter() -> bytes:
+    """rule F: warp 1 issues PRE (write barrier 1), then an acquire
+    that is suspended until the publish is visible (b5_descriptor);
+    the suspension is booked on the first instruction behind PRE
+    whose wait mask holds barrier 1 (WAITER, 0x1050), not on PRE."""
+    s = Seg(1, 2)
+    s.const_program("synchronization.descriptor.visibility",
+                    3, 4, 23, 724.0)
+    f = s.template("FILL")
+    pub = s.template("DESC.PUBLISH")
+    pre = s.template("PRE", scoreboard_write=1)
+    acq = s.template("DESC.ACQUIRE")
+    waiter = s.template("WAITER", scoreboard_wait_mask=0x2)
+    s.warp(0, 0, 0,
+           [(pub, s.semantic(DESC_VIS, fields=(1, 1, 0xABC))), (f, None)])
+    s.warp(0, 1, 1, fills(f, 3)
+           + [(pre, None),
+              (acq, s.semantic(DESC_VIS, fields=(4, 0, 0xABC))),
+              (waiter, None), (f, None)])
+    _pl_code(s)
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def pl_fence_service_waiter() -> bytes:
+    """rule F (extended), service-floor form (b300 s.fence_bar, first
+    copy): FENCE.VIEW.ASYNC.S (stall 2, result 20, write barrier 2),
+    two VIADD, then a BAR whose wait mask holds barrier 2.  The part of
+    the floor beyond the stall field is booked on the BAR (0x1030); the
+    stall-field part stays control_floor on the next instance (0x1010)."""
+    s = Seg(1, 1)
+    fen = s.template("FENCE.VIEW.ASYNC.S", control=2, scoreboard_write=2,
+                     svc={1: 20.0, 2: 20.0})
+    add = s.template("VIADD")
+    bar = s.template("BAR.SYNC", scoreboard_wait_mask=0x4)
+    f = s.template("FILL")
+    s.warp(0, 0, 0, [(fen, None), (add, None), (add, None), (bar, None),
+                     (f, None)])
+    _pl_code(s)
+    s.cta(0, 0, 0, 1, 0)
+    return container(s.build())
+
+
+def _pl_origin(flagged: bool, cap: float) -> bytes:
+    """rule P'' (ledger): warp 0 polls object 0 (pre-initialised, phase 0
+    pending) with a TRYWAIT whose pending result gates the reader (a
+    BRA with wait mask 0x1); warp 1 arrives after ~100 fills.  With the
+    wait-origin flag (earliest_issue 0x1ff0) the cycles earlier than
+    issue(poll) + cap are booked on 0x1ff0; the reader is held from ten
+    issues after the poll."""
+    s = Seg(1, 2)
+    s.mbpi.append((0, 0, 0x1000, 1, 0))
+    s.const_program("synchronization.mbarrier.release", 3, 4, 22, 10.0)
+    s.const_program("synchronization.mbarrier.trywait_timeout",
+                    1, 4, TK_TRYWAIT, 0.0, extra={22: cap})
+    f = s.template("FILL")
+    wt = s.template("SYNCS.PHASECHK", scoreboard_write=0)
+    rd = s.template("BRA", scoreboard_wait_mask=0x1)
+    arr = s.template("MBAR.ARRIVE")
+    sw = s.semantic(MBAR_WAIT, flags=0x200 if flagged else 0, fields=(0, 0))
+    if flagged:
+        k, fl, _e, *slots = s.sema[sw]
+        s.sema[sw] = (k, fl, 0x1ff0, *slots)
+    s.warp(0, 0, 0, [(wt, sw)] + fills(f, 10) + [(rd, None), (f, None)])
+    s.warp(0, 1, 1, fills(f, 100)
+           + [(arr, s.semantic(MBAR_ARRIVE, fields=(0, 0, 0, 1)))])
+    _pl_code(s)
+    s.cta(0, 0, 0, 2, 0)
+    return container(s.build())
+
+
+def pl_origin_all() -> bytes:
+    return _pl_origin(True, 100000.0)
+
+
+def pl_origin_cap() -> bytes:
+    return _pl_origin(True, 30.0)
+
+
+def pl_origin_off() -> bytes:
+    return _pl_origin(False, 100000.0)
+
+
 FIXTURES = {
     "l1_one_warp": l1_one_warp,
     "l1_two_warps": l1_two_warps,
@@ -2560,6 +4568,11 @@ FIXTURES = {
     "c8_dependents_launch": lambda: _c8(True),
     "c8_no_marker": lambda: _c8(False),
     "c9_slow_gpc": c9_slow_gpc,
+    "kb1_active_cycles": kb1_active_cycles,
+    "kb2_first_line": kb2_first_line,
+    "kb3_exit": kb3_exit,
+    "kb3b_exit_drain": kb3b_exit_drain,
+    "kb4_drain_starve": kb4_drain_starve,
     "a14_stale_poll": a14_stale_poll,
     "a15_macc_kind": a15_macc_kind,
     "a15b_tma_leaf_excess": a15b_tma_leaf_excess,
@@ -2584,6 +4597,13 @@ FIXTURES = {
     "a20_stas_lane_objects": a20_stas_lane_objects,
     "a24_branch_envelope": a24_branch_envelope,
     "a25_control_stall": a25_control_stall,
+    "sl_waits": sl_waits,
+    "sl_loop": sl_loop,
+    "sl_issue_slot": sl_issue_slot,
+    "sl_control_floor": sl_control_floor,
+    "sl_due": sl_due,
+    "sl_cta_barrier": sl_cta_barrier,
+    "sl_cluster_barrier": sl_cluster_barrier,
     "a26_failed_poll_result": a26_failed_poll_result,
     "a27_read_barrier_accept": a27_read_barrier_accept,
     "a27b_read_barrier_issue": a27b_read_barrier_issue,
@@ -2595,14 +4615,41 @@ FIXTURES = {
     "m_l1_port": m_l1_port,
     "m_l1_port_off": m_l1_port_off,
     "m_control_yield": m_control_yield,
+    "r2_bsync_floor": r2_bsync_floor,
+    "r2_bsync_floor_stall": r2_bsync_floor_stall,
+    "sl_control_branch": sl_control_branch,
+    "sl_control_yield": sl_control_yield,
+    "sl_control_stall": sl_control_stall,
+    "r2_bssy_no_floor": r2_bssy_no_floor,
     "c7_dispatch_no_enabled": c7_dispatch_no_enabled,
+    "cp1_uhold": cp1_uhold,
+    "cp2_vbarrier": cp2_vbarrier,
+    "cp3_sets": cp3_sets,
+    "cp4_batch": cp4_batch,
+    "cp5_block": cp5_block,
+    "cp6_smsp1": cp6_smsp1,
+    "cp6_smsp2": cp6_smsp2,
+    "cp6_smsp3": cp6_smsp3,
+    "cp6_smsp4": cp6_smsp4,
+    "cp6_smsp_retire": cp6_smsp_retire,
     "c8_const_capacity": c8_const_capacity,
     "c8b_const_inflight": c8b_const_inflight,
     "c8c_bank0": c8c_bank0,
     "c8d_bank0_uniform": c8d_bank0_uniform,
+    "c8e_const_hold": c8e_const_hold,
+    "c8f_const_hold_off": c8f_const_hold_off,
+    "c8g_const_hold_noresident": c8g_const_hold_noresident,
+    "c8h_vbank0_cold": c8h_vbank0_cold,
+    "c8i_vbank0_cold_off": c8i_vbank0_cold_off,
     "c4b_shared_l0": lambda: _c4(True, False),
     "c4c_no_code": lambda: _c4(False, True),
     "c4d_sharing_smsp": lambda: _c4(True, False, sharing=1.0),
+    "ir1_no_register_tracking": ir1_no_register_tracking,
+    "ir2_barrier_latest": ir2_barrier_latest,
+    "ir4_yield_stall": ir4_yield_stall,
+    "ir3_load_s1": ir3_load_s1,
+    "ir3_load_s2": ir3_load_s2,
+    "ir3_load_s1g1": ir3_load_s1g1,
     "op1_stream3": op1_stream3,
     "op2_dep3_w2": op2_dep3_w2,
     "op2_dep3_w3": op2_dep3_w3,
@@ -2611,7 +4658,54 @@ FIXTURES = {
     "op4_reads2": op4_reads2,
     "op5_pair_w1": op5_pair_w1,
     "op5_pair_w2": op5_pair_w2,
+    "g1_self": g1_self,
+    "g1_handoff": g1_handoff,
+    "g1_late_wait": g1_late_wait,
+    "g1_nonsyncs_pend": g1_nonsyncs_pend,
+    "g1_nonsyncs_late": g1_nonsyncs_late,
+    "g1_sleep_syncs": g1_sleep_syncs,
+    "g1_sleep_nonsyncs": g1_sleep_nonsyncs,
+    "g1_nobarrier": g1_nobarrier,
+    "g1_nobarrier_pend": g1_nobarrier_pend,
+    "g1_deadlock": g1_deadlock,
+    "g1_two_pending": g1_two_pending,
+    "g1_two_pending_rev": g1_two_pending_rev,
+    "g1_service": g1_service,
+    "g1_service_frac": g1_service_frac,
+    "g1_service_2sm": g1_service_2sm,
+    "mio_return_chain": mio_return_chain,
+    "mio_return_chain_r4": mio_return_chain_r4,
+    "mio_chain_sharing": mio_chain_sharing,
+    "mio_chain_sharing_b3": mio_chain_sharing_b3,
+    "mio_sm_service": mio_sm_service,
+    "mio_sm_service_2cls": mio_sm_service_2cls,
+    "mio_sm_service_gaps": mio_sm_service_gaps,
+    "mio_inflight_group": mio_inflight_group,
+    "mio_inflight_group6": mio_inflight_group6,
+    "mio_inflight_group_2x6": mio_inflight_group_2x6,
+    "mio_unit_two_cycle": mio_unit_two_cycle,
+    "mio_lds_turn": mio_lds_turn,
+    "mio_lds_turn_frontier": mio_lds_turn_frontier,
+    "mio_constant_turn": mio_constant_turn,
+    "mio_constant_turn_off": mio_constant_turn_off,
+    "pl_branch_pieces": pl_branch_pieces,
+    "pl_depbar_wait": pl_depbar_wait,
+    "pl_defer_d4": pl_defer_d4,
+    "pl_defer_d5": pl_defer_d5,
+    "pl_defer_umov": pl_defer_umov,
+    "pl_defer_pass": pl_defer_pass,
+    "pl_bar_plain": pl_bar_plain,
+    "pl_membar_names": pl_membar_names,
+    "pl_fence_drain": pl_fence_drain,
+    "pl_fence_waiter": pl_fence_waiter,
+    "pl_fence_service_waiter": pl_fence_service_waiter,
+    "pl_origin_all": pl_origin_all,
+    "pl_origin_cap": pl_origin_cap,
+    "pl_origin_off": pl_origin_off,
 }
+
+
+FIXTURES.update(_wq_fixtures())
 
 
 def main() -> None:

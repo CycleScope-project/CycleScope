@@ -1,0 +1,35 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "queue_basic",
+ "version": 3,
+ "frozen_before_gpu": true,
+ "date": "2026-11-22",
+ "kind": "survey, supplement: the steady-state reader wait behind L1-resident global loads, separated from the first loop iteration, by running existing probes with 256 loop iterations next to the 64 of v1; installs nothing",
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "warp_queue v3 addenda: the result constant c of member LDG was read from 64-iteration averages. The replay's journal (diag-ldg, B300 q.ldg.n16) shows the loop's first loads issue about 300 cycles after the prologue's cold anchor load of the same line, whose fill returns 620 cycles after its issue, so the first iteration's reader waits for the fill (the replay books 210-360 cycles, 3.3-5.9 per iteration of 64); mem_basic m2.ldg.n1, whose reader has no steady wait, reads 7.9 / 7.2 on H100 against the replay's 8.4. The hardware's 64-iteration averages therefore contain a first-iteration share that c must not contain; its size per cell is not measured.",
+ "probe": {
+  "chain": "Probes, plans and cubins of queue_basic v1 unchanged; new cells differ only in the iteration argument (256) and the expected check count. Case list tools/microbench/queue_basic/cases-v3.txt; root $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/queue_basic-v3/<device>; replay build f349dd06 (run.sh's replay step).",
+  "cells": "q.nop.i256, q.ldg.n16.i256, q.fwd.stg0_ldg2.i256, q.fwd.stg4_ldg2.i256, q.alt.lds_ldg.n24.i256, q.lds.n24.i256 (control without a cache), q.ldg.n16.w16.i256; and, re-run in the same job for the day-to-day control, q.ldg.n16 and q.fwd.stg0_ldg2 at 64 (8 cells and the frame per device)."
+ },
+ "derivation": "Per cell X the reader wait per iteration a64 (v1's or v2's value; the same-job re-run where there is one) and a256. Steady wait s = (256 a256 - 64 a64) / 192; first-iteration excess e = 64 (a64 - s) cycles. The same from the replay's ledgers of the same cells. tools: mem_basic/readings.py (iterations from the cell's check count).",
+ "questions_before_data": {
+  "Q1": "Is there a first-iteration excess on hardware (e > 100 cycles in the LDG cells, about 0 in q.lds.n24)? Expected: yes, 300-550 cycles.",
+  "Q2": "Steady reader wait of the LDG cells on hardware against the replay's steady wait with c = 28.3 / 30.2: the difference d is the correction of c (c' = c + d, per device, median over the one-warp LDG cells). Expected from the 64-iteration tables: d between -3 and -8.",
+  "Q3": "Does the replay's first-iteration excess agree with the hardware's (within 30 %)? If not, the difference is recorded as a defect of the cold-start path, not folded into c."
+ },
+ "install": "Nothing. The corrected c is installed under warp_queue v4 with these readings as its evidence.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case or error used to choose a value; no cell dropped after its data is seen.",
+ "addenda": [
+  {
+   "when": "2026-11-22, before the run (realisation; no data)",
+   "text": "The 16-warp cell is named q.ldg.n16.i256.w16 (not q.ldg.n16.w16.i256) so that the warp suffix stays last for the reading tools. The frame advances its far pointer by 0x800 per iteration in every cell and the anchor behind the loop reads there, so a 256-iteration run would read past the far buffer: for rows with more than 64 iterations the far buffer is enlarged by (n - 64) x 2048 + 4096 bytes (run.sh and the suite rows); the 64-iteration rows, all plans and cubins are unchanged. cases-v3.txt: the frame and two v1 cells at 64 for the same-job control plus the seven 256-iteration cells (10 lines)."
+  },
+  {
+   "when": "2026-11-22, readings (clone stall-attribution-58 at 78fb4573; jobs mechver-queue3-h100 on gpu-h100-0141 and mechver-queue3-b300 on gpu-b300-0824; roots $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/queue_basic-v3/{h100,b300}; replay build f349dd06; tables $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/queue_basic-v3-readings/<device>.{role,pc}.tsv and <device>.steady.txt from tools/microbench/queue_basic/steady.py)",
+   "text": "Run: 10 of 10 cells per device pass the gate, the direct run with the check word, the stored-value check, the capture and both reference passes (20 of 20); replayed, except B300 q.ldg.n16.i256.w16 whose replay was still converting when this was written (its hardware passes are in). 64-iteration partners: the same-job re-runs for q.nop, q.ldg.n16, q.fwd.stg0_ldg2 (they repeat v1: 66.9 / 67.5 and 41.6 / 44.9 against v1's 67.1 / 68.4 and 41.0 / 44.0), v1 / v2 for the others. Reader wait per iteration, a64 -> a256, steady s, first-iteration excess e in cycles; pass a (pass b), H100 / B300. Q1: yes. q.ldg.n16: 66.9 -> 61.0, s 59.0 (58.7), e 503 (578) / 67.5 -> 61.5, s 59.6 (59.1), e 508 (692). q.fwd.stg0_ldg2: 41.6 -> 35.2, s 33.1 (33.5), e 542 (457) / 44.9 -> 35.6, s 32.5 (33.0), e 794 (654). q.fwd.stg4_ldg2: 65.0 -> 58.0, s 55.7 (55.6), e 591 (585) / 65.6 -> 58.8, s 56.6 (55.4), e 575 (701). q.alt.lds_ldg.n24: 58.5 -> 51.9, s 49.7 (49.8), e 561 (568) / 58.3 -> 52.4, s 50.5 (50.0), e 498 (559). Control q.lds.n24: 34.2 -> 34.0 / 34.2 -> 33.9, e 14 / 26 (none); frame q.nop 134.7 -> 135.1 / 135.4 -> 135.7. So the first iteration of every LDG cell costs 460-590 cycles on H100 and 500-790 on B300 (7-12 cycles of the 64-iteration average), and the steady reader waits are the same on the two devices within 1 cycle: 59.0 / 59.6, 33.1 / 32.5, 55.7 / 56.6, 49.7 / 50.5. The 1.9 cycles between the devices' c of warp_queue v2 were the devices' different first iterations. Q2: replay's steady reader with c = 28.3 / 30.2: 67.0, 42.0, 63.0, 57.0 / 69.0, 44.0, 65.0, 59.0; d = -8.0, -8.9, -7.3, -7.3 on H100 (median -7.7) and -9.4, -11.5, -8.4, -8.5 on B300 (median -9.0), larger than the expected -3 to -8 on B300. In whole cycles behind the release the hardware's steady result is 21 on both devices (the replay has 29 / 31): mean residual over the eight readings and both passes -0.2 with 21, +0.8 with 22. Q3: no. The replay's first-iteration excess is 296-335 cycles on H100 and 418-464 on B300, 55-60 % and 60-80 % of the hardware's: the replay serves the first loads from the anchor's in-flight fill too early. Recorded as a defect of the cold-start path (not in stage 2's scope); a 64-iteration probe average of the replay will sit 2.5-5 cycles below the hardware's for that reason once c is right. 16 warps (H100 q.ldg.n16.i256.w16): reader 71.6 -> 71.8, s 71.9, no first-iteration excess in the average (the SM limit hides it); loop total 249.8 -> 253.5 (0.99 cycles per load per SM); the replay 71.6 -> 71.5. For the SM bound: with c fixed by one-warp cells, the replay's 16-warp readers under the bound of 46 are short by 4.7 / 4.6 (LDS), 5.1 / 4.6 (SHFL.IDX) and, once c(LDG) is lowered by 8 / 10, by about 8.0 / 6.3 (LDG)."
+  }
+ ]
+}

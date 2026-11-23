@@ -118,6 +118,7 @@ int usage() {
                "usage: cyclescope-engine <info|validate> --job <file>\n"
                "       cyclescope-engine simulate --job <job.bin> --out "
                "<result.bin> [--journal f] [--wait-ledger f] "
+               "[--stall-ledger f] "
                "[--telemetry off] [--progress]\n");
   return 2;
 }
@@ -133,6 +134,8 @@ int simulate(int argc, char** argv) {
       journal_path = argv[++i], opt.journal = true;
     else if (a == "--wait-ledger" && i + 1 < argc)
       ledger_path = argv[++i], opt.wait_ledger = true;
+    else if (a == "--stall-ledger" && i + 1 < argc)
+      opt.stall_ledger = argv[++i];
     else if (a == "--telemetry" && i + 1 < argc) { ++i; }
     else if (a == "--progress") opt.progress = true;
   }
@@ -148,7 +151,15 @@ int simulate(int argc, char** argv) {
   cyclescope::MechanismRuntime rt(job, job.launch.device, ropt);
   cyclescope::Simulator::Options sopt = opt;
   cyclescope::Simulator sim(job, rt, sopt);
-  auto stats = sim.run();
+  cyclescope::ResultStats stats;
+  try {
+    stats = sim.run();
+  } catch (const cyclescope::EngineError&) {
+    // journal rows collected so far stay available on a deadlock exit
+    if (opt.journal)
+      cyclescope::write_journal(sim.partial_stats().journal, journal_path);
+    throw;
+  }
   const auto t2 = std::chrono::steady_clock::now();
   std::fprintf(stderr, "LOAD=%.3f RUN=%.3f\n",
       std::chrono::duration<double>(t1 - t0).count(),

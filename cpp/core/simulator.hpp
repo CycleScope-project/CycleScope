@@ -97,6 +97,11 @@ enum EngineTele : std::uint32_t {
   // (full-gpu-chain-report.md §19)
   kTele2CtaSpanMean,
   kTele2CtaSpanMax,
+  // kernel_boundary K2: the cycle of the last completion since launch
+  // plus the (now always absent-field) envelope — the old cycles
+  // definition, kept in telemetry after cycles became the SM-active
+  // maximum
+  kTele2LastCompletionCycle,
   kTele2Count
 };
 
@@ -128,9 +133,26 @@ struct WarpState {
   std::unordered_map<std::uint32_t, std::uint32_t> reg_writer;
   std::uint32_t barrier_writer[8] = {};
   std::uint64_t barrier_free[8] = {};
-  // cached "register + scoreboard ready" horizon for the CURRENT
-  // next_instance: reg_ready/barrier_free only change at issue time,
-  // so this stays valid until the warp issues again
+  // issue_rules v1 (R2 counters, R3 increment visibility): a raise
+  // records the state just before it; a raise issued at cycle t is
+  // judged by its previous release at t + 1 and by barrier_free from
+  // t + 2 on.  barrier_free never lowers (max over outstanding
+  // producers' releases); barrier_writer is the producer whose
+  // release is the outstanding max (maintained whenever the stall
+  // ledger or the instance diagnostic is on)
+  std::uint32_t barrier_prev_writer[8] = {};
+  std::uint64_t barrier_prev_free[8] = {};
+  // G1: number of pending wait results on the barrier and the latest
+  // finite release among its producers while it is pending (fixed
+  // results and ordinary raises)
+  std::uint32_t barrier_pending_count[8] = {};
+  std::uint64_t barrier_pending_floor[8] = {};
+  std::uint64_t barrier_raised_at[8] = {};
+  bool barrier_is_read[8] = {};
+  bool barrier_prev_is_read[8] = {};
+  // cached scoreboard/control ready horizon for the CURRENT
+  // next_instance: barrier_free only changes at issue time, so this
+  // stays valid until the warp issues again
   std::uint64_t ready_at_ = 0;
   std::uint64_t stall_since = 0;
   WaitBucket last_wait = WaitBucket::kScheduler;
@@ -142,6 +164,36 @@ struct WarpState {
   // that is already phase-ready at its first evaluation is not gated
   std::uint64_t suspended_mbar_since = 0;
   WaitBucket block_bucket = WaitBucket::kCollective;
+  // semantic kind that armed block_bucket (stall ledger naming only)
+  std::uint32_t block_kind = 0;
+  // stall ledger key of the open interval: blocked instruction's
+  // code address (0 = none / no code address) and a reason id into
+  // Simulator::stall_names_; reason 0 = "dispatch" (a
+  // not-yet-executed warp's convention)
+  std::uint64_t stall_pc = 0;
+  std::uint32_t stall_reason = 0;
+  // key of the interval last accrued in flush_wait; a key change
+  // opens a new event (issue closes it via stall_open_* = key)
+  std::uint64_t stall_open_pc = ~0ull;
+  std::uint32_t stall_open_reason = 0;
+  // stall ledger conservation (per warp, maintained only when the
+  // option is on): cycles accrued under "dispatch", under
+  // "exit_drain" (a subset of resident), and under every other
+  // reason; cycle of the last issue; code address of the previously
+  // issued instruction (stall_has_issue guards the first pair)
+  std::uint64_t stall_dispatch_cycles = 0;
+  std::uint64_t stall_resident_cycles = 0;
+  std::uint64_t stall_drain_cycles = 0;
+  // first cycle charged to a non-dispatch reason (start of the
+  // first non-dispatch span or of the first issue cycle)
+  std::uint64_t stall_first_resident = ~0ull;
+  std::uint64_t stall_last_issue = 0;
+  std::uint64_t stall_prev_issue_pc = 0;
+  bool stall_has_issue = false;
+  // the ledger's own interval mark: cycles [stall_mark, eval) accrue
+  // under (stall_pc, stall_reason); independent of wait_mark so an
+  // interval can be split without touching the wait buckets
+  std::uint64_t stall_mark = 0;
   // Hopper deferred wait: issue wait, block at instance block_index
   struct Deferred {
     bool active = false;
@@ -152,6 +204,10 @@ struct WarpState {
     bool active = false;
     std::uint32_t barrier = 0;
     std::uint64_t generation = 0;
+    // stall ledger only (placement v1 rule B): the instance the
+    // cta_barrier interval is booked on (kNone64 = the warp's next
+    // instance)
+    std::uint64_t book_instance = ~0ull;
   } cta_wait;
   struct ClusterWait {
     bool active = false;
@@ -167,8 +223,50 @@ struct WarpState {
   std::uint64_t inflight_until = 0;
   // last object evaluated by a global_sync acquire (deadlock report)
   std::uint64_t wait_detail = 0;
+  // uniform constant-load cold hold (kernel_start v2): instance index
+  // of the access held at issue until its line is fill-ready
+  // (kNone64 = none), and the class counted at its first block
+  // evaluation (1 in-flight fill, 2 cold miss) for the ledger suffix
+  std::uint64_t const_hold_instance = kNone64;
+  std::uint8_t const_hold_class = 0;
   // next-issue floor: control envelope and no-destination service results
   std::uint64_t control_floor = 0;
+  // which mechanism set the binding control floor at the warp's last
+  // issue (stall-ledger naming only): 0 = the stall field or any
+  // other floor, 1 = taken-branch envelope, 2 = YIELD service floor,
+  // 3 = BSYNC service floor, 4 = MEMBAR* / FENCE* service or drain
+  // floor (named by control_mech)
+  std::uint8_t control_kind = 0;
+  // reason id of control:membar:<class> / control:fence:<class> for
+  // placement v4 rule P' (stall-ledger booking only): the open barrier
+  // wait is held by a poll instance carrying a wait origin; the first
+  // origin_cap cycles of it are booked on origin_pc
+  // (v5: counted from the poll's issue; origin_inst / origin_issue = the
+  // flagged poll instance last issued and its issue cycle)
+  std::uint64_t origin_pc = 0, origin_cap = 0, origin_booked = 0,
+                origin_end = 0, origin_issue = 0;
+  std::uint32_t origin_writer = ~0u;
+  std::uint64_t origin_inst = ~0ull;
+  // control_kind 4 (stall-ledger naming only)
+  std::uint32_t control_mech = 0;
+  // taken-branch envelope of the last issue (placement v1 rule T,
+  // stall-ledger naming only): issue cycle, end of the envelope, the
+  // branch's code address and the hold / resolve cycles; hold =
+  // resolve = 0 keeps the stall-boundary split
+  std::uint64_t branch_issue = 0, branch_end = 0, branch_pc = 0;
+  std::uint32_t branch_hold = 0, branch_resolve = 0;
+  // issue cycle + control-word stall field of that instruction: a
+  // control:* ledger interval splits at this boundary, the
+  // stall-field part keeping the name control_floor
+  std::uint64_t control_stall_end = 0;
+  // G1: a wait that raises no dependency barrier holds the warp's next
+  // issue until its result time (kPending while the phase is
+  // incomplete, the fixed result time afterwards)
+  std::uint64_t result_floor = 0;
+  // issue_rules Y1: the issue+2 floor a yield-hint / stall-1
+  // instruction contributed (0 = not in force); the ledger names
+  // the skipped cycle "yield" only while it is the binding floor
+  std::uint64_t yield_floor = 0;
   // co-resident dependent penalty toggle (arch C4 rule): flips on
   // every dependency-triggered issue while the penalty applies
   bool dep_penalty_toggle = false;
@@ -179,6 +277,14 @@ struct WarpState {
   std::uint64_t implicit_committed_instance = ~0ull;
   // dispatch entry floor (§13.11): 0 = admitted at cycle 0
   std::uint64_t entry_cycle = 0;
+  // kernel_boundary K2: cycle the warp was set done (residency
+  // interval [entry_cycle, done_cycle) feeds the SM-active union)
+  std::uint64_t done_cycle = 0;
+  // kernel_boundary K4: last-instruction bookkeeping recorded at its
+  // issue (exit_is_exit set only when it is the EXIT class)
+  std::uint64_t exit_issue_cycle = 0;
+  std::uint64_t exit_stall = 0;
+  bool exit_is_exit = false;
   // cached fetch verdict for (fetch_instance) — one ready() per inst
   std::uint64_t fetch_instance = ~0ull, fetch_ready = 0;
   // earliest cycle this warp can be retried (0 = semantic, event-driven)
@@ -199,6 +305,30 @@ struct WarpState {
   // try_issue verdict was a unit busy/outbid verdict when unit_blocked
   std::uint64_t unit_wait_key = ~0ull;
   bool unit_blocked = false;
+  // mio_basic protocol v3 (M1/M3): per return_chain the warp's result
+  // chain frontier and the in-flight count behind it (a chain whose
+  // frontier has passed keeps count 0)
+  struct {
+    double free = 0.0;
+    std::uint32_t count = 0;
+  } mio_chain[8];
+  // instruction.warp_queue: release time of every unreleased entry of
+  // this warp's queue (ascending: one serial server) with its
+  // global-kind flag, and the server's free time (fractions kept)
+  struct QueueEntry {
+    double release;
+    bool is_global;
+  };
+  std::deque<QueueEntry> queue;
+  double queue_free = 0.0;
+  // warp_queue S4: the 128-byte line the warp's previous global store
+  // wrote (~0 = none, or that store touched more than one line)
+  std::uint64_t last_store_line = ~0ull;
+  // S2': the last try_issue verdict was a wait behind an earlier
+  // waiter of the SM bound (not a verdict about this warp's own state):
+  // the scheduler goes on to the next candidate instead of ending the
+  // SMSP's attempt, so the head of the list is always reached
+  bool queue_deferred = false;
 };
 
 struct SmspState {
@@ -250,11 +380,18 @@ class Simulator {
  public:
   struct Options {
     bool journal = false, wait_ledger = false, progress = false;
+    // path of the fine-grained stall ledger TSV (empty = off);
+    // statistics-only: timing is unaffected
+    std::string stall_ledger;
     std::uint64_t max_cycles = 0;
   };
   Simulator(const Job& job, MechanismRuntime& rt, Options opt);
 
   ResultStats run();
+
+  // rows collected so far when run() throws (journal on a deadlock
+  // exit); do not call while running
+  const ResultStats& partial_stats() const { return out_; }
 
   std::uint64_t now() const { return now_; }
   const Job& job() const { return job_; }
@@ -269,6 +406,9 @@ class Simulator {
 
   // arch-module hooks (docs/en/design/engine.md): the module sees warp tables
   // and enqueue/arrive helpers but not core containers
+  std::uint32_t warp_count() const {
+    return static_cast<std::uint32_t>(warps_.size());
+  }
   WarpState& warp(std::uint32_t i) { return warps_[i]; }
   const WarpState& warp(std::uint32_t i) const { return warps_[i]; }
   const std::vector<std::uint32_t>& warps_of_cta(
@@ -282,7 +422,9 @@ class Simulator {
                        std::uint32_t warp);
   bool mbarrier_complete_tx(std::uint32_t segment,
                             std::uint32_t object,
-                            std::uint64_t bytes);
+                            std::uint64_t bytes,
+                            bool by_syncs = false,
+                            std::uint64_t cycle = 0);
   std::pair<std::uint32_t, std::uint32_t> resolve_destination(
       std::uint32_t segment, std::uint64_t object, std::uint32_t rank,
       std::uint32_t issuer_rank) const;
@@ -385,18 +527,41 @@ class Simulator {
   bool eligible(const WarpState& w) const;
   void mark_smsp_of(const WarpState& w);
   void flush_wait(WarpState& w, std::uint64_t now);
+  // stall ledger interval accrual (statistics-only): [w.stall_mark,
+  // now) under the open (pc, reason) key, then stall_mark = now
+  void stall_flush(WarpState& w, std::uint64_t now);
   bool try_issue(WarpState& w);
+  // timing index of the instance's enabled instruction.warp_queue row
+  // (kNone64 when the instance is not a member: no row, row disabled,
+  // or a remote shared-memory access)
+  std::uint64_t warp_queue_row(const InstructionTemplate& t,
+                               const InstructionInstance& inst);
+  // warp_queue S4: a lane global store of at least 4 bytes per lane
+  // whose lanes all fall into the 128-byte line this warp's previous
+  // global store wrote; *line receives the single line (or ~0)
+  bool store_fast_path(const WarpState& w, const InstructionInstance& inst,
+                       std::uint64_t* line) const;
   bool resource_ready(WarpState& w, const InstructionTemplate& t,
                       const Fields& s);
   bool register_ready(const WarpState& w,
                       const InstructionTemplate& t) const;
   bool scoreboard_ready(const WarpState& w,
                         const InstructionTemplate& t) const;
-  // earliest unmet register/scoreboard/control ready cycle (kNever ok)
+  // earliest unmet scoreboard/control ready cycle (kNever ok)
   std::uint64_t max_source_reg_ready(const WarpState& w,
                                      const InstructionTemplate& t) const;
   std::uint64_t register_retry(const WarpState& w,
                                const InstructionTemplate& t) const;
+  // R2/R3: record a producer's claim on barrier b (release at
+  // free_cycle; is_read for the scoreboard_read path) — the release
+  // is max-ed into barrier_free and the raise is stamped at now_
+  void raise_barrier(WarpState& w, std::uint32_t b,
+                     std::uint64_t free_cycle, bool is_read);
+  // the release cycle barrier b is judged by at `now` (R3 increment
+  // visibility)
+  static std::uint64_t barrier_effective(const WarpState& w,
+                                         std::uint32_t b,
+                                         std::uint64_t now);
   std::uint64_t capacity_ready(
       const std::vector<std::uint64_t>& completions,
       std::uint64_t max_inflight, std::uint64_t candidate);
@@ -422,7 +587,8 @@ class Simulator {
                          std::uint64_t finish_cycle);
   void on_warp_exit(WarpState& w);
   void mbarrier_phase_complete(std::uint32_t segment,
-                               std::uint32_t object);
+                               std::uint32_t object,
+                               bool by_syncs = false);
   void cta_generation_close(std::uint32_t cta, std::uint32_t barrier,
                             const CtaBarrierTable::ArriveResult& r);
   void cluster_generation_close(
@@ -447,6 +613,10 @@ class Simulator {
   [[noreturn]] void deadlock_report() const;
 
   static constexpr std::uint64_t kNever = ~0ull;
+  // barrier_free / reg_ready / result_floor value of a result whose
+  // release time is not yet known (pending mbarrier wait): parks the
+  // reader like any other barrier hold, never equal to a real cycle
+  static constexpr std::uint64_t kPending = kNever - 1;
 
   const Job& job_;
   MechanismRuntime& rt_;
@@ -537,6 +707,67 @@ class Simulator {
   std::unordered_map<std::uint64_t,
                      std::pair<std::uint64_t, std::uint64_t>>
       wait_ledger_;
+  // --stall-ledger: (code address, reason id) -> accrual; interval
+  // accounting in flush_wait only (statistics-only)
+  struct StallAcc {
+    std::uint64_t cycles = 0, events = 0;
+  };
+  bool stall_on_ = false;
+  std::unordered_map<std::string, std::uint32_t> stall_ids_;
+  // id 0 is "dispatch" so a warp's initial reason (0) is dispatch
+  std::vector<std::string> stall_names_{"dispatch"};
+  std::map<std::pair<std::uint64_t, std::uint32_t>, StallAcc>
+      stall_acc_;
+  // (from code address, to code address) -> count of consecutive
+  // issues by one warp (sequential fall-through included)
+  std::map<std::pair<std::uint64_t, std::uint64_t>, std::uint64_t>
+      stall_trans_;
+  // reason id of "exit_drain", resolved once the option is on
+  std::uint32_t stall_drain_id_ = 0;
+  // reason ids of "control_floor" / "control:branch" /
+  // "control:yield" / "control:bsync" for the stall-boundary split
+  std::uint32_t stall_cfloor_id_ = 0;
+  std::uint32_t stall_cbranch_id_ = 0;
+  std::uint32_t stall_cyield_id_ = 0;
+  std::uint32_t stall_cbsync_id_ = 0;
+  // issued memory instance -> HitLevel (for reg:<op>:<layer> detail)
+  std::unordered_map<std::uint32_t, std::uint8_t> inst_hit_;
+  std::uint32_t stall_id_(const std::string& s);
+  void stall_set(WarpState& w, const char* r);
+  void stall_set(WarpState& w, const std::string& r);
+  void stall_set_inst(WarpState& w, const std::string& r,
+                      std::uint64_t inst);
+  // key at the warp's last issued instruction (blocks armed by the
+  // instruction that just issued: suspended, cta/cluster barrier)
+  void stall_set_last(WarpState& w, const std::string& r);
+  // suspended:<kind> at the instruction after NANOSLEEP for
+  // kSemaNanosleep, at the last issued instruction otherwise
+  void stall_set_suspended(WarpState& w);
+  void exit_ledger_flush(WarpState& w, std::uint64_t now);
+  std::uint64_t stall_inst_pc(std::uint64_t inst) const;
+  std::string stall_reg_reason(const WarpState& w,
+                               const InstructionTemplate& t,
+                               std::uint64_t r,
+                               std::uint32_t* writer = nullptr) const;
+  void stall_arm_origin(WarpState& w, const std::string& reason,
+                        std::uint32_t writer);
+  static const char* stall_kind_name(std::uint32_t kind);
+  static const char* stall_unit_name(std::uint32_t res);
+  // ledger name of the warp's current control floor once the
+  // yield-hint name does not apply ("control_floor" or control:<kind>)
+  std::string stall_control_reason(const WarpState& w) const;
+  // placement v1: the instance a suspended:descriptor_visibility
+  // interval is booked on (rule F), the instance a DEFER_BLOCKING
+  // cta_barrier interval is booked on (rule B)
+  std::uint64_t stall_fence_waiter(const WarpState& w) const;
+  std::uint64_t stall_defer_target(const WarpState& w,
+                                   const InstructionTemplate& bar,
+                                   std::uint64_t bar_instance);
+  void stall_set_cta_barrier(WarpState& w);
+  // reason id of control:membar:<operation class> / control:fence:...
+  // for a MEMBAR* / FENCE* instruction (0 = neither)
+  std::uint32_t stall_membar_reason(const InstructionTemplate& t);
+  void write_stall_ledger() const;
   ResultStats out_;
   std::uint32_t smsps_per_sm_ = 4;
 
@@ -547,6 +778,49 @@ class Simulator {
   std::optional<std::uint32_t> prog_mbarrier_release_;
   std::optional<std::uint32_t> prog_trywait_;
   std::optional<std::uint32_t> prog_cluster_release_;
+  // synchronization.mbarrier (sync_basic v5 R2): one SYNCS server per
+  // SM; a SYNCS-class instruction carrying an mbarrier_arrive /
+  // mbarrier_wait row takes a turn at issue (known failed polls take
+  // none).  service_interval_cycles 0 / absent = no server.  The
+  // frontier keeps the fraction; the service cycle is its ceiling.
+  std::vector<double> syncs_server_free_;
+  std::optional<double> syncs_service_interval_;
+  // mio_basic protocol v4 (M2): one server per SM and operation
+  // class (key sm << 32 | operation_class) holding the sorted,
+  // non-overlapping granted intervals [start, end); fractional
+  std::unordered_map<std::uint64_t,
+                     std::vector<std::pair<double, double>>>
+      mio_server_busy_;
+  // instruction.warp_queue S1: granted release slots [start, end) per
+  // (sm << 32 | operation class), as mio_server_busy_; S2: release
+  // times of the unreleased entries of every warp of an SM
+  std::unordered_map<std::uint64_t,
+                     std::vector<std::pair<double, double>>>
+      queue_server_busy_;
+  std::vector<std::priority_queue<double, std::vector<double>,
+                                  std::greater<double>>>
+      sm_queue_;
+  // S2': warps waiting at the SM bound, in the order they began to wait
+  // (only the head may pass; removed when it passes, or at exit)
+  std::vector<std::deque<std::uint32_t>> sm_wait_q_;
+  // service_start of the instance currently issuing (now_ when it
+  // took no turn); a SYNCS arrive dates its effects at this cycle
+  std::uint64_t syncs_service_cycle_ = 0;
+  double syncs_service_interval();
+  // sync_basic v5 G1: a non-failed mbarrier wait issued while its
+  // phase is incomplete keeps a pending result; the phase's
+  // completion fixes it at max(service_start, suspended_release_cycle)
+  // + the wait's result latency.  Keyed by MbarrierTable::key.
+  struct PendingWait {
+    std::uint32_t warp = 0, instance = 0, parity = 0;
+    std::uint64_t service_start = 0, result_lat = 0;
+    // scoreboard barrier the wait raises (kNone32 = none -> the
+    // warp's next issue is held on result_floor instead)
+    std::uint32_t barrier = kNone32;
+    std::vector<std::uint32_t> dests;
+  };
+  std::unordered_map<std::uint64_t, std::vector<PendingWait>>
+      mbar_pending_;
   // instance index -> next mbarrier_wait's (object, parity) in the same
   // warp (failed-poll lookahead, §13.3.6)
   std::unordered_map<std::uint64_t,
@@ -680,9 +954,34 @@ class Simulator {
   std::vector<bool> gsync_failed_poll_;
   std::unordered_set<std::uint32_t> sm_prefetched_, sm_used_;
   std::unordered_map<std::uint32_t, std::uint32_t> sm_entries_;
+  // constant_paths v1: per-SM GPC key for the 256 B block layer
+  // (TOPO gpc when the row carries one, else 0x80000000|sm — an SM
+  // without a TOPO row is its own GPC) and the resident-warp count
+  // for the h100 few-warps step (C5)
+  std::unordered_map<std::uint32_t, std::uint64_t> sm_const_gpc_;
+  std::unordered_map<std::uint32_t, std::uint32_t> sm_resident_warps_;
+  // constant_paths v2 C5: bitmask of the SM's SMSPs that hold a
+  // resident warp; same counting as sm_resident_warps_
+  std::unordered_map<std::uint32_t, std::uint32_t>
+      sm_resident_smsp_mask_;
+  // resident warp count per (sm << 8 | smsp); a mask bit above is set
+  // on ++ and cleared when the count returns to 0
+  std::unordered_map<std::uint64_t, std::uint32_t> sm_smsp_resident_;
+  std::uint64_t sm_occupied_smsps(std::uint32_t sm) const;
+  std::uint64_t const_gpc(std::uint32_t sm) const {
+    const auto it = sm_const_gpc_.find(sm);
+    return it == sm_const_gpc_.end() ? (0x80000000ull | sm)
+                                   : it->second;
+  }
   // use indexes for schemas 24 (dispatch), 25 (lifecycle), 26 (fetch)
   std::uint64_t dispatch_use_ = kNone64, lifecycle_use_ = kNone64,
       fetch_use_ = kNone64;
+  // kernel_boundary K4: schema-25 fields 4/5; k4 armed only when both
+  // are present in the leaf
+  std::uint64_t exit_branch_cycles_ = 0, exit_tail_cycles_ = 0;
+  bool exit_k4_ = false;
+  // per-template flag: operation_class == "EXIT" (K4 detection)
+  std::vector<char> tmpl_exit_;
   void try_dispatch_queue(std::uint64_t now);
   void admit_cluster(std::uint32_t entry_index);
 };

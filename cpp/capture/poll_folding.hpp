@@ -5,6 +5,7 @@
 #include "capture/trace_reader.hpp"
 #include "capture/static_code.hpp"
 #include <functional>
+#include <map>
 #include <set>
 #include <utility>
 #include <vector>
@@ -15,8 +16,15 @@ namespace cyclescope_convert::capture {
 using StaticOf = std::function<const StaticRow *(const DynRecord &)>;
 
 // (folded positions, dropped poll count)
-std::pair<std::set<int>, int>
-fold_warp(const std::vector<DynRecord> &records,
-          const StaticOf &static_of);
+// folded positions, dropped poll count, wait origins (survivor
+// position -> absolute code address; placement v4 rule P')
+struct FoldResult {
+  std::set<int> folded;
+  int dropped = 0;
+  std::map<int, std::uint64_t> wait_origin;
+};
+
+FoldResult fold_warp(const std::vector<DynRecord> &records,
+                     const StaticOf &static_of);
 
 }  // namespace cyclescope_convert::capture

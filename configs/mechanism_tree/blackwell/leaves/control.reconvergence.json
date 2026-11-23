@@ -10,10 +10,10 @@
      ],
      "intercept": 0.0,
      "kind": "affine",
-     "slope": 34.0
+     "slope": 0.0
     },
     "sources": [
-     "reconvergence.b300.r3"
+     "branch_basic.b300.v1"
     ]
    }
   },

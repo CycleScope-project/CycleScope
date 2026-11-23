@@ -65,6 +65,7 @@ bool HopperModule::sync_shared_store(
 bool HopperModule::instance_ready(
     Simulator& s, WarpState& w, const InstructionInstance& inst,
     const InstanceSemantics& sema) {
+  stall_detail_ = nullptr;
   if (sema.kind == kSemaWgmma) return wgmma_ready(s, w, inst, sema);
   if (sema.kind == kSemaWarpgroupWait)
     return warpgroup_wait_ready(s, w, sema);
@@ -84,6 +85,7 @@ bool HopperModule::instance_ready(
                           pf_sm_drain_));
         w.retry_at = retry;
         ++tele_[kProxyFenceBackpressure];
+        stall_detail_ = "proxy_fence";
         return false;
       }
     }
@@ -146,6 +148,9 @@ void HopperModule::on_instance_issue(
         s.block_warp(w, static_cast<std::uint64_t>(
             std::ceil(drain + pf_latency_)),
                      WaitBucket::kCollective);
+        // the helper does not name the block; record the semantic
+        // kind so the stall ledger reports suspended:<kind>
+        w.block_kind = sema.kind;
         ++tele_[kFenceBlocks];
       }
       return;

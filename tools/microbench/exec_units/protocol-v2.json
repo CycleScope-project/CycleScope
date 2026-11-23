@@ -1,0 +1,38 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "exec_units",
+ "version": 2,
+ "frozen_before_gpu": false,
+ "date": "2026-11-16",
+ "kind": "install from readings already taken (exec_units v1, warp_issue v2 / v3 unit cells): the leaf changes are declared before they are made; no new GPU data",
+ "mechanisms": [
+  "instruction.service (resource, issue interval)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "exec_units v1 addendum: four units per SMSP with fixed membership and interval; a few leaves disagree with it.",
+ "data_seen_before_freezing": [
+  "exec_units v1 addendum; warp_issue v2 and v3 addenda (unit cells); the instruction.service leaves and common/class_resource.json as of 0c1a3a81."
+ ],
+ "rules": {
+  "membership": "VIADD moves from alu_smsp to the unit of IMAD (fmaheavy_smsp) on both devices. Nothing else changes unit.",
+  "intervals": "Issue interval 2.0 cycles for VIADD, LEA, MOV and ULOP3 on both devices (LOP3, SHF, IADD3, ISETP, PRMT, SEL, FMNMX, UIADD3, USHF, IMAD keep their measured values near 2.0, IMAD.HI near 4.0). single_source_issue_interval_cycles is removed from VIADD, LOP3 and LEA on both devices (the engine branch stays until the refactor).",
+  "not changed": "I2F (the measured form has no write barrier; the class leaf serves the barrier-writing forms), IMAD.WIDE (no leaf of its own: reported how the classifier files it), UMOV and every kind not in the table, result latencies, max_inflight."
+ },
+ "values": "issue_interval_cycles = 2.0 for the four kinds above, source exec_units.<device>.v1 (measured: 2.02-2.03 on both devices, self cells and pairs).",
+ "judgement": {
+  "gates": "The seven gates, tree build / validate --strict; changed fixture expectations listed with the rule.",
+  "replay": "warp_issue v2 / v3 unit cells and the exec_units cells at one warp per SMSP, both devices (existing captures): replayed cycles per instruction of the body, issued + unit wait only (fetch and issue_slot reported apart), within 0.15 of the hardware launch-2 value for every cell whose kinds all have leaves touched or confirmed by the table: self cells 2.0 (4.0 for IMAD.HI), VIADD with IMAD 2.0, VIADD with IMAD.HI 3.0, the other pairs across units 1.0, pairs inside unit L 2.0. Cells with I2F, IMAD.WIDE, uniform-with-LOP3 are reported without criterion.",
+  "full GPU": "500 x 2 against full-y2c2b: cycles and attribution reported (expected: slower where VIADD / MOV / LEA / LOP3 chains are dense; math_pipe_throttle, which the replay already overstates by 2.4 / 1.7 points in loops, may rise further: reported, not a criterion)."
+ },
+ "install": "Leaf and class-resource changes above on both devices.",
+ "not_allowed": "No full-GPU case decides a value.",
+ "addenda": [
+  {
+   "when": "2026-11-16, install (leaves 74ce8aab; build $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/build-74ce8aab, seven gates 0; replays sim-xu under exec_units, warp_issue-v2, warp_issue-v3; tables exec_units/replay-<device>-{x,u,e}.txt; full GPU full-xu)",
+   "text": "Installed on both devices; no existing test expectation changed. IMAD.WIDE is filed under the IMAD leaf by the converter (only IMAD.HI has its own). Replay at one warp per SMSP / SM, issued + unit wait per instruction against the hardware launch-2 value, 61 cells per device: inside 0.15 for all cells the criterion names except x.imadhi_lop (1.86 h100 / 1.83 b300 against 2.05). Outside and not under the criterion: the three IMAD.WIDE cells (replayed as IMAD, 2 cycles; hardware 4), and d.add at stall 2 / 4, which I had put in the check by mistake (there the stall is the covering term: issued + unit + control_floor = hardware). Every replayed total is about 0.4-0.5 above hardware because of the fetch wait the replay gives one-warp-per-SMSP shapes (known, code-fetch work). Full GPU against full-y2c2b: h100 MAPE 11.03 % -> 11.01 %, 262 cases closer / 234 farther; b300 9.54 % -> 9.62 %, 237 / 239; median sim / hardware 0.904 / 0.918 (unchanged). MY EXPECTATION WAS WRONG: I had named the unit grouping as the main candidate for the replay being faster than hardware; correcting it moves the full-GPU cycles by nothing on average. The leaves were already near the measured intervals for the kinds that dominate real code (IMAD, IADD3, ISETP, SHF, LOP3 with register sources); the missing time is elsewhere."
+  }
+ ]
+}

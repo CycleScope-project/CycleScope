@@ -23,7 +23,7 @@ bool in(const std::string &s, std::initializer_list<const char *> l) {
 
 constexpr int FLAG_MEMORY = 1, FLAG_ATOMIC = 2, FLAG_BARRIER = 4,
               FLAG_BRANCH = 8, FLAG_ASYNC = 16, FLAG_TENSOR = 32,
-              FLAG_PREDICATED = 64, FLAG_TMEM = 128, FLAG_CLC = 256;
+              FLAG_PREDICATED = 64, FLAG_TMEM = 128, FLAG_CLC = 256, FLAG_DEFER_BLOCKING = 512;
 
 const std::set<std::string> kBranchRoots = {"BRA", "BRX", "BRXU", "CALL",
                                             "BREAK", "BSSY", "BSYNC",
@@ -162,6 +162,10 @@ struct BlackwellRules final : cyclescope_convert::ConvertRules {
     if (kTmemRoots.count(root)) flags |= FLAG_TMEM;
     if (root == "UGETNEXTWORKID") flags |= FLAG_CLC;
     if (s.has_predicate) flags |= FLAG_PREDICATED;
+    if (root == "BAR" &&
+        std::find(toks.begin() + 1, toks.end(), "DEFER_BLOCKING") !=
+            toks.end())
+      flags |= FLAG_DEFER_BLOCKING;
     return flags;
   }
 

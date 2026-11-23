@@ -113,7 +113,7 @@ def _run_source(argv, env, cwd, log: Path, timeout_s: int,
 
 def _pick(rows: list[dict], resolved: Resolved) -> dict | None:
     """Choose the target launch row by suite rule."""
-    if resolved.arch == "hopper":
+    if resolved.argv_row:
         # same rule as the tracer's `regex@N`: the Nth (1-based) census
         # row whose mangled name matches kernel_regex
         matches = [r for r in rows

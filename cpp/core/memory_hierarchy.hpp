@@ -95,6 +95,44 @@ struct MemoryConfig {
   // uniform-path (ULDC/LDCU) accesses use const_bank0_uniform instead
   // when that field is present (per-path rule)
   double const_bank0 = -1.0, const_bank0_uniform = -1.0;
+  // uniform-path cold hold (kernel_start v2): a uniform constant
+  // access on a non-resident / still-filling line holds its warp at
+  // issue until the fill completes; -1 = rule off (fields absent)
+  double const_ubank0_hold = -1.0, const_uhold = -1.0;
+  // kernel_start v3: a uniform load of a resident (incl. same-line)
+  // line uses this result latency instead of const_same_line /
+  // const_hit; active only when both cold-hold fields are set too
+  double const_uresident_hold = -1.0;
+  // kernel_start v4: a vector load of a bank-0 line not resident in
+  // the SM's constant cache starts a fill and gets its result after
+  // this latency; resident / in-flight lines keep const_bank0;
+  // -1 = rule off (field absent), flat const_bank0 for every access
+  double const_vbank0_cold = -1.0;
+  // constant_paths v1: two per-SM resident sets (vector path 0,
+  // uniform path 1), 64 B lines, per-path first-touch / re-read /
+  // fill interval and a per-GPC 256 B block layer for banks != 0.
+  // The model is on when both first-touch fields are present;
+  // absent -> every rule above keeps today's behaviour byte for
+  // byte (the old fields are unused while the model is on).
+  double const_ufirst = -1.0, const_ureread = 0.0,
+      const_ufill_interval = 0.0;
+  double const_vfirst = -1.0, const_vreread = 0.0,
+      const_vfill_interval = 0.0;
+  double const_block_fetch = 0.0;
+  std::uint64_t const_block_bytes = 0;
+  // h100 few-warps step (superseded C5): uniform first touch uses
+  // this value when at most few_warps_limit warps are resident on
+  // the SM at fill start; both fields absent -> always const_ufirst
+  double const_ufirst_few = -1.0;
+  std::uint64_t const_few_warps_limit = 0;
+  // constant_paths v2 C5 (h100): uniform first touch =
+  // const_ufirst x max(min_smsps, n) / smsps_per_sm, n = SMSPs of
+  // the SM holding a resident warp at fill start (0 = absent)
+  std::uint64_t const_ufirst_min_smsps = 0;
+  std::uint32_t const_smsps_per_sm = 0;
+  bool const_paths() const {
+    return const_ufirst >= 0.0 && const_vfirst >= 0.0;
+  }
   std::uint64_t const_line_bytes = 0, const_capacity = 0;
   // memory.dram_port (32)
   std::uint64_t dram_port_inflight = 0;
@@ -227,17 +265,65 @@ class MemoryHierarchy {
   std::uint64_t store_issue_block(std::uint32_t sm, std::uint64_t now);
   // lane_store: the request is a lane-masked global STG (not TMA /
   // bulk / reduce / atomic): the partial-line port term and the
-  // issue-interval floor apply
+  // issue-interval floor apply.  merged: the request is folded into
+  // the pending write of its line (warp_queue S4 fast path): the L2
+  // line state is updated but no write-service, store-port or store
+  // buffer occupancy is added
   std::uint64_t store(std::uint32_t sm, std::uint64_t now,
                       const MemorySector* sectors, std::size_t n,
                       bool atomic, std::uint64_t address0,
                       std::uint64_t* fill_done = nullptr,
-                      double cost_ratio = 1.0, bool lane_store = false);
+                      double cost_ratio = 1.0, bool lane_store = false,
+                      bool merged = false);
   // Constant-cache access.  `warp` is the issuing warp's index; the
   // same-line fast path tracks the last line each warp touched.
+  // uniform cold-hold readiness: the earliest cycle the access may
+  // issue (> now = held).  A missing line starts its fill here once
+  // (same capacity / LRU logic as the constant() miss branch) and is
+  // in flight on every later evaluation; a resident, fill-complete
+  // line returns now with no state touched (caller runs constant()).
+  std::uint64_t constant_uniform_hold(std::uint32_t sm,
+                                      std::uint32_t warp,
+                                      std::uint64_t now,
+                                      std::uint64_t address,
+                                      std::uint8_t* hold_class,
+                                      bool count,
+                                      // constant_paths v1 (only when
+                                      // const_paths()): the block
+                                      // layer's GPC key and the SM's
+                                      // resident-warp count for C5
+                                      std::uint64_t gpc = 0,
+                                      std::uint64_t sm_warps = ~0ull,
+                                      std::uint64_t sm_smsps = ~0ull);
+  // issue-time bookkeeping of a held load: LRU tick + last-line, no
+  // latency and no telemetry recount
+  void constant_post_hold(std::uint32_t sm, std::uint32_t warp,
+                          std::uint64_t address);
+  // constant_paths v1 miss path (C2/C3) shared by constant() and
+  // constant_uniform_hold()
+  std::uint64_t const_paths_fill(std::uint32_t sm, std::uint32_t path,
+                                 std::uint64_t now,
+                                 std::uint64_t address,
+                                 std::uint64_t line,
+                                 std::uint64_t gpc,
+                                 std::uint64_t sm_warps,
+                                 std::uint64_t sm_smsps,
+                                 std::uint8_t* hit_kind, bool count);
   std::uint64_t constant(std::uint32_t sm, std::uint32_t warp,
                          std::uint64_t now, std::uint64_t address,
-                         std::size_t bytes, bool uniform = false);
+                         std::size_t bytes, bool uniform = false,
+                         // optional diagnostic (stall ledger):
+                         // old model: 0 same-line, 1 hit, 2 miss;
+                         // const_paths: 3 resident, 4 inflight,
+                         // 5 first, 6 first+block
+                         std::uint8_t* hit_kind = nullptr,
+                         std::uint64_t gpc = 0,
+                         std::uint64_t sm_warps = ~0ull,
+                         std::uint64_t sm_smsps = ~0ull,
+                         // mio_basic protocol v3 M1: cycle the
+                         // const_paths re-read terms count from
+                         // (default: now)
+                         std::uint64_t reread_from = ~0ull);
 
   // architectural limits of sm_90 / sm_100 class SMs; the dispatcher's
   // 64-slot warp bitmap is the same limit
@@ -395,6 +481,17 @@ class MemoryHierarchy {
   std::unordered_map<std::uint32_t,
                    std::unordered_map<std::uint64_t, std::uint64_t>>
       const_last_line_;
+  // constant_paths v1: per-SM per-path resident sets (key sm*2+path,
+  // path 0 = vector, 1 = uniform); per-set previous fill-ready for
+  // the fill interval; per-GPC block fetch state (no eviction — a
+  // fetched block stays)
+  std::unordered_map<std::uint64_t,
+                   std::unordered_map<std::uint64_t, ConstLine>>
+      const_resident_p_;
+  std::unordered_map<std::uint64_t, std::uint64_t> const_last_fill_;
+  std::unordered_map<std::uint64_t,
+                   std::unordered_map<std::uint64_t, std::uint64_t>>
+      const_blocks_;
   std::uint64_t const_tick_ = 0;
   std::unordered_map<std::uint64_t, MergeEntry> merge_last_;
   // GPU-level fractional delivery queue for merged sectors

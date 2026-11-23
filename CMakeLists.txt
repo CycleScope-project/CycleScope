@@ -140,6 +140,11 @@ target_link_libraries(instruction_fetch_test PRIVATE cyclescope_core)
 add_test(NAME instruction_fetch
   COMMAND $<TARGET_FILE:instruction_fetch_test>)
 
+add_executable(poll_folding_test cpp/tests/poll_folding_test.cpp)
+target_link_libraries(poll_folding_test PRIVATE cyclescope_capture cyclescope_convert)
+add_test(NAME poll_folding
+  COMMAND $<TARGET_FILE:poll_folding_test>)
+
 add_executable(str_util_test cpp/tests/str_util_test.cpp)
 target_include_directories(str_util_test PRIVATE cpp)
 add_test(NAME str_util

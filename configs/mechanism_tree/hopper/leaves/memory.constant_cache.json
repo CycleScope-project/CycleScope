@@ -63,6 +63,87 @@
     "sources": [
      "constant_launch.h100.r3"
     ]
+   },
+   "uniform_first_touch_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 129.0
+    },
+    "sources": [
+     "constant_paths.h100.v1"
+    ]
+   },
+   "uniform_reread_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "constant_paths.h100.v1"
+    ]
+   },
+   "uniform_fill_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 0.0
+    },
+    "sources": [
+     "constant_paths.h100.v1.experimental"
+    ]
+   },
+   "vector_first_touch_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 92.15
+    },
+    "sources": [
+     "constant_paths.h100.v1"
+    ]
+   },
+   "vector_reread_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 22.75
+    },
+    "sources": [
+     "constant_paths.h100.v1"
+    ]
+   },
+   "vector_fill_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 27.0
+    },
+    "sources": [
+     "constant_paths.h100.v1.experimental"
+    ]
+   },
+   "block_bytes": {
+    "model": {
+     "kind": "constant",
+     "value": 256
+    },
+    "sources": [
+     "constant_paths.h100.v1.experimental"
+    ]
+   },
+   "block_fetch_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 491.1
+    },
+    "sources": [
+     "constant_paths.h100.v1.experimental"
+    ]
+   },
+   "uniform_first_touch_min_smsps": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "constant_paths.h100.v2.experimental"
+    ]
    }
   },
   "scope": "sm"

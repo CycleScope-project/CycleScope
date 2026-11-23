@@ -18,6 +18,15 @@
     "sources": [
      "crossings.trywait_timeout.b300.r3"
     ]
+   },
+   "origin_hold_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 7757
+    },
+    "sources": [
+     "poll_origin_basic.b300.v1"
+    ]
    }
   }
  }

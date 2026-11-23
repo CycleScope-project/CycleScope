@@ -20,6 +20,9 @@
   },
   "enabled": {
    "kind": "constant"
+  },
+  "defer_stop_distance_cycles": {
+   "kind": "constant"
   }
  }
 }

@@ -17,6 +17,9 @@
   },
   "enabled": {
    "kind": "constant"
+  },
+  "origin_hold_cycles": {
+   "kind": "constant"
   }
  }
 }

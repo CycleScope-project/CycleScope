@@ -23,6 +23,7 @@ namespace IT = core::parameter_fields::INSTRUCTION_TEMPLATE;
 namespace RS = core::parameter_fields::RESOURCE;
 namespace SC = core::parameter_fields::SCHEDULER;
 namespace TR = core::parameter_fields::TIMING_ROW;
+namespace INT = core::parameter_fields::INSTANCE_TIMING;
 
 namespace {
 
@@ -32,6 +33,14 @@ constexpr std::uint8_t SCOPE_SMSP = 0, SCOPE_SM = 1, SCOPE_CLUSTER = 2;
 constexpr std::uint32_t SMSPS_PER_SM = 4;
 // SASS barrier index 7 (and 0xFF) means "none" (ControlWord default).
 constexpr std::uint8_t NO_BARRIER = 7;
+// stall ledger unit names: common/resources.json order (shared ids);
+// architecture-only units beyond the table fall back to the id
+constexpr const char* kStallUnitNames[] = {
+    "issue_frontend_smsp", "alu_smsp", "fma_smsp", "fmaheavy_smsp",
+    "xu_smsp", "uniform_smsp", "shfl_smsp", "shfl_sm", "fp64_sm",
+    "match_smsp", "matrix_smsp", "tensor_sm", "lsu_smsp", "atomic_sm",
+    "async_copy_sm", "tma_sm", "fence_view_async_sm",
+    "membar_cta_smsp"};
 
 std::uint64_t accumulate_spacing(double interval, double& residual) {
   // predecessor accumulate_measured_spacing: fractional intervals
@@ -53,11 +62,322 @@ std::uint64_t accumulate_spacing(double interval, double& residual) {
 
 }  // namespace
 
+// --stall-ledger: assign the blocked-instruction reason at each
+// verdict site; no-op when the option is off
+#define STALL_SET(w, r)                                        \
+  do {                                                         \
+    if (stall_on_) stall_set((w), (r));                        \
+  } while (0)
+
+std::uint32_t Simulator::stall_id_(const std::string& s) {
+  const auto it = stall_ids_.find(s);
+  if (it != stall_ids_.end()) return it->second;
+  const auto id = static_cast<std::uint32_t>(stall_names_.size());
+  stall_ids_.emplace(s, id);
+  stall_names_.push_back(s);
+  return id;
+}
+
+std::uint64_t Simulator::stall_inst_pc(std::uint64_t inst) const {
+  // absolute code address as in the job's code-address table; 0 for
+  // instances without one
+  const auto* a = code_address_of(inst);
+  return a ? *a : 0;
+}
+
+void Simulator::stall_set_inst(WarpState& w, const std::string& r,
+                               std::uint64_t inst) {
+  w.stall_reason = stall_id_(r);
+  w.stall_pc = stall_inst_pc(inst);
+}
+void Simulator::stall_set(WarpState& w, const std::string& r) {
+  stall_set_inst(w, r, w.next_instance);
+}
+void Simulator::stall_set(WarpState& w, const char* r) {
+  stall_set_inst(w, std::string(r), w.next_instance);
+}
+
+void Simulator::stall_set_last(WarpState& w, const std::string& r) {
+  stall_set_inst(w, r, w.next_instance ? w.next_instance - 1 : 0);
+}
+
+void Simulator::stall_set_suspended(WarpState& w) {
+  // a nanosleep suspension samples at the instruction after NANOSLEEP;
+  // every other suspension stays at the instruction that armed it
+  const std::string r =
+      "suspended:" + std::string(stall_kind_name(w.block_kind));
+  if (w.block_kind == kSemaNanosleep)
+    stall_set(w, r);
+  else if (w.block_kind == kSemaDescriptorVisibility)
+    stall_set_inst(w, r, stall_fence_waiter(w));
+  else
+    stall_set_last(w, r);
+}
+
+// placement v1 rule F: the first instance behind the suspending one
+// (the warp's last issued instruction), at most 16 ahead, whose wait
+// mask holds the suspending instruction's write barrier; none: the
+// warp's next instance to issue
+std::uint64_t Simulator::stall_fence_waiter(const WarpState& w) const {
+  const std::uint64_t next = w.next_instance;
+  if (next == 0 || next >= w.end_instance) return next;
+  const auto& st = job_.templates[
+      job_.instances[next - 1].template_index];
+  const std::uint32_t wb = st.scoreboard_write;
+  if (wb >= NO_BARRIER) return next;
+  for (std::uint64_t j = next; j < next + 16 && j < w.end_instance; ++j)
+    if (job_.templates[job_.instances[j].template_index]
+            .scoreboard_wait_mask & (1u << wb))
+      return j;
+  return next;
+}
+
+// placement v2 rule B: the cta_barrier interval armed by a BAR whose
+// template carries the DEFER_BLOCKING flag is booked on the first
+// instance j behind it (at most 64 ahead; none stops: the last one
+// looked at) that stops the warp: not pass(j) and dist(j) >= Dmin,
+// dist(first behind) = the BAR's stall field, dist(j + 1) = dist(j) +
+// max(1, stall field of j).  Dmin = the cta.release leaf's
+// defer_stop_distance_cycles (absent / 0: the booking of before).
+// pass: served by alu / fma / fmaheavy / uniform, no MIO turn, class
+// root not UMOV.
+std::uint64_t Simulator::stall_defer_target(
+    const WarpState& w, const InstructionTemplate& bar,
+    std::uint64_t bar_instance) {
+  if (!(bar.flags & kTemplateFlagDeferBlocking)) return kNone64;
+  std::uint64_t dmin = 0;
+  for (std::uint64_t ti = bar.timing_begin;
+       ti < bar.timing_begin + bar.timing_count; ++ti) {
+    if (timing_[ti].kind != kTimingCtaBarrierRelease) continue;
+    dmin = static_cast<std::uint64_t>(MechanismRuntime::field(
+        timing_fields(ti, nullptr), TR::DEFER_STOP_DISTANCE_CYCLES, 0.0));
+    break;
+  }
+  if (dmin == 0) return kNone64;
+  auto passes = [&](const InstructionTemplate& tj) {
+    const std::string_view cls =
+        job_.strings.c_str() + tj.operation_class;
+    if (cls.substr(0, cls.find('.')) == "UMOV") return false;
+    const auto idx = std::uint32_t(&tj - job_.templates.data());
+    if (idx >= tmpl_use_.size() || tmpl_use_[idx] == kNone64)
+      return false;
+    const auto& svc = service_fields(tj);
+    const std::uint32_t res = service_resource(tj, svc, 0);
+    const char* un = res == kNone32 ? nullptr : stall_unit_name(res);
+    if (!un) return false;
+    const std::string_view u = un;
+    if (u != "alu_smsp" && u != "fmaheavy_smsp" && u != "fma_smsp" &&
+        u != "uniform_smsp")
+      return false;
+    return MechanismRuntime::field(svc, IT::RETURN_INTERVAL_CYCLES,
+                                   0.0) == 0.0 &&
+           MechanismRuntime::field(svc, IT::SM_SERVICE_INTERVAL_CYCLES,
+                                   0.0) == 0.0;
+  };
+  std::uint64_t dist = bar.control & 0xF;
+  std::uint64_t last = kNone64;
+  for (std::uint64_t j = bar_instance + 1;
+       j <= bar_instance + 64 && j < w.end_instance; ++j) {
+    const auto& tj = job_.templates[job_.instances[j].template_index];
+    last = j;
+    if (dist >= dmin && !passes(tj)) return j;
+    dist += std::max<std::uint64_t>(1, tj.control & 0xF);
+  }
+  return last;
+}
+
+void Simulator::stall_set_cta_barrier(WarpState& w) {
+  if (w.cta_wait.book_instance != kNone64 &&
+      w.cta_wait.book_instance < w.end_instance)
+    stall_set_inst(w, "cta_barrier", w.cta_wait.book_instance);
+  else
+    stall_set(w, "cta_barrier");
+}
+
+// placement v1 rule M: reason id of control:membar:<class> /
+// control:fence:<class> for an instance of class MEMBAR* / FENCE*
+std::uint32_t Simulator::stall_membar_reason(const InstructionTemplate& t) {
+  const std::string_view cls = job_.strings.c_str() + t.operation_class;
+  if (cls.rfind("MEMBAR", 0) == 0)
+    return stall_id_("control:membar:" + std::string(cls));
+  if (cls.rfind("FENCE", 0) == 0)
+    return stall_id_("control:fence:" + std::string(cls));
+  return 0;
+}
+
+const char* Simulator::stall_kind_name(std::uint32_t kind) {
+  switch (kind) {
+    case kSemaMbarrierInit: return "mbarrier_init";
+    case kSemaMbarrierArrive: return "mbarrier_arrive";
+    case kSemaMbarrierExpectTx: return "mbarrier_expect_tx";
+    case kSemaMbarrierWait: return "mbarrier_wait";
+    case kSemaMbarrierInval: return "mbarrier_inval";
+    case kSemaCtaBarrierArrive: return "cta_barrier_arrive";
+    case kSemaCtaBarrierWait: return "cta_barrier_wait";
+    case kSemaClusterBarrierArrive: return "cluster_barrier_arrive";
+    case kSemaClusterBarrierWait: return "cluster_barrier_wait";
+    case kSemaTmaLoad: return "tma_load";
+    case kSemaBulkGroupIssue: return "bulk_group_issue";
+    case kSemaBulkGroupCommit: return "bulk_group_commit";
+    case kSemaBulkGroupWait: return "bulk_group_wait";
+    case kSemaAsyncCopyIssue: return "async_copy_issue";
+    case kSemaAsyncCopyCommit: return "async_copy_commit";
+    case kSemaAsyncCopyWait: return "async_copy_wait";
+    case kSemaBulkCopy: return "bulk_copy";
+    case kSemaBulkReduce: return "bulk_reduce";
+    case kSemaWarpgroupArrive: return "warpgroup_arrive";
+    case kSemaWarpgroupWait: return "warpgroup_wait";
+    case kSemaWgmma: return "wgmma";
+    case kSemaUmmaIssue: return "umma_issue";
+    case kSemaUmmaCommit: return "umma_commit";
+    case kSemaTmemAlloc: return "tmem_alloc";
+    case kSemaTmemDealloc: return "tmem_dealloc";
+    case kSemaTmemRelinquish: return "tmem_relinquish";
+    case kSemaTmemLoad: return "tmem_load";
+    case kSemaTmemStore: return "tmem_store";
+    case kSemaTmemCopy: return "tmem_copy";
+    case kSemaTmemWaitStore: return "tmem_wait_store";
+    case kSemaClcQuery: return "clc_query";
+    case kSemaSharedStoreAsync: return "shared_store_async";
+    case kSemaGlobalSync: return "gsync";
+    case kSemaReconvergenceStart: return "reconvergence_start";
+    case kSemaReconvergenceComplete: return "reconvergence_complete";
+    case kSemaNanosleep: return "sleep";
+    case kSemaDescriptorVisibility: return "descriptor_visibility";
+    case kSemaClockMarker: return "clock_marker";
+    case kSemaDependentsLaunch: return "dependents_launch";
+    default: return "kind";
+  }
+}
+
+const char* Simulator::stall_unit_name(std::uint32_t res) {
+  return res < std::size(kStallUnitNames) ? kStallUnitNames[res]
+                                        : nullptr;
+}
+
+// which term of register_retry() produced `r`: a masked barrier's
+// effective release first (issue_rules v1: the reason names the
+// producer whose release is the outstanding one), then the control
+// floor.  Register readiness is never the binding term any more.
+std::string Simulator::stall_reg_reason(
+    const WarpState& w, const InstructionTemplate& t,
+    std::uint64_t r, std::uint32_t* writer) const {
+  for (std::uint32_t b = 0; b < NO_BARRIER; ++b) {
+    if (!(t.scoreboard_wait_mask & (1u << b))) continue;
+    const bool prev = now_ == w.barrier_raised_at[b] + 1;
+    // mirror register_retry: in the t+1 window the barrier only binds
+    // when the previous release still holds; the retry then comes
+    // from the raised release
+    if (prev && w.barrier_prev_free[b] <= now_) continue;
+    const bool held_prev = prev;
+    const std::uint64_t term =
+        held_prev ? std::max(now_ + 1, w.barrier_free[b])
+                  : w.barrier_free[b];
+    if (term != r) continue;
+    const std::uint32_t pi = held_prev ? w.barrier_prev_writer[b]
+                                       : w.barrier_writer[b];
+    const bool is_read = held_prev ? w.barrier_prev_is_read[b]
+                                   : w.barrier_is_read[b];
+    std::string s = "barrier:";
+    if (writer) *writer = pi;
+    if (pi < job_.instances.size()) {
+      const auto& wi = job_.instances[pi];
+      s += job_.strings.c_str() +
+           job_.templates[wi.template_index].operation_class;
+      using HL = MemoryHierarchy::HitLevel;
+      if (const auto ih = inst_hit_.find(pi);
+          ih != inst_hit_.end()) {
+        if (ih->second == static_cast<std::uint8_t>(HL::l1))
+          s += ":l1";
+        else if (ih->second == static_cast<std::uint8_t>(HL::l2))
+          s += ":l2";
+        else if (ih->second == static_cast<std::uint8_t>(HL::dram))
+          s += ":dram";
+        else if (ih->second == (0x40 | 0)) s += ":same_line";
+        else if (ih->second == (0x40 | 1)) s += ":hit";
+        else if (ih->second == (0x40 | 2)) s += ":miss";
+        else if (ih->second == (0x40 | 3)) s += ":resident";
+        else if (ih->second == (0x40 | 4)) s += ":inflight";
+        else if (ih->second == (0x40 | 5)) s += ":first";
+        else if (ih->second == (0x40 | 6)) s += ":block";
+      }
+    } else {
+      s += "unknown";
+    }
+    if (is_read) s += ":read";
+    return s;
+  }
+  if (w.control_floor == r)
+    return (w.yield_floor && w.yield_floor == r)
+               ? "yield"
+               : stall_control_reason(w);
+  if (w.result_floor == r) return "mbarrier_wait_result";
+  return "other:register_retry";
+}
+
+// ledger name of the warp's current control floor once the yield-hint
+// name does not apply: a binding taken-branch envelope, YIELD service
+// floor or BSYNC service floor carries its mechanism name
+// (control:branch / control:yield / control:bsync); the stall field
+// and every other floor stay "control_floor"
+std::string Simulator::stall_control_reason(const WarpState& w) const {
+  switch (w.control_kind) {
+    case 1: return "control:branch";
+    case 2: return "control:yield";
+    case 3: return "control:bsync";
+    case 4:
+      return w.control_mech < stall_names_.size()
+                 ? stall_names_[w.control_mech]
+                 : std::string("control_floor");
+    default: return "control_floor";
+  }
+}
+
+void Simulator::write_stall_ledger() const {
+  // code address -> a static instruction owning it (operation_class
+  // column of residency rows)
+  std::unordered_map<std::uint64_t, std::uint64_t> addr_inst;
+  addr_inst.reserve(job_.code.size());
+  for (const auto& c : job_.code)
+    addr_inst[c.code_address] = c.instance;
+  FILE* f = std::fopen(opt_.stall_ledger.c_str(), "w");
+  if (!f)
+    throw EngineError("unsupported:engine:stall_ledger_open (" +
+                      opt_.stall_ledger + ")");
+  std::fprintf(f, "#schema\tcyclescope.stall-ledger.v1\n"
+                  "#warps\t%llu\n#cycles\t%llu\n",
+               (unsigned long long)warps_.size(),
+               (unsigned long long)out_.cycles);
+  for (const auto& [key, e] : stall_acc_) {
+    const char* op = "?";
+    if (const auto it = addr_inst.find(key.first);
+        it != addr_inst.end())
+      op = job_.strings.c_str() +
+           job_.templates[
+               job_.instances[it->second].template_index]
+               .operation_class;
+    const char* rn = key.second < stall_names_.size()
+                         ? stall_names_[key.second].c_str()
+                         : "other:unset";
+    std::fprintf(f, "residency\t%llx\t%s\t%s\t%llu\t%llu\n",
+                 (unsigned long long)key.first, op, rn,
+                 (unsigned long long)e.cycles,
+                 (unsigned long long)e.events);
+  }
+  for (const auto& [key, n] : stall_trans_)
+    std::fprintf(f, "transition\t%llx\t%llx\t%llu\n",
+                 (unsigned long long)key.first,
+                 (unsigned long long)key.second,
+                 (unsigned long long)n);
+  std::fclose(f);
+}
+
 Simulator::Simulator(const Job& job, MechanismRuntime& rt,
                      Options opt)
     : job_(job), rt_(rt),
       arch_(make_architecture(job.launch.device)), opt_(opt) {
   smsps_per_sm_ = SMSPS_PER_SM;
+  mem_cfg_.const_smsps_per_sm = smsps_per_sm_;
 }
 
 void Simulator::enqueue(Event::Kind k, std::uint64_t cycle,
@@ -211,6 +531,9 @@ void Simulator::place_warps() {
     w.smsp = w.slot % smsps_per_sm_;
     w.resident = true;
     sm_used_.insert(w.sm);
+    ++sm_resident_warps_[w.sm];
+    sm_resident_smsp_mask_[w.sm] |= 1u << w.smsp;
+    ++sm_smsp_resident_[(std::uint64_t{w.sm} << 8) | w.smsp];
     smsps_[w.sm][w.smsp].warps.push_back(i);
     if (i >= active_pos_.size()) active_pos_.resize(i + 1);
     active_pos_[i] = active_.size();
@@ -281,6 +604,9 @@ void Simulator::admit_cluster(std::uint32_t entry_index) {
       w.entry_cycle = now_;
       w.resident = true;
       sm_used_.insert(w.sm);
+      ++sm_resident_warps_[w.sm];
+      sm_resident_smsp_mask_[w.sm] |= 1u << w.smsp;
+      ++sm_smsp_resident_[(std::uint64_t{w.sm} << 8) | w.smsp];
       smsps_[w.sm][w.smsp].warps.push_back(i);
       smsps_[w.sm][w.smsp].needs_eval = true;
       newly_resident.push_back(i);
@@ -474,6 +800,50 @@ void Simulator::load_setup() {
         const auto itbu = f.find(CC::BANK0_UNIFORM_ACCESS_CYCLES);
         mem_cfg_.const_bank0_uniform =
             itbu == f.end() ? -1.0 : itbu->second;
+        const auto ith0 =
+            f.find(CC::UNIFORM_BANK0_COLD_HOLD_CYCLES);
+        mem_cfg_.const_ubank0_hold =
+            ith0 == f.end() ? -1.0 : ith0->second;
+        const auto ithu = f.find(CC::UNIFORM_COLD_HOLD_CYCLES);
+        mem_cfg_.const_uhold =
+            ithu == f.end() ? -1.0 : ithu->second;
+        const auto itr = f.find(CC::UNIFORM_RESIDENT_HOLD_CYCLES);
+        mem_cfg_.const_uresident_hold =
+            itr == f.end() ? -1.0 : itr->second;
+        const auto itv = f.find(CC::VECTOR_BANK0_COLD_LATENCY_CYCLES);
+        mem_cfg_.const_vbank0_cold =
+            itv == f.end() ? -1.0 : itv->second;
+        // constant_paths v1: the model is on when both first-touch
+        // fields are present (const_paths()); absent -> old rules
+        if (const auto it = f.find(CC::UNIFORM_FIRST_TOUCH_CYCLES);
+            it != f.end()) mem_cfg_.const_ufirst = it->second;
+        if (const auto it = f.find(CC::UNIFORM_REREAD_CYCLES);
+            it != f.end()) mem_cfg_.const_ureread = it->second;
+        if (const auto it = f.find(CC::UNIFORM_FILL_INTERVAL_CYCLES);
+            it != f.end()) mem_cfg_.const_ufill_interval = it->second;
+        if (const auto it = f.find(CC::VECTOR_FIRST_TOUCH_CYCLES);
+            it != f.end()) mem_cfg_.const_vfirst = it->second;
+        if (const auto it = f.find(CC::VECTOR_REREAD_CYCLES);
+            it != f.end()) mem_cfg_.const_vreread = it->second;
+        if (const auto it = f.find(CC::VECTOR_FILL_INTERVAL_CYCLES);
+            it != f.end()) mem_cfg_.const_vfill_interval = it->second;
+        if (const auto it = f.find(CC::BLOCK_BYTES); it != f.end())
+          mem_cfg_.const_block_bytes =
+              static_cast<std::uint64_t>(it->second);
+        if (const auto it = f.find(CC::BLOCK_FETCH_CYCLES);
+            it != f.end()) mem_cfg_.const_block_fetch = it->second;
+        if (const auto it =
+                f.find(CC::UNIFORM_FIRST_TOUCH_FEW_WARPS_CYCLES);
+            it != f.end()) mem_cfg_.const_ufirst_few = it->second;
+        if (const auto it = f.find(CC::UNIFORM_FEW_WARPS_LIMIT);
+            it != f.end())
+          mem_cfg_.const_few_warps_limit =
+              static_cast<std::uint64_t>(it->second);
+        if (const auto it =
+                f.find(CC::UNIFORM_FIRST_TOUCH_MIN_SMSPS);
+            it != f.end())
+          mem_cfg_.const_ufirst_min_smsps =
+              static_cast<std::uint64_t>(it->second);
       }
     }
     if (u.schema_id == 32) {
@@ -633,6 +1003,13 @@ void Simulator::load_setup() {
       }
     }
   }
+  // constant_paths v1: per-SM key for the per-GPC block layer —
+  // TOPO gpc when the SM's row carries one; an SM without a TOPO row
+  // (or without a gpc in it) is its own GPC
+  if (mem_cfg_.const_paths() && mem_cfg_.const_block_bytes)
+    for (const auto& t : job_.topology)
+      sm_const_gpc_[t.sm] = t.gpc != 0xFFFFFFFFu
+          ? t.gpc : (0x80000000ull | t.sm);
   mem_ = MemoryHierarchy(mem_cfg_);
   timing_ = job_.timing;
   if (sched_use_ != kNone64) {
@@ -720,6 +1097,8 @@ void Simulator::load_setup() {
           static_cast<std::uint64_t>(MechanismRuntime::field(f, 13, 0.0));
       fc.l0_ways =
           static_cast<std::uint64_t>(MechanismRuntime::field(f, 14, 0.0));
+      fc.launch_first_line =
+          static_cast<std::uint64_t>(MechanismRuntime::field(f, 15, 0.0));
     }
     if (fc.enabled && fc.line_bytes == 0)
       throw EngineError("unsupported:engine:fetch_line_bytes ()");
@@ -728,6 +1107,21 @@ void Simulator::load_setup() {
     fetch_enabled_ = fc.enabled;
     if (!fetch_enabled_) tele2_[kTele2FetchUnavailable] = 1;
   }
+  // kernel_boundary K4 (schema-25 fields 4/5): armed only when both
+  // exit fields are present; absent -> the drain path is unchanged
+  if (lifecycle_use_ != kNone64) {
+    const auto& f = rt_.resolve(lifecycle_use_, engine_facts_, nullptr);
+    if (f.find(4) != f.end() && f.find(5) != f.end()) {
+      exit_branch_cycles_ = static_cast<std::uint64_t>(f.at(4));
+      exit_tail_cycles_ = static_cast<std::uint64_t>(f.at(5));
+      exit_k4_ = true;
+    }
+  }
+  tmpl_exit_.assign(job_.templates.size(), 0);
+  for (std::size_t i = 0; i < job_.templates.size(); ++i)
+    if (std::string_view(job_.strings.c_str() +
+                         job_.templates[i].operation_class) == "EXIT")
+      tmpl_exit_[i] = 1;
   {
     bool dense = job_.code.size() == job_.instances.size();
     for (std::size_t i = 0; dense && i < job_.code.size(); ++i)
@@ -741,6 +1135,14 @@ void Simulator::load_setup() {
       for (const auto& c : job_.code)
         code_addr_[c.instance] = c.code_address;
     }
+  }
+  stall_on_ = !opt_.stall_ledger.empty();
+  if (stall_on_) {
+    stall_drain_id_ = stall_id_("exit_drain");
+    stall_cfloor_id_ = stall_id_("control_floor");
+    stall_cbranch_id_ = stall_id_("control:branch");
+    stall_cyield_id_ = stall_id_("control:yield");
+    stall_cbsync_id_ = stall_id_("control:bsync");
   }
 
   for (const auto& r : job_.register_refs)
@@ -948,23 +1350,30 @@ const Fields& Simulator::service_fields(const InstructionTemplate& t) {
 }
 
 void Simulator::update_ready_at(WarpState& w) {
-  // ready_at_ = max(source reg_ready, masked barrier_free) for the
-  // current next_instance — both only change at issue time, so the
-  // value is exact until this warp's next issue
+  // ready_at_ = earliest cycle (> now_) at which the masked barriers
+  // and the control floor let the current next_instance issue —
+  // issue_rules v1 R1: source-register readiness is not an issue
+  // term; R3: a barrier raised at now_ is judged by its previous
+  // release at now_ + 1 and by the raised release from now_ + 2 on.
+  // barrier state only changes at issue time, so the value is exact
+  // until this warp's next issue
   w.ready_at_ = 0;
   if (w.next_instance >= w.end_instance) return;
   const auto& inst = job_.instances[w.next_instance];
   const auto& t = job_.templates[inst.template_index];
-  for (std::uint32_t i = 0; i < t.source_count; ++i) {
-    const auto reg = reg_id(job_.register_refs[t.source_begin + i]);
-    const std::uint64_t v =
-        reg < w.reg_ready.size() ? w.reg_ready[reg] : 0;
-    w.ready_at_ = std::max(w.ready_at_, v);
+  for (std::uint32_t b = 0; b < NO_BARRIER; ++b) {
+    if (!(t.scoreboard_wait_mask & (1u << b))) continue;
+    std::uint64_t c;
+    if (w.barrier_raised_at[b] == now_)
+      c = w.barrier_prev_free[b] <= now_ + 1
+              ? now_ + 1
+              : std::max(now_ + 2, w.barrier_free[b]);
+    else
+      c = std::max(now_ + 1, w.barrier_free[b]);
+    w.ready_at_ = std::max(w.ready_at_, c);
   }
-  for (std::uint32_t b = 0; b < NO_BARRIER; ++b)
-    if (t.scoreboard_wait_mask & (1u << b))
-      w.ready_at_ = std::max(w.ready_at_, w.barrier_free[b]);
   w.ready_at_ = std::max(w.ready_at_, w.control_floor);
+  w.ready_at_ = std::max(w.ready_at_, w.result_floor);
 }
 
 // ---- readiness (fixed order; buckets per spec) ----------------------
@@ -1000,6 +1409,38 @@ bool Simulator::sync_shared_store(
   return true;
 }
 
+std::uint64_t Simulator::barrier_effective(
+    const WarpState& w, std::uint32_t b, std::uint64_t now) {
+  return now == w.barrier_raised_at[b] + 1 ? w.barrier_prev_free[b]
+                                         : w.barrier_free[b];
+}
+
+void Simulator::raise_barrier(WarpState& w, std::uint32_t b,
+                              std::uint64_t free_cycle, bool is_read) {
+  // an ordinary producer raising the barrier while it is pending must
+  // not be lost
+  if (w.barrier_pending_count[b] && free_cycle != kPending)
+    w.barrier_pending_floor[b] =
+        std::max(w.barrier_pending_floor[b], free_cycle);
+  w.barrier_prev_free[b] = w.barrier_free[b];
+  w.barrier_prev_writer[b] = w.barrier_writer[b];
+  w.barrier_prev_is_read[b] = w.barrier_is_read[b];
+  w.barrier_raised_at[b] = now_;
+  if (stall_on_) {
+    const auto& ri = job_.instances[w.next_instance];
+    if (ri.semantics != kNone32 &&
+        (job_.semantics[ri.semantics].flags & kSemaFlagWaitOrigin)) {
+      w.origin_inst = w.next_instance;
+      w.origin_issue = now_;
+    }
+  }
+  if (free_cycle > w.barrier_free[b]) {
+    w.barrier_free[b] = free_cycle;
+    w.barrier_writer[b] = static_cast<std::uint32_t>(w.next_instance);
+    w.barrier_is_read[b] = is_read;
+  }
+}
+
 bool Simulator::register_ready(const WarpState& w,
                                const InstructionTemplate& t) const {
   for (std::uint32_t i = 0; i < t.source_count; ++i) {
@@ -1014,7 +1455,7 @@ bool Simulator::scoreboard_ready(const WarpState& w,
                                  const InstructionTemplate& t) const {
   for (std::uint32_t b = 0; b < NO_BARRIER; ++b) {
     if (t.scoreboard_wait_mask & (1u << b)) {
-      if (w.barrier_free[b] > now_)
+      if (barrier_effective(w, b, now_) > now_)
         return false;
     }
   }
@@ -1034,17 +1475,23 @@ std::uint64_t Simulator::max_source_reg_ready(
 
 std::uint64_t Simulator::register_retry(
     const WarpState& w, const InstructionTemplate& t) const {
+  // issue_rules v1 R1: the terms are the wait-mask barriers and the
+  // control floor only — registers never hold issue.  R3: a barrier
+  // raised at now_ - 1 is judged by its previous release this cycle;
+  // when that previous release is the binding term the retry is the
+  // raised release (which the next cycle sees), never <= now_
   std::uint64_t r = kNever;
-  for (std::uint32_t i = 0; i < t.source_count; ++i) {
-    std::uint32_t reg = reg_id(job_.register_refs[t.source_begin + i]);
-    if (reg < w.reg_ready.size() && w.reg_ready[reg] > now_)
-      r = std::min(r, w.reg_ready[reg]);
-  }
-  for (std::uint32_t b = 0; b < NO_BARRIER; ++b)
-    if ((t.scoreboard_wait_mask & (1u << b)) &&
-        w.barrier_free[b] > now_)
+  for (std::uint32_t b = 0; b < NO_BARRIER; ++b) {
+    if (!(t.scoreboard_wait_mask & (1u << b))) continue;
+    if (now_ == w.barrier_raised_at[b] + 1) {
+      if (w.barrier_prev_free[b] > now_)
+        r = std::min(r, std::max(now_ + 1, w.barrier_free[b]));
+    } else if (w.barrier_free[b] > now_) {
       r = std::min(r, w.barrier_free[b]);
+    }
+  }
   if (w.control_floor > now_) r = std::min(r, w.control_floor);
+  if (w.result_floor > now_) r = std::min(r, w.result_floor);
   return r;
 }
 
@@ -1160,6 +1607,11 @@ bool Simulator::resource_ready(
         w.unit_blocked = true;
       }
       w.last_wait = WaitBucket::kResource;
+      if (stall_on_) {
+        const char* un = stall_unit_name(res);
+        stall_set(w, "unit:" +
+                     std::string(un ? un : std::to_string(res)));
+      }
       w.retry_at = earliest;
       return false;
     }
@@ -1192,6 +1644,11 @@ bool Simulator::resource_ready(
           }
           w.unit_blocked = true;
           w.last_wait = WaitBucket::kResource;
+          if (stall_on_) {
+            const char* un = stall_unit_name(res);
+            stall_set(w, "unit_outbid:" +
+                         std::string(un ? un : std::to_string(res)));
+          }
           w.retry_at = now_ + 1;
           return false;
         }
@@ -1209,8 +1666,58 @@ void Simulator::clear_unit_waiter(WarpState& w) {
   w.unit_wait_key = kNone64;
 }
 
+std::uint64_t Simulator::warp_queue_row(const InstructionTemplate& t,
+                                        const InstructionInstance& inst) {
+  if (!t.timing_count) return kNone64;
+  if (inst.memory_access != kNone32 &&
+      (job_.accesses[inst.memory_access].flags & 0x20))
+    return kNone64;
+  for (std::uint64_t ti = t.timing_begin;
+       ti < t.timing_begin + t.timing_count; ++ti) {
+    if (timing_[ti].kind != kTimingWarpQueueEntry || !timing_[ti].enabled)
+      continue;
+    if (MechanismRuntime::field(timing_fields(ti), TR::ENABLED, 1.0) ==
+        0.0) {
+      timing_[ti].enabled = 0;
+      return kNone64;
+    }
+    return ti;
+  }
+  return kNone64;
+}
+
+bool Simulator::store_fast_path(const WarpState& w,
+                                const InstructionInstance& inst,
+                                std::uint64_t* line) const {
+  *line = ~0ull;
+  if (inst.memory_access == kNone32) return false;
+  const auto& ma = job_.accesses[inst.memory_access];
+  if ((ma.flags & 0x7) != 0 || (ma.flags & 0x1C0) != 0x40 ||
+      ma.sector_count == 0)
+    return false;
+  const auto* secs = job_.sectors.data() + ma.sector_begin;
+  std::uint64_t first_line = ~0ull, bytes = 0;
+  std::uint32_t lanes = 0;
+  bool one_line = true;
+  for (std::size_t i = 0; i < ma.sector_count; ++i) {
+    const std::uint64_t l = secs[i].address >> 7;
+    if (i == 0) first_line = l;
+    else if (l != first_line) one_line = false;
+    bytes += static_cast<std::uint64_t>(__builtin_popcount(secs[i].byte_mask));
+    lanes |= secs[i].lane_mask;
+  }
+  if (!one_line) return false;
+  *line = first_line;
+  if (lanes == 0) return false;  // TMA / bulk: no per-lane facts
+  // per-lane width from the written bytes (the access record has no
+  // width field): bytes / active lanes
+  const std::uint64_t width = bytes / __builtin_popcount(lanes);
+  return width >= 4 && w.last_store_line == first_line;
+}
+
 bool Simulator::try_issue(WarpState& w) {
   w.unit_blocked = false;
+  w.queue_deferred = false;
   if (w.next_instance >= w.end_instance) return false;
   // rule 3b (§13.10): the head of a foldable poll region waits on the
   // paired winner's acquire readiness; once ready every instance in
@@ -1229,6 +1736,7 @@ bool Simulator::try_issue(WarpState& w) {
       gsync_wait_smsps_.insert(
           (std::uint64_t(w.sm) << 3) | w.smsp);
       w.last_wait = WaitBucket::kSemantic;
+      STALL_SET(w, "gsync");
       return false;
     }
     if (w.region_wait_mark != ~0ull) {
@@ -1284,13 +1792,49 @@ bool Simulator::try_issue(WarpState& w) {
     // (mbarrier waits, gsync) stay in the semantic bucket
     if (w.blocked_until > now_) {
       w.last_wait = w.block_bucket;
+      if (stall_on_)
+        stall_set_suspended(w);
       w.retry_at = w.blocked_until;
     } else {
       w.last_wait = WaitBucket::kSemantic;
+      // kinds with a dedicated ledger reason set it inside
+      // semantic_ready (async_group_wait / gsync)
+      if (stall_on_ && sema.kind != kSemaBulkGroupWait &&
+          sema.kind != kSemaAsyncCopyWait &&
+          sema.kind != kSemaGlobalSync)
+        stall_set(w, "semantic:" +
+                         std::string(stall_kind_name(sema.kind)));
     }
     return false;
   }
   if (!resource_ready(w, t, svc)) return false;
+  // mio_basic protocol v3 M3: the group of g in-flight results is
+  // released as a whole -- while the chain's turn frontier is still
+  // ahead an instance with count >= g waits at issue until the
+  // frontier (mio_inflight), where the count is 0.  Only the group
+  // field is looked up before the gate; the turn fields and the
+  // unsupported:mio_return_chain throw are resolved at commit below.
+  const std::uint64_t mio_group = static_cast<std::uint64_t>(
+      MechanismRuntime::field(svc, IT::WARP_INFLIGHT_GROUP, 0.0));
+  if (mio_group > 0) {
+    const double mio_r = MechanismRuntime::field(
+        svc, IT::RETURN_INTERVAL_CYCLES, 0.0);
+    const std::uint64_t mio_chain = static_cast<std::uint64_t>(
+        MechanismRuntime::field(svc, IT::RETURN_CHAIN, 0.0));
+    if (mio_r > 0.0 && mio_chain >= 1 && mio_chain <= 7 &&
+        !(inst.memory_access != kNone32 &&
+          (job_.accesses[inst.memory_access].flags & 0x20))) {
+      auto& c = w.mio_chain[mio_chain];
+      if (static_cast<double>(now_) >= c.free) {
+        c.count = 0;
+      } else if (c.count >= mio_group) {
+        w.last_wait = WaitBucket::kResource;
+        STALL_SET(w, "mio_inflight");
+        w.retry_at = static_cast<std::uint64_t>(std::ceil(c.free - 1e-9));
+        return false;
+      }
+    }
+  }
   // storage.global.store_issue (kind 65): a global / local store cannot
   // issue before its SMSP's previous store's interval has elapsed
   // (lsu_accept protocol v5: STG.32 / .64 / .128 every 3 / 6 / 23
@@ -1305,12 +1849,78 @@ bool Simulator::try_issue(WarpState& w) {
       auto it = store_issue_next_.find((std::uint64_t(w.sm) << 4) | w.smsp);
       if (it != store_issue_next_.end() && it->second > now_) {
         w.last_wait = WaitBucket::kResource;
+        STALL_SET(w, "store_issue_interval");
         w.retry_at = it->second;
         return false;
       }
       break;
     }
   }
+  // instruction.warp_queue (Q3): a member cannot issue while
+  // queue_depth_count entries of its warp are unreleased; it waits
+  // until the first cycle at or after the oldest release.  The wait is
+  // warp_queue:lg when the waiting instruction and every unreleased
+  // entry are global (LDG / STG), warp_queue:mio otherwise.
+  const std::uint64_t queue_row = warp_queue_row(t, inst);
+  if (queue_row != kNone64) {
+    const auto& qf = timing_fields(queue_row);
+    const std::uint64_t depth = static_cast<std::uint64_t>(
+        MechanismRuntime::field(qf, TR::QUEUE_DEPTH_COUNT, 0.0));
+    const double now_d = static_cast<double>(now_);
+    while (!w.queue.empty() && w.queue.front().release <= now_d + 1e-9)
+      w.queue.pop_front();
+    if (depth > 0 && w.queue.size() >= depth) {
+      bool all_global =
+          MechanismRuntime::field(qf, TR::IS_GLOBAL_ENTRY, 0.0) != 0.0;
+      for (const auto& e : w.queue) all_global = all_global && e.is_global;
+      w.last_wait = WaitBucket::kResource;
+      STALL_SET(w, all_global ? "warp_queue:lg" : "warp_queue:mio");
+      w.retry_at = static_cast<std::uint64_t>(
+          std::ceil(w.queue.front().release - 1e-9));
+      return false;
+    }
+    // S2: the SM's own bound over the unreleased entries of all warps
+    const std::uint64_t sm_depth = static_cast<std::uint64_t>(
+        MechanismRuntime::field(qf, TR::SM_DEPTH_COUNT, 0.0));
+    if (sm_depth > 0) {
+      if (sm_queue_.size() <= w.sm) sm_queue_.resize(w.sm + 1);
+      auto& sq = sm_queue_[w.sm];
+      while (!sq.empty() && sq.top() <= now_d + 1e-9) sq.pop();
+      if (sm_wait_q_.size() <= w.sm) sm_wait_q_.resize(w.sm + 1);
+      auto& wq = sm_wait_q_[w.sm];
+      const bool full = sq.size() >= sm_depth;
+      const bool head = !wq.empty() && wq.front() == w.warp_index;
+      if (full || (!wq.empty() && !head)) {
+        if (std::find(wq.begin(), wq.end(), w.warp_index) == wq.end())
+          wq.push_back(w.warp_index);
+        bool all_global =
+            MechanismRuntime::field(qf, TR::IS_GLOBAL_ENTRY, 0.0) != 0.0;
+        for (const auto& e : w.queue)
+          all_global = all_global && e.is_global;
+        w.last_wait = WaitBucket::kResource;
+        STALL_SET(w, all_global ? "warp_queue:lg" : "warp_queue:mio");
+        w.queue_deferred = !head;
+        w.retry_at = full ? static_cast<std::uint64_t>(
+                                std::ceil(sq.top() - 1e-9))
+                          : now_ + 1;
+        return false;
+      }
+      // the head passes the bound here; a later gate (the store buffer
+      // keeps its own first-in first-out list) may still hold it, and
+      // keeping its place in this list would make the two lists wait
+      // for each other
+      if (head) wq.pop_front();
+    }
+  }
+  // warp_queue S4: a global store on the fast path (a member row with
+  // an SM slot, a whole-word store to the line the warp's previous
+  // global store wrote) skips the per-SM store buffer
+  bool fast_store = false;
+  std::uint64_t fast_line = ~0ull;
+  if (queue_row != kNone64 &&
+      MechanismRuntime::field(timing_fields(queue_row),
+                              TR::SM_START_INTERVAL_CYCLES, 0.0) > 0.0)
+    fast_store = store_fast_path(w, inst, &fast_line);
   // register_file.operand_read: while the most recently issued
   // instruction with n > 0 unserved GPR reads has not started its
   // collector service, the SMSP issues nothing further
@@ -1318,6 +1928,7 @@ bool Simulator::try_issue(WarpState& w) {
     auto& s = smsps_[w.sm][w.smsp];
     if (s.coll_svc_start > now_) {
       w.last_wait = WaitBucket::kResource;
+      STALL_SET(w, "operand_collector");
       w.retry_at = s.coll_svc_start;
       return false;
     }
@@ -1339,7 +1950,7 @@ bool Simulator::try_issue(WarpState& w) {
       }
       for (std::uint32_t b = 0; b < NO_BARRIER; ++b)
         if ((t.scoreboard_wait_mask & (1u << b)) &&
-            w.barrier_free[b] > now_)
+            barrier_effective(w, b, now_) > now_)
           fprintf(stderr,
                   "DBG_INST %llu fail@ %llu barrier_free sb%u=%llu "
                   "wr=%u\n",
@@ -1358,12 +1969,23 @@ bool Simulator::try_issue(WarpState& w) {
               (unsigned long long)w.retry_at);
     }
     w.last_wait = WaitBucket::kRegister;
-    w.retry_at = reg_r;
+    if (stall_on_) {
+      std::uint32_t wr = ~0u;
+      const std::string rs = stall_reg_reason(w, t, reg_r, &wr);
+      stall_set(w, rs);
+      stall_arm_origin(w, rs, wr);
+    }
+    // kPending (a wait result whose release is not yet fixed) is an
+    // event wait, not a future cycle: contribute nothing to time
+    // advance; the kWake enqueued by mbarrier_phase_complete marks
+    // the SMSP for the resolved cycle
+    w.retry_at = reg_r == kPending ? 0 : reg_r;
     return false;
   }
   if (auto it = sm_issue_block_until_.find(w.sm);
       it != sm_issue_block_until_.end() && it->second > now_) {
     w.last_wait = WaitBucket::kResource;
+    STALL_SET(w, "sm_issue_block");
     w.retry_at = it->second;
     return false;
   }
@@ -1390,12 +2012,18 @@ bool Simulator::try_issue(WarpState& w) {
         arch_->memory_queue_retry(w.sm, w.smsp, now_);
     if (mq_r) {
       w.last_wait = WaitBucket::kResource;
+      STALL_SET(w, "memory_queue");
       w.retry_at = (mq_r == ~0ull ? 0 : mq_r);
       return false;
     }
   }
   if (!arch_->instance_ready(*this, w, inst, sema)) {
     w.last_wait = WaitBucket::kSemantic;
+    if (stall_on_) {
+      const char* d = arch_->stall_detail();
+      stall_set(w, "arch:" +
+                   std::string(d ? d : "instance_ready"));
+    }
     return false;
   }
   // co-resident dependent penalty (hopper wgmma C4): while another
@@ -1406,6 +2034,7 @@ bool Simulator::try_issue(WarpState& w) {
       max_source_reg_ready(w, t) == now_ &&
       (w.dep_penalty_toggle ^= 1)) {
     w.last_wait = WaitBucket::kRegister;
+    STALL_SET(w, "coresident_penalty");
     w.retry_at = now_ + 1;
     return false;
   }
@@ -1413,6 +2042,14 @@ bool Simulator::try_issue(WarpState& w) {
   std::uint64_t result_lat = static_cast<std::uint64_t>(
       std::max(0.0, MechanismRuntime::field(
           svc, IT::RESULT_LATENCY_CYCLES, 1.0)));
+  // stall-ledger naming candidate: which mechanism contributed the
+  // value that ends up as this instruction's binding control floor
+  // (0 = none / stall field; 1 = taken-branch envelope, 2 = YIELD,
+  // 3 = BSYNC).  Checked against the final floor below
+  std::uint8_t ctl_kind = 0;
+  std::uint64_t ctl_val = 0;
+  std::uint32_t ctl_mech = 0;   // reason id for ctl_kind 4
+  std::uint32_t br_hold = 0, br_resolve = 0;
   // failed polls (§13.3.6) carry no result latency — their predicate
   // is consumed by the retry whose timing is the suspension / wake
   // model; a stale one (phase already released on the simulated
@@ -1437,13 +2074,34 @@ bool Simulator::try_issue(WarpState& w) {
   if (gsync_failed_poll) result_lat = 0;
   // fence-family ops have no destination register: their service result
   // is the warp's own next-issue floor (MEMBAR/FENCE block the warp in
-  // order until complete; k_fence definition).  Other no-destination
-  // classes keep the register/barrier-only path.
-  if (t.destination_count == 0 && result_lat > 1) {
+  // order until complete; k_fence definition).  BSYNC joins them
+  // (branch_basic v2 R2): every BSYNC instance is floored whether or
+  // not its template names the B register as a destination.  Other
+  // no-destination classes keep the register/barrier-only path.
+  if (result_lat > 1) {
     const std::string_view cls = job_.strings.c_str() + t.operation_class;
-    if (cls.rfind("MEMBAR", 0) == 0 || cls.rfind("FENCE", 0) == 0 ||
-        cls == "YIELD")
+    if (cls.rfind("BSYNC", 0) == 0 ||
+        (t.destination_count == 0 &&
+         (cls.rfind("MEMBAR", 0) == 0 || cls.rfind("FENCE", 0) == 0 ||
+          cls == "YIELD"))) {
       w.control_floor = std::max(w.control_floor, now_ + result_lat);
+      // stall-ledger naming: remember a YIELD / BSYNC service floor as
+      // the control-kind candidate; which candidate bound the final
+      // floor is decided once all of this instruction's floors are in
+      if (cls.rfind("BSYNC", 0) == 0) {
+        ctl_kind = 3;
+        ctl_val = now_ + result_lat;
+      } else if (cls == "YIELD") {
+        ctl_kind = 2;
+        ctl_val = now_ + result_lat;
+      } else if (stall_on_) {
+        if (const std::uint32_t id = stall_membar_reason(t)) {
+          ctl_kind = 4;
+          ctl_val = now_ + result_lat;
+          ctl_mech = id;
+        }
+      }
+    }
   }
   const std::uint64_t completion_lat = static_cast<std::uint64_t>(
       std::max<double>(result_lat,
@@ -1528,7 +2186,7 @@ bool Simulator::try_issue(WarpState& w) {
     const auto& sma = job_.accesses[inst.memory_access];
     const std::uint32_t sspace = sma.flags & 0x7;
     const std::uint32_t sakind = sma.flags & 0x1C0;
-    if (sspace == 0 && sakind == 0x40) {
+    if (sspace == 0 && sakind == 0x40 && !fast_store) {
       const std::uint64_t block =
           mem_.store_issue_block(w.sm, now_);
       if (store_gate_q_.size() <= w.sm) store_gate_q_.resize(w.sm + 1);
@@ -1544,14 +2202,77 @@ bool Simulator::try_issue(WarpState& w) {
         }
         tele_[kTeleStoreBufferStallCycles] += full ? block - now_ : 1;
         w.last_wait = WaitBucket::kResource;
+        STALL_SET(w, "store_buffer");
         w.retry_at = full ? block : now_ + 1;
         return false;
       }
       if (head) q.pop_front();
     }
   }
+  // memory.constant_cache uniform cold-hold: a uniform-path
+  // constant access whose line is not resident in this SM's
+  // constant cache -- or whose fill is still in flight -- holds
+  // at issue until the fill is ready; its result is ready at issue.
+  // Two model variants gate this: kernel_start v2 (both hold
+  // fields present, any uniform constant template) and
+  // constant_paths v1 C4 (both first-touch fields present and the
+  // template has no write barrier).  Last gate before commit: the
+  // fill it starts cannot be undone by a later verdict, and
+  // re-evaluation while the fill is in flight only sees the
+  // in-flight line.
+  if ((mem_cfg_.const_paths()
+           ? (t.scoreboard_write == 0xFF || t.scoreboard_write >= NO_BARRIER)
+           : (mem_cfg_.const_ubank0_hold >= 0.0 &&
+              mem_cfg_.const_uhold >= 0.0)) &&
+      inst.memory_access != kNone32 && !gsync_failed_poll) {
+    const auto& ma = job_.accesses[inst.memory_access];
+    if ((ma.flags & 0x7) == 3 && (ma.flags & 0x10)) {
+      const auto* secs = job_.sectors.data() + ma.sector_begin;
+      std::uint8_t hold_class = 0;
+      const std::uint64_t ready = mem_.constant_uniform_hold(
+          w.sm, w.warp_index, now_,
+          ma.sector_count ? secs[0].address : 0, &hold_class,
+          w.const_hold_instance != w.next_instance,
+          const_gpc(w.sm),
+          sm_resident_warps_[w.sm],
+          sm_occupied_smsps(w.sm));
+      if (ready > now_) {
+        if (w.const_hold_instance != w.next_instance) {
+          w.const_hold_instance = w.next_instance;
+          w.const_hold_class = hold_class;
+        }
+        w.last_wait = WaitBucket::kResource;
+        STALL_SET(w, "constant_hold");
+        w.retry_at = ready;
+        return false;
+      }
+    }
+  }
   // commit issue
   ++out_.issued;
+  if (stall_on_) {
+    stall_set(w, "issued");
+    auto& e = stall_acc_[{w.stall_pc, w.stall_reason}];
+    // the issue cycle [now, now+1) is excluded from the wait-bucket
+    // interval (wait_mark = now+1); the ledger charges it here so
+    // every resident cycle is covered exactly once
+    ++e.cycles;
+    ++e.events;
+    ++w.stall_resident_cycles;
+    if (w.stall_first_resident == ~0ull)
+      w.stall_first_resident = now_;
+    // this key is already counted: flush_wait must not open a new
+    // event for the span that follows this issue
+    w.stall_open_pc = w.stall_pc;
+    w.stall_open_reason = w.stall_reason;
+    // transition (previous issued pc -> this pc) and the per-warp
+    // conservation fields
+    if (w.stall_has_issue)
+      ++stall_trans_[{w.stall_prev_issue_pc, w.stall_pc}];
+    w.stall_prev_issue_pc = w.stall_pc;
+    w.stall_has_issue = true;
+    w.stall_last_issue = now_;
+  }
   clear_unit_waiter(w);
   if (cta_first_issue_.size() != job_.ctas.size()) {
     cta_first_issue_.assign(job_.ctas.size(), kNone64);
@@ -1574,7 +2295,7 @@ bool Simulator::try_issue(WarpState& w) {
   // registers and the write barrier are released below at
   // data_ready (§data-ready).
   if (t.scoreboard_read != 0xFF && t.scoreboard_read < NO_BARRIER)
-    w.barrier_free[t.scoreboard_read] = now_;
+    raise_barrier(w, t.scoreboard_read, now_, /*is_read=*/true);
   // resource instance: initiation interval per copy + inflight record
   for (std::uint32_t which = 0; which < 2; ++which) {
     const std::uint32_t res = service_resource(t, svc, which);
@@ -1687,10 +2408,180 @@ bool Simulator::try_issue(WarpState& w) {
     }
   }
   std::uint64_t finish_cycle = now_ + completion_lat;
+  // synchronization.mbarrier (sync_basic v5 R2): one SYNCS server per
+  // SM; a SYNCS-class instruction carrying an mbarrier_arrive /
+  // mbarrier_wait row takes a turn at issue (known failed polls take
+  // none): service_start = max(issue cycle, server_free), server_free
+  // = service_start + service_interval_cycles.  Issue is never
+  // delayed; the arrive's effects are dated at service_start
+  // (syncs_service_cycle_, consumed by on_semantic_issue) and a wait's
+  // result latency counts from it.
+  const std::string_view op_cls =
+      job_.strings.c_str() + t.operation_class;
+  const bool syncs_row =
+      (sema.kind == kSemaMbarrierArrive ||
+       (sema.kind == kSemaMbarrierWait &&
+        !failed_poll(w.next_instance, sema))) &&
+      op_cls.rfind("SYNCS", 0) == 0;
+  syncs_service_cycle_ = now_;
+  if (syncs_row) {
+    const double si = syncs_service_interval();
+    if (si > 0.0) {
+      if (w.sm >= syncs_server_free_.size())
+        syncs_server_free_.resize(w.sm + 1, 0.0);
+      const double start_d =
+          std::max(static_cast<double>(now_), syncs_server_free_[w.sm]);
+      syncs_server_free_[w.sm] = start_d + si;
+      syncs_service_cycle_ =
+          static_cast<std::uint64_t>(std::ceil(start_d - 1e-9));
+    }
+  }
+  // mio_basic protocol v3 (M1/M2): the turn is taken at issue, in
+  // issue order: turn_start = max(issue cycle, the warp's chain_free
+  // (r > 0), the SM-class server_free (q > 0)); then chain_free =
+  // turn_start + r and server_free = turn_start + q.  The three times
+  // keep their fractions; a whole-cycle view takes the ceiling.
+  // A remote shared-memory access (flag 0x20) takes no turn; a
+  // predicated-off instance resolves to the predicated_on=0 leaf and
+  // carries none of these fields.
+  const double mio_r = MechanismRuntime::field(
+      svc, IT::RETURN_INTERVAL_CYCLES, 0.0);
+  const double mio_q = MechanismRuntime::field(
+      svc, IT::SM_SERVICE_INTERVAL_CYCLES, 0.0);
+  const std::uint64_t mio_chain = static_cast<std::uint64_t>(
+      MechanismRuntime::field(svc, IT::RETURN_CHAIN, 0.0));
+  if (mio_r > 0.0 && (mio_chain < 1 || mio_chain > 7))
+    throw EngineError("unsupported:mio_return_chain (" +
+                      std::to_string(mio_chain) + ")");
+  const bool mio_turn =
+      (mio_r > 0.0 || mio_q > 0.0) &&
+      !(inst.memory_access != kNone32 &&
+        (job_.accesses[inst.memory_access].flags & 0x20));
+  std::uint64_t turn_start = now_;
+  if (mio_turn) {
+    auto* c = mio_r > 0.0 ? &w.mio_chain[mio_chain] : nullptr;
+    const double eligible =
+        std::max(static_cast<double>(now_), c ? c->free : 0.0);
+    double start_d = eligible;
+    // M2 (protocol v4): the server holds the intervals it has
+    // granted; a new turn takes the earliest interval of length q at
+    // or after eligible that overlaps none of them, so the cycles
+    // between one warp's turns serve other warps.  Granted intervals
+    // that end at or before the current cycle are forgotten.
+    if (mio_q > 0.0) {
+      auto& busy = mio_server_busy_[(std::uint64_t(w.sm) << 32) |
+                                    t.operation_class];
+      while (!busy.empty() &&
+             busy.front().second <=
+                 static_cast<double>(now_) + 1e-9)
+        busy.erase(busy.begin());
+      double t = eligible;
+      for (const auto& iv : busy) {
+        if (iv.second <= t + 1e-9) continue;
+        if (iv.first >= t + mio_q - 1e-9) break;
+        t = iv.second;
+      }
+      start_d = t;
+      busy.insert(
+          std::lower_bound(
+              busy.begin(), busy.end(),
+              std::pair<double, double>{start_d, 0.0},
+              [](const std::pair<double, double>& a,
+                 const std::pair<double, double>& b) {
+                return a.first < b.first;
+              }),
+          {start_d, start_d + mio_q});
+    }
+    if (c) {
+      if (static_cast<double>(now_) >= c->free) c->count = 0;
+      c->free = start_d + mio_r;
+      if (mio_group > 0) ++c->count;
+    }
+    turn_start =
+        static_cast<std::uint64_t>(std::ceil(start_d - 1e-9));
+    finish_cycle = std::max(finish_cycle,
+                            turn_start + completion_lat);
+  }
+  // instruction.warp_queue (Q2 / Q4): the member becomes an entry of
+  // its warp's queue; the release server starts it after the first
+  // service latency (start_latency_cycles + start_interval_ratio * r)
+  // or when it is free, whichever is later, and keeps the fractions.  A
+  // row with has_chain_turn also takes a turn of r in the warp's return
+  // chain 1 (the frontier later loads start from); the instruction's
+  // own result / completion times are not changed.
+  double queue_release = -1.0, queue_result_after = 0.0;
+  bool queue_l1_served = false;
+  if (queue_row != kNone64) {
+    const auto& qf = timing_fields(queue_row);
+    const double qr = MechanismRuntime::field(
+        qf, TR::RELEASE_INTERVAL_CYCLES, 0.0);
+    double qstart = std::max(
+        w.queue_free,
+        static_cast<double>(now_) +
+            MechanismRuntime::field(qf, TR::START_LATENCY_CYCLES, 0.0) +
+            MechanismRuntime::field(qf, TR::START_INTERVAL_RATIO, 0.0) *
+                qr);
+    // S1: the release starts in a free slot of length a of the
+    // (SM, operation class) server (granted intervals as mio_basic
+    // v4 M2); an STG takes a slot only on the S4 fast path
+    const bool is_global_store =
+        inst.memory_access != kNone32 &&
+        (job_.accesses[inst.memory_access].flags & 0x7) == 0 &&
+        (job_.accesses[inst.memory_access].flags & 0x1C0) == 0x40;
+    double slot_a = MechanismRuntime::field(
+        qf, TR::SM_START_INTERVAL_CYCLES, 0.0);
+    if (is_global_store && !fast_store) slot_a = 0.0;
+    if (slot_a > 0.0) {
+      auto& busy = queue_server_busy_[(std::uint64_t(w.sm) << 32) |
+                                      t.operation_class];
+      while (!busy.empty() &&
+             busy.front().second <= static_cast<double>(now_) + 1e-9)
+        busy.erase(busy.begin());
+      double ts = qstart;
+      for (const auto& iv : busy) {
+        if (iv.second <= ts + 1e-9) continue;
+        if (iv.first >= ts + slot_a - 1e-9) break;
+        ts = iv.second;
+      }
+      qstart = ts;
+      busy.insert(
+          std::lower_bound(
+              busy.begin(), busy.end(),
+              std::pair<double, double>{qstart, 0.0},
+              [](const std::pair<double, double>& a,
+                 const std::pair<double, double>& b) {
+                return a.first < b.first;
+              }),
+          {qstart, qstart + slot_a});
+    }
+    w.queue_free = qstart + qr;
+    queue_release = w.queue_free;
+    queue_result_after = MechanismRuntime::field(
+        qf, TR::RESULT_AFTER_RELEASE_CYCLES, 0.0);
+    w.queue.push_back(WarpState::QueueEntry{
+        w.queue_free,
+        MechanismRuntime::field(qf, TR::IS_GLOBAL_ENTRY, 0.0) != 0.0});
+    if (MechanismRuntime::field(qf, TR::SM_DEPTH_COUNT, 0.0) > 0.0) {
+      if (sm_queue_.size() <= w.sm) sm_queue_.resize(w.sm + 1);
+      sm_queue_[w.sm].push(w.queue_free);
+    }
+    if (MechanismRuntime::field(qf, TR::HAS_CHAIN_TURN, 0.0) != 0.0) {
+      if (mio_r > 0.0 || mio_q > 0.0)
+        throw EngineError(
+            "unsupported:warp_queue_chain_turn_with_return_fields (" +
+            std::string(job_.strings.c_str() + t.operation_class) +
+            " carries instruction.service return fields)");
+      auto& c = w.mio_chain[1];
+      c.free = std::max(static_cast<double>(now_), c.free) + qr;
+    }
+  }
   // data_ready: when dependents can consume this instruction's result.
-  // Starts at result latency; a data-producing return (load, constant,
-  // atomic with destination) or bound TIME row completion raises it.
-  std::uint64_t data_ready = now_ + result_lat;
+  // Starts at result latency from the turn start; a data-producing
+  // return (load, constant, atomic with destination) or bound TIME
+  // row completion raises it.
+  std::uint64_t data_ready = turn_start + result_lat;
+  if (syncs_row && sema.kind == kSemaMbarrierWait)
+    data_ready = std::max(data_ready, syncs_service_cycle_ + result_lat);
   const bool dbg = kDebugInst && dbg_inst == w.next_instance;
   if (dbg)
     fprintf(stderr,
@@ -1762,11 +2653,10 @@ bool Simulator::try_issue(WarpState& w) {
           if (loc_n < loc_small.size()) {
             loc_small[loc_n] = s;
           } else {
-            if (loc_big.empty()) {
+            if (loc_big.empty())
               loc_big.assign(loc_small.begin(), loc_small.end());
-              loc_secs = loc_big.data();
-            }
             loc_big.push_back(s);
+            loc_secs = loc_big.data();   // push_back may reallocate
           }
           ++loc_n;
         }
@@ -1778,13 +2668,41 @@ bool Simulator::try_issue(WarpState& w) {
       // shared-space: bank facts + TIME rows only (no cache path);
       // applied below via timing rows.
     } else if (space == 3) {
-      const std::uint64_t cret =
-          mem_.constant(w.sm, w.warp_index, now_,
-                        ns ? secs[0].address : 0,
-                        ns * mem_cfg_.sector_bytes,
-                        (ma.flags & 0x10) != 0);
-      finish_cycle = std::max(finish_cycle, cret);
-      data_ready = std::max(data_ready, cret);
+      std::uint8_t chit = 0xFF;
+      if (w.const_hold_instance == w.next_instance) {
+        // uniform cold-hold access issued at fill-ready: result at
+        // issue, no hit / same-line latency on top; keep the LRU
+        // tick and last-line bookkeeping a hit would have done
+        chit = w.const_hold_class;
+        mem_.constant_post_hold(w.sm, w.warp_index,
+                                ns ? secs[0].address : 0);
+        w.const_hold_instance = kNone64;
+      } else {
+        const std::uint64_t cret =
+            mem_.constant(w.sm, w.warp_index, now_,
+                          ns ? secs[0].address : 0,
+                          ns * mem_cfg_.sector_bytes,
+                          (ma.flags & 0x10) != 0, &chit,
+                          const_gpc(w.sm), sm_resident_warps_[w.sm],
+                          sm_occupied_smsps(w.sm),
+                          // mio_basic protocol v3 M1: the re-read
+                          // term counts from the turn start
+                          mio_turn ? turn_start : now_);
+        finish_cycle = std::max(finish_cycle, cret);
+        data_ready = std::max(data_ready, cret);
+        // constant_paths v1 C4: a vector load without a write
+        // barrier holds nobody, but its outstanding fill is part of
+        // the exit drain
+        if (mem_cfg_.const_paths() && !(ma.flags & 0x10) &&
+            (t.scoreboard_write == 0xFF ||
+             t.scoreboard_write >= NO_BARRIER) &&
+            cret > now_)
+          w.inflight_until = std::max(w.inflight_until, cret);
+      }
+      // stall ledger const suffix: hit / miss / same_line
+      if (stall_on_ && chit != 0xFF)
+        inst_hit_[static_cast<std::uint32_t>(w.next_instance)] =
+            0x40 | chit;
     } else if (store_op) {
       // storage.tma.reduce (kind 81): a reduce's sectors occupy the
       // store port and the shared L2-write service sector_cost_ratio
@@ -1818,7 +2736,7 @@ bool Simulator::try_issue(WarpState& w) {
       const std::uint64_t sret =
           mem_.store(w.sm, now_, secs, ns, atomic,
                      ns ? secs[0].address : 0, &fill_done,
-                     cost_ratio, lane_store);
+                     cost_ratio, lane_store, fast_store);
       finish_cycle = std::max(finish_cycle, sret);
       // a local store leaves its expanded lines resident in the SM's
       // L1 (usable this cycle); the store's cost above stays on the
@@ -1894,12 +2812,26 @@ bool Simulator::try_issue(WarpState& w) {
         finish_cycle = std::max(finish_cycle, ret);
         // plain loads raise data_ready; async_copy / prefetch return
         // through their own semantic objects, not the scoreboard
-        if (akind != 0xC0 && akind != 0x140)
-          data_ready = std::max(data_ready, ret);
+        if (akind != 0xC0 && akind != 0x140) {
+          // warp_queue R1: a member load with a result floor whose
+          // sectors are all served by L1 (hit sectors only: a line
+          // whose fill is still in flight is a miss) has its result at
+          // release + c exactly (applied below); the hierarchy's L1
+          // latency and port time do not set it
+          if (queue_release >= 0.0 && queue_result_after > 0.0 &&
+              akind == 0x0 && space == 0 && use_l1 && ns > 0 &&
+              hl == MemoryHierarchy::HitLevel::l1 && l1o == ns)
+            queue_l1_served = true;
+          else
+            data_ready = std::max(data_ready, ret);
+        }
       }
       if (ax_cache_hit_ < engine_facts_.size())
         engine_facts_[ax_cache_hit_].second =
             static_cast<std::uint64_t>(hl);
+      if (stall_on_)
+        inst_hit_[static_cast<std::uint32_t>(w.next_instance)] =
+            static_cast<std::uint8_t>(hl);
     }
     // TIME rows (3-2 bound kinds): resolve once via the row's USES
     // (FACT + engine axes), write cycles/enabled back, then apply.
@@ -1927,10 +2859,14 @@ bool Simulator::try_issue(WarpState& w) {
       const double cyc = MechanismRuntime::field(
           f, core::parameter_fields::TIMING_ROW::CYCLES, 0.0);
       tr.cycles = cyc;  // write-back at first use
+      // mio_basic protocol v3 M1: with a turn the kind-5
+      // (storage.shared.issue) term counts from turn_start
+      const std::uint64_t row_base =
+          (mio_turn && tr.kind == 5) ? turn_start : now_;
       finish_cycle = std::max(finish_cycle,
-          now_ + static_cast<std::uint64_t>(cyc) + completion_lat);
+          row_base + static_cast<std::uint64_t>(cyc) + completion_lat);
       data_ready = std::max(data_ready,
-          now_ + static_cast<std::uint64_t>(cyc) + completion_lat);
+          row_base + static_cast<std::uint64_t>(cyc) + completion_lat);
       if (dbg)
         fprintf(stderr, "DBG_INST %llu acc_time kind=%u cyc=%.1f\n",
                 (unsigned long long)w.next_instance, tr.kind, cyc);
@@ -1997,8 +2933,16 @@ bool Simulator::try_issue(WarpState& w) {
     std::uint64_t start = now_;
     std::uint64_t fin = kNone64;  // kind 80 supplies its own end
     if (tr.kind == 5) {
-      auto& nx = shared_issue_next_[(std::uint64_t(w.sm) << 4) | w.smsp];
-      start = std::max(now_, nx); nx = start + c;
+      // mio_basic protocol v3 M1: an instance that took a turn runs
+      // the shared-issue row from its turn start and neither reads
+      // nor advances the SMSP frontier
+      if (mio_turn) {
+        start = turn_start;
+      } else {
+        auto& nx = shared_issue_next_[(std::uint64_t(w.sm) << 4) |
+                                      w.smsp];
+        start = std::max(now_, nx); nx = start + c;
+      }
     } else if (tr.kind == 6) {
       auto& nx = shared_accept_next_[w.sm];
       start = std::max(now_, nx); nx = start + c;
@@ -2080,6 +3024,13 @@ bool Simulator::try_issue(WarpState& w) {
                    static_cast<double>(fence_dirty_until_[w.cta])))) +
           result_lat;
       w.control_floor = std::max(w.control_floor, floor);
+      if (stall_on_ && floor >= ctl_val) {
+        if (const std::uint32_t id = stall_membar_reason(t)) {
+          ctl_kind = 4;
+          ctl_val = floor;
+          ctl_mech = id;
+        }
+      }
       ++tele_[kTeleFenceDrainHolds];
       tele_[kTeleFenceDrainCycles] += floor - now_;
     }
@@ -2101,10 +3052,39 @@ bool Simulator::try_issue(WarpState& w) {
                ? mem_.shared_store_port_wait(w.sm, begin, occupy)
                : 0.0)));
       w.control_floor = std::max(w.control_floor, done);
+      if (stall_on_ && done >= ctl_val) {
+        if (const std::uint32_t id = stall_membar_reason(t)) {
+          ctl_kind = 4;
+          ctl_val = done;
+          ctl_mech = id;
+        }
+      }
       ++tele_[kTeleFenceDrainHolds];
       tele_[kTeleFenceDrainCycles] += done - now_;
       fence_dirty_bytes_[w.cta] = 0;
       fence_dirty_until_[w.cta] = 0;
+    }
+  }
+  // warp_queue S3: the result of a member load is not available
+  // before its release + c; a floor on the result time above
+  if (queue_release >= 0.0 && queue_result_after > 0.0) {
+    const auto floor_cycle = static_cast<std::uint64_t>(std::ceil(
+        queue_release + queue_result_after - 1e-9));
+    data_ready = queue_l1_served ? floor_cycle
+                                 : std::max(data_ready, floor_cycle);
+  }
+  // S4 bookkeeping: the line this warp's latest global store wrote
+  if (inst.memory_access != kNone32 && !gsync_failed_poll) {
+    const auto& ma = job_.accesses[inst.memory_access];
+    if ((ma.flags & 0x7) == 0 && (ma.flags & 0x1C0) == 0x40) {
+      std::uint64_t line = ~0ull;
+      const auto* secs = job_.sectors.data() + ma.sector_begin;
+      for (std::size_t i = 0; i < ma.sector_count; ++i) {
+        const std::uint64_t l = secs[i].address >> 7;
+        if (line == ~0ull) line = l;
+        else if (line != l) { line = ~0ull; break; }
+      }
+      w.last_store_line = line;
     }
   }
   if (dbg)
@@ -2121,9 +3101,42 @@ bool Simulator::try_issue(WarpState& w) {
   // queues) may hold it (2026-11-08, full-gpu-chain-report §11.3)
   if (t.scoreboard_read != 0xFF && t.scoreboard_read < NO_BARRIER &&
       accept_start > now_)
-    w.barrier_free[t.scoreboard_read] = accept_start;
+    raise_barrier(w, t.scoreboard_read, accept_start,
+                  /*is_read=*/true);
+  // sync_basic v5 G1 (ii)/(iii): a non-failed mbarrier wait's result
+  // is ready at max(its service_start, the awaited phase's visible
+  // date) + result latency.  Phase already complete -> the date is
+  // the object's release_cycle (a SYNCS-completed phase's
+  // release_cycle is its completion date; anything else carries the
+  // release leaf).  Phase incomplete -> the result is pending: the
+  // dependency barrier and the destinations are raised kPending and
+  // fixed when the phase completes (mbarrier_phase_complete); a wait
+  // that raises no dependency barrier holds the warp's next issue on
+  // result_floor instead.
+  const bool g1_wait =
+      sema.kind == kSemaMbarrierWait &&
+      sema.field[2] == 0 &&
+      !failed_poll(w.next_instance, sema);
+  bool wait_pending = false;
+  std::uint32_t wait_parity = 0;
+  if (g1_wait) {
+    wait_parity = static_cast<std::uint32_t>(sema.field[1] & 1u);
+    const auto* wo = mbar_.find(
+        job_.cta_segment[w.cta],
+        static_cast<std::uint32_t>(sema.field[0]));
+    if (wo && wo->initialized && (wo->phase % 2) != wait_parity) {
+      data_ready = std::max(
+          data_ready,
+          std::max(syncs_service_cycle_, wo->release_cycle) +
+              result_lat);
+    } else {
+      wait_pending = true;
+      data_ready = kPending;
+    }
+  }
   // dependents consume the result at data_ready (result latency raised
   // by every data-producing return above)
+  std::vector<std::uint32_t> wait_dests;
   for (std::uint32_t i = 0; i < t.destination_count; ++i) {
     std::uint32_t reg =
         reg_id(job_.register_refs[t.destination_begin + i]);
@@ -2131,14 +3144,58 @@ bool Simulator::try_issue(WarpState& w) {
       w.reg_ready.resize(
           std::max<std::uint32_t>(max_reg_ + 1, reg + 1), 0);
     w.reg_ready[reg] = data_ready;
-    if (kDebugInst)
+    if (wait_pending) wait_dests.push_back(reg);
+    if (kDebugInst || stall_on_)
       w.reg_writer[reg] = static_cast<std::uint32_t>(w.next_instance);
   }
-  if (t.scoreboard_write < NO_BARRIER) {
-    w.barrier_free[t.scoreboard_write] = data_ready;
-    if (kDebugInst)
-      w.barrier_writer[t.scoreboard_write] =
-          static_cast<std::uint32_t>(w.next_instance);
+  // a wait that goes pending keeps the barrier at kPending until the
+  // last pending result is fixed; the finite release of the barrier's
+  // earlier producers (captured before this instruction's own raise)
+  // is the pending floor
+  if (wait_pending && t.scoreboard_write < NO_BARRIER &&
+      w.barrier_pending_count[t.scoreboard_write] == 0)
+    w.barrier_pending_floor[t.scoreboard_write] =
+        w.barrier_free[t.scoreboard_write];
+  if (t.scoreboard_write < NO_BARRIER)
+    raise_barrier(w, t.scoreboard_write, data_ready,
+                  /*is_read=*/false);
+  if (g1_wait) {
+    if (wait_pending) {
+      PendingWait pw;
+      pw.warp = w.warp_index;
+      pw.instance = static_cast<std::uint32_t>(w.next_instance);
+      pw.parity = wait_parity;
+      pw.service_start = syncs_service_cycle_;
+      pw.result_lat = result_lat;
+      pw.dests = std::move(wait_dests);
+      if (t.scoreboard_write < NO_BARRIER) {
+        pw.barrier = t.scoreboard_write;
+        const std::uint32_t b = t.scoreboard_write;
+        // the barrier stays not-ready from issue + 1 on: the raise's
+        // own +1 window judges the previous release, so the previous
+        // slot gets the pending marker too (an outstanding produce
+        // whose release is not yet known); the writer names this
+        // instance even when a second pending wait shares the barrier
+        w.barrier_prev_free[b] = kPending;
+        w.barrier_prev_writer[b] =
+            static_cast<std::uint32_t>(w.next_instance);
+        w.barrier_prev_is_read[b] = false;
+        w.barrier_writer[b] =
+            static_cast<std::uint32_t>(w.next_instance);
+        w.barrier_is_read[b] = false;
+        ++w.barrier_pending_count[b];
+      } else {
+        w.result_floor = kPending;
+      }
+      mbar_pending_[MbarrierTable::key(
+          job_.cta_segment[w.cta],
+          static_cast<std::uint64_t>(sema.field[0]))]
+          .push_back(std::move(pw));
+    } else if (t.scoreboard_write >= NO_BARRIER) {
+      // complete phase, no dependency barrier: the warp's next issue
+      // is held until the result time
+      w.result_floor = std::max(w.result_floor, data_ready);
+    }
   }
   // store visibility (§13.8): kind 3/4 TIME rows are settled at the
   // next barrier release.  Template-level rows have no store-accept
@@ -2166,8 +3223,23 @@ bool Simulator::try_issue(WarpState& w) {
   if (auto ei = inst_envelope_.find(w.next_instance);
       ei != inst_envelope_.end()) {
     const auto& ef = rt_.resolve(ei->second, engine_facts_, nullptr);
-    w.control_floor = now_ + static_cast<std::uint64_t>(
+    const std::uint64_t env = static_cast<std::uint64_t>(
         MechanismRuntime::field(ef, 4, 0.0));
+    w.control_floor = now_ + env;
+    // stall-ledger naming: a positive envelope on a BRA* class is the
+    // taken-branch floor candidate
+    if (env > 0 &&
+        std::string_view(job_.strings.c_str() + t.operation_class)
+                .rfind("BRA", 0) == 0) {
+      ctl_kind = 1;
+      ctl_val = w.control_floor;
+      if (stall_on_) {
+        br_hold = static_cast<std::uint32_t>(MechanismRuntime::field(
+            ef, INT::FALLTHROUGH_HOLD_CYCLES, 0.0));
+        br_resolve = static_cast<std::uint32_t>(MechanismRuntime::field(
+            ef, INT::RESOLVE_CYCLES, 0.0));
+      }
+    }
   }
   arch_->on_instance_issue(*this, w, inst, sema, finish_cycle);
   // control word stall count (TMPL.control bit0-3): the warp's next
@@ -2176,12 +3248,43 @@ bool Simulator::try_issue(WarpState& w) {
   // distance regardless of register tracking.  max() with the other
   // floors (fence result, control envelope): never additive.
   const std::uint64_t stall = t.control & 0xF;
-  if (stall > 1)
+  w.yield_floor = 0;
+  if (stall > 1) {
     w.control_floor = std::max(w.control_floor, now_ + stall);
+  } else if (stall == 1 && ((t.control >> 4) & 1) &&
+             w.control_floor < now_ + 2) {
+    // issue_rules Y1: a yield hint with stall 1 holds the warp's
+    // next issue until issue + 2 (the warp skips the cycle after
+    // issue itself); remembered so the ledger names the skipped
+    // cycle "yield" only while this is the binding floor
+    w.control_floor = now_ + 2;
+    w.yield_floor = now_ + 2;
+  }
   // issue-steal floor (hopper wgmma C3+C7+R): max() like the stall —
   // dependent chains whose own stall >= floor_eff do not move
   if (floor_eff)
     w.control_floor = std::max(w.control_floor, now_ + floor_eff);
+  // stall-ledger naming: every floor of this instruction is applied;
+  // the candidate names the floor only when it IS the binding value
+  // and reaches beyond the stall field — the stall-field part of the
+  // interval keeps the name control_floor at flush time
+  w.control_stall_end = now_ + stall;
+  w.control_kind = (ctl_kind && ctl_val == w.control_floor &&
+                    ctl_val > w.control_stall_end)
+                       ? ctl_kind
+                       : 0;
+  if (stall_on_) {
+    w.control_mech = w.control_kind == 4 ? ctl_mech : 0;
+    // placement v1 rule T: the taken-branch pieces of the interval
+    w.branch_hold = w.branch_resolve = 0;
+    if (w.control_kind == 1 && (br_hold || br_resolve)) {
+      w.branch_hold = br_hold;
+      w.branch_resolve = br_resolve;
+      w.branch_issue = now_;
+      w.branch_end = ctl_val;
+      w.branch_pc = stall_inst_pc(w.next_instance);
+    }
+  }
   if (opt_.journal)
     out_.journal.push_back(
         JournalRow{w.warp_index, w.smsp,
@@ -2190,7 +3293,45 @@ bool Simulator::try_issue(WarpState& w) {
                    inst_wait_bucket, inst_wait_cycles,
                    inst_wait_object});
   ++w.next_instance;
+  if (w.next_instance >= w.end_instance) {
+    // kernel_boundary K4 bookkeeping for the exhaustion settle
+    w.exit_issue_cycle = now_;
+    w.exit_stall = stall;
+    w.exit_is_exit =
+        inst.template_index < tmpl_exit_.size() &&
+        tmpl_exit_[inst.template_index];
+  }
   update_ready_at(w);
+  if (stall_on_) {
+    // the span that follows the issue cycle opens under the verdict
+    // step_smsp would reach for an idle warp, at the code address of
+    // the new next instruction; an exhausted warp's key is left to
+    // the exit-drain naming in the exhaustion settle
+    if (w.next_instance < w.end_instance) {
+      if (w.blocked_until > now_) {
+        if (w.draining)
+          stall_set_inst(w, "exit_drain", w.end_instance - 1);
+        else
+          stall_set_suspended(w);
+      } else if (w.deferred.active &&
+                 w.next_instance == w.deferred.block_index) {
+        stall_set(w, "mbarrier_deferred");
+      } else if (w.cta_wait.active) {
+        stall_set_cta_barrier(w);
+      } else if (w.cluster_wait.active) {
+        stall_set_last(w, "cluster_barrier");
+      } else if (w.control_floor > now_ + 1) {
+        stall_set(w, w.yield_floor && w.yield_floor == w.control_floor
+                         ? "yield"
+                         : stall_control_reason(w));
+      } else {
+        stall_set(w, "issue_slot");
+      }
+    }
+    // the issue cycle was charged directly above; the ledger's
+    // interval restarts at now+1 (same boundary as wait_mark)
+    w.stall_mark = now_ + 1;
+  }
   // the issue cycle itself is not a wait cycle
   w.wait_mark = now_ + 1;
   // issued warps with more instances may issue again next cycle
@@ -2204,6 +3345,14 @@ bool Simulator::try_issue(WarpState& w) {
   if (w.next_instance >= w.end_instance)
     just_exhausted_.push_back(w.warp_index);
   return true;
+}
+
+std::uint64_t Simulator::sm_occupied_smsps(std::uint32_t sm) const {
+  const auto it = sm_resident_smsp_mask_.find(sm);
+  return it == sm_resident_smsp_mask_.end()
+             ? 0
+             : static_cast<std::uint64_t>(
+                   __builtin_popcount(it->second));
 }
 
 // scheduler policy: candidate_order from the predecessor — a cursor
@@ -2298,6 +3447,24 @@ EngineFacts Simulator::event_facts(
   for (const auto& [name, v] : axes)
     if (auto id = rt_.axis_id(name)) ef.emplace_back(*id, v);
   return ef;
+}
+
+double Simulator::syncs_service_interval() {
+  // constant field of the synchronization.mbarrier.release leaf;
+  // resolved once (no event axes enter it), absent -> 0 = no server
+  if (syncs_service_interval_) return *syncs_service_interval_;
+  double v = 0.0;
+  if (prog_mbarrier_release_) {
+    bool na = false;
+    const auto& rf = rt_.resolve_node(
+        rt_.program(*prog_mbarrier_release_).root_node, engine_facts_,
+        "mbarrier.release.service_interval", nullptr, &na);
+    if (!na)
+      v = MechanismRuntime::field(rf, TR::SERVICE_INTERVAL_CYCLES,
+                                  0.0);
+  }
+  syncs_service_interval_ = v;
+  return v;
 }
 
 double Simulator::program_cycles(std::optional<std::uint32_t> prog,
@@ -2408,24 +3575,10 @@ bool Simulator::semantic_blocked(const WarpState& w) const {
   }
   if (sema.kind != kSemaMbarrierWait || f[2] > 0) return false;
   if (failed_poll(w.next_instance, sema)) return false;
-  const std::uint32_t sob_obj = static_cast<std::uint32_t>(sema.field[0]);
-  if (!mbar_.wait_ready(
-      job_.cta_segment[w.cta], sob_obj,
-      static_cast<std::uint32_t>(sema.field[1] & 1u), now_)) {
-    // issued while the phase was incomplete -> suspended waiter
-    auto& wm = const_cast<WarpState&>(w);
-    if (!wm.suspended_mbar_since) wm.suspended_mbar_since = now_ + 1;
-    return true;
-  }
-  const auto* sob = mbar_.find(job_.cta_segment[w.cta], sob_obj);
-  // only a wait that was already blocked before the object's release
-  // resumes at suspended_release_cycle; a wait first evaluated ready
-  // (issued after completion) is not gated
-  const bool gated = sob && w.suspended_mbar_since &&
-      w.suspended_mbar_since - 1 < sob->release_cycle &&
-      now_ < sob->suspended_release_cycle;
-  if (!gated) const_cast<WarpState&>(w).suspended_mbar_since = 0;
-  return gated;
+  // G1: a wait that is not a known failed poll never blocks at issue;
+  // its pending result holds a reader on the dependency barrier (or
+  // the warp's result_floor), neither of which is this verdict
+  return false;
 }
 
 bool Simulator::semantic_ready(WarpState& w,
@@ -2457,6 +3610,18 @@ bool Simulator::semantic_ready(WarpState& w,
     std::uint64_t earliest = 0;
     if (!async_.wait_ready(lane, w.warp_index, f[1], now_, &earliest)) {
       w.last_wait = WaitBucket::kCollective;
+      if (stall_on_) {
+        // placement v1 rule D: a waiting DEPBAR-class instance is
+        // booked on the code address of the instance behind it
+        std::uint64_t at = w.next_instance;
+        if (std::string_view(
+                job_.strings.c_str() +
+                job_.templates[inst.template_index].operation_class)
+                    .rfind("DEPBAR", 0) == 0 &&
+            at + 1 < w.end_instance)
+          ++at;
+        stall_set_inst(w, "async_group_wait", at);
+      }
       w.retry_at = earliest;
       if (dbg_cpasync)
         fprintf(stderr, "DBG_CPASYNC wait w=%u wake=%llu\n",
@@ -2484,6 +3649,7 @@ bool Simulator::semantic_ready(WarpState& w,
       // readiness cycle is known: suspend until it (semantic bucket)
       w.blocked_until = ready;
       w.block_bucket = WaitBucket::kSemantic;
+      w.block_kind = sema.kind;
       return false;
     }
     return true;
@@ -2507,6 +3673,7 @@ bool Simulator::semantic_ready(WarpState& w,
       gsync_wait_smsps_.insert(
           (std::uint64_t(w.sm) << 3) | w.smsp);
       w.last_wait = WaitBucket::kSemantic;
+      STALL_SET(w, "gsync");
     } else if (w.gsync_wait_mark != ~0ull) {
       tele_[kTeleGsyncWaitCycles] += now_ - w.gsync_wait_mark;
       w.gsync_wait_mark = ~0ull;
@@ -2515,19 +3682,16 @@ bool Simulator::semantic_ready(WarpState& w,
   }
   if (sema.kind != kSemaMbarrierWait) return true;
   const std::uint32_t object = static_cast<std::uint32_t>(f[0]);
-  const std::uint32_t parity =
-      static_cast<std::uint32_t>(f[1] & 1u);
   if (failed_poll(w.next_instance, sema)) {
     mbar_.remove_waiter(seg, object, w.warp_index);
     return true;  // polls issue; the warp suspends after issue
   }
-  if (mbar_.wait_ready(seg, object, parity, now_)) {
-    mbar_.remove_waiter(seg, object, w.warp_index);
-    return true;
-  }
-  if (f[2] > 0) return true;  // deferred wait block
-  mbar_.add_waiter(seg, object, w.warp_index);
-  return false;
+  // G1: every other wait issues as soon as the ordinary issue
+  // conditions hold; the phase timing lives on its result (issue-time
+  // visible date or the pending resolution at completion), not on the
+  // wait's issue
+  mbar_.remove_waiter(seg, object, w.warp_index);
+  return true;
 }
 
 void Simulator::on_semantic_issue(WarpState& w,
@@ -2567,6 +3731,11 @@ void Simulator::on_semantic_issue(WarpState& w,
       }
     return 0.0;
   };
+  // G1 (iv): a phase completed by an instruction whose operation
+  // class begins with SYNCS is visible at its completion date
+  const bool syncs_cls =
+      std::string_view(job_.strings.c_str() + t.operation_class)
+          .rfind("SYNCS", 0) == 0;
   switch (sema.kind) {
     case kSemaMbarrierInit: {
       auto do_init = [&](std::uint32_t object) {
@@ -2597,8 +3766,11 @@ void Simulator::on_semantic_issue(WarpState& w,
                            std::uint64_t credit) {
         ++tele_[kTeleMbarrierArrivals];
         tele_[kTeleMbarrierTxBytes] += tx;
-        if (mbar_.arrive(s, object, credit, tx, w.warp_index, now_))
-          mbarrier_phase_complete(s, object);
+        // R2: a SYNCS arrive's effects are dated at its service_start;
+        // every other arrive dates at its issue cycle
+        if (mbar_.arrive(s, object, credit, tx, w.warp_index,
+                         syncs_service_cycle_))
+          mbarrier_phase_complete(s, object, syncs_cls);
       };
       // .A<n>TX: the row completes the transaction bytes (0 arrivals)
       const bool complete_tx = (sema.flags & kSemaFlagCompleteTx) != 0;
@@ -2606,7 +3778,8 @@ void Simulator::on_semantic_issue(WarpState& w,
                          std::uint64_t credit) {
         if (complete_tx) {
           tele_[kTeleMbarrierTxBytes] += tx;
-          mbarrier_complete_tx(s, object, tx);
+          mbarrier_complete_tx(s, object, tx, syncs_cls,
+                               syncs_service_cycle_);
         } else {
           do_arrive(s, object, credit);
         }
@@ -2643,7 +3816,8 @@ void Simulator::on_semantic_issue(WarpState& w,
       tele_[kTeleMbarrierTxBytes] += f[2];
       if (mbar_.expect_tx(seg, static_cast<std::uint32_t>(f[0]), f[2],
                           now_))
-        mbarrier_phase_complete(seg, static_cast<std::uint32_t>(f[0]));
+        mbarrier_phase_complete(seg, static_cast<std::uint32_t>(f[0]),
+                                syncs_cls);
       break;
     case kSemaMbarrierWait: {
       const std::uint32_t object = static_cast<std::uint32_t>(f[0]);
@@ -2676,6 +3850,7 @@ void Simulator::on_semantic_issue(WarpState& w,
           if (wake > now_) {
             w.blocked_until = wake;
             w.block_bucket = WaitBucket::kCollective;
+            w.block_kind = sema.kind;
             tele_[kTelePollSuspendCycles] += wake - now_;
             if (!release_known && o && o->initialized)
               mbar_.add_sleeper(seg, object, w.warp_index, wake);
@@ -2957,9 +4132,13 @@ void Simulator::on_semantic_issue(WarpState& w,
     case kSemaCtaBarrierWait: {
       auto r = cta_bar_.arrive(w.cta, static_cast<std::uint32_t>(f[0]),
                                w.warp_index, f[1], inst_index, now_);
-      if (sema.kind == kSemaCtaBarrierWait)
+      if (sema.kind == kSemaCtaBarrierWait) {
         w.cta_wait = WarpState::CtaWait{
             true, static_cast<std::uint32_t>(f[0]), r.generation};
+        if (stall_on_)
+          w.cta_wait.book_instance =
+              stall_defer_target(w, t, inst_index);
+      }
       if (r.full)
         cta_generation_close(w.cta, static_cast<std::uint32_t>(f[0]), r);
       break;
@@ -3074,10 +4253,15 @@ void Simulator::on_semantic_issue(WarpState& w,
             auto* o = mbar_.find(seg, object);
             if (!o || !o->initialized) continue;
             if ((o->phase % 2) != parity && o->release_cycle > now_)
-              wake = std::min(wake,
-                              o->release_cycle +
-                                  static_cast<std::uint64_t>(
-                                      syncs_wake));
+              // G1 (iv): a phase completed by a SYNCS instruction is
+              // visible at its completion date; the sleeper wakes
+              // there without syncs_wake_cycles
+              wake = std::min(
+                  wake, o->release_cycle +
+                            (o->completed_by_syncs
+                                 ? 0
+                                 : static_cast<std::uint64_t>(
+                                       syncs_wake)));
             mbar_.add_sleeper(seg, object, w.warp_index, wake,
                               static_cast<std::uint64_t>(syncs_wake));
           }
@@ -3087,6 +4271,7 @@ void Simulator::on_semantic_issue(WarpState& w,
       if (wake > now_) {
         w.blocked_until = wake;
         w.block_bucket = WaitBucket::kCollective;
+        w.block_kind = sema.kind;
         enqueue(Event::kWake, wake, w.warp_index, 0, 0);
       }
       break;
@@ -3106,6 +4291,10 @@ void Simulator::on_warp_exit(WarpState& w) {
   // an exiting warp can never be stalled at the rule S store gate
   // (it must issue the STG before exhausting), but keep the per-SM
   // FIFO free of stale entries in case a future gate moves earlier
+  if (w.sm < sm_wait_q_.size()) {
+    auto& q = sm_wait_q_[w.sm];
+    q.erase(std::remove(q.begin(), q.end(), w.warp_index), q.end());
+  }
   if (w.sm < store_gate_q_.size()) {
     auto& q = store_gate_q_[w.sm];
     q.erase(std::remove(q.begin(), q.end(), w.warp_index), q.end());
@@ -3168,51 +4357,117 @@ Simulator::resolve_destination(std::uint32_t segment,
 }
 
 void Simulator::mbarrier_phase_complete(std::uint32_t segment,
-                                        std::uint32_t object) {
+                                        std::uint32_t object,
+                                        bool by_syncs) {
   auto* o = mbar_.find(segment, object);
   ++tele_[kTeleMbarrierPhases];
+  o->completed_by_syncs = by_syncs;
   EngineFacts ef = event_facts({
       {"expected_tx_bytes", o->release_expected_tx_bytes},
       {"completed_tx_bytes", o->release_completed_tx_bytes},
       {"actual_participant_warps", o->release_participant_warps},
       {"same_parity", 0}});
-  const std::uint64_t release_cyc = static_cast<std::uint64_t>(
-      program_cycles(prog_mbarrier_release_, ef, "mbarrier.release"));
-  std::uint64_t rel = o->phase_complete_cycle + release_cyc;
-  // a wait that was issued while the phase was incomplete suspends and
-  // wakes at completion + suspended_wake_cycles (not + cycles); waits
-  // issued after completion keep release_cyc (trywait_wake protocol).
-  // The field is read off the same resolved leaf as cycles; absent -> 0
-  // -> bit-identical old behaviour.
+  std::uint64_t rel;
   double susp = 0.0;
-  if (prog_mbarrier_release_) {
-    bool na = false;
-    const auto& rf = rt_.resolve_node(
-        rt_.program(*prog_mbarrier_release_).root_node, ef,
-        "mbarrier.release.suspended_wake", nullptr, &na);
-    if (!na)
-      susp = MechanismRuntime::field(
-          rf, TR::SUSPENDED_WAKE_CYCLES, 0.0);
-  }
-  if (susp > 0.0)
-    o->suspended_release_cycle = o->phase_complete_cycle +
-        static_cast<std::uint64_t>(std::llround(susp));
-  else
+  if (by_syncs) {
+    // G1 (iv): a phase completed by a SYNCS instruction is visible at
+    // its completion date; release.cycles and suspended_wake_cycles
+    // are not added and deferred blocks / failed-poll suspensions /
+    // NANOSLEEP.SYNCS sleepers all use this same date
+    rel = o->phase_complete_cycle;
     o->suspended_release_cycle = rel;
+  } else {
+    const std::uint64_t release_cyc = static_cast<std::uint64_t>(
+        program_cycles(prog_mbarrier_release_, ef,
+                       "mbarrier.release"));
+    rel = o->phase_complete_cycle + release_cyc;
+    // a wait that was issued while the phase was incomplete suspends
+    // and wakes at completion + suspended_wake_cycles (not + cycles);
+    // waits issued after completion keep release_cyc (trywait_wake
+    // protocol).  The field is read off the same resolved leaf as
+    // cycles; absent -> 0 -> bit-identical old behaviour.
+    if (prog_mbarrier_release_) {
+      bool na = false;
+      const auto& rf = rt_.resolve_node(
+          rt_.program(*prog_mbarrier_release_).root_node, ef,
+          "mbarrier.release.suspended_wake", nullptr, &na);
+      if (!na)
+        susp = MechanismRuntime::field(
+            rf, TR::SUSPENDED_WAKE_CYCLES, 0.0);
+    }
+    if (susp > 0.0)
+      o->suspended_release_cycle = o->phase_complete_cycle +
+          static_cast<std::uint64_t>(std::llround(susp));
+    else
+      o->suspended_release_cycle = rel;
+  }
   if (o->owner_cta != kNone32)
     rel = std::max(rel, settle_visibility(o->owner_cta, now_,
                                           o->release_participant_warps));
   o->release_cycle = rel;
+  if (by_syncs) o->suspended_release_cycle = rel;
   enqueue(Event::kBarrierRelease, rel, kNone32, 0,
           (std::uint64_t(object) & 0xFFFFFFFFull));
+  // G1 (ii): fix every pending wait result on this phase at
+  // max(the wait's own service_start, the phase's visible date) + its
+  // result latency, and wake the warp for that cycle
+  if (auto pit = mbar_pending_.find(MbarrierTable::key(segment, object));
+      pit != mbar_pending_.end()) {
+    for (const auto& pw : pit->second) {
+      const std::uint64_t result_time =
+          std::max(pw.service_start, o->suspended_release_cycle) +
+          pw.result_lat;
+      auto& pw_w = warps_[pw.warp];
+      for (const std::uint32_t reg : pw.dests)
+        if (reg < pw_w.reg_ready.size() &&
+            pw_w.reg_ready[reg] == kPending)
+          pw_w.reg_ready[reg] = result_time;
+      if (pw.barrier != kNone32) {
+        // the pending raise behaved like an ordinary raise whose
+        // release time was not yet known: it becomes visible one
+        // cycle after this fix, judged by the previous (pending)
+        // release in between.  A barrier held by several pending wait
+        // results stays pending until the last is fixed; its value is
+        // then the pending floor (the latest finite release among its
+        // producers while pending, including the fixed results)
+        const std::uint32_t b = pw.barrier;
+        pw_w.barrier_pending_floor[b] =
+            std::max(pw_w.barrier_pending_floor[b], result_time);
+        if (pw_w.barrier_pending_count[b])
+          --pw_w.barrier_pending_count[b];
+        if (pw_w.barrier_pending_count[b] == 0) {
+          pw_w.barrier_prev_free[b] = pw_w.barrier_free[b];
+          pw_w.barrier_prev_writer[b] = pw_w.barrier_writer[b];
+          pw_w.barrier_prev_is_read[b] = pw_w.barrier_is_read[b];
+          pw_w.barrier_raised_at[b] = now_;
+          if (pw_w.barrier_free[b] == kPending) {
+            pw_w.barrier_free[b] = pw_w.barrier_pending_floor[b];
+            pw_w.barrier_writer[b] = pw.instance;
+            pw_w.barrier_is_read[b] = false;
+          }
+        }
+      } else {
+        pw_w.result_floor = result_time;
+      }
+      enqueue(Event::kWake, result_time, pw.warp, 0, 0);
+      if (pw.barrier != kNone32 &&
+          pw_w.barrier_pending_count[pw.barrier] == 0 &&
+          pw_w.barrier_pending_floor[pw.barrier] > result_time)
+        enqueue(Event::kWake, pw_w.barrier_pending_floor[pw.barrier],
+                pw.warp, 0, 0);
+    }
+    mbar_pending_.erase(pit);
+  }
   // wake warps suspended until this object's release (failed-poll
-  // trywait suspensions and NANOSLEEP.SYNCS sleepers)
+  // trywait suspensions and NANOSLEEP.SYNCS sleepers); a SYNCS-
+  // completed phase wakes them at the visible date itself
   const std::uint64_t wake_base = o->suspended_release_cycle;
   if (susp > 0.0)
     tele_[kTeleSuspendedWaits] += o->sleepers.size();
   for (const auto& s : o->sleepers) {
     auto& w = warps_[s.warp];
-    const std::uint64_t wk = wake_base + s.wake_latency;
+    const std::uint64_t wk =
+        wake_base + (by_syncs ? 0 : s.wake_latency);
     if (!w.done && w.blocked_until == s.blocked_until &&
         w.blocked_until > wk) {
       w.blocked_until = wk;
@@ -3299,10 +4554,155 @@ void Simulator::flush_wait(WarpState& w, std::uint64_t now) {
       e.first += delta;
       ++e.second;
     }
+    if (stall_on_) stall_flush(w, now);
     if (w.stall_since == 0) w.stall_since = w.wait_mark ? w.wait_mark
                                                       : (now ? now : 1);
     w.wait_mark = now;
   }
+}
+
+// placement v4 rule P': a barrier:SYNCS.PHASECHK wait held by a poll
+// instance carrying the wait origin books its first origin_hold_cycles
+// on the origin address (ledger only)
+void Simulator::stall_arm_origin(WarpState& w, const std::string& reason,
+                                 std::uint32_t writer) {
+  if (writer == w.origin_writer && w.origin_pc) return;
+  w.origin_pc = 0;
+  w.origin_writer = writer;
+  w.origin_booked = 0;
+  if (writer >= job_.instances.size() ||
+      reason.rfind("barrier:SYNCS.PHASECHK", 0) != 0)
+    return;
+  const auto& wi = job_.instances[writer];
+  if (wi.semantics == kNone32) return;
+  const auto& sm = job_.semantics[wi.semantics];
+  if (!(sm.flags & kSemaFlagWaitOrigin) || !sm.earliest_issue) return;
+  if (!prog_trywait_) return;
+  bool na = false;
+  const auto& rf = rt_.resolve_node(
+      rt_.program(*prog_trywait_).root_node, engine_facts_,
+      "trywait_timeout", nullptr, &na);
+  if (na) return;
+  const auto cap = static_cast<std::uint64_t>(MechanismRuntime::field(
+      rf, TR::ORIGIN_HOLD_CYCLES, 0.0));
+  if (!cap) return;
+  if (w.origin_inst != writer) return;
+  w.origin_pc = sm.earliest_issue;
+  w.origin_cap = cap;
+  w.origin_end = w.origin_issue + cap;
+}
+
+void Simulator::stall_flush(WarpState& w, std::uint64_t now) {
+  if (now <= w.stall_mark) return;
+  const std::uint64_t delta = now - w.stall_mark;
+  const std::uint32_t reason = w.stall_reason;
+  // a control:* interval splits at the issuing instruction's stall
+  // boundary: [stall_mark, min(now, control_stall_end)) is the stall
+  // field and keeps the name control_floor at the same pc; only the
+  // remainder is the mechanism's reason (the event counts on the
+  // mechanism key, not twice)
+  std::uint64_t stall_part = 0;
+  // placement v1 rule T: a taken-branch interval is booked in pieces
+  // by the cycle since the branch's issue (no stall-field split)
+  const bool branch_pieces =
+      reason == stall_cbranch_id_ && w.control_kind == 1 &&
+      (w.branch_hold || w.branch_resolve);
+  if (!branch_pieces &&
+      (reason == stall_cbranch_id_ || reason == stall_cyield_id_ ||
+       reason == stall_cbsync_id_ ||
+       (w.control_mech && reason == w.control_mech)) &&
+      w.stall_mark < w.control_stall_end)
+    stall_part = std::min(delta, w.control_stall_end - w.stall_mark);
+  // placement v3 rule F (extended): the part of a control:fence:<class>
+  // interval beyond the FENCE's stall field is booked on the first
+  // waiter of the FENCE's write barrier
+  std::uint64_t book_pc = w.stall_pc;
+  if (w.control_mech && reason == w.control_mech &&
+      reason < stall_names_.size() &&
+      stall_names_[reason].rfind("control:fence:", 0) == 0)
+    book_pc = stall_inst_pc(stall_fence_waiter(w));
+  // the open interval accrues under the reason/pc of the verdict
+  // that started it; a key change opens a new event
+  if (reason == 0) w.stall_dispatch_cycles += delta;
+  else {
+    w.stall_resident_cycles += delta;
+    if (w.stall_first_resident == ~0ull)
+      w.stall_first_resident = now - delta;
+    if (reason == stall_drain_id_)
+      w.stall_drain_cycles += delta;
+  }
+  if (branch_pieces) {
+    const std::uint64_t t0 = w.branch_issue;
+    const std::uint64_t c0 = t0 + 1;
+    const std::uint64_t c1 = std::min(c0 + w.branch_hold, w.branch_end);
+    const std::uint64_t c2 = std::min(c1 + w.branch_resolve, w.branch_end);
+    const std::uint64_t c3 = std::max(c2, w.branch_end);
+    struct Piece {
+      std::uint64_t lo, hi, pc;
+      std::uint32_t id;
+    };
+    const Piece pieces[] = {
+        {c0, c1, w.branch_pc + 16, stall_id_("control:branch_fallthrough")},
+        {c1, c2, w.stall_pc, stall_cbranch_id_},
+        {c2, c3, w.stall_pc, stall_id_("control:branch_refetch")},
+        {c3, ~0ull, w.stall_pc, stall_cfloor_id_}};
+    for (const auto& pc : pieces) {
+      const std::uint64_t lo = std::max(pc.lo, w.stall_mark);
+      const std::uint64_t hi = std::min(pc.hi, now);
+      if (hi <= lo) continue;
+      auto& pe = stall_acc_[{pc.pc, pc.id}];
+      pe.cycles += hi - lo;
+      if (pc.pc != w.stall_open_pc || pc.id != w.stall_open_reason) {
+        ++pe.events;
+        w.stall_open_pc = pc.pc;
+        w.stall_open_reason = pc.id;
+      }
+    }
+    w.stall_mark = now;
+    return;
+  }
+  if (stall_part)
+    stall_acc_[{w.stall_pc, stall_cfloor_id_}].cycles += stall_part;
+  std::uint64_t at_origin = 0;
+  if (w.origin_pc && reason != 0 &&
+      stall_names_[reason].rfind("barrier:SYNCS.PHASECHK", 0) == 0 &&
+      w.origin_end > w.stall_mark) {
+    at_origin = std::min(delta, w.origin_end - w.stall_mark);
+    auto& oe = stall_acc_[{w.origin_pc, reason}];
+    oe.cycles += at_origin;
+    // the wait is one event: counted on the key that gets its first
+    // cycle; the interval then counts as open for the key of today
+    if (w.origin_booked == 0 &&
+        (book_pc != w.stall_open_pc || reason != w.stall_open_reason)) {
+      ++oe.events;
+      w.stall_open_pc = book_pc;
+      w.stall_open_reason = reason;
+    }
+    w.origin_booked += at_origin;
+  }
+  auto& e = stall_acc_[{book_pc, reason}];
+  e.cycles += delta - stall_part - at_origin;
+  if (book_pc != w.stall_open_pc ||
+      reason != w.stall_open_reason) {
+    ++e.events;
+    w.stall_open_pc = book_pc;
+    w.stall_open_reason = reason;
+  }
+  w.stall_mark = now;
+}
+
+// kernel_boundary K4 ledger split: cycles [stall_mark, now) are
+// accrued under control_floor up to EXIT's stall boundary, then
+// exit_branch up to the branch-resolve boundary; the remainder is
+// left open under exit_drain for the caller's flush
+void Simulator::exit_ledger_flush(WarpState& w, std::uint64_t now) {
+  const std::uint64_t floor_end = w.exit_issue_cycle + w.exit_stall;
+  const std::uint64_t br_end = floor_end + exit_branch_cycles_;
+  stall_set_inst(w, "control_floor", w.end_instance - 1);
+  stall_flush(w, std::min(now, floor_end));
+  stall_set_inst(w, "exit_branch", w.end_instance - 1);
+  stall_flush(w, std::min(now, br_end));
+  stall_set_inst(w, "exit_drain", w.end_instance - 1);
 }
 
 void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
@@ -3327,14 +4727,17 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
   }
   std::size_t cursor = 0;
   for (; cursor < n; ++cursor) {
-    if (issued_slots >= policy_.issue_slots) break;
     auto& w = warps_[s.warps[(start + cursor) % n]];
     if (!w.done && w.next_instance >= w.end_instance) {
       // exhaustion is settled post-sweep to keep the original
-      // ordering (barrier exit deductions happen after all steps)
+      // ordering (barrier exit deductions happen after all steps);
+      // checked before the issue quota: the drain wake is the only
+      // event that lands this warp on `now`, so skipping its push
+      // under a spent quota leaves it parked forever
       just_exhausted_.push_back(s.warps[(start + cursor) % n]);
       continue;
     }
+    if (issued_slots >= policy_.issue_slots) break;
     if (!eligible(w) || w.issue_stamp == now_) continue;
     w.retry_at = 0;
     // account the cycles since the last verdict into the old bucket
@@ -3343,6 +4746,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
     // readiness order (§13.2): dispatch -> collective waits -> try_issue
     if (!w.resident || w.entry_cycle > now_) {
       w.last_wait = WaitBucket::kDispatch;
+      STALL_SET(w, "dispatch");
       if (w.resident) w.retry_at = w.entry_cycle;
       continue;
     }
@@ -3364,6 +4768,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
         if (w.fetch_ready > now_) {
           clear_unit_waiter(w);
           w.last_wait = WaitBucket::kFetch;
+          STALL_SET(w, "fetch");
           w.retry_at = w.fetch_ready;
           continue;
         }
@@ -3372,6 +4777,12 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
     if (w.blocked_until > now_) {
       clear_unit_waiter(w);
       w.last_wait = w.block_bucket;
+      if (stall_on_) {
+        if (w.draining)
+          stall_set_inst(w, "exit_drain", w.end_instance - 1);
+        else
+          stall_set_suspended(w);
+      }
       w.retry_at = w.blocked_until;
       continue;
     }
@@ -3386,6 +4797,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
       } else {
         clear_unit_waiter(w);
         w.last_wait = WaitBucket::kCollective;
+        STALL_SET(w, "mbarrier_deferred");
         continue;
       }
     }
@@ -3396,6 +4808,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
       } else {
         clear_unit_waiter(w);
         w.last_wait = WaitBucket::kCollective;
+        if (stall_on_) stall_set_cta_barrier(w);
         continue;
       }
     }
@@ -3406,6 +4819,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
       } else {
         clear_unit_waiter(w);
         w.last_wait = WaitBucket::kCollective;
+        if (stall_on_) stall_set_last(w, "cluster_barrier");
         continue;
       }
     }
@@ -3420,7 +4834,7 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
     } else {
       // a verdict other than "unit busy / outbid" ends the waitership
       if (!w.unit_blocked) clear_unit_waiter(w);
-      if (!policy_.try_next_on_block) break;
+      if (!policy_.try_next_on_block && !w.queue_deferred) break;
     }
   }
   // candidates never tried because the slots ran out may be re-attempted
@@ -3429,8 +4843,16 @@ void Simulator::step_smsp(std::uint32_t sm, std::uint32_t smsp) {
     auto& w = warps_[s.warps[(start + cursor) % n]];
     // retry slots from an earlier round that already fell due are
     // stale — the earliest legal re-attempt is next cycle
-    if (eligible(w) && w.resident && w.retry_at <= now_)
+    if (eligible(w) && w.resident && w.retry_at <= now_) {
+      // the warp was due to be re-judged but never reached: the
+      // span up to its due time stays under the blocking reason,
+      // from the due time on it waits for an issue slot
+      if (stall_on_ && w.retry_at) {
+        stall_flush(w, w.retry_at);
+        stall_set(w, "issue_slot");
+      }
       w.retry_at = now_ + 1;
+    }
   }
   // this SMSP's next due retry: warps with retry_at == 0 are
   // semantic/event waits — they contribute nothing to advance and
@@ -3509,7 +4931,8 @@ void Simulator::schedule(const Event& e) {
       break;
     case Event::kWarpDone:
       warps_[e.warp].done = true;
-      break;
+      warps_[e.warp].done_cycle = now_;
+      break;  // done warps are already !resident via the drain path
     case Event::kWake:
       break;  // exists only to land `now` on the wake cycle
     case Event::kBarrierRelease:
@@ -3654,9 +5077,37 @@ ResultStats Simulator::run() {
         }
         const std::uint64_t drain = std::max(
             async_.drain_until(w.warp_index), w.inflight_until);
-        if (drain <= now_) {
+        // kernel_boundary K4: an EXIT-class last instruction is done
+        // at max(issue + stall + exit_branch_resolve, drain) +
+        // exit_drain_tail; the ledger splits into control_floor /
+        // exit_branch / exit_drain at the same boundaries
+        const bool k4 = exit_k4_ && w.exit_is_exit;
+        const std::uint64_t done_at =
+            k4 ? std::max(w.exit_issue_cycle + w.exit_stall +
+                              exit_branch_cycles_,
+                          drain) +
+                     exit_tail_cycles_
+               : drain;
+        if (done_at <= now_) {
+          if (stall_on_ && k4) exit_ledger_flush(w, now_);
           flush_wait(w, now_);
           w.done = true;
+          w.done_cycle = now_;
+          if (w.resident) {
+            w.resident = false;
+            auto rc = sm_resident_warps_.find(w.sm);
+            if (rc != sm_resident_warps_.end() && rc->second)
+              --rc->second;
+            const std::uint64_t key =
+                (std::uint64_t{w.sm} << 8) | w.smsp;
+            if (auto it = sm_smsp_resident_.find(key);
+                it != sm_smsp_resident_.end() && --it->second == 0) {
+              sm_smsp_resident_.erase(it);
+              auto mask = sm_resident_smsp_mask_.find(w.sm);
+              if (mask != sm_resident_smsp_mask_.end())
+                mask->second &= ~(1u << w.smsp);
+            }
+          }
           // CTA slot frees only when its last warp is done (§13.11);
           // with CTAs queued, the slot becomes placeable only
           // slot_free_to_entry after ITS completion: a release event
@@ -3690,11 +5141,22 @@ ResultStats Simulator::run() {
                                   job_.ctas[w.cta].warp_count);
             }
           }
-        } else if (!w.draining) {
+        } else if (!w.draining || w.blocked_until != done_at) {
+          // re-arm when the drain target moved: the kWake at the old
+          // done_at would land `now` early with nothing to settle,
+          // and the stale-wake purge then drops it for good
+          const bool was_draining = w.draining;
           w.draining = true;
-          w.blocked_until = drain;
+          w.blocked_until = done_at;
           w.block_bucket = WaitBucket::kCollective;
-          enqueue(Event::kWake, drain, w.warp_index, 0, 0);
+          // stall ledger: the drain wait is attributed to the EXIT
+          // instruction's pc (w.next_instance already ran past it);
+          // K4 opens under control_floor (the stall segment), later
+          // segments are split at exit_ledger_flush
+          if (stall_on_ && !was_draining)
+            stall_set_inst(w, k4 ? "control_floor" : "exit_drain",
+                           w.end_instance - 1);
+          enqueue(Event::kWake, done_at, w.warp_index, 0, 0);
         }
       }
       if (w.done) {
@@ -3766,13 +5228,43 @@ ResultStats Simulator::run() {
   }
   tele2_[kTele2LifecycleEnvelope] = envelope;
   for (auto& w : warps_)
-    if (!w.done) flush_wait(w, now_);
+    if (!w.done) {
+      if (stall_on_ && exit_k4_ && w.exit_is_exit &&
+          w.next_instance >= w.end_instance)
+        exit_ledger_flush(w, now_);
+      w.done_cycle = now_;
+      flush_wait(w, now_);
+    }
   tele2_[kTele2FetchL0Hits] = fetch_.l0_hits;
   tele2_[kTele2FetchL1Lines] = fetch_.l1_lines;
   tele2_[kTele2FetchL2Lines] = fetch_.l2_lines;
   tele2_[kTele2FetchColdLines] = fetch_.cold_lines;
   arch_->collect_tele(out_.tele);
-  out_.cycles = now_ + envelope;
+  // kernel_boundary K2: cycles = the largest number of active cycles
+  // of any SM, an SM being active while at least one warp is resident
+  // on it (interval [entry_cycle, done)); the old definition (last
+  // completion + envelope) stays in TELE
+  tele2_[kTele2LastCompletionCycle] = now_ + envelope;
+  {
+    std::vector<std::vector<std::pair<std::uint64_t, std::uint64_t>>>
+        sm_span(smsps_.size());
+    for (const auto& w : warps_)
+      if ((w.done || w.resident) && w.sm < sm_span.size() &&
+          w.done_cycle > w.entry_cycle)
+        sm_span[w.sm].emplace_back(w.entry_cycle, w.done_cycle);
+    std::uint64_t active = 0;
+    for (auto& spans : sm_span) {
+      std::sort(spans.begin(), spans.end());
+      std::uint64_t cur_b = 0, cur_e = 0, total = 0;
+      for (const auto& [b, e] : spans) {
+        if (b > cur_e) { total += cur_e - cur_b; cur_b = b; }
+        cur_e = std::max(cur_e, e);
+      }
+      total += cur_e - cur_b;
+      active = std::max(active, total);
+    }
+    out_.cycles = active;
+  }
   for (std::uint32_t sm = 0; sm < smsps_.size(); ++sm)
     for (std::uint32_t sp = 0; sp < smsps_per_sm_; ++sp) {
       const auto& s = smsps_[sm][sp];
@@ -3830,6 +5322,7 @@ ResultStats Simulator::run() {
     for (std::uint32_t c = 0; c < std::size(g4); ++c)
       if (g4[c]) out_.tele.push_back({4, c, g4[c]});
   }
+  if (stall_on_) write_stall_ledger();
   return out_;
 }
 
@@ -3846,9 +5339,12 @@ bool Simulator::mbarrier_arrive(std::uint32_t segment,
 
 bool Simulator::mbarrier_complete_tx(std::uint32_t segment,
                                      std::uint32_t object,
-                                     std::uint64_t bytes) {
-  if (mbar_.complete_tx(segment, object, bytes, now_)) {
-    mbarrier_phase_complete(segment, object);
+                                     std::uint64_t bytes,
+                                     bool by_syncs,
+                                     std::uint64_t cycle) {
+  if (mbar_.complete_tx(segment, object, bytes,
+                        cycle ? cycle : now_)) {
+    mbarrier_phase_complete(segment, object, by_syncs);
     return true;
   }
   return false;

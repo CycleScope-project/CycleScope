@@ -23,11 +23,14 @@ def _write_once(target: Path):
 
 
 def test_concurrent_writes(tmp_path):
+    # tests/ is a namespace package: put tests/ itself on the worker's
+    # path so `common` (a regular package) wins over any installed
+    # `tests` package on the image
     worker = f"""
 import sys
-sys.path.insert(0, {os.getcwd()!r})
+sys.path.insert(0, {str(Path(os.getcwd()) / 'tests')!r})
 from pathlib import Path
-from tests.common.test_program_cache_atomic import _write_once
+from common.test_program_cache_atomic import _write_once
 for _ in range(50):
     _write_once(Path({str(tmp_path)!r}) / 'k.gsp')
 """

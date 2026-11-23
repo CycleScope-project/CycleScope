@@ -1,0 +1,34 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "placement_basic",
+ "version": 2,
+ "frozen_before_gpu": true,
+ "date": "2026-11-20",
+ "kind": "survey, supplement to version 1 question Q4: UMOV behind BAR.SYNC.DEFER_BLOCKING, and the distance behind the BAR from which an S2R stops the warp; installs nothing",
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "Version 1 addendum: an instruction two cycles behind the BAR is issued whatever its kind, a stopping kind six or more cycles behind it holds the barrier wait; three to five cycles are not measured. UMOV is not among the measured kinds; it is a uniform-unit instruction like UIADD3 (issued while the barrier is pending) but ptxas gives a BAR.SYNC.DEFER_BLOCKING in front of it the stall it gives one in front of LDS / BRA (static listings of the full-GPU captures: stall 6).",
+ "data_seen_before_freezing": [
+  "placement_basic v1 addendum and the tables it cites; static control words of the full-GPU captures (no timing data of a full-GPU case)."
+ ],
+ "probe": {
+  "chain": "As version 1: frame probe/b.loop.ptx, plans by gen_b.py, the same build dir and the run root $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/placement_basic-v2/<device>; direct, capture, two reference passes, replay with build 370bf919.",
+  "cells": "b.umov.w8: slots 0 and 1 = UMOV URd, 0x400 (the frame's own UMOV as template; stall 2 / 1, no barrier), slot 2 the constant load, as the other b cells. b.s2r.d3.w8, .d4.w8, .d5.w8: the BAR.SYNC's stall field set to 3 / 4 / 5, slot 0 = S2R (stall 2), slot 1 = NOP with the replaced stall, slot 2 the constant load: the S2R is the first instruction behind the BAR, d cycles behind it. b.s2r.d2.w8 and b.s2r.d6.w8 as controls (version 1: issued at 2; a stopping kind at 6 holds the wait).",
+  "unrealised": "As version 1 (tools/microbench/placement_basic/unrealised.txt)."
+ },
+ "readings": "Per cell and device the pc that carries class barrier and its cycles per iteration.",
+ "questions_before_data": {
+  "U": "UMOV: barrier on the second UMOV (it stops the warp) or on the constant load (it is issued)?",
+  "D": "The smallest d at which the barrier is on the S2R itself."
+ },
+ "install": "Nothing here. The installation protocol placement v1 (rule B) takes U and D from the addendum of this protocol.",
+ "not_allowed": "No full-GPU timing data used to choose a rule; no cell dropped after its data is seen.",
+ "addenda": [
+  {
+   "when": "2026-11-20, run placement_basic-v2 (clone stall-attribution-37, commit 97e1aec3; jobs mechver-place3-h100 / -b300; roots $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/placement_basic-v2/{h100,b300}); 6 cells per device, direct values right, captured, two reference passes, replayed with 370bf919",
+   "text": "Class barrier per iteration by pc (reference-a), h100 / b300. U: b.umov: 20.2 / 19.2 on the SECOND UMOV (slot 1, six cycles behind the BAR), nothing on the constant load: UMOV stops the warp, unlike UIADD3 of the same unit. D: S2R as the first instruction d cycles behind the BAR (behind it ISETP, then a NOP): d = 2: 0 on the S2R, 20.3 / 19.2 on the NOP; d = 3: 0, 18.7 / 17.7 on the NOP; d = 4: 5.7 / 5.0 on the S2R and 12.8 / 12.5 on the NOP; d = 5: 10.7 on the S2R and 7.9 on the NOP (h100), 19.4 on the S2R (b300); d = 6: 20.2 / 19.5 on the S2R. The stop is not a sharp distance: at 4 and (h100) 5 cycles part of the eight warps stop on the S2R and part issue it; from 5 (b300) / 6 (h100) all stop. More than half of the barrier is on the S2R from d = 5 on both devices (h100 57 %, b300 100 %). Nothing is installed here."
+  }
+ ]
+}

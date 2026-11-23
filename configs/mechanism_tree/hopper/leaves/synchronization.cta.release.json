@@ -36,6 +36,15 @@
     "sources": [
      "barrier_release.h100.r4"
     ]
+   },
+   "defer_stop_distance_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 5
+    },
+    "sources": [
+     "placement.h100.v1"
+    ]
    }
   },
   "scope": "cta"

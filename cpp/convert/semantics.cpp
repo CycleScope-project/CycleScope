@@ -373,6 +373,10 @@ SemRow d_mbarrier_wait(const DynOps &d, SemanticsContext &c, int cta,
     r.fields["block_offset"] = *b;
   if (auto *t = uniform(d, {"timeout_hint", "suspend_time_hint"}))
     r.fields["timeout_hint"] = *t;
+  if (auto *o = uniform(d, {"wait_origin"}); o && *o) {
+    r.flags |= SEMA_FLAG_WAIT_ORIGIN;
+    r.earliest_issue = *o;
+  }
   return r;
 }
 

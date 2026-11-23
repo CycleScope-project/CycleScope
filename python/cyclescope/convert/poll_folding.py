@@ -9,6 +9,8 @@ folds its no-op-reader repeats by the same gap rule extended with
 """
 from __future__ import annotations
 
+from .operand_facts import poll_barrier_word
+
 _NO_SIDE_EFFECT = {
     "BRA", "BRX", "BSSY", "BSYNC", "NANOSLEEP", "VOTEU", "VOTE",
     "ISETP", "FSETP", "DSETP", "PLOP3", "LOP3", "SEL", "FSEL", "MOV",
@@ -58,11 +60,52 @@ def _gap_free(opcode: str, root: str, gsync: bool) -> bool:
     return False
 
 
-def fold_warp(records, static_of) -> tuple[set, int]:
+_ORIGIN_REACH = 16
+
+
+def _wait_origins(records, static_of, polls, folded) -> dict:
+    """placement v5 rule P'' (converter fact): for every ready poll S
+    that is kept, the chain = the maximal run of failed polls directly
+    in front of it in poll order addressing the same barrier word with
+    the same parity; P1 = its first poll.  W = the first record behind
+    P1 (at most 16 ahead, not behind S) whose wait mask holds P1's
+    write barrier b; the search ends at a record that writes b.  S ->
+    W's absolute code address."""
+    keys = [(poll_barrier_word(r, static_of(r)),
+             _poll_key(r, static_of(r))[1]) for _i, r in polls]
+    origins: dict = {}
+    for n, (i, rec) in enumerate(polls):
+        if poll_ready(rec) is not True or i in folded:
+            continue
+        m = n
+        while m > 0 and poll_ready(polls[m - 1][1]) is False \
+                and keys[m - 1] == keys[n]:
+            m -= 1
+        if m == n:
+            continue
+        p1 = polls[m][0]
+        first, own = static_of(records[p1]), static_of(rec)
+        wbar = first.inst.control.write_barrier
+        if first.inst.pc == own.inst.pc or wbar >= 7:
+            continue
+        for k in range(p1 + 1, min(p1 + _ORIGIN_REACH, i) + 1):
+            ctl = static_of(records[k]).inst.control
+            if (ctl.wait_mask >> wbar) & 1:
+                address = static_of(records[k]).inst.code_address
+                if address is not None:
+                    origins[i] = address
+                break
+            if ctl.write_barrier == wbar:
+                break
+    return origins
+
+
+def fold_warp(records, static_of) -> tuple[set, int, dict]:
     """records: per-warp DynRecord list in issue order.
 
     ``static_of(rec)`` -> StaticRow for the record's (function_id, idx).
-    Returns (folded positions, dropped_poll_count).
+    Returns (folded positions, dropped_poll_count, wait origins:
+    kept ready poll position -> absolute code address, rule P'').
     """
     folded: set = set()
     polls = [(i, r) for i, r in enumerate(records)
@@ -108,5 +151,6 @@ def fold_warp(records, static_of) -> tuple[set, int]:
                 folded.add(posn)
                 dropped += 1
             folded.update(range(run[start][0] + 1, end_pos))
+
         pos = j + 1 if fold_ok else j
-    return folded, dropped
+    return folded, dropped, _wait_origins(records, static_of, polls, folded)

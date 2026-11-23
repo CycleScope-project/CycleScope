@@ -1,0 +1,28 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "warp_queue",
+ "version": 4,
+ "frozen_before_gpu": true,
+ "date": "2026-11-22",
+ "kind": "installation, timing, leaf values only: the result constant of member global loads from steady-state readings, and the SM bound",
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "evidence": "queue_basic v3 addendum (steady reader waits from 256- against 64-iteration runs: equal on the two devices; the result is 21 whole cycles behind the release where the replay has 29 / 31; the first iteration costs 460-790 cycles on hardware and 300-460 in the replay); warp_queue v3 addenda.",
+ "rules": {
+  "C1": "result_after_release_cycles of LDG = 20.5 on both devices (was 28.3 / 30.2): with releases on half cycles the result is 21 whole cycles behind the release. R1 of v3 stays (an L1-served member LDG has its result at release + c exactly).",
+  "C2": "sm_depth_count = 52 on every member leaf of both devices (was 46). From the 16-warp readers with c fixed by one-warp cells: the replay's readers under 46 are short by 4.7 / 4.6 (q.lds.n16.w16), 5.1 / 4.6 (q.shfli.n16.w16) and, with C1, about 8.0 / 6.3 (q.ldg.n16.w16); a reader moves one cycle per entry of the bound (sm_toy.py); mean 5.6. One bound for all kinds; per-kind bounds are not introduced."
+ },
+ "criteria": {
+  "K1 (steady readers)": "For q.ldg.n16, q.fwd.stg0_ldg2, q.fwd.stg4_ldg2, q.alt.lds_ldg.n24 on both devices: the replay's steady reader wait (64- and 256-iteration replays, steady.py) within 2.0 of the hardware's (pass a).",
+  "K2 (64-iteration readers)": "For the one-warp LDG cells of v3's K1 list (q.fwd.stg0_ldg2, q.ldg.n16, q.ldg.n24, q.fwd.stg4_ldg2, q.fwd.stg8_ldg2, q.alt.lds_ldg.n24, q.alt.stg_ldg.n24, q.seq.stg6_ldg18, mem_basic m2.ldg.n4, m2.ldg.n8, m2.ldgd.n4, m2.ldgd.n8): replay minus hardware between -7.0 and +1.5 (the replay's first iteration is 2.5-5 short, see evidence; it must not be long).",
+  "K3 (16-warp readers)": "reader wait within 3.5 of the hardware's in q.lds.n16.w16, q.shfli.n16.w16, q.ldg.n16.w16 on both devices; the SM rates of warp_queue v2's K1 still pass in every cell that passed in the v3 replay.",
+  "K4 (no harm)": "(pc, class) error of no cell of any source rises by more than 0.05 against the v3 replay (warp_queue-r5); against the v1 replay (warp_queue-r1) the four B300 cells raised by v2 (m2.ldg.n4, m2.ldg.n8.w16, m2.ldgd.n4, q.fwd.stg4_ldg2.s) are within 0.05 of their v1 value.",
+  "gates and runs": "seven gates, replay of the fifteen sources plus queue_basic-v3, full GPU 500 x 2 with comparison; full-GPU numbers reported, not criteria."
+ },
+ "known misses (before data)": "cold-start path (first iteration); q.sts.e3.w16; q.sts.n12.w8; wide-slot loads (q.lds128, q.ldg128, q.ldsx); two-line and wide global stores; q.ldgfar.",
+ "expectation_not_criterion": "Full GPU: L1-served global loads return 8-10 cycles earlier than under v3; the long_scoreboard deficit of the replay grows further (it was -2.85 / -1.56 points) -- that deficit is then not a property of resident-load latency and belongs to the fills (cold / L2 / DRAM paths) or to stage 3.",
+ "not_allowed": "No value from another machine or the literature; no full-GPU case or error used to choose a rule or a value; a failed criterion is recorded as failed.",
+ "addenda": []
+}

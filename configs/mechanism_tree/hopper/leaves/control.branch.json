@@ -14,13 +14,31 @@
       ],
       [
        1,
-       6.050927109974424
+       10.0
       ]
      ]
     },
     "sources": [
      "control_branch.structural.not_taken_fallthrough",
-     "control_branch.h100.r2"
+     "branch_basic.h100.v1"
+    ]
+   },
+   "fallthrough_hold_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "placement.h100.v1"
+    ]
+   },
+   "resolve_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 3
+    },
+    "sources": [
+     "placement.h100.v1"
     ]
    }
   }

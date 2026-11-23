@@ -13,7 +13,8 @@ the model.
 
 ```bash
 cyclescope-engine simulate --job job.bin --out result.bin \
-    [--journal j.bin] [--wait-ledger w.bin] [--progress]
+    [--journal j.bin] [--wait-ledger w.bin] [--stall-ledger stall.tsv]
+    [--progress]
 cyclescope-engine validate --job job.bin   # structural check
 cyclescope-engine info     --job job.bin   # segment/instance statistics
 ```
@@ -46,6 +47,14 @@ A short tour; each item is one or two lines, the full picture is in
   captured placement; later ones enter as slots free up.
 - **Instruction fetch**: code is served from per-SM instruction caches
   with prefetch, empty at the start of a launch.
+- **Per-warp queue** (`instruction.warp_queue`): an issued STS, LDS,
+  SHFL, LDG or STG is an entry of its warp's queue until a serial
+  release server frees it; a warp at the queue's depth limit cannot
+  issue.
+- **Kernel boundary**: `cycles` is the largest count of active cycles
+  of any SM — the union of its warps' residency intervals
+  [entry, done); the former last-completion-plus-envelope value is
+  telemetry `last_completion_cycle`.
 - **Architecture modules**: warpgroups and WGMMA on Hopper, UMMA,
   tensor memory and CLC on Blackwell, behind one interface.
 
@@ -72,7 +81,45 @@ Counter names are the `SyncTele` / `EngineTele` enums in
 `cpp/core/simulator.hpp` (group 4 order is fixed in
 `cpp/core/simulator.cpp`).
 
-## 4. Failures
+## 4. Stall ledger
+
+`--stall-ledger <path>` writes a tab-separated per-PC stall ledger
+(schema `cyclescope.stall-ledger.v1`). It is statistics-only: a run
+with the option produces a byte-identical `result.bin` and journal,
+and no timing decision reads ledger state.
+
+```
+#schema	cyclescope.stall-ledger.v1
+#warps	<warps that became resident>
+#cycles	<kernel cycles, the same value the result reports>
+residency	<code address hex>	<operation_class>	<reason>	<warp_cycles>	<events>
+transition	<from code address hex>	<to code address hex>	<count>
+```
+
+Every cycle a resident warp is evaluated for issue is charged to
+exactly one `(code address of its next instruction, reason)`; only
+the issue cycle itself is charged `issued`, and cycles before the
+warp is resident are `dispatch`. Cycles in which a warp is ready and
+waits only because its SMSP's issue slot went to another warp are
+`issue_slot`. Reasons are `<site>[:<detail>]` assigned at the verdict
+site: `barrier:<op>[:<detail>][:read]` (a wait on a producer's
+dependency barrier), `unit:<name>` / `unit_outbid:<name>` (unit names
+of `configs/mechanism_tree/common/resources.json`), `semantic:<kind>`,
+`suspended:<kind>`, `arch:<module rule>`, `warp_queue:mio` /
+`warp_queue:lg` (the per-warp queue), the control floors
+`control:branch` / `control:yield` / `control:bsync`, and one site
+name per remaining verdict site (`fetch`, `cta_barrier`,
+`cluster_barrier`, `control_floor`, `issue_slot`, `exit_branch`,
+`exit_drain`, `other:<site>`, …). `transition` rows count, per warp,
+each pair of consecutively issued instructions (sequential
+fall-through included).
+
+Per-warp conservation:
+
+    resident_cycles == (last_issue_cycle - first_resident_cycle + 1)
+                       + exit_drain_cycles
+
+## 5. Failures
 
 Two data failure classes, the same as the rest of the pipeline:
 `missing_fact:<fact> (<where>)` when the job lacks a fact the model
@@ -81,7 +128,7 @@ cover it. A run that cannot progress stops with
 `unsupported:engine:deadlock` and a dump of the stalled warps and
 synchronization objects.
 
-## 5. Benchmarking the engine
+## 6. Benchmarking the engine
 
 ```bash
 OUT=<dir> [SIZES="S L"] [PROFILE=1] bash scripts/pipeline/engine_perf.sh
@@ -100,7 +147,7 @@ Hashes the result and journal binaries of every `*.job` fixture;
 `--compare` diffs two such work directories table by table (every
 table must match except WAIT).
 
-## 6. Debug switches
+## 7. Debug switches
 
 `CYCLESCOPE_DEBUG_*` environment variables print diagnostics to
 stderr; each is off unless set:

@@ -673,7 +673,7 @@ int main(int argc, char **argv) {
         t_desc = 0, t_ops = 0, t_opsx = 0;
     std::size_t t_addr = 0;
     // pass 1: per-warp folded positions + control-flow patches
-    std::vector<std::pair<std::set<int>, int>> foldeds;
+    std::vector<FoldResult> foldeds;
     std::vector<Patches> warp_patches;
     std::vector<Patches *> patch_ptrs;
     const StaticOf static_of = [&](const DynRecord &r) {
@@ -689,8 +689,8 @@ int main(int argc, char **argv) {
     };
     for (const auto &w : warps) {
       foldeds.push_back(fold_warp(w.recs, static_of));
-      dropped_polls += foldeds.back().second;
-      dropped_l += foldeds.back().second;
+      dropped_polls += foldeds.back().dropped;
+      dropped_l += foldeds.back().dropped;
       warp_patches.push_back(flow_patches(
           w.recs, static_of, by_pc,
           std::uint64_t(w.x) << 40 | std::uint64_t(w.y) << 20 |
@@ -710,7 +710,7 @@ int main(int argc, char **argv) {
           if (r.has_after_ready) ++ar;
         }
         std::fprintf(stderr, "warp %u recs=%zu phasechk=%d after=%d folded=%zu\n",
-                     w.warp, w.recs.size(), ph, ar, folded.first.size());
+                     w.warp, w.recs.size(), ph, ar, folded.folded.size());
       }
       WarpRow wr;
       wr.cta_linear =
@@ -728,7 +728,7 @@ int main(int argc, char **argv) {
       const int crank = rank[{int(w.x), int(w.y), int(w.z)}];
       int pos = 0;
       for (const auto &r : w.recs) {
-        if (folded.first.count(pos++)) continue;
+        if (folded.folded.count(pos++)) continue;
         const StaticRow *srow = row_of(r.function_id, r.idx);
         if (!srow) continue;   // missing static_row
         // patch position key uses 0-based record pos before fold-skip
@@ -745,8 +745,13 @@ int main(int argc, char **argv) {
               r, *srow, cap_rules, tms, missing_l,
               unsupported_l, ranks, ops ? &*ops : nullptr);
           const auto pit = patches.find(pos - 1);
-          if (pit != patches.end() && !ops)
+          const auto wo = folded.wait_origin.find(pos - 1);
+          if ((pit != patches.end() || wo != folded.wait_origin.end()) &&
+              !ops)
             ops = SemanticOperands{};
+          if (wo != folded.wait_origin.end())
+            uput_wrap(*ops, "wait_origin",
+                      static_cast<std::int64_t>(wo->second));
           if (pit != patches.end()) {
             for (const auto &[k, v, is_int] : pit->second.entries) {
               if (!k.empty() && k[0] == '_') continue;

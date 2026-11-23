@@ -1,0 +1,312 @@
+{
+ "schema_version": "cyclescope.stall-class-mapping.v1",
+ "note": "Engine stall-ledger reasons -> ncu warp-stall classes. Ordered; the first matching rule wins. Every rule is a hypothesis written from the ncu class descriptions until a single-stall kernel of tools/microbench decides it (evidence becomes `calibrated`, source names the protocol). No rule is tuned on a suite case.",
+ "issue_pc_shift": {
+  "instructions": 1,
+  "evidence": "calibrated",
+  "source": "placement v1 rule S (55 taken back-edges per device: selected 1.04 / 1.03 on the fall-through pc of a taken branch, 0.00 on its target: the sample of an issue cycle carries the pc the warp holds next)"
+ },
+ "excluded": [
+  "^dispatch$"
+ ],
+ "rules": [
+  {
+   "reason": "^issued$",
+   "class": "selected",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^fetch",
+   "class": "no_instruction",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^exit_branch",
+   "class": "branch_resolving",
+   "evidence": "calibrated",
+   "source": "warp_issue v1 (families a / b, both devices: the counter gives branch_resolving = 8 cycles per warp after EXIT in every cell)"
+  },
+  {
+   "reason": "^exit_drain",
+   "class": "drain",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^(suspended|semantic):sleep",
+   "class": "sleeping",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^gsync",
+   "class": "membar",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^cta_barrier",
+   "class": "barrier",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v2 (35 usable rows, barrier 0.81 of the overlap)"
+  },
+  {
+   "reason": "^cluster_barrier",
+   "class": "barrier",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^(semantic|suspended):(cta|cluster)_barrier",
+   "class": "barrier",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^scoreboard_slot",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v1 (5 usable rows, long_scoreboard 0.85 of the overlap)"
+  },
+  {
+   "reason": "^async_group_wait",
+   "class": "long_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^(semantic|suspended|mbarrier_deferred)",
+   "class": "long_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^arch:warpgroup_wait",
+   "class": "barrier",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v2 (17 usable rows, barrier 0.76 of the overlap; the hypothesis was gmma, a class the per-pc samples never report)"
+  },
+  {
+   "reason": "^arch",
+   "class": "gmma",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^constant_hold",
+   "class": "imc_miss",
+   "evidence": "calibrated",
+   "source": "kernel_start.h100.v2 (24 probe rows twice: the wait on a held uniform constant load is imc_miss)"
+  },
+  {
+   "reason": "^(store_issue_interval|store_buffer)",
+   "class": "lg_throttle",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^memory_queue",
+   "class": "mio_throttle",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^mio_inflight",
+   "class": "mio_throttle",
+   "evidence": "calibrated",
+   "source": "mio_basic v3 M3 (the in-flight group's wait at issue is the hardware's mio_throttle on the producers, K3)"
+  },
+  {
+   "reason": "^issue_slot",
+   "class": "not_selected",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit_outbid:",
+   "class": "not_selected",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:issue_frontend",
+   "class": "not_selected",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:(lsu|atomic|async_copy)",
+   "class": "lg_throttle",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:(tma|shfl)",
+   "class": "mio_throttle",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:fence",
+   "class": "long_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:membar",
+   "class": "membar",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^unit:tensor",
+   "class": "gmma",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^warp_queue:lg",
+   "class": "lg_throttle",
+   "evidence": "calibrated",
+   "source": "warp_queue v1 (queue_basic v1 / v2, both devices)"
+  },
+  {
+   "reason": "^warp_queue:mio",
+   "class": "mio_throttle",
+   "evidence": "calibrated",
+   "source": "warp_queue v1 (queue_basic v1 / v2, both devices)"
+  },
+  {
+   "reason": "^unit:xu_smsp",
+   "operation": "^MUFU(\\.|$)",
+   "class": "mio_throttle",
+   "evidence": "calibrated",
+   "source": "mufu_class v1 (plan_pilot v1 and queue_basic v1, both devices: the wait of a MUFU on its unit is mio_throttle on the MUFU's pc, math_pipe_throttle 0; the other instructions of the unit have no probe and keep the generic rule)"
+  },
+  {
+   "reason": "^unit:",
+   "class": "math_pipe_throttle",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^(operand_collector|sm_issue_block)",
+   "class": "dispatch_stall",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^yield$",
+   "class": "misc",
+   "evidence": "calibrated",
+   "source": "warp_issue v1 / v2 (d.nop.s1.y0 at one and two warps per SMSP and one warp per SM, both devices: the skipped cycle is class misc, 0.99 per NOP)"
+  },
+  {
+   "reason": "^control:branch_fallthrough",
+   "class": "wait",
+   "evidence": "calibrated",
+   "source": "placement v1 rule T (55 taken back-edges per device in sync_basic / branch_basic / mio_basic one-warp cells: wait 4.11 / 4.04 on the fall-through pc of a taken branch)"
+  },
+  {
+   "reason": "^control:branch_refetch",
+   "class": "no_instruction",
+   "evidence": "calibrated",
+   "source": "placement v1 rule T (the same branches: no_instruction 2.00 / 2.04 on the target behind branch_resolving 3.00 / 3.01)"
+  },
+  {
+   "reason": "^control:membar:MEMBAR\\.SC\\.GPU",
+   "class": "membar",
+   "evidence": "calibrated",
+   "source": "placement v1 rule M (s.membar_gl, both devices: membar 535 of 541 cycles on the pc behind MEMBAR.SC.GPU)"
+  },
+  {
+   "reason": "^control:membar:MEMBAR\\.ALL\\.CTA",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "placement v1 rule M (placement_basic v1 fence cells, both devices: beyond the MEMBAR's stall the FENCE's pc carries long_scoreboard, 1.4-7.3 by the stores in front)"
+  },
+  {
+   "reason": "^control:fence:FENCE\\.VIEW\\.ASYNC",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "placement v1 rule M (s.fence_bar, both devices: long_scoreboard 17.8-21.7 on the BAR.SYNC behind the fence)"
+  },
+  {
+   "reason": "^control:membar:MEMBAR\\.SC\\.CTA",
+   "class": "wait",
+   "evidence": "calibrated",
+   "source": "placement v1 rule M (s.membar_cta, both devices: the 11 cycles behind MEMBAR.SC.CTA are class wait, no membar sample)"
+  },
+  {
+   "reason": "^control:(membar|fence)",
+   "class": "membar",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^control:(branch|yield|bsync)",
+   "class": "branch_resolving",
+   "evidence": "calibrated",
+   "source": "branch_basic v1 per-pc tables, both devices: beyond the stall field the hardware samples the time behind a YIELD as branch_resolving (40.9 of 45 cycles), behind a BSYNC as branch_resolving (7.7-8.2 of 8) and behind a taken branch as branch_resolving + no_instruction (2.8 + 1.6-2.0 of 5); the stall-field part stays control_floor -> wait"
+  },
+  {
+   "reason": "^control_floor",
+   "class": "wait",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^barrier:(LDC|LDCU)(?=[.:]|$)",
+   "class": "short_scoreboard",
+   "evidence": "calibrated",
+   "source": "warp_issue v1 (family c, both devices: the wait at the reader of a barrier-writing LDC / LDCU is short_scoreboard, 0.97+ of the samples at the reader)"
+  },
+  {
+   "reason": "^barrier:(LDS|LDSM|ATOMS|LDTM|ULDC|S2R|CS2R|S2UR|R2UR|SHFL|MUFU|UTC\\w*)(?=[.:]|$)",
+   "class": "short_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^barrier:LDG(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v1 (11 usable rows, long_scoreboard 0.90 of the overlap); same wait, named by its barrier since issue_rules v1"
+  },
+  {
+   "reason": "^barrier:LDL(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v2 (6 usable rows, long_scoreboard 0.94 of the overlap); same wait, named by its barrier since issue_rules v1"
+  },
+  {
+   "reason": "^barrier:(LDG|LDL|LD|LDGSTS|ATOM\\w*|RED\\w*|TLD\\w*|TEX\\w*|SYNCS|UTMA\\w*|UBLK\\w*)(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^barrier:",
+   "class": "short_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^reg:(ULDC|LDC|LDCU)([.][^:]*)?:miss",
+   "class": "imc_miss",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^reg:(LDS|LDSM|ATOMS|LDTM|ULDC|LDC|LDCU|S2R|CS2R|S2UR|R2UR|SHFL|MUFU|UTC\\w*)(?=[.:]|$)",
+   "class": "short_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^reg:LDG(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v1 (11 usable rows, long_scoreboard 0.90 of the overlap)"
+  },
+  {
+   "reason": "^reg:LDL(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "calibrated",
+   "source": "stall_class_mapping.h100.v2 (6 usable rows, long_scoreboard 0.94 of the overlap)"
+  },
+  {
+   "reason": "^reg:(LDG|LDL|LD|LDGSTS|ATOM\\w*|RED\\w*|TLD\\w*|TEX\\w*|SYNCS|UTMA\\w*|UBLK\\w*)(?=[.:]|$)",
+   "class": "long_scoreboard",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^reg:",
+   "class": "wait",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "^coresident_penalty",
+   "class": "wait",
+   "evidence": "hypothesis"
+  },
+  {
+   "reason": "",
+   "class": "misc",
+   "evidence": "hypothesis"
+  }
+ ]
+}

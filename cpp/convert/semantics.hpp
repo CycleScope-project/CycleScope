@@ -65,7 +65,8 @@ constexpr int SEMA_FLAG_AFTER_READY = 0x1, SEMA_FLAG_ALSO_ARRIVES = 0x2,
               SEMA_FLAG_GROUP_OPENER = 0x8, SEMA_FLAG_GROUP_COMMIT = 0x10,
               SEMA_FLAG_STAT = 0x20, SEMA_FLAG_SYNCS = 0x40,
               SEMA_FLAG_CTA_PAIR = 0x80,
-              SEMA_FLAG_COMPLETE_TX = 0x100;
+              SEMA_FLAG_COMPLETE_TX = 0x100,
+              SEMA_FLAG_WAIT_ORIGIN = 0x200;
 constexpr int DV_PUBLISH = 1, DV_STORE = 2, DV_ERROR_CHECK = 3,
               DV_ACQUIRE = 4, DV_PROXY_FENCE = 5;
 
@@ -79,6 +80,7 @@ struct SemRow {
   std::map<std::string, std::uint64_t> fields;
   std::vector<std::uint32_t> object_list;   // empty = none
   std::vector<std::array<std::uint32_t, 3>> split;
+  std::uint64_t earliest_issue = 0;
 };
 
 // dynamic-operand view (what decoders read)

@@ -1091,10 +1091,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 13.0
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.b300.v1"
     ]
    },
    "issue_group_resource": {
@@ -1145,10 +1145,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 13.0
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.b300.v1"
     ]
    }
   }
@@ -1560,10 +1560,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 2
     },
     "sources": [
-     "placeholder.p0"
+     "mio_basic.b300.v1"
     ]
    },
    "issue_group_resource": {
@@ -1578,11 +1578,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 0
+     "value": 2.0
     },
     "sources": [
-     "placeholder.p0",
-     "service_latency.b300.v5r2.unrealised"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -1615,10 +1614,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 2
     },
     "sources": [
-     "placeholder.p0"
+     "mio_basic.b300.v1"
     ]
    }
   }
@@ -5497,6 +5496,43 @@
     "sources": [
      "structural.service_owner"
     ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 2
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v2"
+    ]
+   },
+   "warp_inflight_group": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.b300.v1",
+     "mio_basic.b300.v2"
+    ]
    }
   }
  },
@@ -5563,6 +5599,34 @@
     },
     "sources": [
      "structural.service_owner"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "warp_inflight_group": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.b300.v1",
+     "mio_basic.b300.v2"
     ]
    }
   }
@@ -5898,6 +5962,33 @@
     },
     "sources": [
      "shared.b300.r2b"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 1.0
+    },
+    "sources": [
+     "mio_basic.b300.v2"
     ]
    }
   }
@@ -7549,10 +7640,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 0
+     "value": 2.0
     },
     "sources": [
-     "placeholder.p0"
+     "exec_units.b300.v1"
     ]
    },
    "max_inflight": {
@@ -7592,15 +7683,6 @@
      "mechtree.w3.instruction.service.UFLO.result_latency",
      "mechtree.w3.instruction.service.ULEA.result_latency",
      "mechtree.w3.instruction.service.UPOPC.result_latency"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.b300.r2"
     ]
    }
   }
@@ -7746,15 +7828,6 @@
      "mechtree.w3.instruction.service.PRMT.result_latency",
      "mechtree.w3.instruction.service.SHF.result_latency",
      "service_latency.b300.r3q"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.b300.r2"
     ]
    }
   }
@@ -10467,10 +10540,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 0
+     "value": 2.0
     },
     "sources": [
-     "placeholder.p0"
+     "exec_units.b300.v1"
     ]
    },
    "max_inflight": {
@@ -12027,7 +12100,7 @@
      "value": 0
     },
     "sources": [
-     "placeholder.p0"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -12066,6 +12139,33 @@
      "mechtree.w3.instruction.service.S2R.result_latency",
      "service_latency.b300.r3q"
     ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v2"
+    ]
    }
   }
  },
@@ -12096,7 +12196,7 @@
      "value": 0
     },
     "sources": [
-     "placeholder.p0"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -12134,6 +12234,43 @@
     "sources": [
      "mechtree.w3.instruction.service.S2UR.result_latency",
      "service_latency.b300.r3q"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 3
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v2"
+    ]
+   },
+   "warp_inflight_group": {
+    "model": {
+     "kind": "constant",
+     "value": 4
+    },
+    "sources": [
+     "mio_basic.b300.v1",
+     "mio_basic.b300.v2"
     ]
    }
   }
@@ -12456,12 +12593,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 3.985665457589286
+     "value": 0
     },
     "sources": [
-     "service_latency.b300.r3q",
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -12503,6 +12638,33 @@
      "service_latency.b300.r3q",
      "service_latency.b300.v3r4",
      "service_latency.b300.v3r4"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 2.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "sm_service_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 1.0
+    },
+    "sources": [
+     "mio_basic.b300.v2"
     ]
    }
   }
@@ -12612,11 +12774,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 3.9906877790178577
+     "value": 0
     },
     "sources": [
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -12656,6 +12817,24 @@
      "service_latency.b300.r3q",
      "service_latency.b300.v3r4",
      "service_latency.b300.v3r4"
+    ]
+   },
+   "return_chain": {
+    "model": {
+     "kind": "constant",
+     "value": 1
+    },
+    "sources": [
+     "mio_basic.b300.v1"
+    ]
+   },
+   "return_interval_cycles": {
+    "model": {
+     "kind": "constant",
+     "value": 4.0
+    },
+    "sources": [
+     "mio_basic.b300.v1"
     ]
    }
   }
@@ -15850,12 +16029,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2.3750000000000004
+     "value": 2.0
     },
     "sources": [
-     "mechtree.w5.uniform",
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "exec_units.b300.v1"
     ]
    },
    "max_inflight": {
@@ -17536,10 +17713,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 0
+     "value": 2.0
     },
     "sources": [
-     "placeholder.p0"
+     "exec_units.b300.v1"
     ]
    },
    "max_inflight": {
@@ -17563,7 +17740,7 @@
    "resource": {
     "model": {
      "kind": "constant",
-     "value": "alu_smsp"
+     "value": "fmaheavy_smsp"
     },
     "sources": [
      "structural.class_resource"
@@ -17576,15 +17753,6 @@
     },
     "sources": [
      "placeholder.p0"
-    ]
-   },
-   "single_source_issue_interval_cycles": {
-    "model": {
-     "kind": "constant",
-     "value": 1.0
-    },
-    "sources": [
-     "alu_forms.b300.r2"
     ]
    }
   }
@@ -17812,11 +17980,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 13.000000000000002
+     "value": 2
     },
     "sources": [
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "mio_basic.b300.v1"
     ]
    },
    "issue_group_resource": {
@@ -17831,12 +17998,10 @@
    "issue_interval_cycles": {
     "model": {
      "kind": "constant",
-     "value": 2.0270647321428577
+     "value": 2.0
     },
     "sources": [
-     "mechtree.w5.alu4",
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "mio_basic.b300.v1"
     ]
    },
    "max_inflight": {
@@ -17860,7 +18025,7 @@
    "resource": {
     "model": {
      "kind": "constant",
-     "value": "shfl_smsp"
+     "value": "alu_smsp"
     },
     "sources": [
      "structural.class_resource"
@@ -17869,11 +18034,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 13.000000000000002
+     "value": 2
     },
     "sources": [
-     "service_latency.b300.v3r4",
-     "service_latency.b300.v3r4"
+     "mio_basic.b300.v1"
     ]
    }
   }
@@ -18151,10 +18315,10 @@
    "completion_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 49.61
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.b300.v1"
     ]
    },
    "issue_group_resource": {
@@ -18205,10 +18369,10 @@
    "result_latency_cycles": {
     "model": {
      "kind": "constant",
-     "value": 1
+     "value": 49.61
     },
     "sources": [
-     "structural.service_owner"
+     "branch_basic.b300.v1"
     ]
    }
   }

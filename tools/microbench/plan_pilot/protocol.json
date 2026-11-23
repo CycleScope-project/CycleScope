@@ -1,0 +1,42 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "plan_pilot",
+ "version": 1,
+ "frozen_before_gpu": true,
+ "date": "2026-11-19",
+ "kind": "planning pilot: which hardware wait classes sit on instruction kinds that no hand-written-PTX cell has covered (MUFU, float and integer multiply-add runs, uniform adds) alone and when an SM is saturated; installs nothing and decides no rule, leaf or mapping; its readings only order the work of the attribution plan and may be cited as data seen by later survey protocols",
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "Read-only analysis of full-mio4 by the mnemonic of the pc a warp is parked on (points of residency, hardware / replay): MUFU carries mio_throttle 0.87 / 0.00 and wait 1.07 / 0.20 on H100 (0.19 / 0.00 and 0.84 / 0.16 on B300) where the replay books unit:xu_smsp -> math_pipe_throttle 1.44 (0.65); H100 dispatch_stall 2.51 / 0.29 sits on runs of FFMA / FMUL / FADD / FMNMX; the replay's math_pipe_throttle on uniform instructions is 1.18 against about 0.2. Existing cells: saturated S2R / LDS / SHFL runs put mio_throttle on the producers on hardware (m.s2r.n16.w32: 715 of 1007 cycles per iteration) where the replay puts everything on the reader.",
+ "data_seen_before_freezing": [
+  "The full-mio4 comparison tables and the per-mnemonic aggregation above (~/tmp/mechver-look/class_by_mnemonic.*.json).",
+  "mio_basic v1-v4 cells and replays (mio_basic-v4r1), exec_units and warp_issue addenda (one warp per SMSP: VIADD / IMAD / LOP3 / SHF 2.0 cycles apart with math_pipe_throttle 0.98 per instruction; FADD / FMUL / FFMA 1.0), mem_basic v1 H100 run (STS and LDG / STG runs at 16 warps: mio_throttle on STS, lg_throttle on LDG / STG).",
+  "No cell with MUFU, no float or uniform run at more than one warp per SMSP."
+ ],
+ "probe": {
+  "chain": "As mio_basic: frame m.loop.ptx, entry m_loop, plans by gen_m.py (new producer kinds below), ptxas -O3 -> sass_patch -> nvdisasm loop gate -> ptx_runner; cells in sync_basic/cells.tsv; build dir $CYCLESCOPE_ARTIFACT_ROOT/microbench/plan_pilot/<device>/build, run root $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/plan_pilot/<device>; direct clocks, capture, two reference passes (counters + per-pc samples), replay with build 370bf919. m.nop of every shape used runs in the same root.",
+  "producers": {
+   "mufu": "MUFU.RCP Rd, Rtid: control word as ptxas emits it for rcp.approx in a donor (if it raises a dependency barrier: producer pattern of gen_m.py with the reader behind the last producer; otherwise the no-reader pattern below).",
+   "ffma": "FFMA Rd, Rtid, Rtid, Rtid; fadd: FADD Rd, Rtid, Rtid; imad: IMAD Rd, Rtid, Rtid, RZ; uiadd3: UIADD3 URd, <the frame's bound UR>, 0x1, URZ. No reader: stall 1, yield 1, no barrier written or waited for, distinct dead destinations; the slot behind the last producer keeps its NOP."
+  },
+  "cells": "m.mufu.n1, .n4, .n8, .n16, .n8.w16, .n16.w32; m.mix.mufu_s2r.n8, m.mix.mufu_lds.n8 (4 + 4 alternating); m.ffma.n8, .n16.w16, .n16.w32; m.fadd.n16.w32; m.imad.n8, .n16.w16, .n16.w32; m.uiadd3.n8, .n16.w16, .n16.w32; m.nop, m.nop.w16, m.nop.w32.",
+  "unrealised": "A producer form that cannot be placed is recorded in tools/microbench/plan_pilot/unrealised.txt before the run and its cells are left out."
+ },
+ "readings": "Per cell and device: extended sample total per iteration and T = total - m.nop of the same shape + 3 x replaced slots; per-pc hardware classes on the producers and behind them against the replay's reasons.",
+ "questions_before_data": {
+  "P1": "MUFU alone: first latency and spacing of results (2 apart on the S2R / LDS chain, or its own); in the mixes: one chain with S2R / LDS or independent.",
+  "P2": "MUFU saturated (16 and 32 warps): which class on the producers (mio_throttle as for S2R, math_pipe_throttle, wait), and the per-SM rate.",
+  "P3": "FFMA / FADD at 16 and 32 warps per SM: does dispatch_stall appear on H100 and not on B300, on which pcs, and what does the replay book there.",
+  "P4": "IMAD and UIADD3 runs: math_pipe_throttle per instruction at one warp and the class split (math_pipe_throttle / not_selected / wait) at 16 and 32 warps against the replay's unit / issue_slot reasons."
+ },
+ "install": "Nothing.",
+ "not_allowed": "No rule, leaf or mapping change from this pilot; no cell dropped after its data is seen.",
+ "addenda": [
+  {
+   "when": "2026-11-19, run plan_pilot-r2 (clone stall-attribution-34, commit 0bfd3875; jobs mechver-pilot2-h100 / -b300; roots $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/plan_pilot-r2/{h100,b300}; replay build 370bf919). The first roots plan_pilot/{h100,b300} are void (VOID.txt there: no suite rows for the new cells, and the H100 pod image could not run ptx_runner). 21 / 21 cells per device: direct ok, captured, two reference passes rc 0; H100 replayed, B300 replay still running when this was written (its hardware readings are from reference-a)",
+   "text": "Per-warp cycles per iteration from the per-pc samples (reference-a) and the replay ledger. P1 / P2 (MUFU): the wait is at issue on the MUFU itself and its class is mio_throttle on both devices, never math_pipe_throttle. One warp: the first two (H100) / three (B300) MUFU of a run issue one cycle apart, every later one waits 6.8-7.3 cycles (the third on H100 11.6, the fourth on B300 8.1); the reader behind the last waits 19.1 (H100) / 29.9 (B300) as short_scoreboard. Loop totals hardware / replay on H100: m.mufu.n8 173.3 / 174.8, .n16 208.1 / 208.9 -- the replay's spacing (unit:xu_smsp 7.25 per MUFU from the second on, reader barrier:MUFU 16) gives the right time and is mapped to the wrong class. Mix with S2R: the S2R issue freely between the MUFU and are not throttled; the MUFU keep their own spacing (independent of the S2R / LDS chain). Saturated: m.mufu.n8.w16 256.4 / 272.3 and m.mufu.n16.w32 1006.7 / 1058.7 (hardware / replay, H100; B300 hardware 998.7): 512 MUFU per SM in about 1000 cycles = 2.0 cycles per MUFU per SM = four units of 8 cycles; hardware spreads mio_throttle evenly over the producers (39-44 each at 32 warps, 212 on the first) with not_selected about 5 each, the replay piles 700 (unit) + 104 (issue_slot) on the first MUFU and 7.2 on the others. P3 (FFMA / FADD): one warp 1.0 cycle per instruction without a wait on both sides; at 16 and 32 warps no dispatch_stall on either device (the pilot's hypothesis that unit contention of a float run produces H100's dispatch_stall is NOT confirmed: destinations here are dead and operands independent); totals at 32 warps 277.3 / 280.4 (H100). P4 (IMAD, UIADD3): one warp math_pipe_throttle 0.84-1.29 per instruction from the second on = the replay's unit wait of 1.0 (fmaheavy_smsp, uniform_smsp) and the mapping unit -> math_pipe_throttle holds for these kinds; at 32 warps hardware books not_selected and math_pipe_throttle in about equal parts on the producers (first IMAD 13.4 + 12.4, first UIADD3 14.7 + 13.3) where the replay books issue_slot 125-127 + unit 74 on the first producer; totals 297.7 / 323.5 (IMAD) and 303.7 / 327.8 (UIADD3), replay 8 % slow. Scheduler, seen in every 32-warp cell including m.nop.w32 (hardware 19699 cycles, replay 22701): hardware holds the waiting warps on one pc (not_selected 125 of 128 at the second instruction behind the taken loop branch) and lets the running warp go through the body, the replay spreads issue_slot 4-15 over every pc of the body. Nothing is installed from these readings."
+  }
+ ]
+}

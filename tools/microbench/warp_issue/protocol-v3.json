@@ -1,0 +1,52 @@
+{
+ "schema": "cyclescope.microbench-protocol.v1",
+ "name": "warp_issue",
+ "version": 3,
+ "frozen_before_gpu": true,
+ "date": "2026-11-16",
+ "kind": "survey: cells, readings and how they decide between named alternatives; installs nothing",
+ "mechanisms": [
+  "kernel start (spread between SMs)",
+  "execution units (interval between consecutive instructions of an SMSP by kind)",
+  "memory.constant_cache (service of a batch)"
+ ],
+ "devices": [
+  "h100",
+  "b300"
+ ],
+ "why": "Three questions the version 2 readings leave: what spreads the SMs at kernel start (the one-CTA shape contradicts an entry stagger on h100 and agrees with it on b300); whether the 2-cycle interval between two VIADD belongs to the instruction kind (alu_forms measured VIADD alternating with LOP3 at 1 cycle per instruction, the service leaf explains that by the number of register sources); how a batch of constant fills is served (b300 uniform batch of 8 replays at 0.74 of hardware).",
+ "data_seen_before_freezing": [
+  "warp_issue v1 and v2 with all addenda (including the correction of the start reading); constant_paths v1 addendum; the instruction.service leaves of VIADD / LOP3 / LEA / IADD3 / IMAD and their source alu_forms r2."
+ ],
+ "probe": {
+  "chain": "as versions 1 and 2. New in the generator: grids given as an absolute number of CTAs for the start cells; body forms for the unit cells taken from the frame's own instructions where they exist (LOP3.LUT R5, R5, R4, RZ, 0x3c, !PT; IMAD R5, R0, UR4, R5) and from a donor extended with float and shift forms (FADD, FMUL, FFMA, SHF); a form the donor does not yield is recorded as unrealised.",
+  "cells": {
+   "g (start)": "a.empty and h.empty.hc with 1, 2, 4, 8, 16 CTAs, a quarter, a half and all of the SMs (h100 33 / 66 / 132, b300 37 / 74 / 148), 8 warps per CTA.",
+   "u (units), stall 1, one warp per SMSP (.w4) and the base shape": "64 instructions of one kind: u.lop (LOP3 with the register source), u.imad, u.shf, u.fadd, u.fmul, u.ffma; 32 pairs alternating two kinds: u.add_lop, u.add_imad, u.lop_imad, u.add_fadd, u.fadd_ffma. In-place forms are avoided where the value would be lost (each instruction writes a register no instruction of the body reads, except where the frame's form is in place); expected values are checked where the generator can state them and marked unchecked otherwise.",
+   "c (batches)": "c.u0.batch{2,16} and c.v0.batch{2,8,16} (n loads one cycle apart on one barrier, one NOP, n readers), base shape; h100 uniform batches are not repeated (they are serial by the hold)."
+  }
+ },
+ "runner": "as version 2; output $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue-v3/<device>; only the new cells run.",
+ "derivation": {
+  "start": "per cell the eight executions of sm__cycles_active max / avg / min (two passes, launch ids 0-3; executions more than 130 above the cell median are the known start lottery and are listed apart); head clocks per GPC group.",
+  "units": "per-warp body length / 64 at .w4 (cycles per instruction of a lone warp), and at the base shape the holder's and the waiter's windows; stall classes on the body.",
+  "batches": "wait of the first reader against n; per-load fill spacing = (n + wait(n) - first touch) / (n - 1)."
+ },
+ "questions_before_data": {
+  "start": "ST1 entry stagger with a launch-level arrival: max of sm__cycles_active the same for every occupancy, min falling as SMs are added. ST2 serial service above the SM: min the same, max rising with the number of SMs, by a constant step per SM or per GPC. Otherwise the table is reported.",
+  "units": "U1 the interval belongs to the kind: two consecutive instructions of the same kind are 2 cycles apart for the kinds that share VIADD's behaviour and 1 cycle apart for the others, and alternating two kinds costs 1 cycle per instruction when the kinds use different units. U2 it belongs to the number of register sources (the installed reading): u.lop with its register source 2.0, VIADD with an immediate 1.0 — already contradicted for VIADD by version 2; reported per kind either way, with the table kind x kind of cycles per instruction.",
+  "batches": "B1 constant spacing between fills (the installed rule): the per-load spacing is the same within 20 % for n = 2, 4, 8, 16. B2 the spacing grows with n (a queue that fills): reported with the n where it changes and the mio_throttle samples on the loads."
+ },
+ "install": "Nothing is installed from this version.",
+ "not_allowed": "No value from another machine or from the literature; no full-GPU case.",
+ "addenda": [
+  {
+   "when": "2026-11-16, before any data",
+   "text": "Start cells: with only part of the SMs occupied the aggregate sm__cycles_active.min is 0 (idle SMs), so the minimum over occupied SMs is not observable. The alternatives are read from the maximum and from the mean over occupied SMs (sum / SMs that launched a CTA; analysis/start_occupancy.py): ST1 = the maximum is the same for every occupancy and the mean falls as SMs are added; ST2 = the maximum rises with the number of occupied SMs and a lone SM shows the smallest value."
+  },
+  {
+   "when": "2026-11-16, h100 and b300 runs (40 new cells each, two sampling passes, replay with engine build 972fcffb; data $CYCLESCOPE_ARTIFACT_ROOT/stall-attribution/warp_issue-v3/{h100,b300}, tables derive-<device>.txt, windows-<device>.txt) — readings; nothing installed",
+   "text": "All 40 cells built on both devices (0 unrealised), captured, sampled twice, replayed; every value check right. UNITS: U1 on both devices, identical numbers. Cycles per instruction of a lone warp with the code resident (launch 2; launch 0 adds 0.4-0.7 of no_instruction to the 1-cycle rows): 64 of one kind: LOP3 2.03, SHF 2.03, IMAD 2.02, VIADD 2.02 (version 2); FADD, FMUL, FFMA 1.03. Alternating two kinds: VIADD / LOP3 1.05, LOP3 / IMAD 1.03, VIADD / FADD 1.03, FADD / FFMA 1.03, VIADD / IMAD 2.02. So the integer instructions go through units that take one instruction of an SMSP every 2 cycles; VIADD and IMAD are in the same unit, LOP3 in another; the float kinds take one per cycle even when alternating FADD and FFMA. Not measured: SHF against LOP3 and against VIADD, IADD3, ISETP, MOV, the uniform-register kinds. With two warps per SMSP the second warp runs after the first for every kind (the 2-cycle kinds: 130 + 130 cycles one after the other, or 129 for the holder and 255 for the waiter), i.e. the idle cycle of a unit is not given to the other warp. Against the service leaves: resource alu_smsp holds VIADD, LOP3, SHF, IADD3, ISETP, LEA together and IMAD sits alone in fmaheavy_smsp: the grouping is wrong in both directions (VIADD with IMAD measured, VIADD with LOP3 not), and the single-source interval of 1.0 is an artefact of alternating two units. BATCHES: B2 (the installed constant spacing does not hold). Time from the first load's issue until the whole batch is ready (wait of the first reader + the loads' own waits + n): b300 uniform (LDCU) n = 1 / 2 / 4 / 8 / 16: 69 / 67 / 119 / 245 / 498 = max(68, 31.5 n - 7): one line per 31.5 cycles from the first request, nothing before two units; almost no wait at the loads. h100 vector (LDC): 92 / 108 / 173 / 293 / 603: about 45 + 31.5 n up to 8, with the loads beyond the fourth held at issue under mio_throttle (15-50 cycles each: a queue of about four). b300 vector: 100 / 108 / 161 / 254 / 636, same shape (loads beyond the fourth held 14-54). h100 uniform (held at the load): 120-149 per load for 16 loads = 4 x 31.5 with four SMSPs occupied. The same 31.5-cycle unit as the h100 per-SMSP first touch of version 2 appears on both devices and both paths: constant fills look like a serial service of one delivery per 31.5 cycles (per line on b300, per line and SMSP on the h100 uniform path), with a minimum of two units for a lone request. Replay / hardware of the sums: h100 c.v0.batch8 1.16, batch16 1.65; b300 c.u0.batch16 0.67, c.v0.batch16 1.22: the installed intervals (27 / 20.9 / 20.3) are wrong in form. START: neither ST1 nor ST2 as written. sm__cycles_active.max (median of the executions without the start lottery) by occupied SMs: h100 1 / 2 / 4 / 8 / 16 / 33 / 66 / 132 SMs: 332 / 342 / 348 / 341 / 406 / 404 / 407 / 460, mean over occupied SMs 332 / 338 / 338 / 326 / 336 / 336 / 330 / 382. b300 1 / 2 / 4 / 8 / 16 / 37 / 74 / 148: 870 / 537 / 546 / 544 / 818 / 824 / 846 / 882, mean 870 / 530 / 537 / 524 / 637 / 640 / 656 / 689. Placement (head clocks): the first 8 CTAs land in one GPC; from 16 CTAs on all GPCs hold SMs (h100 16 CTAs: 9 in one GPC and 1 in each other; b300: 8 + 4 x 2). h100: up to 8 SMs (one GPC) the maximum does not rise (so SMs of one GPC are not served one after another at a visible cost); with several GPCs occupied the maximum is about 65-75 higher while the mean stays (one or a few SMs are slower); with all SMs occupied the mean rises by 50 and the maximum by 128. b300: a lone SM takes 870, 2-8 SMs in one GPC 540, and with several GPCs occupied the maximum is back at 820-880 with the mean near 640-690 (about half of the SMs slow by 280-330). The b300 pattern is that of two classes of GPC (the dispatch leaf already carries a slow-GPC mask from the refill measurements: 228 on b300, 142 on h100) plus a lone-SM case; not decided, the cells cannot tell which GPC an SM is in across runs. First-instruction spread inside a GPC (head clocks): 3-4 cycles per SM on h100 (8 SMs 26, 12 SMs 42-49, 16-18 SMs 39-60), regular pairs on b300 (two SMs one cycle apart, 3-4 cycles between pairs, some pairs 15-20 later); this spread does not show in sm__cycles_active (8 SMs in one GPC: maximum +9 against one SM), so inside a GPC the SMs enter as far apart as they are served. kernel_boundary v1 (the same wait for every SM after its entry) stays; a version 2 needs a way to tell the GPCs apart (per-GPC clock bases recorded in one process across several launches with different occupancies)."
+  }
+ ]
+}

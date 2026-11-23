@@ -33,6 +33,9 @@ class ArchitectureModule {
                               const InstanceSemantics&) {
     return true;
   }
+  // stall ledger detail of the last instance_ready verdict: which
+  // module rule blocked (nullptr = unnamed); statistics-only
+  virtual const char* stall_detail() const { return nullptr; }
   // every issued instance, after the core commit
   virtual void on_instance_issue(Simulator&, WarpState&,
                                  const InstructionInstance&,

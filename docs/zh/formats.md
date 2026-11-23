@@ -32,10 +32,10 @@ TableDirectory: table_count x TableEntry (32 B)
 | META | 120 | tree_digest[32], program_digest[32], converter_digest[32], cluster_id, cta_count, warp_count u32, instruction_count u64, flags u32 (bit0 model_complete) |
 | CTAS | 56 | cta_index, cta_x/y/z, cluster_rank, cluster_shape_x/y/z, sm_id, peer_sm_id, multicast_mask u32; cta_group, is_pair_leader u8; tmem_columns u16; first_warp, warp_count u32 |
 | WARP | 32 | cta_index, warp_in_cta, warp_slot, smsp u32; first_instance, instance_count u64 |
-| TMPL | 68 | operation_class u32 (STRS 偏移), flags u32, resource u32, issue_group_resource u32; source_begin u64, source_count u32, destination_begin u64, destination_count u32; scoreboard_read/write/wait_mask u8, control u8 (bit0-3 stall, bit4 yield); timing_begin u64, timing_count u32, semantic_kind u32, semantic_u64 u64 |
+| TMPL | 68 | operation_class u32 (STRS 偏移), flags u32（arch 规则的 `instruction_flags`：bit0 memory、1 atomic、2 barrier、3 branch、4 async、5 tensor、6 predicated、7 tmem（Blackwell）、8 clc（Blackwell）、9 DEFER_BLOCKING：opcode 文本带 `DEFER_BLOCKING` 修饰符的 `BAR`，Python 与 C++ 转换器都会置位；operation class 仍为 `BAR`；仅 stall 账本的规则 B 读取）, resource u32, issue_group_resource u32; source_begin u64, source_count u32, destination_begin u64, destination_count u32; scoreboard_read/write/wait_mask u8, control u8 (bit0-3 stall, bit4 yield); timing_begin u64, timing_count u32, semantic_kind u32, semantic_u64 u64 |
 | INST | 16 | template, semantics, memory_access, code_line u32 |
 | REGS | 4 | register u32: bits 0-23 寄存器 id（命名空间：R<n>→n，UR<n>→256+n，P<n>→512+n，UP<n>→768+n，B<n>→1024+n；RZ/URZ/PT/UPT/SR_* 等硬连线或特殊名不发行、不进模板键），bits 24-31 flags（bit0 reuse_served：pc-16 的静态指令在同一操作数槽带 reuse 标志且同名寄存器；bit2 reuse_carrier：本指令自己控制字 reuse_mask 在该源槽的位；bit1 pair：64 位源操作数（`.64`/`.F32x2` 后缀，或 DADD/DMUL/DFMA/DSETP/DMNMX 类，或 FFMA2/FADD2/FMUL2 类中不带 `.F32` 后缀的 token——`.F32` 广播标量不是对）；目的寄存器行 flags=0。源槽序 = 操作数文本去掉目的寄存器与其后的普通谓词目的（PT/UPT/P<n>/UP<n>）后的顺序，非寄存器 token 也占槽位；与 reuse 位逐位对应） |
-| SEMA | 60 | kind u16, flags u16, earliest_issue u64, field[6] u64 (§5) |
+| SEMA | 60 | kind u16, flags u16, earliest_issue u64, field[6] u64 (§5)；mbarrier_wait：flags 0x200 = wait origin，此时 `earliest_issue` 存该幸存轮询所代表轮询序列首个 waiter 的绝对代码地址（代码地址表空间；可选 uniform 操作数事实 `wait_origin` 由轮询折叠在首个被折叠轮询地址与幸存轮询不同的时候写入）；引擎只为 stall 账本读取它；没有该事实即无 origin，facts 标记不变 |
 | MACC | 48 | sector_begin u64, sector_count u32, flags u32 (低 3 位 = space: 1 shared, 3 constant; bit5 remote; bits 6-8 = access_kind: 0x0 load / 0x40 store / 0x80 atomic / 0xC0 async_copy / 0x100 async_reduce / 0x140 prefetch; bit9 = 不带 .BYPASS 的 LDGSTS 填 L1)；facts 空间 `shared_cluster` 解析为 1——引用带远端 rank 时置 bit5——`global_system` 为 0，`param` 为 4), sequence u64, shape u64, timing_begin u64, timing_count u32, cache_hint u32 (位域，Blackwell L1/L2 提示) |
 | MSEC | 16 | address u64, byte_mask u32, lane_mask u32（扇区行只在一次访问内按 lane 合并；不同访问即使同扇区也各自有行） |
 | TIME | 40 | kind, selector_a, selector_b, ready_warps u32; selector_c u64; cycles f64; enabled u8, pad[7] |
@@ -196,6 +196,7 @@ USE targets：0 InstructionTemplate, 1 TimingRow, 2 InstanceTiming,
 | 64 | `tensor_result_latency` | `tensor.completion` | 两者 |
 | 65 | `global_store_issue_interval_smsp` | `storage.global.store_issue` | 两者 |
 | 66 | `shared_fence_drain` | `storage.shared.fence` | 两者 |
+| 67 | `warp_queue_entry` | `instruction.warp_queue` | 两者 |
 | 80 | `shared_store_acceptance_smsp` | `storage.shared.acceptance_smsp` | 两者 |
 | 81 | `tma_reduce_store` | `storage.tma.reduce` | 两者 |
 
@@ -203,7 +204,9 @@ USE targets：0 InstructionTemplate, 1 TimingRow, 2 InstanceTiming,
 
 ## 7. 结果 `GSIMRES` / `GSIMJNL` / `GSIMWLG`
 
-RSLT（一行）：cycles, issued, completed, hard_constraint_failures u64,
+RSLT（一行）：cycles（任一 SM 活跃周期数的最大值——其上 warp 驻留区间
+[entry, done) 的并集长度；原先的「末次完成时刻 + envelope」值为
+TELE group 2 `last_completion_cycle`）, issued, completed, hard_constraint_failures u64,
 flags u32。SMSP：sm, smsp u32, first_active, last_active u64。WAIT：
 scope, cause_kind u32, cycles u64。RWAIT：resource, cause_kind u32,
 cycles u64。TELE：group, counter u32, value u64。

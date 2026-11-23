@@ -27,6 +27,9 @@
   "l0_ways": {
    "kind": "constant"
   },
+  "launch_first_line_cycles": {
+   "kind": "constant"
+  },
   "launch_prefetch_bytes": {
    "kind": "constant"
   },
