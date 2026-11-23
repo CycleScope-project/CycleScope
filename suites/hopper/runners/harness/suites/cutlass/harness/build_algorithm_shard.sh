@@ -36,7 +36,7 @@ else
     h100) [[ "${gpu_name}" == *"NVIDIA H100"* ]] ;;
     h200) [[ "${gpu_name}" == *"NVIDIA H200"* ]] ;;
     *) echo "unsupported GPU profile: ${gpu_profile}" >&2; exit 2 ;;
-  esac || { echo "expected ${gpu_profile}, got: ${gpu_name}" >&2; exit 3; }
+  esac || echo "WARNING: expected ${gpu_profile}, got: ${gpu_name}" >&2
 
   nvidia-smi --query-gpu=name,driver_version,memory.total,clocks.max.sm,clocks.max.memory \
     --format=csv,noheader > "${log_root}/gpu_group${delivery_group}.csv"

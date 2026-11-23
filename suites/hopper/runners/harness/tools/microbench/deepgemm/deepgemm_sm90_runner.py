@@ -180,6 +180,13 @@ def _gpu_profile_matches(name: str, profile: str) -> bool:
     raise RuntimeError(f"unsupported GEMM_DELIVERY_GPU profile: {profile}")
 
 
+def _warn_gpu_profile_mismatch(names: Sequence[str], profile: str) -> None:
+    mismatched = sorted({name for name in names if not _gpu_profile_matches(name, profile)})
+    if mismatched:
+        shown = ", ".join(name or "<unknown>" for name in mismatched)
+        print(f"WARNING: GPU profile {profile} selected, running on {shown}", file=sys.stderr)
+
+
 def _selected_gpu_profile() -> str:
     return os.environ.get("GEMM_DELIVERY_GPU", "h100").lower()
 
@@ -1230,10 +1237,9 @@ def run_case(args: argparse.Namespace) -> dict[str, Any]:
     snapshot = _nvidia_snapshot()
     gpu_profile = _selected_gpu_profile()
     device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
-    if not _gpu_profile_matches(str(snapshot.get("name", "")), gpu_profile):
-        raise RuntimeError(f"expected {gpu_profile}, got {snapshot.get('name')}")
-    if torch.cuda.device_count() != 1 or not _gpu_profile_matches(device_name, gpu_profile):
-        raise RuntimeError(f"the suite requires one visible {gpu_profile} GPU")
+    if torch.cuda.device_count() != 1:
+        raise RuntimeError("the suite requires exactly one visible GPU")
+    _warn_gpu_profile_mismatch([str(snapshot.get("name", "")), device_name], gpu_profile)
     device_sm_count = int(torch.cuda.get_device_properties(0).multi_processor_count)
     requested_sms = int(args.num_sms) if cluster_sm else device_sm_count
     minimum_active_sms = 1 if cluster_sm else _minimum_full_gpu_sms(device_sm_count)

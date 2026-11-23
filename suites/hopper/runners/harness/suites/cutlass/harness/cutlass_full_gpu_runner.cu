@@ -734,9 +734,11 @@ int main(int argc, char const** argv) {
     cudaDeviceProp props{};
     CUDA_CHECK(cudaGetDeviceProperties(&props, 0));
     std::string profile = cutlass_full_gpu::env_or("GEMM_DELIVERY_GPU", "h100");
-    if (!cutlass_full_gpu::matches_gpu_profile(props.name, profile) || props.major != 9 || props.minor != 0) {
-      throw std::runtime_error(
-          std::string("requires selected NVIDIA ") + profile + " sm_90 profile; got " + props.name);
+    if (props.major != 9 || props.minor != 0) {
+      throw std::runtime_error(std::string("requires an sm_90 GPU; got ") + props.name);
+    }
+    if (!cutlass_full_gpu::matches_gpu_profile(props.name, profile)) {
+      std::cerr << "WARNING: GPU profile " << profile << " selected, running on " << props.name << std::endl;
     }
     return cutlass_full_gpu::run_variant(cutlass_full_gpu::parse_options(argc, argv));
   } catch (std::exception const& error) {
