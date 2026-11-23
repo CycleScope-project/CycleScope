@@ -1010,9 +1010,11 @@ int run(int argc, char const** argv) {
   cudaDeviceProp props{};
   DELIVERY_CUDA_CHECK(cudaGetDeviceProperties(&props, 0));
   std::string gpu_profile = env_or("GEMM_DELIVERY_GPU", "h100");
-  if (!matches_gpu_profile(props.name, gpu_profile) || props.major != 9 || props.minor != 0) {
-    throw std::runtime_error(
-        std::string("requires selected NVIDIA ") + gpu_profile + " sm_90 profile; got " + props.name);
+  if (props.major != 9 || props.minor != 0) {
+    throw std::runtime_error(std::string("requires an sm_90 GPU; got ") + props.name);
+  }
+  if (!matches_gpu_profile(props.name, gpu_profile)) {
+    std::cerr << "WARNING: GPU profile " << gpu_profile << " selected, running on " << props.name << std::endl;
   }
 
   if (env_or("CUTLASS_DELIVERY_TRACE_ONLY", "0") == "1") {

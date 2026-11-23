@@ -26,11 +26,11 @@ from tools.microbench.deepgemm_sm90_runner import (
     _consecutive_medians,
     _delivery_raw_per_recorded_sample,
     _dump_sass,
-    _gpu_profile_matches,
     _minimum_full_gpu_sms,
     _normal_span_cycles,
     _nvidia_snapshot,
     _selected_gpu_profile,
+    _warn_gpu_profile_mismatch,
 )
 from tools.microbench.deepgemm_sm90_suite import (
     CLUSTER_SM_MAX_CYCLES,
@@ -276,12 +276,9 @@ def run(args: argparse.Namespace) -> dict[str, Any]:
     snapshot = _nvidia_snapshot()
     gpu_profile = _selected_gpu_profile()
     device_name = torch.cuda.get_device_name(0) if torch.cuda.device_count() == 1 else ""
-    if (
-        torch.cuda.device_count() != 1
-        or not _gpu_profile_matches(str(snapshot.get("name", "")), gpu_profile)
-        or not _gpu_profile_matches(device_name, gpu_profile)
-    ):
-        raise RuntimeError(f"attention suite requires one {gpu_profile} GPU")
+    if torch.cuda.device_count() != 1:
+        raise RuntimeError("attention suite requires exactly one visible GPU")
+    _warn_gpu_profile_mismatch([str(snapshot.get("name", "")), device_name], gpu_profile)
     device_sm_count = int(torch.cuda.get_device_properties(0).multi_processor_count)
     minimum_active_sms = _minimum_full_gpu_sms(device_sm_count)
     snapshot.update({

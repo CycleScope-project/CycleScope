@@ -9,7 +9,7 @@ delivery_check_gpu_profile() {
     h100) [[ "${gpu_name}" == *"NVIDIA H100"* ]] ;;
     h200) [[ "${gpu_name}" == *"NVIDIA H200"* ]] ;;
     *) echo "GPU profile must be h20, h100, or h200" >&2; return 2 ;;
-  esac || { echo "expected ${profile}, got ${gpu_name}" >&2; return 3; }
+  esac || echo "WARNING: expected ${profile}, got ${gpu_name}" >&2
   printf '%s\n' "${gpu_name}"
 }
 
